@@ -1,0 +1,84 @@
+{
+  "name": "julianboilen-base-app",
+  "version": "1.1.2",
+  "description": "Audio components for takomaradio.org",
+  "main": "dist/app.bundle.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack  --config webpack.prod.js",
+    "watch": "webpack-dev-server --config webpack.dev.js",
+    "watch:hot": "webpack-dev-server --config webpack.dev.js --hotOnly",
+    "lint": "eslint --ext .js --ext jsx --ext .ts --ext .tsx src",
+    "lint-strict": "eslint --ext .js --ext jsx --ext .ts --ext .tsx --max-warnings 0 src",
+    "lint-fix": "eslint --ext .js --ext jsx --ext .ts --ext .tsx --fix src",
+    "profile": "webpack --profile --json --config webpack.prod.js > dist/stats.json && webpack-bundle-analyzer dist/stats.json"
+  },
+  "keywords": [],
+  "author": "Julian Boilen",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "@types/mapbox-gl": "^0.54.3",
+    "babel-polyfill": "^6.26.0",
+    "core-js": "^3.2.1",
+    "mapbox-gl": "^1.3.1",
+    "normalize.css": "^8.0.1",
+    "npm": "^6.11.3",
+    "prop-types": "^15.6.2",
+    "rc-trigger": "^2.5.4",
+    "react": "^16.4.1",
+    "react-dom": "^16.4.1",
+    "react-hot-loader": "^4.12.13"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.6.0",
+    "@babel/plugin-proposal-class-properties": "^7.5.5",
+    "@babel/preset-env": "^7.6.0",
+    "@babel/preset-react": "^7.0.0",
+    "@types/react": "^16.9.2",
+    "@types/react-dom": "^16.9.0",
+    "@typescript-eslint/eslint-plugin": "^2.3.0",
+    "@typescript-eslint/parser": "^2.3.0",
+    "autoprefixer": "^9.6.1",
+    "babel-eslint": "^10.0.3",
+    "babel-loader": "^8.0.6",
+    "css-loader": "^3.2.0",
+    "eslint": "^6.4.0",
+    "eslint-config-prettier": "^6.3.0",
+    "eslint-config-squarespace": "^1.0.1",
+    "eslint-import-resolver-webpack": "^0.11.1",
+    "eslint-loader": "^3.0.0",
+    "eslint-plugin-prettier": "^3.1.1",
+    "eslint-plugin-react": "^7.10.0",
+    "expose-loader": "^0.7.5",
+    "html-webpack-plugin": "^3.2.0",
+    "husky": "^3.0.5",
+    "less": "^3.10.3",
+    "less-loader": "^5.0.0",
+    "lint-staged": "^9.3.0",
+    "mini-css-extract-plugin": "^0.8.0",
+    "postcss-loader": "^3.0.0",
+    "prettier": "^1.18.2",
+    "ts-loader": "^6.1.2",
+    "typescript": "^3.6.3",
+    "uglifyjs-webpack-plugin": "^2.2.0",
+    "webpack": "^4.40.2",
+    "webpack-bundle-analyzer": "^3.5.1",
+    "webpack-cli": "^3.3.9",
+    "webpack-dev-server": "^3.8.1",
+    "webpack-merge": "^4.1.3"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "src/**/*.{js,jsx,ts,tsx}": [
+      "eslint --fix --max-warnings 0",
+      "git add"
+    ]
+  },
+  "files": [
+    "dist"
+  ]
+}

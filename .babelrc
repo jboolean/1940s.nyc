@@ -1,0 +1,16 @@
+{
+  "plugins": [
+    "@babel/plugin-proposal-class-properties"
+  ],
+  "presets": [
+    ["@babel/env", { 
+      "targets": {
+        "browsers": ["> 5% in US", "last 2 versions"]
+      },
+      "exclude": ["transform-regenerator"],
+      "useBuiltIns": "usage",
+      "corejs": 3
+    }],
+    "@babel/preset-react"
+  ]
+}
