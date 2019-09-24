@@ -3,6 +3,7 @@
 const path = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const webpack = require('webpack');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 // Constant with our paths
 const paths = {
@@ -23,6 +24,9 @@ module.exports = {
       filename: '[name].[hash].css',
     }),
     new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
+    new HtmlWebpackPlugin({
+      template: path.join(path.resolve(__dirname, 'src'), 'app.html')
+    }),
   ],
   module: {
     rules: [
