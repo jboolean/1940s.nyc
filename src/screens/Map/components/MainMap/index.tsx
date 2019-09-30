@@ -1,5 +1,9 @@
 import React from 'react';
+
 import mapboxgl from 'mapbox-gl';
+import classnames from 'classnames';
+
+import stylesheet from './MainMap.less';
 
 const MAPBOX_STYLE = __DEV__
   ? 'mapbox://styles/julianboilen/ck0n6mu9t59e41dl5nhs6bzze/draft'
@@ -7,7 +11,12 @@ const MAPBOX_STYLE = __DEV__
 
 const PHOTO_LAYER = 'photos-1940s';
 
-export default class MainMap extends React.Component {
+interface Props {
+  onPhotoClick: (photoIdentifier: string) => void;
+  className?: string;
+}
+
+export default class MainMap extends React.PureComponent<Props> {
   private mapContainer: Element;
   private map: mapboxgl.Map;
 
@@ -15,12 +24,16 @@ export default class MainMap extends React.Component {
     const map = (this.map = new mapboxgl.Map({
       container: this.mapContainer,
       style: MAPBOX_STYLE,
+      center: [-73.927, 40.734],
+      zoom: 11.16,
+      maxBounds: [
+        [-74.25908989999999, 40.4773991], // SW
+        [-73.70027209999999, 40.9175771], // NE
+      ],
     }));
 
     map.on('click', PHOTO_LAYER, e => {
-      window.open(
-        `https://photos.1940s.nyc/${e.features[0].properties.photoIdentifier}`
-      );
+      this.props.onPhotoClick(e.features[0].properties.photoIdentifier);
     });
 
     // Change the cursor to a pointer when the mouse is over the places layer.
@@ -35,17 +48,18 @@ export default class MainMap extends React.Component {
   }
 
   componentWillUnmount(): void {
+    console.warn('unmounting');
     this.map.remove();
   }
 
   render(): React.ReactNode {
-    const style = {
-      position: 'absolute' as 'absolute',
-      top: '0',
-      bottom: '0',
-      width: '100%',
-    };
+    const { className: propsClassName } = this.props;
 
-    return <div style={style} ref={el => (this.mapContainer = el)} />;
+    return (
+      <div
+        className={classnames(stylesheet.map, propsClassName)}
+        ref={el => (this.mapContainer = el)}
+      />
+    );
   }
 }

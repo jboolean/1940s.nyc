@@ -5,9 +5,9 @@ import 'normalize.css';
 import 'core-js/stable';
 import 'utils/initMapboxgl';
 
-import MainMap from './screens/MainMap';
+import Map from './screens/Map';
 
 ReactDOM.render(
-  React.createElement(MainMap),
+  React.createElement(Map),
   document.getElementById('app-container')
 );
