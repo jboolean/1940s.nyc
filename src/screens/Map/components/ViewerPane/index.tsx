@@ -20,7 +20,7 @@ export default class ViewerPane extends React.Component<Props> {
         {photoIdentifier ? (
           <img
             className={stylesheet.image}
-            src={`https://photos.1940s.nyc/${photoIdentifier}`}
+            src={`https://photos.1940s.nyc/jpg/${photoIdentifier}.jpg`}
           />
         ) : null}
       </div>

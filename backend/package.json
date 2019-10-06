@@ -1,0 +1,23 @@
+{
+  "name": "fourtiesnyc-backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "deploy": "serverless deploy --stage production",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Julian Boilen",
+  "license": "ISC",
+  "devDependencies": {
+    "eslint": "^6.5.1",
+    "eslint-config-prettier": "^6.3.0",
+    "eslint-config-squarespace": "^1.0.1",
+    "prettier": "^1.18.2",
+    "serverless": "^1.53.0"
+  },
+  "dependencies": {
+    "aws-sdk": "^2.541.0",
+    "sharp": "^0.23.1"
+  }
+}
