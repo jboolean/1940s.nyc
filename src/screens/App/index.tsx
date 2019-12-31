@@ -3,13 +3,13 @@ import React from 'react';
 import MainMap from './components/MainMap';
 import ViewerPane from './components/ViewerPane';
 
-import stylesheet from './Map.less';
+import stylesheet from './App.less';
 
 interface State {
   activePhotoIdentifier: string | null;
 }
 
-export default class Map extends React.PureComponent<{}, State> {
+export default class App extends React.PureComponent<{}, State> {
   map?: MainMap;
 
   constructor(props: {}) {

@@ -53,6 +53,16 @@ export default class MainMap extends React.PureComponent<Props> {
     map.on('mouseleave', PHOTO_LAYER, () => {
       map.getCanvas().style.cursor = '';
     });
+
+    map.addSource('arial-1924', {
+      type: 'raster',
+      tiles: ['https://maps.nyc.gov/xyz/1.0.0/photo/1924/{z}/{x}/{y}.png8'],
+    });
+
+    map.addLayer({
+      id: 'arial-1924',
+      source: 'arial-1924',
+    });
   }
 
   componentDidUpdate(prevProps: Props): void {
