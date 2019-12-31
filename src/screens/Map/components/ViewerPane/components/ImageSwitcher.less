@@ -1,0 +1,22 @@
+:local {
+  .enter, .appear {
+    opacity: 0;
+  }
+  .enterActive, .appearActive {
+    opacity: 1;
+    transition: opacity 150ms ease-in;
+  }
+  .enterDone, .appearDone {
+    opacity: 1;
+  }
+  .exit {
+    opacity: 1;
+  }
+  .exitActive {
+    opacity: 0;
+    transition: opacity 300ms ease-out;
+  }
+  .exitDone {
+    opacity: 0;
+  }
+}

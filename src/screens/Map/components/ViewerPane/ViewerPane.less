@@ -14,6 +14,8 @@
 
     box-shadow: 0 0 5px 0px rgba(0, 0, 0, 0.3);
 
+    background-color: grey;
+
     &.isOpen {
       width: 66.6vh;
       text-align: center;
@@ -33,5 +35,20 @@
     top: 11px;
     right: 11px;
     z-index: 2;
+  }
+
+  .imageEnter {
+    opacity: 0;
+  }
+  .imageEnterActive {
+    opacity: 1;
+    transition: opacity 200ms;
+  }
+  .imageExit {
+    opacity: 1;
+  }
+  .imageExitActive {
+    opacity: 0;
+    transition: opacity 200ms;
   }
 }

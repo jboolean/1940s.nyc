@@ -1,5 +1,7 @@
 import React from 'react';
 
+import ImageSwitcher from './components/ImageSwitcher';
+
 import classnames from 'classnames';
 
 import stylesheet from './ViewerPane.less';
@@ -24,7 +26,8 @@ export default class ViewerPane extends React.Component<Props> {
         >
           Close
         </button>
-        <img
+
+        <ImageSwitcher
           className={stylesheet.image}
           src={`https://photos.1940s.nyc/jpg/${photoIdentifier}.jpg`}
         />
