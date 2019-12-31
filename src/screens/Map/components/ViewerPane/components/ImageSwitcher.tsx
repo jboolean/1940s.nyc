@@ -79,11 +79,7 @@ export default class ImageSwitcher<T> extends React.Component<Props, State> {
         appear={true}
         in={!hide && loaded}
         classNames={{ ...stylesheet }}
-        timeout={{
-          appear: 150,
-          enter: 150,
-          exit: 300,
-        }}
+        timeout={150}
         onExited={this.handleExited}
       >
         <img {...this.props} src={visibleSrc} />

@@ -1,22 +1,31 @@
 :local {
+
+  .unfaded {
+    filter: contrast(1);
+  }
+
+  .faded {
+    filter: contrast(0);
+  }
+
   .enter, .appear {
-    opacity: 0;
+    .faded();
   }
   .enterActive, .appearActive {
-    opacity: 1;
-    transition: opacity 150ms ease-in;
+    transition: filter 150ms ease-in;
+    .unfaded();
   }
   .enterDone, .appearDone {
-    opacity: 1;
+    .unfaded();
   }
   .exit {
-    opacity: 1;
+    .unfaded();
   }
   .exitActive {
-    opacity: 0;
-    transition: opacity 300ms ease-out;
+    .faded();
+    transition: filter 150ms ease-out;
   }
   .exitDone {
-    opacity: 0;
+    .faded();
   }
 }
