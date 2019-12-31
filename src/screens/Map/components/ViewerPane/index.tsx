@@ -22,7 +22,7 @@ export default class ViewerPane extends React.Component<Props> {
           className={stylesheet.closeButton}
           onClick={() => this.props.onRequestClose()}
         >
-          ×
+          Close
         </button>
         <img
           className={stylesheet.image}
