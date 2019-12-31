@@ -10,6 +10,8 @@ interface State {
 }
 
 export default class Map extends React.PureComponent<{}, State> {
+  map?: MainMap;
+
   constructor(props: {}) {
     super(props);
     this.state = {
@@ -20,9 +22,14 @@ export default class Map extends React.PureComponent<{}, State> {
   }
 
   handlePhotoSelected(newPhotoIdentifier: string): void {
-    this.setState({
-      activePhotoIdentifier: newPhotoIdentifier,
-    });
+    this.setState(
+      {
+        activePhotoIdentifier: newPhotoIdentifier,
+      },
+      () => {
+        this.map.resize();
+      }
+    );
   }
 
   render(): React.ReactNode {
@@ -30,8 +37,19 @@ export default class Map extends React.PureComponent<{}, State> {
 
     return (
       <div className={stylesheet.container}>
-        <MainMap onPhotoClick={this.handlePhotoSelected} />
-        <ViewerPane photoIdentifier={activePhotoIdentifier} />
+        {activePhotoIdentifier ? (
+          <ViewerPane
+            photoIdentifier={activePhotoIdentifier}
+            onRequestClose={this.handlePhotoSelected.bind(this, null)}
+          />
+        ) : null}
+        <MainMap
+          ref={ref => (this.map = ref)}
+          className={stylesheet.map}
+          onPhotoClick={this.handlePhotoSelected}
+          panOnClick={false}
+          activePhotoIdentifier={activePhotoIdentifier}
+        />
       </div>
     );
   }

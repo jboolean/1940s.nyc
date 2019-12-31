@@ -5,7 +5,8 @@ import classnames from 'classnames';
 import stylesheet from './ViewerPane.less';
 
 interface Props {
-  photoIdentifier: string | null;
+  photoIdentifier: string;
+  onRequestClose: () => void;
 }
 
 export default class ViewerPane extends React.Component<Props> {
@@ -17,12 +18,16 @@ export default class ViewerPane extends React.Component<Props> {
           [stylesheet.isOpen]: !!photoIdentifier,
         })}
       >
-        {photoIdentifier ? (
-          <img
-            className={stylesheet.image}
-            src={`https://photos.1940s.nyc/jpg/${photoIdentifier}.jpg`}
-          />
-        ) : null}
+        <button
+          className={stylesheet.closeButton}
+          onClick={() => this.props.onRequestClose()}
+        >
+          ×
+        </button>
+        <img
+          className={stylesheet.image}
+          src={`https://photos.1940s.nyc/jpg/${photoIdentifier}.jpg`}
+        />
       </div>
     );
   }

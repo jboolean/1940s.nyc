@@ -14,6 +14,8 @@ const PHOTO_LAYER = 'photos-1940s';
 interface Props {
   onPhotoClick: (photoIdentifier: string) => void;
   className?: string;
+  panOnClick: boolean;
+  activePhotoIdentifier?: string;
 }
 
 export default class MainMap extends React.PureComponent<Props> {
@@ -30,10 +32,16 @@ export default class MainMap extends React.PureComponent<Props> {
         [-74.25908989999999, 40.4773991], // SW
         [-73.70027209999999, 40.9175771], // NE
       ],
+      hash: true,
     }));
 
     map.on('click', PHOTO_LAYER, e => {
-      this.props.onPhotoClick(e.features[0].properties.photoIdentifier);
+      const { panOnClick, onPhotoClick } = this.props;
+      if (panOnClick) map.panTo(e.lngLat);
+      const feature = e.features[0];
+      onPhotoClick(feature.properties.photoIdentifier);
+      // map.setPaintProperty(PHOTO_LAYER, 'circle-color', 'hsl(0, 99%, 31%)');
+      // map.setFeatureState(feature, { active: true });
     });
 
     // Change the cursor to a pointer when the mouse is over the places layer.
@@ -47,9 +55,31 @@ export default class MainMap extends React.PureComponent<Props> {
     });
   }
 
+  componentDidUpdate(prevProps: Props): void {
+    // Update the conditional color expression to make the active dot a different color
+    if (!this.map.isStyleLoaded()) {
+      return;
+    }
+    if (prevProps.activePhotoIdentifier !== this.props.activePhotoIdentifier) {
+      this.map.setPaintProperty(PHOTO_LAYER, 'circle-color', [
+        'case',
+        ['==', ['get', 'photoIdentifier'], this.props.activePhotoIdentifier],
+        'hsl(0, 99%, 31%)',
+        'hsl(0, 99%, 0%)',
+      ]);
+    }
+  }
+
   componentWillUnmount(): void {
     console.warn('unmounting');
     this.map.remove();
+  }
+
+  /**
+   * Call if container has resized
+   */
+  resize(): void {
+    this.map.resize();
   }
 
   render(): React.ReactNode {
