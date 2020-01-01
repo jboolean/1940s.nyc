@@ -1,12 +1,14 @@
 import React from 'react';
 
 import MainMap from './components/MainMap';
+import { LayerId } from './components/MainMap';
 import ViewerPane from './components/ViewerPane';
 
 import stylesheet from './App.less';
 
 interface State {
   activePhotoIdentifier: string | null;
+  layer: LayerId;
 }
 
 export default class App extends React.PureComponent<{}, State> {
@@ -16,9 +18,11 @@ export default class App extends React.PureComponent<{}, State> {
     super(props);
     this.state = {
       activePhotoIdentifier: null,
+      layer: 'photos-1940s',
     };
 
     this.handlePhotoSelected = this.handlePhotoSelected.bind(this);
+    this.handleLayerChange = this.handleLayerChange.bind(this);
   }
 
   handlePhotoSelected(newPhotoIdentifier: string): void {
@@ -32,8 +36,14 @@ export default class App extends React.PureComponent<{}, State> {
     );
   }
 
+  handleLayerChange(layer: LayerId): void {
+    this.setState({
+      layer,
+    });
+  }
+
   render(): React.ReactNode {
-    const { activePhotoIdentifier } = this.state;
+    const { activePhotoIdentifier, layer } = this.state;
 
     return (
       <div className={stylesheet.container}>
@@ -43,13 +53,35 @@ export default class App extends React.PureComponent<{}, State> {
             onRequestClose={this.handlePhotoSelected.bind(this, null)}
           />
         ) : null}
-        <MainMap
-          ref={ref => (this.map = ref)}
-          className={stylesheet.map}
-          onPhotoClick={this.handlePhotoSelected}
-          panOnClick={false}
-          activePhotoIdentifier={activePhotoIdentifier}
-        />
+        <div className={stylesheet.mapContainer}>
+          <div className={stylesheet.layers}>
+            {([
+              { name: 'Street', value: 'photos-1940s' },
+              { name: 'Arial (1924)', value: 'arial-1924' },
+              { name: 'Arial (1951)', value: 'arial-1951' },
+            ] as { name: string; value: LayerId }[]).map(option => (
+              <label key={option.value}>
+                <input
+                  key={option.value}
+                  type="radio"
+                  name="layer"
+                  value={layer}
+                  checked={option.value === layer}
+                  onChange={() => this.handleLayerChange(option.value)}
+                />
+                {option.name}
+              </label>
+            ))}
+          </div>
+          <MainMap
+            ref={ref => (this.map = ref)}
+            className={stylesheet.map}
+            onPhotoClick={this.handlePhotoSelected}
+            panOnClick={false}
+            activePhotoIdentifier={activePhotoIdentifier}
+            layer={layer}
+          />
+        </div>
       </div>
     );
   }
