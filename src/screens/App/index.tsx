@@ -57,6 +57,7 @@ export default class App extends React.PureComponent<{}, State> {
           <div className={stylesheet.layers}>
             {([
               { name: 'Street', value: 'photos-1940s' },
+              { name: 'Street (1937)', value: 'district-1937' },
               { name: 'Arial (1924)', value: 'arial-1924' },
               { name: 'Arial (1951)', value: 'arial-1951' },
             ] as { name: string; value: LayerId }[]).map(option => (

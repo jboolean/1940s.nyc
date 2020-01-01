@@ -11,8 +11,13 @@ const MAPBOX_STYLE = __DEV__
 
 const PHOTO_LAYER = 'photos-1940s';
 
-const LAYER_IDS = [PHOTO_LAYER, 'arial-1924', 'arial-1951'] as const;
-const ARIAL_LAYERS = ['arial-1924', 'arial-1951'];
+const LAYER_IDS = [
+  PHOTO_LAYER,
+  'arial-1924',
+  'arial-1951',
+  'district-1937',
+] as const;
+const ARIAL_LAYERS = ['arial-1924', 'arial-1951', 'district-1937'];
 
 export type LayerId = typeof LAYER_IDS[number];
 
@@ -23,6 +28,9 @@ interface Props {
   activePhotoIdentifier?: string;
   layer: LayerId;
 }
+
+const NYC_ATTRIBUTION =
+  '© City of New York <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank">CC BY 4.0</a>';
 
 export default class MainMap extends React.PureComponent<Props> {
   private mapContainer: Element;
@@ -65,28 +73,35 @@ export default class MainMap extends React.PureComponent<Props> {
         {
           url: 'https://maps.nyc.gov/xyz/1.0.0/photo/1924/{z}/{x}/{y}.png8',
           targetId: 'arial-1924',
+          attribution: NYC_ATTRIBUTION,
         },
         {
           url: 'https://maps.nyc.gov/xyz/1.0.0/photo/1951/{z}/{x}/{y}.png8',
           targetId: 'arial-1951',
+          attribution: NYC_ATTRIBUTION,
+        },
+        {
+          url: 'http://maps.nypl.org/warper/layers/tile/1067/{z}/{x}/{y}.png',
+          targetId: 'district-1937',
+          attribution: 'NYPL Digital Collections',
         },
         {
           url: 'https://maps.nyc.gov/xyz/1.0.0/carto/label-lt/{z}/{x}/{y}.png8',
           targetId: 'nyc-label',
+          attribution: NYC_ATTRIBUTION,
         },
-      ].forEach(nycMap => {
-        map.addSource(nycMap.targetId, {
+      ].forEach(mapSpec => {
+        map.addSource(mapSpec.targetId, {
           type: 'raster',
-          tiles: [nycMap.url],
-          attribution:
-            '© City of New York <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank">CC BY 4.0</a>',
+          tiles: [mapSpec.url],
+          attribution: mapSpec.attribution,
           tileSize: 256,
         });
 
         map.addLayer(
           {
-            id: nycMap.targetId,
-            source: nycMap.targetId,
+            id: mapSpec.targetId,
+            source: mapSpec.targetId,
             type: 'raster',
             layout: {
               visibility: 'none',
