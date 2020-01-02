@@ -16,12 +16,14 @@ const LAYER_IDS = [
   'arial-1924',
   'arial-1951',
   'district-1937',
+  'atlas-1916',
   'atlas-1956',
 ] as const;
 const ARIAL_LAYERS = [
   'arial-1924',
   'arial-1951',
   'district-1937',
+  'atlas-1916',
   'atlas-1956',
 ];
 
@@ -91,6 +93,12 @@ export default class MainMap extends React.PureComponent<Props> {
           targetId: 'district-1937',
           attribution:
             '[1937] The Lionel Pincus & Princess Firyal Map Division, NYPL',
+        },
+        {
+          url: 'https://nypl-tiles.1940s.nyc/862/{z}/{x}/{y}.png',
+          targetId: 'atlas-1916',
+          attribution:
+            '[1916] The Lionel Pincus & Princess Firyal Map Division, NYPL',
         },
         {
           url: 'https://nypl-tiles.1940s.nyc/1453/{z}/{x}/{y}.png',
