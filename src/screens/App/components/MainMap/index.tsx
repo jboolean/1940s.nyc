@@ -81,7 +81,7 @@ export default class MainMap extends React.PureComponent<Props> {
           attribution: NYC_ATTRIBUTION,
         },
         {
-          url: 'http://maps.nypl.org/warper/layers/tile/1067/{z}/{x}/{y}.png',
+          url: 'https://nypl-tiles.1940s.nyc/1067/{z}/{x}/{y}.png',
           targetId: 'district-1937',
           attribution: 'NYPL Digital Collections',
         },
