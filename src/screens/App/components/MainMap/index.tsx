@@ -16,8 +16,14 @@ const LAYER_IDS = [
   'arial-1924',
   'arial-1951',
   'district-1937',
+  'atlas-1956',
 ] as const;
-const ARIAL_LAYERS = ['arial-1924', 'arial-1951', 'district-1937'];
+const ARIAL_LAYERS = [
+  'arial-1924',
+  'arial-1951',
+  'district-1937',
+  'atlas-1956',
+];
 
 export type LayerId = typeof LAYER_IDS[number];
 
@@ -73,17 +79,24 @@ export default class MainMap extends React.PureComponent<Props> {
         {
           url: 'https://maps.nyc.gov/xyz/1.0.0/photo/1924/{z}/{x}/{y}.png8',
           targetId: 'arial-1924',
-          attribution: NYC_ATTRIBUTION,
+          attribution: '[1924] ' + NYC_ATTRIBUTION,
         },
         {
           url: 'https://maps.nyc.gov/xyz/1.0.0/photo/1951/{z}/{x}/{y}.png8',
           targetId: 'arial-1951',
-          attribution: NYC_ATTRIBUTION,
+          attribution: '[1951] ' + NYC_ATTRIBUTION,
         },
         {
           url: 'https://nypl-tiles.1940s.nyc/1067/{z}/{x}/{y}.png',
           targetId: 'district-1937',
-          attribution: 'NYPL Digital Collections',
+          attribution:
+            '[1937] The Lionel Pincus & Princess Firyal Map Division, NYPL',
+        },
+        {
+          url: 'https://nypl-tiles.1940s.nyc/1453/{z}/{x}/{y}.png',
+          targetId: 'atlas-1956',
+          attribution:
+            '[1956] The Lionel Pincus & Princess Firyal Map Division, NYPL',
         },
         {
           url: 'https://maps.nyc.gov/xyz/1.0.0/carto/label-lt/{z}/{x}/{y}.png8',
