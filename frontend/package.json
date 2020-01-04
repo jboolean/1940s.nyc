@@ -9,8 +9,8 @@
     "watch": "webpack-dev-server --config webpack.dev.js",
     "watch:hot": "webpack-dev-server --config webpack.dev.js --hotOnly",
     "lint": "eslint --ext .js --ext jsx --ext .ts --ext .tsx src",
-    "lint-strict": "eslint --ext .js --ext jsx --ext .ts --ext .tsx --max-warnings 0 src",
-    "lint-fix": "eslint --ext .js --ext jsx --ext .ts --ext .tsx --fix src",
+    "lint:strict": "eslint --ext .js --ext jsx --ext .ts --ext .tsx --max-warnings 0 src",
+    "lint:fix": "eslint --ext .js --ext jsx --ext .ts --ext .tsx --fix src",
     "profile": "webpack --profile --json --config webpack.prod.js > dist/stats.json && webpack-bundle-analyzer dist/stats.json"
   },
   "keywords": [],

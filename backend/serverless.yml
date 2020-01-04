@@ -40,7 +40,11 @@ provider:
         #   - ''
         #   - - 'arn:aws:s3:::'
         #     - Ref: S3BucketFourtiesPhotos
-
+plugins:
+  - serverless-plugin-select
+  - serverless-offline
+  - serverless-plugin-typescript
+ 
 # you can add statements to the Lambda function's IAM Role here
 #  iamRoleStatements:
 #    - Effect: "Allow"
@@ -71,7 +75,15 @@ provider:
 #    - exclude-me-dir/**
 
 functions:
+  app:
+    handler: appHandler.handler 
+    events: 
+      - http:
+          path: /{proxy+}
+          method: ANY
   convertImage:
+    stages:
+      - production
     handler: convertImage.handler
     events:
       - s3:
@@ -80,6 +92,8 @@ functions:
           rules:
             - prefix: originals/
   deleteImage:
+    stages:
+      - production
     handler: convertImage.deletionHandler
     events:
       - s3:

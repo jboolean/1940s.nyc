@@ -1,10 +1,40 @@
 {
   "extends": [
-    "squarespace",
+    "squarespace/vanilla",
     "prettier",
-    "plugin:prettier/recommended"
+    "plugin:prettier/recommended",
+    "plugin:@typescript-eslint/recommended",
+    "prettier/@typescript-eslint"
   ],
+  "parser": "@typescript-eslint/parser",
   "env": {
     "node": true
   },
+  "plugins": [
+    "@typescript-eslint"
+  ],
+  "globals": {
+    "__DEV__": true
+  },
+  "rules": {
+    "no-var": "error",
+    "prefer-const": "warn"
+  },
+  "overrides": [
+    {
+      // enable the rule specifically for TypeScript files
+      "files": [
+        "*.ts",
+        "*.tsx"
+      ],
+      "rules": {
+        "@typescript-eslint/explicit-function-return-type": [
+          "error",
+          {
+            "allowExpressions": true
+          }
+        ]
+      }
+    }
+  ]
 }
