@@ -1,8 +1,8 @@
 import React from 'react';
 
-import MainMap from './components/MainMap';
-import { LayerId } from './components/MainMap';
-import ViewerPane from './components/ViewerPane';
+import MainMap from './screens/MainMap';
+import { LayerId } from './screens/MainMap';
+import ViewerPane from './screens/ViewerPane';
 
 import stylesheet from './App.less';
 
@@ -59,7 +59,7 @@ export default class App extends React.PureComponent<{}, State> {
               { name: 'Street', value: 'photos-1940s' },
               { name: 'Street (1937)', value: 'district-1937' },
               { name: 'Buildings (1916)', value: 'atlas-1916' },
-              { name: 'Buildings (1956)', value: 'atlas-1956'},
+              { name: 'Buildings (1956)', value: 'atlas-1956' },
               { name: 'Arial (1924)', value: 'arial-1924' },
               { name: 'Arial (1951)', value: 'arial-1951' },
             ] as { name: string; value: LayerId }[]).map(option => (
