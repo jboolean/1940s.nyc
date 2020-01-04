@@ -1,0 +1,44 @@
+import { Entity, Column, PrimaryColumn, OneToMany } from 'typeorm';
+import GeocodeResult from './GeocodeResult';
+
+@Entity('photos')
+export default class Photo {
+  @PrimaryColumn()
+  identifier: string;
+
+  @Column()
+  date?: string;
+
+  @Column()
+  borough?: string;
+
+  @Column()
+  block?: number;
+
+  @Column()
+  lot?: number;
+
+  @Column()
+  bldgNumberStart?: string;
+
+  @Column()
+  bldgNumberEnd?: string;
+
+  @Column()
+  sideOfStreet?: boolean;
+
+  @Column()
+  streetName?: string;
+
+  @Column()
+  address?: string;
+
+  @Column()
+  isOuttake: boolean;
+
+  @OneToMany(
+    type => GeocodeResult,
+    geocode => geocode.photo
+  )
+  geocodeResults: GeocodeResult[];
+}

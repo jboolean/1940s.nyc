@@ -44,6 +44,7 @@ plugins:
   - serverless-plugin-select
   - serverless-offline
   - serverless-plugin-typescript
+  - serverless-secrets-plugin
  
 # you can add statements to the Lambda function's IAM Role here
 #  iamRoleStatements:
@@ -81,6 +82,7 @@ functions:
       - http:
           path: /{proxy+}
           method: ANY
+    environment: ${file(secrets.${opt:stage, self:provider.stage}.yml)}
   convertImage:
     stages:
       - production

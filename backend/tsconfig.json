@@ -7,8 +7,10 @@
     "target": "es5",
     "outDir": ".build",
     "moduleResolution": "node",
-    "lib": ["es2015"],
+    "lib": ["es2015", "ES6"],
     "rootDir": "./",
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
   }
 }

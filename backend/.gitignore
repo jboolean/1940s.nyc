@@ -5,3 +5,5 @@ jspm_packages
 # Serverless directories
 .serverless
 .build
+
+secrets.*.yml
