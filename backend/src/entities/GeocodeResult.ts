@@ -6,7 +6,7 @@ import Photo from './Photo';
 @Entity('geocode_results')
 export default class GeocodeResult {
   @ManyToOne(
-    type => Photo,
+    () => Photo,
     photo => photo.geocodeResults,
     {
       primary: true,

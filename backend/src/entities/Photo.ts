@@ -37,7 +37,7 @@ export default class Photo {
   isOuttake: boolean;
 
   @OneToMany(
-    type => GeocodeResult,
+    () => GeocodeResult,
     geocode => geocode.photo
   )
   geocodeResults: GeocodeResult[];
