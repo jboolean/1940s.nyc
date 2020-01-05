@@ -3,6 +3,10 @@ import React from 'react';
 import mapboxgl from 'mapbox-gl';
 import classnames from 'classnames';
 
+import * as overlays from './overlays';
+
+export { OverlayId } from './overlays';
+
 import stylesheet from './MainMap.less';
 
 const MAPBOX_STYLE = __DEV__
@@ -11,34 +15,13 @@ const MAPBOX_STYLE = __DEV__
 
 const PHOTO_LAYER = 'photos-1940s';
 
-const LAYER_IDS = [
-  PHOTO_LAYER,
-  'arial-1924',
-  'arial-1951',
-  'district-1937',
-  'atlas-1916',
-  'atlas-1956',
-] as const;
-const ARIAL_LAYERS = [
-  'arial-1924',
-  'arial-1951',
-  'district-1937',
-  'atlas-1916',
-  'atlas-1956',
-];
-
-export type LayerId = typeof LAYER_IDS[number];
-
 interface Props {
   onPhotoClick: (photoIdentifier: string) => void;
   className?: string;
   panOnClick: boolean;
   activePhotoIdentifier?: string;
-  layer: LayerId;
+  overlay: overlays.OverlayId;
 }
-
-const NYC_ATTRIBUTION =
-  '© City of New York <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank">CC BY 4.0</a>';
 
 export default class MainMap extends React.PureComponent<Props> {
   private mapContainer: Element;
@@ -62,8 +45,6 @@ export default class MainMap extends React.PureComponent<Props> {
       if (panOnClick) map.panTo(e.lngLat);
       const feature = e.features[0];
       onPhotoClick(feature.properties.photoIdentifier);
-      // map.setPaintProperty(PHOTO_LAYER, 'circle-color', 'hsl(0, 99%, 31%)');
-      // map.setFeatureState(feature, { active: true });
     });
 
     // Change the cursor to a pointer when the mouse is over the places layer.
@@ -77,60 +58,7 @@ export default class MainMap extends React.PureComponent<Props> {
     });
 
     map.on('style.load', () => {
-      [
-        {
-          url: 'https://maps.nyc.gov/xyz/1.0.0/photo/1924/{z}/{x}/{y}.png8',
-          targetId: 'arial-1924',
-          attribution: '[1924] ' + NYC_ATTRIBUTION,
-        },
-        {
-          url: 'https://maps.nyc.gov/xyz/1.0.0/photo/1951/{z}/{x}/{y}.png8',
-          targetId: 'arial-1951',
-          attribution: '[1951] ' + NYC_ATTRIBUTION,
-        },
-        {
-          url: 'https://nypl-tiles.1940s.nyc/1067/{z}/{x}/{y}.png',
-          targetId: 'district-1937',
-          attribution:
-            '[1937] The Lionel Pincus & Princess Firyal Map Division, NYPL',
-        },
-        {
-          url: 'https://nypl-tiles.1940s.nyc/862/{z}/{x}/{y}.png',
-          targetId: 'atlas-1916',
-          attribution:
-            '[1916] The Lionel Pincus & Princess Firyal Map Division, NYPL',
-        },
-        {
-          url: 'https://nypl-tiles.1940s.nyc/1453/{z}/{x}/{y}.png',
-          targetId: 'atlas-1956',
-          attribution:
-            '[1956] The Lionel Pincus & Princess Firyal Map Division, NYPL',
-        },
-        {
-          url: 'https://maps.nyc.gov/xyz/1.0.0/carto/label-lt/{z}/{x}/{y}.png8',
-          targetId: 'nyc-label',
-          attribution: NYC_ATTRIBUTION,
-        },
-      ].forEach(mapSpec => {
-        map.addSource(mapSpec.targetId, {
-          type: 'raster',
-          tiles: [mapSpec.url],
-          attribution: mapSpec.attribution,
-          tileSize: 256,
-        });
-
-        map.addLayer(
-          {
-            id: mapSpec.targetId,
-            source: mapSpec.targetId,
-            type: 'raster',
-            layout: {
-              visibility: 'none',
-            },
-          },
-          PHOTO_LAYER
-        );
-      });
+      overlays.installLayers(this.map, PHOTO_LAYER);
 
       this.syncUI();
     });
@@ -143,7 +71,7 @@ export default class MainMap extends React.PureComponent<Props> {
     }
     if (
       prevProps.activePhotoIdentifier !== this.props.activePhotoIdentifier ||
-      prevProps.layer !== this.props.layer
+      prevProps.overlay !== this.props.overlay
     ) {
       this.syncUI();
     }
@@ -157,19 +85,7 @@ export default class MainMap extends React.PureComponent<Props> {
       'hsl(0, 99%, 0%)',
     ]);
 
-    const isArial = ARIAL_LAYERS.includes(this.props.layer);
-    ARIAL_LAYERS.forEach(layerId => {
-      this.map.setLayoutProperty(
-        layerId,
-        'visibility',
-        layerId === this.props.layer ? 'visible' : 'none'
-      );
-    });
-    this.map.setLayoutProperty(
-      'nyc-label',
-      'visibility',
-      isArial ? 'visible' : 'none'
-    );
+    overlays.setOverlay(this.map, this.props.overlay);
   }
 
   componentWillUnmount(): void {
