@@ -2,6 +2,9 @@ import React from 'react';
 
 import { OverlayId } from './components/MainMap';
 import classnames from 'classnames';
+import { Feature, Point } from 'geojson';
+import { closest } from 'utils/photosApi';
+import noop from 'lodash/noop';
 
 import stylesheet from './MapPane.less';
 import MainMap from './components/MainMap';
@@ -27,12 +30,22 @@ export default class MapPane extends React.Component<Props, State> {
     };
 
     this.handleOverlayChange = this.handleOverlayChange.bind(this);
+    this.handleSearchFeatureSelected = this.handleSearchFeatureSelected.bind(
+      this
+    );
   }
 
   handleOverlayChange(overlay: OverlayId): void {
     this.setState({
       overlay,
     });
+  }
+
+  handleSearchFeatureSelected(feature: Feature<Point>): void {
+    const [lng, lat] = feature.geometry.coordinates;
+    this.map.goTo({ lng, lat });
+
+    closest({ lng, lat }).then(this.props.onPhotoClick, noop);
   }
 
   render(): React.ReactNode {
@@ -43,10 +56,7 @@ export default class MapPane extends React.Component<Props, State> {
       <div className={classnames(stylesheet.container, className)}>
         <Search
           className={stylesheet.search}
-          onFeatureSelected={feature => {
-            const [lng, lat] = feature.geometry.coordinates;
-            this.map.goTo({ lng, lat });
-          }}
+          onFeatureSelected={this.handleSearchFeatureSelected}
         />
         <div className={stylesheet.overlays}>
           {([
