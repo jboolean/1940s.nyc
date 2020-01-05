@@ -16,7 +16,7 @@ export default class Photo {
   block?: number;
 
   @Column()
-  lot?: number;
+  lot?: string;
 
   @Column()
   bldgNumberStart?: string;

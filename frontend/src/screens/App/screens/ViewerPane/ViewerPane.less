@@ -4,7 +4,8 @@
     top: 0;
     left: 0;
     bottom: 0;
-    width: 0%;
+    width: 66.6vh;
+    text-align: center;
 
     background-color: black;
 
@@ -14,11 +15,15 @@
 
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 
-    // background-color: grey;
+    .closeButton, .credit {
+      opacity: 0;
+      transition: opacity 150ms ease;
+    }
 
-    &.isOpen {
-      width: 66.6vh;
-      text-align: center;
+    &:hover {
+      .closeButton, .credit {
+        opacity: 1;
+      }
     }
   }
 
@@ -35,6 +40,24 @@
     top: 11px;
     right: 11px;
     z-index: 2;
+  }
+
+  .credit {
+    position: absolute;
+    bottom: 0;
+    margin: 5.5px 11px;
+    z-index: 2;
+    color: white;
+  }
+
+  .purchase {
+    display: inline-block;
+    color: inherit;
+    text-decoration: none;
+    padding: 5px;
+    border: 1px solid white;
+    border-radius: 3px;
+    margin: 5.5px;
   }
 
   .imageEnter {

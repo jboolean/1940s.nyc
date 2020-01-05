@@ -10,6 +10,6 @@ app.use(async (req, res, next) => {
   next();
 });
 
-app.use(PhotosResource);
+app.use('/photos', PhotosResource);
 
 export default app;
