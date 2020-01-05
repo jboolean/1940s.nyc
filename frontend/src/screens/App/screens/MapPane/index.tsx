@@ -5,6 +5,7 @@ import classnames from 'classnames';
 
 import stylesheet from './MapPane.less';
 import MainMap from './components/MainMap';
+import Search from './components/Search';
 
 interface Props {
   onPhotoClick: (identifier: string) => void;
@@ -17,6 +18,8 @@ interface State {
 }
 
 export default class MapPane extends React.Component<Props, State> {
+  map?: MainMap;
+
   constructor(props: Props) {
     super(props);
     this.state = {
@@ -38,6 +41,13 @@ export default class MapPane extends React.Component<Props, State> {
 
     return (
       <div className={classnames(stylesheet.container, className)}>
+        <Search
+          className={stylesheet.search}
+          onFeatureSelected={feature => {
+            const [lng, lat] = feature.geometry.coordinates;
+            this.map.goTo({ lng, lat });
+          }}
+        />
         <div className={stylesheet.overlays}>
           {([
             { name: 'Street', value: null },
@@ -61,6 +71,7 @@ export default class MapPane extends React.Component<Props, State> {
           ))}
         </div>
         <MainMap
+          ref={ref => (this.map = ref)}
           className={stylesheet.map}
           onPhotoClick={onPhotoClick}
           panOnClick={false}

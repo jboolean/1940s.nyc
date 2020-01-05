@@ -100,6 +100,13 @@ export default class MainMap extends React.PureComponent<Props> {
     this.map.resize();
   }
 
+  goTo(center: mapboxgl.LngLatLike): void {
+    this.map.easeTo({
+      zoom: 17.5,
+      center,
+    });
+  }
+
   render(): React.ReactNode {
     const { className: propsClassName } = this.props;
 
