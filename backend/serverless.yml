@@ -22,6 +22,11 @@ service: fourtiesnyc
 
 custom:
   bucket: fourties-photos
+  customDomain:
+    domainName: api.1940s.nyc
+    basePath: ''
+    stage: ${self:provider.stage}
+    createRoute53Record: true
 
 provider:
   name: aws
@@ -45,6 +50,7 @@ plugins:
   - serverless-offline
   - serverless-plugin-typescript
   - serverless-secrets-plugin
+  - serverless-domain-manager
  
 # you can add statements to the Lambda function's IAM Role here
 #  iamRoleStatements:

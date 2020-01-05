@@ -27,6 +27,7 @@
     "lint-staged": "^9.5.0",
     "prettier": "^1.19.1",
     "serverless": "^1.53.0",
+    "serverless-domain-manager": "^3.3.0",
     "serverless-offline": "^5.12.1",
     "serverless-plugin-select": "^2.0.0-rc.1",
     "serverless-plugin-typescript": "^1.1.9",
