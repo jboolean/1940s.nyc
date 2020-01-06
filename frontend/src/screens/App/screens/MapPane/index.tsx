@@ -9,6 +9,7 @@ import noop from 'lodash/noop';
 import stylesheet from './MapPane.less';
 import MainMap from './components/MainMap';
 import Search from './components/Search';
+import Geolocate from './components/Geolocate';
 
 interface Props {
   onPhotoClick: (identifier: string) => void;
@@ -33,6 +34,7 @@ export default class MapPane extends React.Component<Props, State> {
     this.handleSearchFeatureSelected = this.handleSearchFeatureSelected.bind(
       this
     );
+    this.handleGeolocated = this.handleGeolocated.bind(this);
   }
 
   handleOverlayChange(overlay: OverlayId): void {
@@ -48,16 +50,21 @@ export default class MapPane extends React.Component<Props, State> {
     closest({ lng, lat }).then(this.props.onPhotoClick, noop);
   }
 
+  handleGeolocated(position: { lat: number; lng: number }): void {
+    this.map.goTo(position);
+    closest(position).then(this.props.onPhotoClick, noop);
+  }
+
   render(): React.ReactNode {
     const { overlay } = this.state;
     const { activePhotoIdentifier, className, onPhotoClick } = this.props;
 
     return (
       <div className={classnames(stylesheet.container, className)}>
-        <Search
-          className={stylesheet.search}
-          onFeatureSelected={this.handleSearchFeatureSelected}
-        />
+        <div className={stylesheet.topControls}>
+          <Search onFeatureSelected={this.handleSearchFeatureSelected} />
+          <Geolocate onGeolocated={this.handleGeolocated} />
+        </div>
         <div className={stylesheet.overlays}>
           {([
             { name: 'Street', value: null },
