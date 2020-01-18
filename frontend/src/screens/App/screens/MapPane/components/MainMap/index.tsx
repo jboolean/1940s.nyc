@@ -10,8 +10,8 @@ export { OverlayId } from './overlays';
 import stylesheet from './MainMap.less';
 
 const MAPBOX_STYLE = __DEV__
-  ? 'mapbox://styles/julianboilen/ck0n6mu9t59e41dl5nhs6bzze/draft'
-  : 'mapbox://styles/julianboilen/ck0n6mu9t59e41dl5nhs6bzze';
+  ? 'mapbox://styles/julianboilen/ck5jrzrs11r1p1imia7qzjkm1/draft'
+  : 'mapbox://styles/julianboilen/ck5jrzrs11r1p1imia7qzjkm1';
 
 const PHOTO_LAYER = 'photos-1940s';
 
@@ -60,6 +60,8 @@ export default class MainMap extends React.PureComponent<Props> {
     map.on('style.load', () => {
       overlays.installLayers(this.map, PHOTO_LAYER);
 
+      map.setLayoutProperty(PHOTO_LAYER + '-active', 'visibility', 'visible');
+
       this.syncUI();
     });
   }
@@ -78,11 +80,10 @@ export default class MainMap extends React.PureComponent<Props> {
   }
 
   syncUI(): void {
-    this.map.setPaintProperty(PHOTO_LAYER, 'circle-color', [
-      'case',
-      ['==', ['get', 'photoIdentifier'], this.props.activePhotoIdentifier],
-      'hsl(0, 99%, 31%)',
-      'hsl(0, 99%, 0%)',
+    this.map.setFilter(PHOTO_LAYER + '-active', [
+      '==',
+      ['get', 'photoIdentifier'],
+      this.props.activePhotoIdentifier,
     ]);
 
     overlays.setOverlay(this.map, this.props.overlay);
