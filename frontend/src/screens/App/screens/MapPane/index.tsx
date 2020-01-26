@@ -27,7 +27,7 @@ export default class MapPane extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
-      overlay: null,
+      overlay: 'default-map',
     };
 
     this.handleOverlayChange = this.handleOverlayChange.bind(this);
@@ -67,12 +67,14 @@ export default class MapPane extends React.Component<Props, State> {
         </div>
         <div className={stylesheet.overlays}>
           {([
-            { name: 'Street', value: null },
-            { name: 'Street (1937)', value: 'district' },
-            { name: 'Buildings (1916)', value: 'atlas-1916' },
-            { name: 'Buildings (1956)', value: 'atlas-1956' },
-            { name: 'Arial (1924)', value: 'arial-1924' },
-            { name: 'Arial (1951)', value: 'arial-1951' },
+            { name: 'Street', value: 'default-map' },
+            { name: 'Arial', value: 'default-arial' },
+            // { name: 'Street (1937)', value: 'district' },
+            // { name: 'Buildings (1916)', value: 'atlas-1916' },
+            // { name: 'Buildings (1930)', value: 'atlas-1930' },
+            // { name: 'Buildings (1956)', value: 'atlas-1956' },
+            // { name: 'Arial (1924)', value: 'arial-1924' },
+            // { name: 'Arial (1951)', value: 'arial-1951' },
           ] as { name: string; value: OverlayId | null }[]).map(option => (
             <label key={option.value}>
               <input

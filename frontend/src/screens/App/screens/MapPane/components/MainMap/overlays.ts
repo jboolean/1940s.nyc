@@ -3,24 +3,35 @@ const LAYER_IDS = [
   'arial-1951',
   'district-1937',
   'atlas-1916',
+  'atlas-1930',
   'atlas-1956',
   'nyc-label',
 ] as const;
 
 type LayerId = typeof LAYER_IDS[number];
 export type OverlayId =
+  | 'default-map'
+  | 'default-arial'
   | 'arial-1924'
   | 'arial-1951'
   | 'district'
   | 'atlas-1916'
+  | 'atlas-1930'
   | 'atlas-1956';
 
 // Overlays are collections of layers
 const overlaysToLayers: { [overlay in OverlayId]: LayerId[] } = {
+  get 'default-map'() {
+    return this['atlas-1930'];
+  },
+  get 'default-arial'() {
+    return [...this['default-map'], ...this['arial-1951']];
+  },
   'arial-1924': ['arial-1924', 'nyc-label'],
   'arial-1951': ['arial-1951', 'nyc-label'],
   district: ['district-1937', 'nyc-label'],
   'atlas-1916': ['atlas-1916'],
+  'atlas-1930': ['atlas-1930'],
   'atlas-1956': ['atlas-1956'],
 };
 
@@ -33,16 +44,6 @@ const NYPL_ATTRIBUTION =
 export const installLayers = (map: mapboxgl.Map, photoLayer: string): void => {
   [
     {
-      url: 'https://maps.nyc.gov/xyz/1.0.0/photo/1924/{z}/{x}/{y}.png8',
-      targetId: 'arial-1924',
-      attribution: '[1924] ' + NYC_ATTRIBUTION,
-    },
-    {
-      url: 'https://maps.nyc.gov/xyz/1.0.0/photo/1951/{z}/{x}/{y}.png8',
-      targetId: 'arial-1951',
-      attribution: '[1951] ' + NYC_ATTRIBUTION,
-    },
-    {
       url: 'https://nypl-tiles.1940s.nyc/1067/{z}/{x}/{y}.png',
       targetId: 'district-1937',
       attribution: '[1937] ' + NYPL_ATTRIBUTION,
@@ -53,9 +54,24 @@ export const installLayers = (map: mapboxgl.Map, photoLayer: string): void => {
       attribution: '[1916] ' + NYPL_ATTRIBUTION,
     },
     {
+      url: 'https://mapwarper.net/mosaics/tile/1194/{z}/{x}/{y}.png',
+      targetId: 'atlas-1930',
+      attribution: '[1930] ' + NYPL_ATTRIBUTION,
+    },
+    {
       url: 'https://nypl-tiles.1940s.nyc/1453/{z}/{x}/{y}.png',
       targetId: 'atlas-1956',
       attribution: '[1956] ' + NYPL_ATTRIBUTION,
+    },
+    {
+      url: 'https://maps.nyc.gov/xyz/1.0.0/photo/1924/{z}/{x}/{y}.png8',
+      targetId: 'arial-1924',
+      attribution: '[1924] ' + NYC_ATTRIBUTION,
+    },
+    {
+      url: 'https://maps.nyc.gov/xyz/1.0.0/photo/1951/{z}/{x}/{y}.png8',
+      targetId: 'arial-1951',
+      attribution: '[1951] ' + NYC_ATTRIBUTION,
     },
     {
       url: 'https://maps.nyc.gov/xyz/1.0.0/carto/label-lt/{z}/{x}/{y}.png8',
@@ -82,6 +98,17 @@ export const installLayers = (map: mapboxgl.Map, photoLayer: string): void => {
       photoLayer
     );
   });
+
+  map.setLayerZoomRange('atlas-1930', 15, 24);
+  map.setPaintProperty('atlas-1930', 'raster-opacity', [
+    'interpolate',
+    ['linear'],
+    ['zoom'],
+    15,
+    0,
+    16,
+    1,
+  ]);
 };
 
 export const setOverlay = (
