@@ -99,14 +99,16 @@ export const installLayers = (map: mapboxgl.Map, photoLayer: string): void => {
     );
   });
 
-  map.setLayerZoomRange('atlas-1930', 15, 24);
+  map.setLayerZoomRange('atlas-1930', 14, 24);
   map.setPaintProperty('atlas-1930', 'raster-opacity', [
     'interpolate',
     ['linear'],
     ['zoom'],
-    15,
+    14,
     0,
-    16,
+    15,
+    0.1,
+    17,
     1,
   ]);
 };
