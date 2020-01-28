@@ -54,7 +54,7 @@ export const installLayers = (map: mapboxgl.Map, photoLayer: string): void => {
       attribution: '[1916] ' + NYPL_ATTRIBUTION,
     },
     {
-      url: 'https://mapwarper.net/mosaics/tile/1194/{z}/{x}/{y}.png',
+      url: 'https://mapwarper-net-tiles.1940s.nyc/1194/{z}/{x}/{y}.png',
       targetId: 'atlas-1930',
       attribution: '[1930] ' + NYPL_ATTRIBUTION,
     },
