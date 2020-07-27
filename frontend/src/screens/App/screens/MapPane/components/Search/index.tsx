@@ -10,6 +10,8 @@ import uniqWith from 'lodash/uniqWith';
 import isEqual from 'lodash/isEqual';
 import property from 'lodash/property';
 
+import stylesheet from './Search.less';
+
 interface Props {
   className?: string;
   onFeatureSelected: (feature: Feature<Point>) => void;
@@ -96,11 +98,11 @@ export default class Search extends React.Component<Props, State> {
     const { onFeatureSelected } = this.props;
     const { value, suggestions } = this.state;
 
-    // Finally, render it!
     return (
       <Autosuggest
         theme={{
-          container: classnames(this.props.className),
+          ...stylesheet,
+          container: classnames(this.props.className, stylesheet.container),
         }}
         suggestions={suggestions}
         onSuggestionsFetchRequested={this.fetchSuggestionsThrottled}

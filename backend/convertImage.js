@@ -104,11 +104,11 @@ module.exports.deletionHandler = async event => {
     .deleteObjects({
       Bucket: srcBucket,
       Delete: {
-        Objects: FILENAMES.map(template => makeFilename(template, rootKey)).map(
-          key => ({
+        Objects: Object.values(FILENAMES)
+          .map(template => makeFilename(template, rootKey))
+          .map(key => ({
             Key: key,
-          })
-        ),
+          })),
       },
     })
     .promise();
