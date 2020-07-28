@@ -1,5 +1,9 @@
 import React from 'react';
 
+import classnames from 'classnames';
+
+import stylesheet from './Geolocate.less';
+
 interface Props {
   className?: string;
   onGeolocated: (position: { lat: number; lng: number }) => void;
@@ -65,7 +69,7 @@ export default class Geolocate extends React.Component<Props, State> {
     const { loading } = this.state;
     return (
       <button
-        className={className}
+        className={classnames(stylesheet.button, className)}
         onClick={this.handleButtonClick}
         disabled={loading}
       >

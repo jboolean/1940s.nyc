@@ -1,12 +1,10 @@
-@border-radius: 4px;
+@import '../../../../../../shared/styles/ui.less';
 
 .container {
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   width: 20rem;
   position: relative;
   max-width: 100%;
-  background-color: white;
-  border-radius: @border-radius;
+  composes: floating from '../../../../../../shared/styles/ui.less';
 }
 
 .input {

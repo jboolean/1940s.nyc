@@ -9,6 +9,7 @@ import throttle from 'lodash/throttle';
 import uniqWith from 'lodash/uniqWith';
 import isEqual from 'lodash/isEqual';
 import property from 'lodash/property';
+import startCase from 'lodash/startCase';
 
 import stylesheet from './Search.less';
 
@@ -24,10 +25,10 @@ interface State {
 }
 
 const getSuggestionValue = (suggestion: Feature<Point>): string =>
-  suggestion.properties.name;
+  startCase(suggestion.properties.name.toLowerCase());
 
 const renderSuggestion = (suggestion: Feature<Point>): JSX.Element => (
-  <div>{suggestion.properties.name}</div>
+  <div>{startCase(suggestion.properties.name.toLowerCase())}</div>
 );
 
 const getCoordinates = property('geometry.coordinates');

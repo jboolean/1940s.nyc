@@ -1,0 +1,18 @@
+.button {
+  background-image: url('./crosshair.svg');
+  background-size: 87%;
+  background-position: center;
+  background-repeat: no-repeat;
+  
+  height: 2rem;
+  width: 2rem;
+  border: none;
+  composes: floating from '../../../../../../shared/styles/ui.less';
+  text-indent: -999999px;
+  outline: none;
+  cursor: pointer;
+
+  &:active {
+    background-color: #e3e3e3;
+  }
+}

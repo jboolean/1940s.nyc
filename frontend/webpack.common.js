@@ -25,7 +25,7 @@ module.exports = {
     }),
     new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
     new HtmlWebpackPlugin({
-      template: path.join(path.resolve(__dirname, 'src'), 'app.html')
+      template: path.join(path.resolve(__dirname, 'src'), 'app.html'),
     }),
   ],
   module: {
@@ -66,7 +66,7 @@ module.exports = {
         ],
       },
       {
-        test: /\.(png|jpg|gif)$/,
+        test: /\.(png|jpg|gif|svg)$/,
         use: [
           {
             loader: 'file-loader',
@@ -78,7 +78,7 @@ module.exports = {
       },
       {
         test: /\.svg$/,
-        issuer: /\.jsx$/,
+        issuer: /\.(j|t)sx$/,
         exclude: /node_modules/,
         loader: 'svg-react-loader',
         query: {
