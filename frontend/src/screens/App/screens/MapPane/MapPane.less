@@ -19,16 +19,21 @@
     top: 22px;
     left: 22px;
     z-index: 1;
+    display: flex;
+    width: 20rem;
+
     
-    & > * {
-      display: inline-block;
+    .search {
+      flex-grow: 1;
+      width: 100%;
       margin-right: 0.5rem;
     }
   }
 }
 
-@media screen and (max-width: 411px) {
+@media screen and (max-width: 480px) {
   .topControls {
+    width: 100%;
     left: 0;
     top: 0;
   }

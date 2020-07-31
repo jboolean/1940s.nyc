@@ -62,7 +62,10 @@ export default class MapPane extends React.Component<Props, State> {
     return (
       <div className={classnames(stylesheet.container, className)}>
         <div className={stylesheet.topControls}>
-          <Search onFeatureSelected={this.handleSearchFeatureSelected} />
+          <Search
+            onFeatureSelected={this.handleSearchFeatureSelected}
+            className={stylesheet.search}
+          />
           <Geolocate onGeolocated={this.handleGeolocated} />
         </div>
         <div className={stylesheet.overlays}>
