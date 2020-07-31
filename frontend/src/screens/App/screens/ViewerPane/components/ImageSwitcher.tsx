@@ -35,13 +35,16 @@ export default class ImageSwitcher<T> extends React.Component<Props, State> {
   componentDidUpdate(prevProps: Props, prevState: State): void {
     if (this.props.src !== prevState.lastSrc && !this.state.hide) {
       // eslint-disable-next-line react/no-did-update-set-state
-      this.setState({
-        hide: true,
-        loaded: false,
-        lastSrc: this.props.src,
-      });
-
-      preloadImage(this.props.src, this.handleNewImgLoad);
+      this.setState(
+        {
+          hide: true,
+          loaded: false,
+          lastSrc: this.props.src,
+        },
+        () => {
+          preloadImage(this.props.src, this.handleNewImgLoad);
+        }
+      );
     }
   }
 
