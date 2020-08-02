@@ -69,16 +69,16 @@
 
 @media screen and (max-width: 480px) {
   .topControls {
-    width: 100%;
-    left: 0;
-    top: 0;
+    width: calc(100% - 1rem);
+    left: 0.5rem;
+    top: 0.5rem;
   }
 }
 
 // Mapbox breaks here, need to move things to get out of the way
 @media screen and (max-width: 640px) {
   .overlays {
-    right: 10px;
+    right: 0.5rem;
     bottom: 44px;
   }
 }
