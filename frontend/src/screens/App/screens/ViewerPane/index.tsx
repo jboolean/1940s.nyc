@@ -24,7 +24,7 @@ export default class ViewerPane extends React.Component<Props> {
         </button>
 
         <p className={stylesheet.credit}>
-          Photo © NYC Municipal Archives
+          Photo © NYC Municipal Archives{' '}
           <a
             href={`${API_BASE}/photos/${photoIdentifier}/buy-prints`}
             target="_blank"

@@ -37,9 +37,21 @@
 
   .closeButton {
     position: absolute;
-    top: 11px;
+    top: 22px;
     right: 11px;
     z-index: 2;
+    text-indent: -99999px;
+    width: 2rem;
+    height: 2rem;
+
+    background-image: url('./assets/close-01.svg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-color: transparent;
+    border: none;
+
+    cursor: pointer;
   }
 
   .credit {
@@ -48,16 +60,17 @@
     margin: 5.5px 11px;
     z-index: 2;
     color: white;
+    font-size: 12px;
   }
 
   .purchase {
     display: inline-block;
     color: inherit;
-    text-decoration: none;
-    padding: 5px;
-    border: 1px solid white;
-    border-radius: 3px;
-    margin: 5.5px;
+    text-decoration: underline;
+    // padding: 5px;
+    // border: 1px solid white;
+    // border-radius: 3px;
+    // margin: 5.5px;
   }
 
   .imageEnter {
