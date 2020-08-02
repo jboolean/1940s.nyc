@@ -1,33 +1,69 @@
-:local {
-  .container {
-    position: relative;
-  }
+@import '../../../../shared/styles/utils.less';
+
+.container {
+  position: relative;
+}
+
+.map {
+  height: 100%;
+}
+
+.overlays {
+  display: flex;
+  position: absolute;
+  bottom: 22px;
+  right: 22px;
+  z-index: 1;
+}
+
+.topControls {
+  position: absolute;
+  top: 22px;
+  left: 22px;
+  z-index: 1;
+  display: flex;
+  width: 20rem;
+
   
-  .map {
-    height: 100%;
+  .search {
+    flex-grow: 1;
+    width: 100%;
+    margin-right: 0.5rem;
+  }
+}
+
+.overlayInput {
+  composes: visuallyhidden from '../../../../shared/styles/utils.less'
+}
+
+.overlayLabel {
+  display: block;
+  height: 3rem;
+  width: 3rem;
+  composes: floating from '../../../../shared/styles/ui.less';
+
+  box-sizing: border-box;
+  
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+
+  text-indent: -999999px;
+  
+  
+  text-align: center;
+  cursor: pointer;
+
+  .overlayInput[value='default-arial'] + & {
+    background-image: url('./assets/airplane.svg');
   }
 
-  .overlays {
-    position: absolute;
-    bottom: 22px;
-    right: 22px;
-    z-index: 1;
+  .overlayInput[value='default-map'] + & {
+    background-image: url('./assets/street.svg');
   }
 
-  .topControls {
-    position: absolute;
-    top: 22px;
-    left: 22px;
-    z-index: 1;
-    display: flex;
-    width: 20rem;
-
-    
-    .search {
-      flex-grow: 1;
-      width: 100%;
-      margin-right: 0.5rem;
-    }
+  .overlayInput:checked + & {
+    .visuallyhidden();
   }
 }
 

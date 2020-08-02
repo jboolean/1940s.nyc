@@ -5,6 +5,7 @@ import classnames from 'classnames';
 import { Feature, Point } from 'geojson';
 import { closest } from 'utils/photosApi';
 import noop from 'lodash/noop';
+import uniqueId from 'lodash/uniqueId';
 
 import stylesheet from './MapPane.less';
 import MainMap from './components/MainMap';
@@ -23,12 +24,14 @@ interface State {
 
 export default class MapPane extends React.Component<Props, State> {
   map?: MainMap;
+  private idPrefix: string;
 
   constructor(props: Props) {
     super(props);
     this.state = {
       overlay: 'default-map',
     };
+    this.idPrefix = uniqueId('MapPane-');
 
     this.handleOverlayChange = this.handleOverlayChange.bind(this);
     this.handleSearchFeatureSelected = this.handleSearchFeatureSelected.bind(
@@ -79,17 +82,24 @@ export default class MapPane extends React.Component<Props, State> {
             // { name: 'Arial (1924)', value: 'arial-1924' },
             // { name: 'Arial (1951)', value: 'arial-1951' },
           ] as { name: string; value: OverlayId | null }[]).map(option => (
-            <label key={option.value}>
+            <React.Fragment key={option.value}>
               <input
+                id={this.idPrefix + option.value}
                 key={option.value || 'default'}
                 type="radio"
                 name="overlay"
-                value={overlay || ''}
-                checked={option.value === overlay}
+                value={option.value}
                 onChange={() => this.handleOverlayChange(option.value)}
+                className={classnames(stylesheet.overlayInput)}
+                checked={option.value === overlay}
               />
-              {option.name}
-            </label>
+              <label
+                htmlFor={this.idPrefix + option.value}
+                className={classnames(stylesheet.overlayLabel)}
+              >
+                {option.name}
+              </label>
+            </React.Fragment>
           ))}
         </div>
         <MainMap
