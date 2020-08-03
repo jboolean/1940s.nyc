@@ -41,6 +41,13 @@ const NYC_ATTRIBUTION =
 const NYPL_ATTRIBUTION =
   'The Lionel Pincus & Princess Firyal Map Division, NYPL';
 
+const MANHATTAN = [
+  -74.04772962763064,
+  40.68291694544512,
+  -73.90665099539478,
+  40.87903804730722,
+];
+
 export const installLayers = (map: mapboxgl.Map, photoLayer: string): void => {
   [
     {
@@ -52,16 +59,19 @@ export const installLayers = (map: mapboxgl.Map, photoLayer: string): void => {
       url: 'https://nypl-tiles.1940s.nyc/862/{z}/{x}/{y}.png',
       targetId: 'atlas-1916',
       attribution: '[1916] ' + NYPL_ATTRIBUTION,
+      bounds: MANHATTAN,
     },
     {
       url: 'https://mapwarper-net-tiles.1940s.nyc/1194/{z}/{x}/{y}.png',
       targetId: 'atlas-1930',
       attribution: '[1930] ' + NYPL_ATTRIBUTION,
+      bounds: MANHATTAN,
     },
     {
       url: 'https://nypl-tiles.1940s.nyc/1453/{z}/{x}/{y}.png',
       targetId: 'atlas-1956',
       attribution: '[1956] ' + NYPL_ATTRIBUTION,
+      bounds: MANHATTAN,
     },
     {
       url: 'https://maps.nyc.gov/xyz/1.0.0/photo/1924/{z}/{x}/{y}.png8',
@@ -84,6 +94,7 @@ export const installLayers = (map: mapboxgl.Map, photoLayer: string): void => {
       tiles: [mapSpec.url],
       attribution: mapSpec.attribution,
       tileSize: 256,
+      ...(mapSpec.bounds ? { bounds: mapSpec.bounds } : {}),
     });
 
     map.addLayer(
