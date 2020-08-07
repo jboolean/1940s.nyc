@@ -50,12 +50,12 @@ export default class ImageSwitcher<T> extends React.Component<Props, State> {
 
   handleNewImgLoad(): void {
     console.log('Preloaded');
-    this.setState({
-      loaded: true,
-    });
     if (!this.state.hide) {
       this.swapImage();
     }
+    this.setState({
+      loaded: true,
+    });
   }
 
   handleExited(): void {
