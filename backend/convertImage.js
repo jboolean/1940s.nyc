@@ -68,6 +68,7 @@ module.exports.handler = async event => {
             Bucket: srcBucket,
             Key: makeFilename(FILENAMES.jpeg, rootKey),
             ACL: 'public-read',
+            ContentType: 'image/jpeg',
           })
           .promise()
       ),
@@ -83,6 +84,7 @@ module.exports.handler = async event => {
             Bucket: srcBucket,
             Key: makeFilename(FILENAMES.jpeg420, rootKey),
             ACL: 'public-read',
+            ContentType: 'image/jpeg',
           })
           .promise()
       ),
