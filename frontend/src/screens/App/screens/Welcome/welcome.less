@@ -1,0 +1,160 @@
+@import '../../../../shared//styles//colors.less';
+
+.welcomeModal {
+  position: relative;
+  display: flex;
+  background-color: @green;
+  color: @font-color-dark;
+  
+  @modal-width: 55rem;
+  @modal-height: 35rem;
+
+  top: calc(50% - (@modal-height/2));
+  width: @modal-width;
+  max-width: 90%;
+  height: @modal-height;
+  max-height: 90%;
+  margin: auto;
+
+  outline: none;
+}
+
+.bodyOpen {
+  overflow: hidden;
+}
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+
+  z-index: 100;
+  backdrop-filter: grayscale(70%);
+  background-color: hsla(0, 0, 10%, 5%);
+}
+
+.imageContainer {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  flex-basis: 35rem * 0.666;
+  flex-shrink: 0;
+}
+
+.image {
+  position: absolute;
+  
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+  transform: scale(1.10);
+}
+
+.textContainer {
+  display: flex;
+  flex-direction: column;
+
+  flex-grow: 1;
+  height: 100%;
+
+  text-align: center;
+}
+
+.text {
+  padding: 1rem;
+  padding-top: 1.5rem;
+  padding-bottom: 0;
+  flex-grow: 1;
+
+  overflow-y: auto;
+
+  h1 {
+    font-size: 34px;
+    margin: 0;
+    margin-bottom: 1rem;
+  }
+
+  hr {
+    display: block;
+    border: none;
+    border-top: 1px solid @font-color-dark;
+    width: 7em;
+    margin: auto;
+  }
+
+  a {
+    color: inherit;
+  }
+
+  p {
+    line-height: 1.6;
+    margin: 1rem 0;
+  }
+}
+
+.finePrint {
+  font-size: 12px;
+}
+
+.buttonContainer {
+  padding: 1rem;
+  text-align: center;
+}
+
+.explore {
+  display: inline-block;
+
+
+  padding: 1rem 2rem;
+
+  background-color: @creme;
+  outline: none;
+  border: none;
+  cursor: pointer;
+}
+
+@media screen and (max-width: 800px), screen and (max-height: 600px) {
+  .welcomeModal {
+    display: block;
+
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+  }
+
+  .imageContainer {
+    height: 75vh;
+  }
+
+  .textContainer {
+    display: block;
+    position: absolute;
+    top: 0;
+
+    padding-top: 75vh;
+    height: 100%;
+    box-sizing: border-box;
+    overflow-y: scroll;
+  }
+
+  .text, .buttonContainer {
+    background: @creme;
+    text-align: left;
+  }
+
+  .explore {
+    background-color: @red;
+    color: @creme;
+  }
+
+  .text hr {
+    margin: 0;
+  }
+}

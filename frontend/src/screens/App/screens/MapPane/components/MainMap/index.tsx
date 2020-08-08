@@ -90,8 +90,7 @@ export default class MainMap extends React.PureComponent<Props> {
   }
 
   componentWillUnmount(): void {
-    console.warn('unmounting');
-    this.map.remove();
+    if (this.map) this.map.remove();
   }
 
   /**

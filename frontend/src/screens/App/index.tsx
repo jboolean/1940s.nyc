@@ -2,11 +2,13 @@ import React from 'react';
 
 import ViewerPane from './screens/ViewerPane';
 import MapPane from './screens/MapPane';
+import Welcome from './screens/Welcome';
 
 import stylesheet from './App.less';
 
 interface State {
   activePhotoIdentifier: string | null;
+  isWelcomeOpen: boolean;
 }
 
 export default class App extends React.PureComponent<{}, State> {
@@ -14,6 +16,7 @@ export default class App extends React.PureComponent<{}, State> {
     super(props);
     this.state = {
       activePhotoIdentifier: null,
+      isWelcomeOpen: true,
     };
 
     this.handlePhotoSelected = this.handlePhotoSelected.bind(this);
@@ -26,10 +29,16 @@ export default class App extends React.PureComponent<{}, State> {
   }
 
   render(): React.ReactNode {
-    const { activePhotoIdentifier } = this.state;
+    const { activePhotoIdentifier, isWelcomeOpen } = this.state;
 
     return (
       <div className={stylesheet.container}>
+        <Welcome
+          isOpen={isWelcomeOpen}
+          onRequestClose={() => {
+            this.setState({ isWelcomeOpen: false });
+          }}
+        />
         {activePhotoIdentifier ? (
           <ViewerPane
             photoIdentifier={activePhotoIdentifier}
