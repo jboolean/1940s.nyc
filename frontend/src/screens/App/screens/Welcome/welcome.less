@@ -45,7 +45,7 @@
 
 .image {
   position: absolute;
-  
+
   height: 100%;
   width: 100%;
   object-fit: cover;
@@ -116,6 +116,10 @@
 }
 
 @media screen and (max-width: 800px), screen and (max-height: 600px) {
+
+  @visible-text-height: 166px;
+  @photo-padding: calc(100vh - @visible-text-height);
+
   .welcomeModal {
     display: block;
 
@@ -130,7 +134,7 @@
   }
 
   .imageContainer {
-    height: 75vh;
+    height: @photo-padding;
   }
 
   .textContainer {
@@ -138,7 +142,7 @@
     position: absolute;
     top: 0;
 
-    padding-top: 75vh;
+    padding-top: @photo-padding;
     height: 100%;
     box-sizing: border-box;
     overflow-y: scroll;
