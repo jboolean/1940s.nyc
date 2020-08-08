@@ -6,6 +6,7 @@ import stylesheet from './Carousel.less';
 interface Image {
   src: string;
   objectPosition: string;
+  alt?: string;
 }
 
 const INTERVAL_MS = 7000;
@@ -44,7 +45,7 @@ export default function Carousel({
           className={className}
           src={image.src}
           style={{ objectPosition: image.objectPosition }}
-          alt="Photograph"
+          alt={image.alt}
         />
       </CSSTransition>
     </SwitchTransition>
