@@ -2,7 +2,7 @@ import React from 'react';
 
 import { FixedSizeList as List } from 'react-window';
 import range from 'lodash/range';
-import findIndex from 'lodash/findIndex';
+import isNil from 'lodash/isNil';
 import classnames from 'classnames';
 
 import AutoSizer from 'react-virtualized-auto-sizer';
@@ -49,27 +49,30 @@ function Grid({
     []
   );
 
+  const visibleImageIRef = React.useRef<number | undefined>();
+
   React.useEffect(() => {
     getOuttakeSummaries().then(setPhotoSummaries);
   }, []);
 
   const history = useHistory();
-  const { identifier: selectedIdentifier } = useParams();
+  const { identifier: selectedIdentifier } = useParams<{
+    identifier?: string;
+  }>();
 
   const listRef = React.createRef<List>();
 
   const itemsPerRow = calculateItemsPerRow(width);
   const itemHeight = (1 / ASPECT) * (width / itemsPerRow);
 
-  // Scroll to selected item
+  // If size changes, scroll to last visible item rather than some flying off somewhere random
   React.useEffect(() => {
-    if (!selectedIdentifier) return;
-    const imageI = findIndex(photoSummaries, {
-      identifier: selectedIdentifier,
-    });
+    const imageI = visibleImageIRef.current;
+    if (isNil(imageI)) return;
     const rowI = imageI / itemsPerRow;
-    listRef.current.scrollToItem(rowI);
-  }, [selectedIdentifier, photoSummaries, width, height]);
+    console.log('Scrolling to photo/row:', imageI, rowI);
+    listRef.current.scrollToItem(rowI, 'start');
+  }, [itemsPerRow]);
 
   return (
     <List
@@ -80,6 +83,14 @@ function Grid({
       itemCount={Math.ceil(photoSummaries.length / itemsPerRow)}
       useIsScrolling
       className={stylesheet.grid}
+      onItemsRendered={({ visibleStartIndex }) => {
+        const imageI = visibleStartIndex * itemsPerRow;
+        console.log('Current photo/row', imageI, visibleStartIndex);
+        // We'll scroll back to here, want to allow time for reflow
+        setTimeout(() => {
+          visibleImageIRef.current = imageI;
+        }, 1500);
+      }}
     >
       {({ index: rowIndex, style, isScrolling }) => {
         const firstPhotoIndex = rowIndex * itemsPerRow;
@@ -101,12 +112,16 @@ function Grid({
                   )}
                   loading="lazy"
                   className={classnames(stylesheet.image, {
-                    [stylesheet.selected]: identifier === selectedIdentifier,
+                    [stylesheet.selected]:
+                      identifier === selectedIdentifier ||
+                      visibleImageIRef.current === i,
                   })}
                   onLoad={e => {
                     e.currentTarget.className += ' ' + stylesheet.loaded;
                   }}
                   onClick={() => {
+                    console.log('Clicked photo/row', i, rowIndex);
+                    visibleImageIRef.current = i;
                     history.push('/outtakes/photo/' + identifier);
                   }}
                 />
