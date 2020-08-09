@@ -13,42 +13,29 @@ import Welcome from './screens/Welcome';
 
 import stylesheet from './App.less';
 
-interface State {
-  isWelcomeOpen: boolean;
-}
+export default function App(): JSX.Element {
+  const [isWelcomeOpen, setWelcomeOpen] = React.useState(true);
 
-export default class App extends React.PureComponent<{}, State> {
-  constructor(props: {}) {
-    super(props);
-    this.state = {
-      isWelcomeOpen: true,
-    };
-  }
-
-  render(): React.ReactNode {
-    const { isWelcomeOpen } = this.state;
-
-    return (
-      <Router>
-        <div className={stylesheet.container}>
-          <Welcome
-            isOpen={isWelcomeOpen}
-            onRequestClose={() => {
-              this.setState({ isWelcomeOpen: false });
-            }}
+  return (
+    <Router>
+      <div className={stylesheet.container}>
+        <Welcome
+          isOpen={isWelcomeOpen}
+          onRequestClose={() => {
+            setWelcomeOpen(false);
+          }}
+        />
+        <Route path="/*/photo/:identifier">
+          <ViewerPane />
+        </Route>
+        <Switch>
+          <Route
+            path={['/map/photo/:identifier', '/map']}
+            render={() => <MapPane className={stylesheet.mapContainer} />}
           />
-          <Route path="/*/photo/:identifier">
-            <ViewerPane />
-          </Route>
-          <Switch>
-            <Route
-              path={['/map/photo/:identifier', '/map']}
-              render={() => <MapPane className={stylesheet.mapContainer} />}
-            />
-            <Redirect to="/map" />
-          </Switch>
-        </div>
-      </Router>
-    );
-  }
+          <Redirect to="/map" />
+        </Switch>
+      </div>
+    </Router>
+  );
 }
