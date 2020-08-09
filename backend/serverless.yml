@@ -83,7 +83,8 @@ plugins:
 
 functions:
   app:
-    handler: appHandler.handler 
+    handler: appHandler.handler
+    timeout: 15
     events: 
       - http:
           path: /{proxy+}
