@@ -1,5 +1,12 @@
 import React from 'react';
 
+import {
+  Route,
+  Switch,
+  Redirect,
+  BrowserRouter as Router,
+} from 'react-router-dom';
+
 import ViewerPane from './screens/ViewerPane';
 import MapPane from './screens/MapPane';
 import Welcome from './screens/Welcome';
@@ -7,7 +14,6 @@ import Welcome from './screens/Welcome';
 import stylesheet from './App.less';
 
 interface State {
-  activePhotoIdentifier: string | null;
   isWelcomeOpen: boolean;
 }
 
@@ -15,42 +21,34 @@ export default class App extends React.PureComponent<{}, State> {
   constructor(props: {}) {
     super(props);
     this.state = {
-      activePhotoIdentifier: null,
       isWelcomeOpen: true,
     };
-
-    this.handlePhotoSelected = this.handlePhotoSelected.bind(this);
-  }
-
-  handlePhotoSelected(newPhotoIdentifier: string): void {
-    this.setState({
-      activePhotoIdentifier: newPhotoIdentifier,
-    });
   }
 
   render(): React.ReactNode {
-    const { activePhotoIdentifier, isWelcomeOpen } = this.state;
+    const { isWelcomeOpen } = this.state;
 
     return (
-      <div className={stylesheet.container}>
-        <Welcome
-          isOpen={isWelcomeOpen}
-          onRequestClose={() => {
-            this.setState({ isWelcomeOpen: false });
-          }}
-        />
-        {activePhotoIdentifier ? (
-          <ViewerPane
-            photoIdentifier={activePhotoIdentifier}
-            onRequestClose={this.handlePhotoSelected.bind(this, null)}
+      <Router>
+        <div className={stylesheet.container}>
+          <Welcome
+            isOpen={isWelcomeOpen}
+            onRequestClose={() => {
+              this.setState({ isWelcomeOpen: false });
+            }}
           />
-        ) : null}
-        <MapPane
-          className={stylesheet.mapContainer}
-          activePhotoIdentifier={activePhotoIdentifier}
-          onPhotoClick={this.handlePhotoSelected}
-        />
-      </div>
+          <Route path="/*/photo/:identifier">
+            <ViewerPane />
+          </Route>
+          <Switch>
+            <Route
+              path={['/map/photo/:identifier', '/map']}
+              render={() => <MapPane className={stylesheet.mapContainer} />}
+            />
+            <Redirect to="/map" />
+          </Switch>
+        </div>
+      </Router>
     );
   }
 }

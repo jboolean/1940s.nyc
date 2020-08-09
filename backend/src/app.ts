@@ -19,4 +19,8 @@ app.use(async (req, res, next) => {
 
 app.use('/photos', PhotosResource);
 
+app.use(function(req, res, next) {
+  res.status(404).send("Sorry can't find that!");
+});
+
 export default app;

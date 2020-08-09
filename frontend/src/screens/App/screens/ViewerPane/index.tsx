@@ -5,41 +5,38 @@ import ImageSwitcher from './components/ImageSwitcher';
 import { API_BASE } from 'utils/apiConstants';
 
 import stylesheet from './ViewerPane.less';
+import { useHistory, useParams } from 'react-router';
 
-interface Props {
-  photoIdentifier: string;
-  onRequestClose: () => void;
-}
+export default function ViewerPane(): JSX.Element {
+  const history = useHistory();
+  const { identifier: photoIdentifier } = useParams<{ identifier?: string }>();
+  return (
+    <div className={stylesheet.container}>
+      <button
+        className={stylesheet.closeButton}
+        onClick={() =>
+          history.push({ pathname: '..', hash: window.location.hash })
+        }
+      >
+        Close
+      </button>
 
-export default class ViewerPane extends React.Component<Props> {
-  render(): React.ReactNode {
-    const { photoIdentifier } = this.props;
-    return (
-      <div className={stylesheet.container}>
-        <button
-          className={stylesheet.closeButton}
-          onClick={() => this.props.onRequestClose()}
+      <p className={stylesheet.credit}>
+        Photo © NYC Municipal Archives{' '}
+        <a
+          href={`${API_BASE}/photos/${photoIdentifier}/buy-prints`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={stylesheet.purchase}
         >
-          Close
-        </button>
+          Buy Prints
+        </a>
+      </p>
 
-        <p className={stylesheet.credit}>
-          Photo © NYC Municipal Archives{' '}
-          <a
-            href={`${API_BASE}/photos/${photoIdentifier}/buy-prints`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={stylesheet.purchase}
-          >
-            Buy Prints
-          </a>
-        </p>
-
-        <ImageSwitcher
-          className={stylesheet.image}
-          src={`https://photos.1940s.nyc/jpg/${photoIdentifier}.jpg`}
-        />
-      </div>
-    );
-  }
+      <ImageSwitcher
+        className={stylesheet.image}
+        src={`https://photos.1940s.nyc/jpg/${photoIdentifier}.jpg`}
+      />
+    </div>
+  );
 }

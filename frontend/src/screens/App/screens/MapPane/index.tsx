@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-ignore */
 import React from 'react';
 
 import { OverlayId } from './components/MainMap';
@@ -11,10 +12,9 @@ import stylesheet from './MapPane.less';
 import MainMap from './components/MainMap';
 import Search from './components/Search';
 import Geolocate from './components/Geolocate';
+import { withRouter, RouteComponentProps } from 'react-router';
 
 interface Props {
-  onPhotoClick: (identifier: string) => void;
-  activePhotoIdentifier?: string;
   className?: string;
 }
 
@@ -22,11 +22,11 @@ interface State {
   overlay: OverlayId | null;
 }
 
-export default class MapPane extends React.Component<Props, State> {
-  map?: MainMap;
+class MapPane extends React.Component<Props & RouteComponentProps, State> {
+  map?: typeof MainMap;
   private idPrefix: string;
 
-  constructor(props: Props) {
+  constructor(props: Props & RouteComponentProps) {
     super(props);
     this.state = {
       overlay: 'default-map',
@@ -38,6 +38,7 @@ export default class MapPane extends React.Component<Props, State> {
       this
     );
     this.handleGeolocated = this.handleGeolocated.bind(this);
+    this.openPhoto = this.openPhoto.bind(this);
   }
 
   handleOverlayChange(overlay: OverlayId): void {
@@ -50,17 +51,24 @@ export default class MapPane extends React.Component<Props, State> {
     const [lng, lat] = feature.geometry.coordinates;
     this.map.goTo({ lng, lat });
 
-    closest({ lng, lat }).then(this.props.onPhotoClick, noop);
+    closest({ lng, lat }).then(this.openPhoto, noop);
   }
 
   handleGeolocated(position: { lat: number; lng: number }): void {
     this.map.goTo(position);
-    closest(position).then(this.props.onPhotoClick, noop);
+    closest(position).then(this.openPhoto, noop);
+  }
+
+  openPhoto(identifier: string): void {
+    this.props.history.push({
+      pathname: '/map/photo/' + identifier,
+      hash: window.location.hash,
+    });
   }
 
   render(): React.ReactNode {
     const { overlay } = this.state;
-    const { activePhotoIdentifier, className, onPhotoClick } = this.props;
+    const { className } = this.props;
 
     return (
       <div className={classnames(stylesheet.container, className)}>
@@ -103,14 +111,15 @@ export default class MapPane extends React.Component<Props, State> {
           ))}
         </div>
         <MainMap
+          // @ts-ignore
           ref={ref => (this.map = ref)}
           className={stylesheet.map}
-          onPhotoClick={onPhotoClick}
           panOnClick={false}
-          activePhotoIdentifier={activePhotoIdentifier}
           overlay={overlay}
         />
       </div>
     );
   }
 }
+
+export default withRouter(MapPane);

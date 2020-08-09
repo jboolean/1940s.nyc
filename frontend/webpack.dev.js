@@ -13,4 +13,7 @@ module.exports = merge(common, {
       __DEV__: true,
     }),
   ],
+  devServer: {
+    historyApiFallback: true,
+  },
 });

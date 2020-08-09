@@ -25,6 +25,20 @@ router.get('/closest', async (req, res) => {
   res.send(photo);
 });
 
+router.get('/outtake-summaries', async (req, res) => {
+  const photoRepo = getRepository(Photo);
+
+  const photos = await photoRepo.find({
+    where: { isOuttake: true },
+    select: ['identifier'],
+    order: {
+      identifier: 'ASC',
+    },
+  });
+
+  res.send(photos);
+});
+
 router.get('/:identifier', async (req, res) => {
   const photoRepo = getRepository(Photo);
 

@@ -1,5 +1,12 @@
 import React from 'react';
 
+import {
+  // withRouter,
+  useHistory,
+  useRouteMatch,
+  useLocation,
+} from 'react-router-dom';
+
 import mapboxgl from 'mapbox-gl';
 import classnames from 'classnames';
 
@@ -8,6 +15,7 @@ import * as overlays from './overlays';
 export { OverlayId } from './overlays';
 
 import stylesheet from './MainMap.less';
+import { RouteComponentProps } from 'react-router';
 
 const MAPBOX_STYLE = __DEV__
   ? 'mapbox://styles/julianboilen/ck5jrzrs11r1p1imia7qzjkm1/draft'
@@ -16,14 +24,14 @@ const MAPBOX_STYLE = __DEV__
 const PHOTO_LAYER = 'photos-1940s';
 
 interface Props {
-  onPhotoClick: (photoIdentifier: string) => void;
   className?: string;
   panOnClick: boolean;
-  activePhotoIdentifier?: string;
   overlay: overlays.OverlayId;
 }
 
-export default class MainMap extends React.PureComponent<Props> {
+type PropsWithRouter = Props & RouteComponentProps<{ identifier?: string }>;
+
+class MainMap extends React.PureComponent<PropsWithRouter> {
   private mapContainer: Element;
   private map: mapboxgl.Map;
 
@@ -41,10 +49,14 @@ export default class MainMap extends React.PureComponent<Props> {
     }));
 
     map.on('click', PHOTO_LAYER, e => {
-      const { panOnClick, onPhotoClick } = this.props;
+      const { panOnClick } = this.props;
       if (panOnClick) map.panTo(e.lngLat);
       const feature = e.features[0];
-      onPhotoClick(feature.properties.photoIdentifier);
+      const identifier = feature.properties.photoIdentifier;
+      this.props.history.push({
+        pathname: '/map/photo/' + identifier,
+        hash: window.location.hash,
+      });
     });
 
     // Change the cursor to a pointer when the mouse is over the places layer.
@@ -66,13 +78,14 @@ export default class MainMap extends React.PureComponent<Props> {
     });
   }
 
-  componentDidUpdate(prevProps: Props): void {
+  componentDidUpdate(prevProps: PropsWithRouter): void {
     // Update the conditional color expression to make the active dot a different color
     if (!this.map.isStyleLoaded()) {
       this.map.once('style.load', () => this.syncUI());
     }
     if (
-      prevProps.activePhotoIdentifier !== this.props.activePhotoIdentifier ||
+      prevProps.match.params.identifier !==
+        this.props.match.params.identifier ||
       prevProps.overlay !== this.props.overlay
     ) {
       this.syncUI();
@@ -83,7 +96,7 @@ export default class MainMap extends React.PureComponent<Props> {
     this.map.setFilter(PHOTO_LAYER + '-active', [
       '==',
       ['get', 'photoIdentifier'],
-      this.props.activePhotoIdentifier,
+      this.props.match.params.identifier || null,
     ]);
 
     overlays.setOverlay(this.map, this.props.overlay);
@@ -118,3 +131,37 @@ export default class MainMap extends React.PureComponent<Props> {
     );
   }
 }
+
+/* This component needs to have public methods. Regular withRouter does not forward the ref needed to use public methods.
+Created my own withRouter that forwards refs.
+All the types got very confusing, sorry.
+*/
+
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+function withRouterRef<
+  OuterProps,
+  C = React.ComponentType<OuterProps & RouteComponentProps>
+>(Component: C) {
+  return React.forwardRef<C, OuterProps>((props, ref) => {
+    const match = useRouteMatch();
+    const location = useLocation();
+    const history = useHistory();
+    return (
+      // I give up on types
+      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+      // @ts-ignore
+      <Component
+        ref={ref}
+        match={match}
+        location={location}
+        history={history}
+        {...props}
+      />
+    );
+  });
+}
+
+export default (withRouterRef<Props>(
+  MainMap
+) as unknown) as React.ComponentType<Props & React.RefAttributes<MainMap>> &
+  Pick<MainMap, 'goTo'>;
