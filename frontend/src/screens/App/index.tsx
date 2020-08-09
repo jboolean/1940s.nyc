@@ -12,6 +12,7 @@ import MapPane from './screens/MapPane';
 import Welcome from './screens/Welcome';
 
 import stylesheet from './App.less';
+import Outtakes from './screens/ImageGrid';
 
 export default function App(): JSX.Element {
   const [isWelcomeOpen, setWelcomeOpen] = React.useState(true);
@@ -33,6 +34,9 @@ export default function App(): JSX.Element {
             path={['/map/photo/:identifier', '/map']}
             render={() => <MapPane className={stylesheet.mapContainer} />}
           />
+          <Route path={['/outtakes/photo/:identifier', '/outtakes']}>
+            <Outtakes className={stylesheet.outtakesContainer} />
+          </Route>
           <Redirect to="/map" />
         </Switch>
       </div>

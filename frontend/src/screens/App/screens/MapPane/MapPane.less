@@ -67,6 +67,19 @@
   }
 }
 
+.outtakesLink {
+  display: block;
+  composes: floating from '../../../../shared/styles/ui.less';
+  position: absolute;
+  top: 22px;
+  right: 22px;
+  z-index: 1;
+  box-sizing: border-box;
+  height: 2rem;
+  padding: 0.5rem 1rem;
+  text-decoration: none;
+}
+
 @media screen and (max-width: 480px) {
   .topControls {
     width: calc(100% - 1rem);
@@ -80,6 +93,13 @@
   .overlays {
     right: 0.5rem;
     bottom: 44px;
+  }
+
+  .outtakesLink {
+    top: initial;
+    right: initial;
+    bottom: 44px;
+    left: 0.5rem;
   }
 }
 

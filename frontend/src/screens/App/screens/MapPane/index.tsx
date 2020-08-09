@@ -13,6 +13,7 @@ import MainMap from './components/MainMap';
 import Search from './components/Search';
 import Geolocate from './components/Geolocate';
 import { withRouter, RouteComponentProps } from 'react-router';
+import { Link } from 'react-router-dom';
 
 interface Props {
   className?: string;
@@ -72,6 +73,9 @@ class MapPane extends React.Component<Props & RouteComponentProps, State> {
 
     return (
       <div className={classnames(stylesheet.container, className)}>
+        <Link to="/outtakes" className={stylesheet.outtakesLink}>
+          Outtakes
+        </Link>
         <div className={stylesheet.topControls}>
           <Search
             onFeatureSelected={this.handleSearchFeatureSelected}
