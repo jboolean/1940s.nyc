@@ -112,9 +112,7 @@ function Grid({
                   )}
                   loading="lazy"
                   className={classnames(stylesheet.image, {
-                    [stylesheet.selected]:
-                      identifier === selectedIdentifier ||
-                      visibleImageIRef.current === i,
+                    [stylesheet.selected]: identifier === selectedIdentifier,
                   })}
                   onLoad={e => {
                     e.currentTarget.className += ' ' + stylesheet.loaded;
