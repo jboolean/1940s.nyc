@@ -65,12 +65,11 @@ function Grid({
   const itemsPerRow = calculateItemsPerRow(width);
   const itemHeight = (1 / ASPECT) * (width / itemsPerRow);
 
-  // If size changes, scroll to last visible item rather than some flying off somewhere random
+  // If items are reorganized, scroll to last visible item rather than some flying off somewhere random
   React.useEffect(() => {
     const imageI = visibleImageIRef.current;
     if (isNil(imageI)) return;
     const rowI = imageI / itemsPerRow;
-    console.log('Scrolling to photo/row:', imageI, rowI);
     listRef.current.scrollToItem(rowI, 'start');
   }, [itemsPerRow]);
 
@@ -85,11 +84,11 @@ function Grid({
       className={stylesheet.grid}
       onItemsRendered={({ visibleStartIndex }) => {
         const imageI = visibleStartIndex * itemsPerRow;
-        console.log('Current photo/row', imageI, visibleStartIndex);
-        // We'll scroll back to here, want to allow time for reflow
+        // We'll scroll back to here
+        // Record on a delay to allow time for reflow
         setTimeout(() => {
           visibleImageIRef.current = imageI;
-        }, 1500);
+        }, 1000);
       }}
     >
       {({ index: rowIndex, style, isScrolling }) => {
@@ -118,7 +117,6 @@ function Grid({
                     e.currentTarget.className += ' ' + stylesheet.loaded;
                   }}
                   onClick={() => {
-                    console.log('Clicked photo/row', i, rowIndex);
                     visibleImageIRef.current = i;
                     history.push('/outtakes/photo/' + identifier);
                   }}

@@ -17,6 +17,7 @@ function preloadImage(url: string, callback: () => void): void {
   const img = new Image();
   img.src = url;
   img.addEventListener('load', callback);
+  img.addEventListener('error', callback);
 }
 
 export default class ImageSwitcher<T> extends React.Component<Props, State> {
@@ -49,7 +50,6 @@ export default class ImageSwitcher<T> extends React.Component<Props, State> {
   }
 
   handleNewImgLoad(): void {
-    console.log('Preloaded');
     if (!this.state.hide) {
       this.swapImage();
     }
@@ -59,7 +59,6 @@ export default class ImageSwitcher<T> extends React.Component<Props, State> {
   }
 
   handleExited(): void {
-    console.log('Exited');
     this.setState({
       hide: false,
     });
