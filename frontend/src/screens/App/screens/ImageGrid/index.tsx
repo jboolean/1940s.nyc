@@ -38,6 +38,16 @@ const onlyIfLoaded = (url: string, isScrolling: boolean): string => {
   return url;
 };
 
+function useForceUpdate(): () => void {
+  const [, setValue] = React.useState(0); // integer state
+  return () => setValue(value => ++value); // update the state to force render
+}
+
+// This "state" is kept outside the component because AutoSizer unmounts the component when it is 0 width,
+// and then it reloads data
+const visibleImageIRef: { current?: number } = { current: undefined };
+let photoSummaries: PhotoSummary[] = [];
+
 function Grid({
   width,
   height,
@@ -45,14 +55,15 @@ function Grid({
   width: number;
   height: number;
 }): JSX.Element {
-  const [photoSummaries, setPhotoSummaries] = React.useState<PhotoSummary[]>(
-    []
-  );
-
-  const visibleImageIRef = React.useRef<number | undefined>();
+  // Sorry this is a hack. State has to be stored outside the component but I still want to re-render.
+  const forceUpdate = useForceUpdate();
 
   React.useEffect(() => {
-    getOuttakeSummaries().then(setPhotoSummaries);
+    if (photoSummaries.length) return;
+    getOuttakeSummaries().then(data => {
+      photoSummaries = data;
+      forceUpdate();
+    });
   }, []);
 
   const history = useHistory();
@@ -88,7 +99,7 @@ function Grid({
         // Record on a delay to allow time for reflow
         setTimeout(() => {
           visibleImageIRef.current = imageI;
-        }, 1000);
+        }, 1500);
       }}
     >
       {({ index: rowIndex, style, isScrolling }) => {

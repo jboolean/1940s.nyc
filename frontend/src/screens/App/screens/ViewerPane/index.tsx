@@ -1,5 +1,7 @@
 import React from 'react';
 
+import classnames from 'classnames';
+
 import ImageSwitcher from './components/ImageSwitcher';
 
 import { API_BASE } from 'utils/apiConstants';
@@ -7,11 +9,15 @@ import { API_BASE } from 'utils/apiConstants';
 import stylesheet from './ViewerPane.less';
 import { useHistory, useParams } from 'react-router';
 
-export default function ViewerPane(): JSX.Element {
+export default function ViewerPane({
+  className,
+}: {
+  className: string;
+}): JSX.Element {
   const history = useHistory();
   const { identifier: photoIdentifier } = useParams<{ identifier?: string }>();
   return (
-    <div className={stylesheet.container}>
+    <div className={classnames(stylesheet.container, className)}>
       <button
         className={stylesheet.closeButton}
         onClick={() =>

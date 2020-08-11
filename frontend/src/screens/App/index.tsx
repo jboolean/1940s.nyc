@@ -27,7 +27,7 @@ export default function App(): JSX.Element {
           }}
         />
         <Route path="/*/photo/:identifier">
-          <ViewerPane />
+          <ViewerPane className={stylesheet.viewer} />
         </Route>
         <Switch>
           <Route
