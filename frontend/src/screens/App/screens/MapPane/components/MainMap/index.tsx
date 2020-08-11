@@ -39,8 +39,8 @@ class MainMap extends React.PureComponent<PropsWithRouter> {
     const map = (this.map = new mapboxgl.Map({
       container: this.mapContainer,
       style: MAPBOX_STYLE,
-      center: [-73.927, 40.734],
-      zoom: 11.16,
+      center: [-73.99397, 40.7093],
+      zoom: 13.69,
       maxBounds: [
         [-74.25908989999999, 40.4773991], // SW
         [-73.70027209999999, 40.9175771], // NE

@@ -35,6 +35,8 @@ export default function({ isOpen, onRequestClose }: Props): JSX.Element {
             In 2018, the NYC Municipal Archives completed the digitization and
             tagging of these photos. This website places
             them&nbsp;on&nbsp;a&nbsp;map.
+            <br />
+            Zoom in! Every dot&nbsp;is&nbsp;a&nbsp;photo.
           </p>
           <hr />
           <p className={stylesheet.finePrint}>
