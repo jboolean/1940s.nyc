@@ -5,6 +5,7 @@ import Modal from 'react-modal';
 import 'normalize.css';
 import 'core-js/stable';
 import 'utils/initMapboxgl';
+// import 'modernizr';
 
 import App from './screens/App';
 

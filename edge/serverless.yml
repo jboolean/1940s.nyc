@@ -1,0 +1,20 @@
+service: fourtiesnyc-edge
+
+provider:
+  name: aws
+  runtime: nodejs10.x
+  stage: production
+  region: us-east-1
+
+plugins:
+  - serverless-lambda-edge-pre-existing-cloudfront
+ 
+functions:
+  compressTileAtEdge:
+    handler: compressTileAtEdge.handler
+    events:
+      - preExistingCloudFront:
+          distributionId: E1WJQI0DS26FO5 # CloudFront distribution ID you want to associate
+          eventType: origin-request # Choose event to trigger your Lambda function, which are `viewer-request`, `origin-request`, `origin-response` or `viewer-response`
+          pathPattern: '*' # Specifying the CloudFront behavior
+          includeBody: false # Whether including body or not within request

@@ -34,6 +34,17 @@ module.exports = {
   ],
   module: {
     rules: [
+      // {
+      //   test: path.resolve(__dirname, './Modernizr.js'),
+      //   use: [
+      //     {
+      //       loader: 'expose-loader',
+      //       options: {
+      //         exposes: ['Modernizr'],
+      //       },
+      //     },
+      //   ],
+      // },
       {
         test: /\.jsx?$/,
         exclude: /node_modules/,
@@ -89,14 +100,14 @@ module.exports = {
           classIdPrefix: '[name]-[hash:8]__',
         },
       },
-      {
-        test: /\.modernizrrc.js$/,
-        loader: 'modernizr-loader',
-      },
-      {
-        test: /\.modernizrrc(\.json)?$/,
-        loader: 'modernizr-loader!json-loader',
-      },
+      // {
+      //   test: /\.modernizrrc.js$/,
+      //   loader: 'modernizr-loader',
+      // },
+      // {
+      //   test: /\.modernizrrc(\.json)?$/,
+      //   loader: 'modernizr-loader!json-loader',
+      // },
     ],
   },
   resolve: {
@@ -104,7 +115,8 @@ module.exports = {
     // directories named 'shared' will be resolved by lower modules, without ../../../.
     modules: ['node_modules', 'shared', path.resolve(__dirname, './src')],
     alias: {
-      modernizr$: path.resolve(__dirname, './.modernizrrc'),
+      // modernizr$: path.resolve(__dirname, './.modernizrrc'),
+      modernizr$: path.resolve(__dirname, './Modernizr.js'),
     },
   },
 };

@@ -1,3 +1,5 @@
+import canUseWebP from 'utils/canUseWebP';
+
 const LAYER_IDS = [
   'arial-1924',
   'arial-1951',
@@ -18,6 +20,9 @@ export type OverlayId =
   | 'atlas-1916'
   | 'atlas-1930'
   | 'atlas-1956';
+
+// For tiles recompressed at edge
+const ext = canUseWebP() ? 'webp' : 'png';
 
 // Overlays are collections of layers
 const overlaysToLayers: { [overlay in OverlayId]: LayerId[] } = {
@@ -62,7 +67,7 @@ export const installLayers = (map: mapboxgl.Map, photoLayer: string): void => {
       bounds: MANHATTAN,
     },
     {
-      url: 'https://mapwarper-net-tiles.1940s.nyc/1194/{z}/{x}/{y}.png',
+      url: `https://mapwarper-net-tiles.1940s.nyc/1194/{z}/{x}/{y}.${ext}`,
       targetId: 'atlas-1930',
       attribution: '[1930] ' + NYPL_ATTRIBUTION,
       bounds: MANHATTAN,
