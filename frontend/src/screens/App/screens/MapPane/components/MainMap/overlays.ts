@@ -1,4 +1,4 @@
-// import Modernizr from 'modernizr';
+import canUseWebP from 'utils/canUseWebP';
 
 const LAYER_IDS = [
   'arial-1924',
@@ -22,8 +22,7 @@ export type OverlayId =
   | 'atlas-1956';
 
 // For tiles recompressed at edge
-// eslint-disable-next-line no-undef
-const ext = Modernizr.webpalpha ? 'webp' : 'png';
+const ext = canUseWebP() ? 'webp' : 'png';
 
 // Overlays are collections of layers
 const overlaysToLayers: { [overlay in OverlayId]: LayerId[] } = {
