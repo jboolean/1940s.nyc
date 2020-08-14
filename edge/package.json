@@ -1,0 +1,20 @@
+{
+  "name": "fourtiesnyc-edge",
+  "version": "1.0.0",
+  "description": "",
+  "main": "compressTileAtEdge.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "deploy": "rm -rf node_modules/sharp && npm install --arch=x64 --platform=linux sharp && serverless deploy --stage production"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "serverless": "^1.78.1",
+    "serverless-lambda-edge-pre-existing-cloudfront": "^1.1.1"
+  },
+  "dependencies": {
+    "axios": "^0.19.2",
+    "sharp": "^0.25.4"
+  }
+}

@@ -5,6 +5,9 @@
 		},
 		{
 			"path": "frontend"
+		},
+		{
+			"path": "edge"
 		}
 	],
 	"settings": {

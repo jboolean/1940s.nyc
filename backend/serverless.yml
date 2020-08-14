@@ -19,7 +19,8 @@ service: fourtiesnyc
 # You can pin your service to only deploy with a specific Serverless version
 # Check out our docs for more details
 # frameworkVersion: "=X.X.X"
-
+package:
+  individually: true
 custom:
   bucket: fourties-photos
   customDomain:
@@ -51,6 +52,7 @@ plugins:
   - serverless-plugin-typescript
   - serverless-secrets-plugin
   - serverless-domain-manager
+  - serverless-lambda-edge-pre-existing-cloudfront
  
 # you can add statements to the Lambda function's IAM Role here
 #  iamRoleStatements:
@@ -120,6 +122,14 @@ functions:
           event: s3:ObjectRemoved:*
           rules:
             - prefix: originals/
+  # compressTileAtEdge:
+  #   handler: compressTileAtEdge.handler
+  #   events:
+  #     - preExistingCloudFront:
+  #         distributionId: E1WJQI0DS26FO5 # CloudFront distribution ID you want to associate
+  #         eventType: origin-request # Choose event to trigger your Lambda function, which are `viewer-request`, `origin-request`, `origin-response` or `viewer-response`
+  #         pathPattern: '*' # Specifying the CloudFront behavior
+  #         includeBody: false # Whether including body or not within request
 
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
