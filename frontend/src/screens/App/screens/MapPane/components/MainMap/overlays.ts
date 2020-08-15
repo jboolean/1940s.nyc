@@ -67,7 +67,9 @@ export const installLayers = (map: mapboxgl.Map, photoLayer: string): void => {
       bounds: MANHATTAN,
     },
     {
-      url: `https://mapwarper-net-tiles.1940s.nyc/1194/{z}/{x}/{y}.${ext}`,
+      url: canUseWebP()
+        ? `https://mapwarper-net-tiles.1940s.nyc/1194/{z}/{x}/{y}.${ext}`
+        : 'https://mapwarper.net/mosaics/tile/1194/{z}/{x}/{y}.png',
       targetId: 'atlas-1930',
       attribution: '[1930] ' + NYPL_ATTRIBUTION,
       bounds: MANHATTAN,
