@@ -67,18 +67,32 @@
   }
 }
 
-.outtakesLink {
-  display: block;
-  composes: floating from '../../../../shared/styles/ui.less';
-  position: absolute;
-  top: 22px;
+.links {
+  display: flex;
+  flex-direction: column;
   right: 22px;
-  z-index: 1;
-  box-sizing: border-box;
-  height: 2rem;
-  padding: 0.5rem 1rem;
-  text-decoration: none;
+  top: 22px;
+  position: absolute;
+  text-align: center;
 }
+
+
+.outtakesLink, .eightiesLink {
+    display: block;
+    composes: floating from '../../../../shared/styles/ui.less';
+    z-index: 1;
+    box-sizing: border-box;
+    height: 2rem;
+    padding: 0.5rem 1rem;
+    text-decoration: none;
+    margin-bottom: 0.5rem;;
+}
+
+.externalIcon {
+  height: 1.2ex;
+  vertical-align: super;
+}
+
 
 @media screen and (max-width: 480px) {
   .topControls {
@@ -95,11 +109,12 @@
     bottom: 44px;
   }
 
-  .outtakesLink {
+  .links {
     top: initial;
     right: initial;
     bottom: 44px;
     left: 0.5rem;
+    flex-direction: column-reverse;
   }
 }
 

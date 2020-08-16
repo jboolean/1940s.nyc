@@ -15,6 +15,8 @@ import Geolocate from './components/Geolocate';
 import { withRouter, RouteComponentProps } from 'react-router';
 import { Link } from 'react-router-dom';
 
+import ExternalIcon from '!file-loader!./assets/external.svg';
+
 interface Props {
   className?: string;
 }
@@ -73,9 +75,24 @@ class MapPane extends React.Component<Props & RouteComponentProps, State> {
 
     return (
       <div className={classnames(stylesheet.container, className)}>
-        <Link to="/outtakes" className={stylesheet.outtakesLink}>
-          Outtakes
-        </Link>
+        <div className={stylesheet.links}>
+          <Link to="/outtakes" className={stylesheet.outtakesLink}>
+            Outtakes
+          </Link>
+          <a
+            href="http://80s.nyc"
+            target="_blank"
+            rel="noopener noreferrer"
+            className={stylesheet.eightiesLink}
+          >
+            1980s{' '}
+            <img
+              src={ExternalIcon}
+              alt="External link"
+              className={stylesheet.externalIcon}
+            />
+          </a>
+        </div>
         <div className={stylesheet.topControls}>
           <Search
             onFeatureSelected={this.handleSearchFeatureSelected}
