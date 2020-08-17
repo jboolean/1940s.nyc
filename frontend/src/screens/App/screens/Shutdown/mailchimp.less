@@ -1,0 +1,49 @@
+@import '../../../../shared//styles/colors.less';
+
+.mailchimp {
+  margin: 1rem 0;
+}
+
+.mailchimp :global {
+
+  .mc-field-group, .clear {
+    display: inline;
+  }
+
+  label {
+    display: none;
+  }
+
+  input {
+    height: 2rem;
+    padding: 0 0.5rem;
+    box-sizing: border-box;
+  }
+
+  input[type='email'] {
+    outline: none;
+    border: none;
+
+    border: 1px solid @font-color-dark;
+  }
+
+  input[type='submit'] {
+      display: inline-block;
+
+      // padding: 1rem 2rem;
+
+      background-color: @creme;
+      outline: none;
+      border: none;
+      cursor: pointer;
+  }
+}
+
+@media screen and (max-width: 800px), screen and (max-height: 600px) {
+  .mailchimp :global {
+    input[type='submit'] {
+      background-color: @red;
+      color: @creme;
+    }
+  }
+}
