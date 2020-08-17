@@ -24,7 +24,7 @@ export default function({ isOpen }: Props): JSX.Element {
       <h2>Well that was fun…and expensive</h2>
       <p>
         Thank you to everyone who shared my project of mapping photos of 1940s
-        New York! Unfortunately, the bill for the map service I was using got
+        New York! Unfortunately, the costs for the map service I was using got
         out of control. I plan to re-launch the site after I find a more
         affordable mapping solution.
       </p>
@@ -42,7 +42,7 @@ export default function({ isOpen }: Props): JSX.Element {
           was
         </a>{' '}
         <a
-          href="boingboing.net/2020/08/14/explore-nyc-in-the-1930s-and-1.html"
+          href="http://boingboing.net/2020/08/14/explore-nyc-in-the-1930s-and-1.html"
           target="_blank"
           rel="noopener noreferrer"
         >
