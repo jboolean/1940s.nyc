@@ -32,6 +32,25 @@ export default function({ isOpen }: Props): JSX.Element {
         Please leave your email address so I can let you know when the site is
         back up.
       </p>
+      <p>
+        I promise it{' '}
+        <a
+          href="https://www.timeout.com/newyork/news/find-out-what-your-nyc-building-looked-like-in-the-1940s-081420"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          was
+        </a>{' '}
+        <a
+          href="boingboing.net/2020/08/14/explore-nyc-in-the-1930s-and-1.html"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          cool
+        </a>{' '}
+        and will be back.
+      </p>
+
       <Mailchimp />
       <hr />
       <p className={stylesheet.finePrint}>
