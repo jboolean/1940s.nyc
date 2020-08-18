@@ -1,4 +1,4 @@
-import canUseWebP from 'utils/canUseWebP';
+// import canUseWebP from 'utils/canUseWebP';
 
 const LAYER_IDS = [
   'arial-1924',
