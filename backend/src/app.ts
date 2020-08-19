@@ -14,7 +14,7 @@ app.use(
     origin: [
       'http://localhost:8080',
       'https://1940s.nyc',
-      /--1940s-nyc.netlify.app$/,
+      /--1940s-nyc\.netlify\.app$/,
     ],
   })
 );
