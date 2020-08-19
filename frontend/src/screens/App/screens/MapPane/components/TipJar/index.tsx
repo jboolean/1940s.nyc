@@ -35,8 +35,9 @@ export default function TipJar({
     <Modal size="small" isOpen={isOpen} onRequestClose={onRequestClose}>
       <h1>Will you chip in on web hosting costs?</h1>
       <p>
-        It costs money to keep this site online, especially given the surprising
-        amount of traffic it’s received.
+        I’ve received a surprisingly large amount of traffic on this site
+        recently. It costs money to serve up photos and maps. If you enjoy my
+        site, consider pitching in a few dollars to keep it online.
       </p>
       <p>
         Thank you, <br />
