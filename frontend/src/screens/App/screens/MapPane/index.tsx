@@ -12,6 +12,7 @@ import stylesheet from './MapPane.less';
 import MainMap from './components/MainMap';
 import Search from './components/Search';
 import Geolocate from './components/Geolocate';
+import TipJar from './components/TipJar';
 import { withRouter, RouteComponentProps } from 'react-router';
 import { Link } from 'react-router-dom';
 
@@ -23,6 +24,7 @@ interface Props {
 
 interface State {
   overlay: OverlayId | null;
+  isTipJarOpen: boolean;
 }
 
 class MapPane extends React.Component<Props & RouteComponentProps, State> {
@@ -33,6 +35,7 @@ class MapPane extends React.Component<Props & RouteComponentProps, State> {
     super(props);
     this.state = {
       overlay: 'default-map',
+      isTipJarOpen: false,
     };
     this.idPrefix = uniqueId('MapPane-');
 
@@ -70,11 +73,17 @@ class MapPane extends React.Component<Props & RouteComponentProps, State> {
   }
 
   render(): React.ReactNode {
-    const { overlay } = this.state;
+    const { overlay, isTipJarOpen } = this.state;
     const { className } = this.props;
 
     return (
       <div className={classnames(stylesheet.container, className)}>
+        <TipJar
+          isOpen={isTipJarOpen}
+          onRequestClose={() => {
+            this.setState({ isTipJarOpen: false });
+          }}
+        />
         <div className={stylesheet.links}>
           <Link to="/outtakes" className={stylesheet.outtakesLink}>
             Outtakes
@@ -92,6 +101,15 @@ class MapPane extends React.Component<Props & RouteComponentProps, State> {
               className={stylesheet.externalIcon}
             />
           </a>
+          <button
+            type="button"
+            className={stylesheet.tipMeButton}
+            onClick={() => {
+              this.setState({ isTipJarOpen: true });
+            }}
+          >
+            $2 Tip?
+          </button>
         </div>
         <div className={stylesheet.topControls}>
           <Search

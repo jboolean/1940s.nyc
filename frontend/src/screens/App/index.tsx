@@ -11,6 +11,7 @@ import ViewerPane from './screens/ViewerPane';
 import MapPane from './screens/MapPane';
 import Welcome from './screens/Welcome';
 import Shutdown from './screens/Shutdown';
+import ThankYou from './screens/MapPane/components/TipJar/ThankYou';
 
 import stylesheet from './App.less';
 import Outtakes from './screens/ImageGrid';
@@ -18,7 +19,10 @@ import Outtakes from './screens/ImageGrid';
 const IS_SHUTDOWN = false;
 
 export default function App(): JSX.Element {
-  const [isWelcomeOpen, setWelcomeOpen] = React.useState(true);
+  const [isThankYouOpen, setThankYouOpen] = React.useState(
+    window.location.search.includes('tipSuccess')
+  );
+  const [isWelcomeOpen, setWelcomeOpen] = React.useState(!isThankYouOpen);
 
   return (
     <Router>
@@ -33,6 +37,13 @@ export default function App(): JSX.Element {
             }}
           />
         )}
+
+        <ThankYou
+          isOpen={isThankYouOpen}
+          onRequestClose={() => {
+            setThankYouOpen(false);
+          }}
+        />
 
         <Route path="/*/photo/:identifier">
           <ViewerPane className={stylesheet.viewer} />
