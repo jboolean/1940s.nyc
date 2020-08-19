@@ -38,7 +38,6 @@ export default function TipJar({
         It costs money to keep this site online, especially given the surprising
         amount of traffic it’s received.
       </p>
-      <p>If tips cover expenses, I’ll remove this tip jar.</p>
       <p>
         Thank you, <br />
         <em>– Julian</em>
