@@ -37,7 +37,7 @@ export default function TipJar({
       </p>
       <p>If tips cover web hosting costs, I’ll remove the tip jar.</p>
       <p>
-        Thanks, <br/>
+        Thanks, <br />
         <em>– Julian</em>
       </p>
       <div className={stylesheet.tipForm}>
