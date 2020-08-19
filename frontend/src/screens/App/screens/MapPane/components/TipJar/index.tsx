@@ -35,11 +35,9 @@ export default function TipJar({
         It costs money to keep this site online, especially given the surprising
         amount of traffic it’s received.
       </p>
+      <p>If tips cover web hosting costs, I’ll remove the tip jar.</p>
       <p>
-        I will not make a profit from this site, and will take down this tip jar
-        once my costs are covered.
-      </p>
-      <p>
+        Thanks, <br/>
         <em>– Julian</em>
       </p>
       <div className={stylesheet.tipForm}>

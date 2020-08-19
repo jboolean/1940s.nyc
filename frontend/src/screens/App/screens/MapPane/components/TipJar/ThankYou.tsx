@@ -7,7 +7,7 @@ export default function ThankYou({
 }: Pick<ReactModal.Props, 'isOpen' | 'onRequestClose'>): JSX.Element {
   return (
     <Modal size="small" isOpen={isOpen} onRequestClose={onRequestClose}>
-      <h1>Thank you!</h1>
+      <h1>Thank you</h1>
       <p>Thank you so much for you helping out!</p>
       <p>
         <em>– Julian</em>
