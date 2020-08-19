@@ -20,7 +20,7 @@ service: fourtiesnyc
 # Check out our docs for more details
 # frameworkVersion: "=X.X.X"
 package:
-  individually: true
+  individually: false
 custom:
   bucket: fourties-photos
   customDomain:
@@ -52,7 +52,6 @@ plugins:
   - serverless-plugin-typescript
   - serverless-secrets-plugin
   - serverless-domain-manager
-  - serverless-lambda-edge-pre-existing-cloudfront
  
 # you can add statements to the Lambda function's IAM Role here
 #  iamRoleStatements:
@@ -86,7 +85,7 @@ plugins:
 functions:
   app:
     handler: appHandler.handler
-    timeout: 30
+    timeout: 10
     events: 
       - http:
           path: /{proxy+}

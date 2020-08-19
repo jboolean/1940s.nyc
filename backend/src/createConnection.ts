@@ -6,10 +6,8 @@ export default function createConnectionIfNotExists(): Promise<Connection> {
   if (connectionManager.has('default')) {
     const connection = connectionManager.get('default');
     if (!connection.isConnected) {
-      console.log('Has connection, not connected.');
       return connection.connect();
     }
-    console.log('Already connected');
     return Promise.resolve(connection);
   }
 
@@ -21,7 +19,6 @@ export default function createConnectionIfNotExists(): Promise<Connection> {
     DB_DATABASE: database,
   } = process.env;
 
-  console.log('Creating new connection');
   return createConnection({
     type: 'postgres',
     host,

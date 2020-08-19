@@ -33,7 +33,7 @@ router.post('/session', async (req, res) => {
 
     res.json({ sessionId: session.id });
   } catch (err) {
-    console.error(err);
+    console.error('Failed to create session', err);
     res.status(500).send();
   }
 });

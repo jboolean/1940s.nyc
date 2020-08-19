@@ -30,11 +30,14 @@
   &.small {
     @modal-width: 35rem;
     @modal-height: 25rem;
+    position: absolute;
 
-    top: calc(50% - (@modal-height/2));
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     width: @modal-width;
 
-    height: @modal-height;
+    min-height: @modal-height;
     overflow-y: auto;
   }
 }
@@ -102,6 +105,8 @@
 
   .modal.small, .modal.large {
     display: block;
+    position: relative;
+    transform: none;
 
     top: 0;
     bottom: 0;

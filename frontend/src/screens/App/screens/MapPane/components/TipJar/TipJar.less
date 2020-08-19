@@ -28,6 +28,32 @@
 
   &:disabled {
     cursor: default;
+    opacity: 0.85;
+  }
+}
+
+.presets {
+  margin: 2rem 0;
+}
+
+.presets > *{
+  display: inline-block;
+  margin-right: 1rem;
+  margin-bottom: 1rem;
+}
+
+.preset {
+  background-color: transparent;
+  outline: none;
+  border: 2px solid @font-color-dark;
+  cursor: pointer;
+
+  padding: 1rem 2rem;
+  transition: background-color 200ms ease-in-out, color 200ms ease-in-out;
+
+  &.active, &:hover {
+    background-color: @font-color-dark;
+    color: @creme;
   }
 }
 
