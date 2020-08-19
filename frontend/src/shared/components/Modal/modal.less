@@ -1,0 +1,122 @@
+@import '../../styles/colors.less';
+
+.modal {
+  position: relative;
+  display: block;
+  background-color: @green-lighter;
+  color: @font-color-dark;
+  
+  margin: auto;
+  box-sizing: border-box;
+
+  outline: none;
+
+  padding: 1rem;
+  padding-top: 1.5rem;
+
+  max-width: 90%;
+  max-height: 90%;
+
+
+  &.large {
+    @modal-width: 55rem;
+    @modal-height: 35rem;
+
+    top: calc(50% - (@modal-height/2));
+    width: @modal-width;
+    height: @modal-height;
+  }
+
+  &.small {
+    @modal-width: 35rem;
+    @modal-height: 25rem;
+
+    top: calc(50% - (@modal-height/2));
+    width: @modal-width;
+
+    height: @modal-height;
+    overflow-y: auto;
+  }
+}
+
+
+.bodyOpen {
+  overflow: hidden;
+}
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+
+  z-index: 100;
+  backdrop-filter: grayscale(70%);
+  background-color: hsla(0, 0, 10%, 5%);
+
+  text-align: center;;
+
+
+  h1 {
+    font-size: 34px;
+    margin: 0;
+    margin-bottom: 1rem;
+  }
+
+  hr {
+    display: block;
+    border: none;
+    border-top: 1px solid @font-color-dark;
+    width: 7em;
+    margin: auto;
+  }
+
+  a {
+    color: inherit;
+  }
+
+  p {
+    line-height: 1.6;
+    margin: 1rem 0;
+  }
+}
+
+.closeButton {
+  outline: none;
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  cursor: pointer;
+  background: none;
+  border: none;
+
+  &::before {
+    content: '×';
+    font-size: 32px;
+    text-align: right;
+  }
+}
+
+@media screen and (max-width: 800px), screen and (max-height: 600px) {
+
+  .modal.small, .modal.large {
+    display: block;
+
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+
+    background: @creme;
+    text-align: left;
+
+    hr {
+      margin: 0;
+    }
+  }
+}

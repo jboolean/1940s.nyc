@@ -1,0 +1,39 @@
+@import '../../../../../../shared/styles/colors.less';
+
+.tipForm > * {
+  display: inline-block;
+  margin-right: 1rem;
+}
+
+.amountInput {
+  outline: none;
+  border: none;
+  width: 3em;
+
+  font-size: 200%;
+  background-color: transparent;
+
+  border: none;
+  border-bottom: 1px solid @font-color-dark;
+  vertical-align: bottom;
+}
+
+.submitButton {
+  background-color: @creme;
+  outline: none;
+  border: none;
+  cursor: pointer;
+
+  padding: 1rem 2rem;
+
+  &:disabled {
+    cursor: default;
+  }
+}
+
+@media screen and (max-width: 800px), screen and (max-height: 600px) {
+  .submitButton {
+    background-color: @red;
+    color: @creme;
+  }
+}
