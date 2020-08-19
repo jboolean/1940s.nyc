@@ -93,12 +93,8 @@ functions:
     environment: ${file(secrets.${opt:stage, self:provider.stage}.yml)}
     vpc:
       subnetIds:
-        - subnet-0605403b
-        - subnet-da3abc82
-        - subnet-7b335a0d
-        - subnet-d64af0da
-        - subnet-f3d46ad9
-        - subnet-71b72814
+        - subnet-060bcc99cdb49b887
+        - subnet-0f1d4c7897a917537
       securityGroupIds:
         - sg-989df5e0
   convertImage:
