@@ -18,11 +18,21 @@ import Outtakes from './screens/ImageGrid';
 
 const IS_SHUTDOWN = false;
 
-export default function App(): JSX.Element {
-  const [isThankYouOpen, setThankYouOpen] = React.useState(
-    window.location.search.includes('tipSuccess')
+const thankYouInitial = window.location.search.includes('tipSuccess');
+const noWelcome = window.location.search.includes('noWelcome');
+
+if (thankYouInitial || noWelcome)
+  history.replaceState(
+    {},
+    '',
+    `${window.location.protocol}//${window.location.host}${window.location.pathname}${window.location.hash}`
   );
-  const [isWelcomeOpen, setWelcomeOpen] = React.useState(!isThankYouOpen);
+
+export default function App(): JSX.Element {
+  const [isThankYouOpen, setThankYouOpen] = React.useState(thankYouInitial);
+  const [isWelcomeOpen, setWelcomeOpen] = React.useState(
+    !isThankYouOpen && !noWelcome
+  );
 
   return (
     <Router>
