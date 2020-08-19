@@ -7,8 +7,6 @@ import {
   BrowserRouter as Router,
 } from 'react-router-dom';
 
-import queryString from 'query-string';
-
 import ViewerPane from './screens/ViewerPane';
 import MapPane from './screens/MapPane';
 import Welcome from './screens/Welcome';
@@ -20,11 +18,9 @@ import Outtakes from './screens/ImageGrid';
 
 const IS_SHUTDOWN = false;
 
-const query = queryString.parse(window.location.search);
-
 export default function App(): JSX.Element {
   const [isThankYouOpen, setThankYouOpen] = React.useState(
-    'tipSuccess' in query
+    window.location.search.includes('tipSuccess')
   );
   const [isWelcomeOpen, setWelcomeOpen] = React.useState(!isThankYouOpen);
 

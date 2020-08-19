@@ -1,15 +1,13 @@
 import getStripe from 'utils/getStripe';
 import api from 'utils/api';
-import queryString from 'query-string';
 
 export default async function redirectToCheckout(
   amount: number
 ): Promise<void> {
-  const parsedUrl = queryString.parseUrl(window.location.href);
-  parsedUrl.query.tipSuccess = '';
+  const successUrl = `${window.location.protocol}//${window.location.host}${window.location.pathname}?tipSuccess=${window.location.hash}`;
   const options = {
     amount,
-    successUrl: queryString.stringifyUrl(parsedUrl),
+    successUrl,
     cancelUrl: window.location.href,
   };
   const stripe = await getStripe();
