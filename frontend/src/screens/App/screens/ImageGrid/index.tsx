@@ -27,17 +27,6 @@ const calculateItemsPerRow = (width: number): number => {
   return itemsPerRow;
 };
 
-// Return null instead of url if is scolling and has not seen this url before
-// Prevent loading lots of images during scrolling
-const loadedUrls = new Set<string>();
-const onlyIfLoaded = (url: string, isScrolling: boolean): string => {
-  if (isScrolling && !loadedUrls.has(url)) {
-    return null;
-  }
-  loadedUrls.add(url);
-  return url;
-};
-
 function useForceUpdate(): () => void {
   const [, setValue] = React.useState(0); // integer state
   return () => setValue(value => ++value); // update the state to force render
@@ -116,10 +105,7 @@ function Grid({
                   key={identifier}
                   height={itemHeight}
                   width={`${100 / itemsPerRow}%`}
-                  src={onlyIfLoaded(
-                    `https://photos.1940s.nyc/420-jpg/${identifier}.jpg`,
-                    isScrolling
-                  )}
+                  src={`https://photos.1940s.nyc/420-jpg/${identifier}.jpg`}
                   loading="lazy"
                   className={classnames(stylesheet.image, {
                     [stylesheet.selected]: identifier === selectedIdentifier,
