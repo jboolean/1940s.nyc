@@ -31,7 +31,7 @@ export default function({ isOpen, onRequestClose }: Props): JSX.Element {
           <p>
             Between 1939 and 1941, the Works Progress Administration
             collaborated with the New York City Tax Department to collect
-            photographs of every building in the five boroughs of New York City.
+            photographs of most buildings in the five boroughs of New York City.
             In 2018, the NYC Municipal Archives completed the digitization and
             tagging of these photos. This website places
             them&nbsp;on&nbsp;a&nbsp;map.
@@ -41,8 +41,8 @@ export default function({ isOpen, onRequestClose }: Props): JSX.Element {
           <hr />
           <p className={stylesheet.finePrint}>
             The photos on this site are property of the NYC Department of
-            Records, with which this site has no affilliation. Prints and
-            high-resolution digital copies may be ordered directly from the
+            Records, <em>with which this site has no affilliation</em>. Prints
+            and high-resolution digital copies may be ordered directly from the
             Municipal Archives using the link at the bottom of every photo. Use
             of these photos is subject to{' '}
             <a
@@ -60,7 +60,14 @@ export default function({ isOpen, onRequestClose }: Props): JSX.Element {
             >
               publicly-viewable
             </a>
-            , low-resolution, watermarked&nbsp;images&nbsp;are&nbsp;shown.
+            , low-resolution, watermarked&nbsp;images&nbsp;are&nbsp;shown.{' '}
+            <a
+              href="https://www1.nyc.gov/assets/records/pdf/1940s%20Tax%20Department%20photographs_REC%200040_MASTER.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Collection guide.
+            </a>
           </p>
           <p className={stylesheet.finePrint}>
             Photos were placed on the map via an automatic
