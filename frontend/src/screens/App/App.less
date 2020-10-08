@@ -1,5 +1,19 @@
 :local {
-  .container {
+  .outermostContainer {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 100%;
+  }
+
+  .mainContentWrapper {
+    position: relative;
+    flex-grow: 1;
+  }
+
+  .mainContentContainer {
     display: flex;
     flex-direction: row;
     position: absolute;

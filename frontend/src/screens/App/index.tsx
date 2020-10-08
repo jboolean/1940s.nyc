@@ -12,6 +12,7 @@ import MapPane from './screens/MapPane';
 import Welcome from './screens/Welcome';
 import Shutdown from './screens/Shutdown';
 import ThankYou from './screens/MapPane/components/TipJar/ThankYou';
+import BestOfBoroughBanner from './screens/BestOfBoroughBanner';
 
 import stylesheet from './App.less';
 import Outtakes from './screens/ImageGrid';
@@ -35,42 +36,47 @@ export default function App(): JSX.Element {
   );
 
   return (
-    <Router>
-      <div className={stylesheet.container}>
-        {IS_SHUTDOWN ? (
-          <Shutdown isOpen={true} />
-        ) : (
-          <Welcome
-            isOpen={isWelcomeOpen}
-            onRequestClose={() => {
-              setWelcomeOpen(false);
-            }}
-          />
-        )}
+    <div className={stylesheet.outermostContainer}>
+      <BestOfBoroughBanner />
+      <Router>
+        <div className={stylesheet.mainContentWrapper}>
+          <div className={stylesheet.mainContentContainer}>
+            {IS_SHUTDOWN ? (
+              <Shutdown isOpen={true} />
+            ) : (
+              <Welcome
+                isOpen={isWelcomeOpen}
+                onRequestClose={() => {
+                  setWelcomeOpen(false);
+                }}
+              />
+            )}
 
-        <ThankYou
-          isOpen={isThankYouOpen}
-          onRequestClose={() => {
-            setThankYouOpen(false);
-          }}
-        />
-
-        <Route path="/*/photo/:identifier">
-          <ViewerPane className={stylesheet.viewer} />
-        </Route>
-        <Switch>
-          {!IS_SHUTDOWN && (
-            <Route
-              path={['/map/photo/:identifier', '/map']}
-              render={() => <MapPane className={stylesheet.mapContainer} />}
+            <ThankYou
+              isOpen={isThankYouOpen}
+              onRequestClose={() => {
+                setThankYouOpen(false);
+              }}
             />
-          )}
-          <Route path={['/outtakes/photo/:identifier', '/outtakes']}>
-            <Outtakes className={stylesheet.outtakesContainer} />
-          </Route>
-          {!IS_SHUTDOWN && <Redirect to="/map" />}
-        </Switch>
-      </div>
-    </Router>
+
+            <Route path="/*/photo/:identifier">
+              <ViewerPane className={stylesheet.viewer} />
+            </Route>
+            <Switch>
+              {!IS_SHUTDOWN && (
+                <Route
+                  path={['/map/photo/:identifier', '/map']}
+                  render={() => <MapPane className={stylesheet.mapContainer} />}
+                />
+              )}
+              <Route path={['/outtakes/photo/:identifier', '/outtakes']}>
+                <Outtakes className={stylesheet.outtakesContainer} />
+              </Route>
+              {!IS_SHUTDOWN && <Redirect to="/map" />}
+            </Switch>
+          </div>
+        </div>
+      </Router>
+    </div>
   );
 }
