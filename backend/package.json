@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "serverless offline start --stage dev",
+    "start": "serverless offline start --stage dev --host dev.1940s.nyc",
     "deploy": "npm run lint:strict && serverless deploy --stage production",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint --ext .js --ext .ts src",

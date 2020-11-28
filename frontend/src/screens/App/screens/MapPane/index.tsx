@@ -16,6 +16,7 @@ import TipJar from './components/TipJar';
 import { withRouter, RouteComponentProps } from 'react-router';
 import { Link } from 'react-router-dom';
 
+import recordEvent from 'shared/utils/recordEvent';
 import ExternalIcon from '!file-loader!./assets/external.svg';
 
 interface Props {
@@ -105,6 +106,10 @@ class MapPane extends React.Component<Props & RouteComponentProps, State> {
             type="button"
             className={stylesheet.tipMeButton}
             onClick={() => {
+              recordEvent({
+                category: 'Map',
+                action: 'Click Leave Tip',
+              });
               this.setState({ isTipJarOpen: true });
             }}
           >

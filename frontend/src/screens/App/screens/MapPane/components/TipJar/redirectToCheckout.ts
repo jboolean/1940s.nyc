@@ -4,7 +4,7 @@ import api from 'utils/api';
 export default async function redirectToCheckout(
   amount: number
 ): Promise<void> {
-  const successUrl = `${window.location.protocol}//${window.location.host}${window.location.pathname}?tipSuccess=${window.location.hash}`;
+  const successUrl = `${window.location.protocol}//${window.location.host}${window.location.pathname}?tipSuccess=&tipAmount=${amount}${window.location.hash}`;
   const cancelUrl = `${window.location.protocol}//${window.location.host}${window.location.pathname}?noWelcome=${window.location.hash}`;
 
   const options = {

@@ -5,6 +5,7 @@ import NumberFormat from 'react-number-format';
 import classnames from 'classnames';
 
 import stylesheet from './TipJar.less';
+import recordEvent from 'shared/utils/recordEvent';
 
 const PRESET_OPTIONS = [2, 4, 8, 16];
 
@@ -22,6 +23,11 @@ export default function TipJar({
     if (Number.isNaN(amountDollars) || amountDollars <= 0) return;
     setIsSubmitting(true);
     setErrorMessage(null);
+    recordEvent({
+      category: 'Tip Jar',
+      action: 'Click Checkout',
+      value: amountDollars * 100,
+    });
     try {
       // Input is dollars, convert to cents
       await redirectToCheckout(amountDollars * 100);
@@ -53,12 +59,7 @@ export default function TipJar({
               [stylesheet.active]: presetAmount === amountDollars,
             })}
           >
-            <NumberFormat
-              displayType="text"
-              prefix="$"
-              thousandsSeparator
-              value={presetAmount}
-            />
+            <NumberFormat displayType="text" prefix="$" value={presetAmount} />
           </button>
         ))}
       </div>
