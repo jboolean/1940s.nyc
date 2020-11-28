@@ -105,6 +105,7 @@ class MapPane extends React.Component<Props & RouteComponentProps, State> {
           <button
             type="button"
             className={stylesheet.tipMeButton}
+            data-test="tip-me-button"
             onClick={() => {
               recordEvent({
                 category: 'Map',

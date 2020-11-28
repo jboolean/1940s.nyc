@@ -2,16 +2,16 @@
 <!-- © Julian Boilen, julianboilen.com-->
 <html>
   <head>
-    <script src="https://www.googleoptimize.com/optimize.js?id=<%= optimizeContainerId %>>"></script>
     <!-- Global site tag (gtag.js) - Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=<%= gaId %>"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-
+      
       gtag('config', '<%= gaId %>');
-    </script>
+      </script>
+    <script src="https://www.googleoptimize.com/optimize.js?id=<%= optimizeContainerId %>"></script>
 
     
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
