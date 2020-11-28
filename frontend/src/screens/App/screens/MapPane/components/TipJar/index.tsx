@@ -51,7 +51,7 @@ export default function TipJar({
         <em>– Julian</em>
       </p>
       <div className={stylesheet.presets}>
-        {amountPresets.map(presetAmount => (
+        {amountPresets.map((presetAmount) => (
           <button
             key={presetAmount}
             type="button"

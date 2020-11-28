@@ -10,7 +10,7 @@ interface Props {
   isOpen: boolean;
   onRequestClose: () => void;
 }
-export default function({ isOpen, onRequestClose }: Props): JSX.Element {
+export default function ({ isOpen, onRequestClose }: Props): JSX.Element {
   return (
     <Modal
       isOpen={isOpen}

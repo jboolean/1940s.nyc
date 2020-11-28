@@ -5,4 +5,3 @@ declare module 'react' {
     loading?: 'auto' | 'eager' | 'lazy';
   }
 }
-

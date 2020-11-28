@@ -48,7 +48,7 @@ class MainMap extends React.PureComponent<PropsWithRouter> {
       hash: true,
     }));
 
-    map.on('click', PHOTO_LAYER, e => {
+    map.on('click', PHOTO_LAYER, (e) => {
       const { panOnClick } = this.props;
       if (panOnClick) map.panTo(e.lngLat);
       const feature = e.features[0];
@@ -126,7 +126,7 @@ class MainMap extends React.PureComponent<PropsWithRouter> {
     return (
       <div
         className={classnames(stylesheet.map, propsClassName)}
-        ref={el => (this.mapContainer = el)}
+        ref={(el) => (this.mapContainer = el)}
       />
     );
   }

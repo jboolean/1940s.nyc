@@ -93,7 +93,7 @@ export const installLayers = (map: mapboxgl.Map, photoLayer: string): void => {
       targetId: 'nyc-label',
       attribution: NYC_ATTRIBUTION,
     },
-  ].forEach(mapSpec => {
+  ].forEach((mapSpec) => {
     map.addSource(mapSpec.targetId, {
       type: 'raster',
       tiles: [mapSpec.url],
@@ -134,7 +134,7 @@ export const setOverlay = (
   overlayId: OverlayId | null
 ): void => {
   const visibleLayers = overlayId ? overlaysToLayers[overlayId] : [];
-  LAYER_IDS.forEach(layerId => {
+  LAYER_IDS.forEach((layerId) => {
     map.setLayoutProperty(
       layerId,
       'visibility',

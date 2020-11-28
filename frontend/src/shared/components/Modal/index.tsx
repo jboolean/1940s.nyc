@@ -32,15 +32,17 @@ export default function FourtiesModal({
       }}
       {...props}
     >
-      <>
-        <button
-          type="button"
-          className={stylesheet.closeButton}
-          onClick={props.onRequestClose}
-          title="Close"
-        />
-        {children}
-      </>
+      {isCloseButtonVisible && (
+        <>
+          <button
+            type="button"
+            className={stylesheet.closeButton}
+            onClick={props.onRequestClose}
+            title="Close"
+          />
+          {children}
+        </>
+      )}
     </ReactModal>
   );
 }

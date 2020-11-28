@@ -8,11 +8,11 @@ const geosearch = axios.create({ baseURL: NYC_GEOSEARCH_BASE });
 export function autocomplete(text: string): Promise<FeatureCollection<Point>> {
   return geosearch
     .get<FeatureCollection<Point>>('/autocomplete', { params: { text } })
-    .then(resp => resp.data);
+    .then((resp) => resp.data);
 }
 
 export function search(text: string): Promise<FeatureCollection<Point>> {
   return geosearch
     .get<FeatureCollection<Point>>('/search', { params: { text } })
-    .then(resp => resp.data);
+    .then((resp) => resp.data);
 }

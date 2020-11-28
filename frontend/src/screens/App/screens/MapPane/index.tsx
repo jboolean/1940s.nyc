@@ -141,7 +141,7 @@ class MapPane extends React.Component<Props & RouteComponentProps, State> {
             // { name: 'Buildings (1956)', value: 'atlas-1956' },
             // { name: 'Arial (1924)', value: 'arial-1924' },
             // { name: 'Arial (1951)', value: 'arial-1951' },
-          ] as { name: string; value: OverlayId | null }[]).map(option => (
+          ] as { name: string; value: OverlayId | null }[]).map((option) => (
             <React.Fragment key={option.value}>
               <input
                 id={this.idPrefix + option.value}
@@ -164,7 +164,7 @@ class MapPane extends React.Component<Props & RouteComponentProps, State> {
         </div>
         <MainMap
           // @ts-ignore
-          ref={ref => (this.map = ref)}
+          ref={(ref) => (this.map = ref)}
           className={stylesheet.map}
           panOnClick={false}
           overlay={overlay}

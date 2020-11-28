@@ -65,7 +65,7 @@ export default [
     objectPosition: '60% 40%',
     alt: 'Tax man',
   },
-].map(image => ({
+].map((image) => ({
   ...image,
   src: `https://photos.1940s.nyc/jpg/${image.identifier}.jpg`,
 }));

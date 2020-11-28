@@ -21,7 +21,7 @@ export default function Carousel({
   const [i, setI] = React.useState(0);
   React.useEffect(() => {
     const handle = setInterval(() => {
-      setI(i2 => (i2 + 1) % images.length);
+      setI((i2) => (i2 + 1) % images.length);
     }, INTERVAL_MS);
     return () => {
       clearInterval(handle);
