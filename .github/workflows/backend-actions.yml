@@ -14,4 +14,8 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
       - run: npm ci
+      - name: Decrypt secrets
+        env:
+          SERVERLESS_SECRETS_PASSWORD: :${{ secrets.SERVERLESS_SECRETS_PASSWORD}}
+        run: npx serverless decrypt --stage production --password "$SERVERLESS_SECRETS_PASSWORD"
       - run: npm run deploy:dry
