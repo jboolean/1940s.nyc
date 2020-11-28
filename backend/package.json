@@ -6,6 +6,7 @@
   "scripts": {
     "start": "serverless offline start --stage dev --host dev.1940s.nyc",
     "deploy": "npm run lint:strict && serverless deploy --stage production",
+    "deploy:dry": "npm run lint:strict && serverless deploy --stage production --noDeploy", 
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint --ext .js --ext .ts src",
     "lint:fix": "npm run lint -- --fix",
