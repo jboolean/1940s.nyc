@@ -9,7 +9,7 @@ import stylesheet from './shutdown.less';
 interface Props {
   isOpen: boolean;
 }
-export default function({ isOpen }: Props): JSX.Element {
+export default function ({ isOpen }: Props): JSX.Element {
   return (
     <Modal
       isOpen={isOpen}

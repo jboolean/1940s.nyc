@@ -112,7 +112,7 @@ export default class Search extends React.Component<Props, State> {
         onSuggestionSelected={(_e, { suggestion }) =>
           onFeatureSelected(suggestion)
         }
-        onSuggestionHighlighted={suggestion => {
+        onSuggestionHighlighted={(suggestion) => {
           this.setState({
             isSuggestionHighlighted: suggestion !== null,
           });

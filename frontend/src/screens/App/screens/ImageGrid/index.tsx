@@ -29,7 +29,7 @@ const calculateItemsPerRow = (width: number): number => {
 
 function useForceUpdate(): () => void {
   const [, setValue] = React.useState(0); // integer state
-  return () => setValue(value => ++value); // update the state to force render
+  return () => setValue((value) => ++value); // update the state to force render
 }
 
 // This "state" is kept outside the component because AutoSizer unmounts the component when it is 0 width,
@@ -49,7 +49,7 @@ function Grid({
 
   React.useEffect(() => {
     if (photoSummaries.length) return;
-    getOuttakeSummaries().then(data => {
+    getOuttakeSummaries().then((data) => {
       photoSummaries = data;
       forceUpdate();
     });
@@ -91,14 +91,14 @@ function Grid({
         }, 1500);
       }}
     >
-      {({ index: rowIndex, style, isScrolling }) => {
+      {({ index: rowIndex, style }) => {
         const firstPhotoIndex = rowIndex * itemsPerRow;
         return (
           <div style={style}>
             {range(
               firstPhotoIndex,
               Math.min(firstPhotoIndex + itemsPerRow, photoSummaries.length)
-            ).map(i => {
+            ).map((i) => {
               const { identifier } = photoSummaries[i];
               return (
                 <img
@@ -110,7 +110,7 @@ function Grid({
                   className={classnames(stylesheet.image, {
                     [stylesheet.selected]: identifier === selectedIdentifier,
                   })}
-                  onLoad={e => {
+                  onLoad={(e) => {
                     e.currentTarget.className += ' ' + stylesheet.loaded;
                   }}
                   onClick={() => {

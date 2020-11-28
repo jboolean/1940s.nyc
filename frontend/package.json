@@ -102,7 +102,7 @@
     "modernizr": "^3.11.3",
     "modernizr-loader": "^1.0.1",
     "postcss-loader": "^3.0.0",
-    "prettier": "^1.18.2",
+    "prettier": "^2.2.1",
     "react-hot-loader": "^4.13.0",
     "ts-loader": "^6.1.2",
     "typescript": "^3.6.3",
