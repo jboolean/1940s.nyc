@@ -27,6 +27,10 @@ module.exports = {
     new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
     new HtmlWebpackPlugin({
       template: path.join(path.resolve(__dirname, 'src'), 'app.html'),
+      templateParameters: {
+        optimizeContainerId: 'OPT-NVNC4KQ',
+        gaId: 'UA-3445091-4',
+      },
     }),
     new CopyPlugin({
       patterns: [{ from: '_redirects' }],

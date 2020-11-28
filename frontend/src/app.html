@@ -2,15 +2,15 @@
 <!-- © Julian Boilen, julianboilen.com-->
 <html>
   <head>
-    <script src="https://www.googleoptimize.com/optimize.js?id=OPT-NVNC4KQ"></script>
+    <script src="https://www.googleoptimize.com/optimize.js?id=<%= optimizeContainerId %>>"></script>
     <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-3445091-4"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=<%= gaId %>"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
 
-      gtag('config', 'UA-3445091-4');
+      gtag('config', '<%= gaId %>');
     </script>
 
     
