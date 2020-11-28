@@ -18,6 +18,13 @@ import { Link } from 'react-router-dom';
 
 import recordEvent from 'shared/utils/recordEvent';
 import ExternalIcon from '!file-loader!./assets/external.svg';
+import NumberFormat from 'react-number-format';
+import useAmountPresets from './components/TipJar/useAmountPresets';
+
+function SuggestedTip(): JSX.Element {
+  const [lowestAmount] = useAmountPresets();
+  return <NumberFormat displayType="text" prefix="$" value={lowestAmount} />;
+}
 
 interface Props {
   className?: string;
@@ -114,7 +121,7 @@ class MapPane extends React.Component<Props & RouteComponentProps, State> {
               this.setState({ isTipJarOpen: true });
             }}
           >
-            $2 Tip?
+            <SuggestedTip /> Tip?
           </button>
         </div>
         <div className={stylesheet.topControls}>

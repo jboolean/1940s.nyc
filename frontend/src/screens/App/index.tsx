@@ -13,6 +13,7 @@ import stylesheet from './App.less';
 import Outtakes from './screens/ImageGrid';
 
 import 'utils/optimize';
+import { OptimizeExperimentsProvider } from 'shared/utils/OptimizeExperiments';
 
 const IS_SHUTDOWN = false;
 
@@ -32,47 +33,51 @@ export default function App(): JSX.Element {
   );
 
   return (
-    <div className={stylesheet.outermostContainer}>
-      <BestOfBoroughBanner />
-      <Router history={history}>
-        <div className={stylesheet.mainContentWrapper}>
-          <div className={stylesheet.mainContentContainer}>
-            {IS_SHUTDOWN ? (
-              <Shutdown isOpen={true} />
-            ) : (
-              <Welcome
-                isOpen={isWelcomeOpen}
-                onRequestClose={() => {
-                  setWelcomeOpen(false);
-                }}
-              />
-            )}
-
-            <ThankYou
-              isOpen={isThankYouOpen}
-              onRequestClose={() => {
-                setThankYouOpen(false);
-              }}
-            />
-
-            <Route path="/*/photo/:identifier">
-              <ViewerPane className={stylesheet.viewer} />
-            </Route>
-            <Switch>
-              {!IS_SHUTDOWN && (
-                <Route
-                  path={['/map/photo/:identifier', '/map']}
-                  render={() => <MapPane className={stylesheet.mapContainer} />}
+    <OptimizeExperimentsProvider>
+      <div className={stylesheet.outermostContainer}>
+        <BestOfBoroughBanner />
+        <Router history={history}>
+          <div className={stylesheet.mainContentWrapper}>
+            <div className={stylesheet.mainContentContainer}>
+              {IS_SHUTDOWN ? (
+                <Shutdown isOpen={true} />
+              ) : (
+                <Welcome
+                  isOpen={isWelcomeOpen}
+                  onRequestClose={() => {
+                    setWelcomeOpen(false);
+                  }}
                 />
               )}
-              <Route path={['/outtakes/photo/:identifier', '/outtakes']}>
-                <Outtakes className={stylesheet.outtakesContainer} />
+
+              <ThankYou
+                isOpen={isThankYouOpen}
+                onRequestClose={() => {
+                  setThankYouOpen(false);
+                }}
+              />
+
+              <Route path="/*/photo/:identifier">
+                <ViewerPane className={stylesheet.viewer} />
               </Route>
-              {!IS_SHUTDOWN && <Redirect to="/map" />}
-            </Switch>
+              <Switch>
+                {!IS_SHUTDOWN && (
+                  <Route
+                    path={['/map/photo/:identifier', '/map']}
+                    render={() => (
+                      <MapPane className={stylesheet.mapContainer} />
+                    )}
+                  />
+                )}
+                <Route path={['/outtakes/photo/:identifier', '/outtakes']}>
+                  <Outtakes className={stylesheet.outtakesContainer} />
+                </Route>
+                {!IS_SHUTDOWN && <Redirect to="/map" />}
+              </Switch>
+            </div>
           </div>
-        </div>
-      </Router>
-    </div>
+        </Router>
+      </div>
+    </OptimizeExperimentsProvider>
   );
 }
