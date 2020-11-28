@@ -5,8 +5,8 @@ import NumberFormat from 'react-number-format';
 import classnames from 'classnames';
 
 import stylesheet from './TipJar.less';
-
-const PRESET_OPTIONS = [2, 4, 8, 16];
+import recordEvent from 'shared/utils/recordEvent';
+import useAmountPresets from './useAmountPresets';
 
 export default function TipJar({
   isOpen,
@@ -18,10 +18,17 @@ export default function TipJar({
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState<null | string>(null);
 
+  const amountPresets = useAmountPresets();
+
   const handleSubmitClick = async (): Promise<void> => {
     if (Number.isNaN(amountDollars) || amountDollars <= 0) return;
     setIsSubmitting(true);
     setErrorMessage(null);
+    recordEvent({
+      category: 'Tip Jar',
+      action: 'Click Checkout',
+      value: amountDollars * 100,
+    });
     try {
       // Input is dollars, convert to cents
       await redirectToCheckout(amountDollars * 100);
@@ -44,7 +51,7 @@ export default function TipJar({
         <em>– Julian</em>
       </p>
       <div className={stylesheet.presets}>
-        {PRESET_OPTIONS.map(presetAmount => (
+        {amountPresets.map(presetAmount => (
           <button
             key={presetAmount}
             type="button"
@@ -53,12 +60,7 @@ export default function TipJar({
               [stylesheet.active]: presetAmount === amountDollars,
             })}
           >
-            <NumberFormat
-              displayType="text"
-              prefix="$"
-              thousandsSeparator
-              value={presetAmount}
-            />
+            <NumberFormat displayType="text" prefix="$" value={presetAmount} />
           </button>
         ))}
       </div>

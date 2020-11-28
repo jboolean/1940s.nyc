@@ -1,5 +1,9 @@
 import React from 'react';
 
+import { activateGoogleOptimize } from 'utils/optimize';
+
+import noop from 'lodash/noop';
+
 import ReactModal from 'react-modal';
 import classnames from 'classnames';
 import stylesheet from './modal.less';
@@ -10,6 +14,7 @@ export default function FourtiesModal({
   overlayClassName,
   bodyOpenClassName,
   isCloseButtonVisible = true,
+  onAfterOpen = noop,
   children,
   ...props
 }: React.PropsWithChildren<ReactModal.Props> & {
@@ -21,6 +26,10 @@ export default function FourtiesModal({
       className={classnames(stylesheet.modal, stylesheet[size], className)}
       bodyOpenClassName={classnames(stylesheet.bodyOpen, bodyOpenClassName)}
       overlayClassName={classnames(stylesheet.overlay, overlayClassName)}
+      onAfterOpen={() => {
+        activateGoogleOptimize();
+        onAfterOpen();
+      }}
       {...props}
     >
       <>
