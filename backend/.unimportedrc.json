@@ -1,0 +1,26 @@
+{
+  "ignoreUnresolved": [],
+  "ignoreUnimported": [],
+  "ignoreUnused": [
+    "pg"
+  ],
+  "ignorePatterns": [
+    "**/node_modules/**",
+    "**/*.stories.{js,jsx,ts,tsx}",
+    "**/*.tests.{js,jsx,ts,tsx}",
+    "**/*.test.{js,jsx,ts,tsx}",
+    "**/*.spec.{js,jsx,ts,tsx}",
+    "**/tests/**",
+    "**/__tests__/**",
+    "**/*.d.ts"
+  ],
+  "entry": [
+    "appHandler.ts",
+    "convertImage.js"
+  ],
+  "moduleDirectory": [
+    "node_modules",
+    "shared",
+    "src"
+  ]
+}
