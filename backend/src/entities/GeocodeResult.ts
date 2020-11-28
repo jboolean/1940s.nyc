@@ -5,13 +5,9 @@ import Photo from './Photo';
 
 @Entity('geocode_results')
 export default class GeocodeResult {
-  @ManyToOne(
-    () => Photo,
-    photo => photo.geocodeResults,
-    {
-      primary: true,
-    }
-  )
+  @ManyToOne(() => Photo, (photo) => photo.geocodeResults, {
+    primary: true,
+  })
   @JoinColumn({ name: 'photo' })
   photo: Photo;
 

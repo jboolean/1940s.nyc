@@ -36,9 +36,6 @@ export default class Photo {
   @Column()
   isOuttake: boolean;
 
-  @OneToMany(
-    () => GeocodeResult,
-    geocode => geocode.photo
-  )
+  @OneToMany(() => GeocodeResult, (geocode) => geocode.photo)
   geocodeResults: GeocodeResult[];
 }
