@@ -15,5 +15,6 @@ module.exports = merge(common, {
   ],
   devServer: {
     historyApiFallback: true,
+    host: 'dev.1940s.nyc',
   },
 });

@@ -12,6 +12,7 @@ app.use(express.json());
 app.use(
   cors({
     origin: [
+      'http://dev.1940s.nyc:8080',
       'http://localhost:8080',
       'https://1940s.nyc',
       /--1940s-nyc\.netlify\.app$/,
