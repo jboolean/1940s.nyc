@@ -20,6 +20,9 @@ import recordEvent from 'shared/utils/recordEvent';
 import ExternalIcon from '!file-loader!./assets/external.svg';
 import NumberFormat from 'react-number-format';
 import useAmountPresets from './components/TipJar/useAmountPresets';
+import { ExperimentVariantsConsumer } from 'shared/utils/OptimizeExperiments';
+
+let hasAutoOpenedTipJar = false;
 
 function SuggestedTip(): JSX.Element {
   const [lowestAmount] = useAmountPresets();
@@ -38,6 +41,7 @@ interface State {
 class MapPane extends React.Component<Props & RouteComponentProps, State> {
   map?: typeof MainMap;
   private idPrefix: string;
+  private tipJarTimerHandle: ReturnType<typeof setTimeout> | null = null;
 
   constructor(props: Props & RouteComponentProps) {
     super(props);
@@ -53,6 +57,10 @@ class MapPane extends React.Component<Props & RouteComponentProps, State> {
     );
     this.handleGeolocated = this.handleGeolocated.bind(this);
     this.openPhoto = this.openPhoto.bind(this);
+  }
+
+  componentWillUnmount(): void {
+    if (this.tipJarTimerHandle) clearTimeout(this.tipJarTimerHandle);
   }
 
   handleOverlayChange(overlay: OverlayId): void {
@@ -169,6 +177,17 @@ class MapPane extends React.Component<Props & RouteComponentProps, State> {
           panOnClick={false}
           overlay={overlay}
         />
+        <ExperimentVariantsConsumer experimentId="7HO_TOnxTeSe9EhSG64nDg">
+          {([variant] = [0]) => {
+            if (!this.tipJarTimerHandle && variant > 0) {
+              this.tipJarTimerHandle = setTimeout(() => {
+                if (!hasAutoOpenedTipJar) this.setState({ isTipJarOpen: true });
+                hasAutoOpenedTipJar = true;
+              }, 30000);
+            }
+            return <React.Fragment />;
+          }}
+        </ExperimentVariantsConsumer>
       </div>
     );
   }
