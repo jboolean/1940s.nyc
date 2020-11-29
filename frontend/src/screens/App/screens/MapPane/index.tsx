@@ -22,8 +22,6 @@ import NumberFormat from 'react-number-format';
 import useAmountPresets from './components/TipJar/useAmountPresets';
 import { ExperimentVariantsConsumer } from 'shared/utils/OptimizeExperiments';
 
-let hasAutoOpenedTipJar = false;
-
 function SuggestedTip(): JSX.Element {
   const [lowestAmount] = useAmountPresets();
   return <NumberFormat displayType="text" prefix="$" value={lowestAmount} />;
@@ -57,6 +55,7 @@ class MapPane extends React.Component<Props & RouteComponentProps, State> {
     );
     this.handleGeolocated = this.handleGeolocated.bind(this);
     this.openPhoto = this.openPhoto.bind(this);
+    this.handlePopupExperiment = this.handlePopupExperiment.bind(this);
   }
 
   componentWillUnmount(): void {
@@ -79,6 +78,19 @@ class MapPane extends React.Component<Props & RouteComponentProps, State> {
   handleGeolocated(position: { lat: number; lng: number }): void {
     this.map.goTo(position);
     closest(position).then(this.openPhoto, noop);
+  }
+
+  handlePopupExperiment([variant] = [0]): JSX.Element {
+    const hasAutoOpenedTipJar =
+      window.localStorage.getItem('hasAutoOpenedTipJar') === 'true';
+    if (!this.tipJarTimerHandle && variant > 0) {
+      this.tipJarTimerHandle = setTimeout(() => {
+        if (!hasAutoOpenedTipJar) this.setState({ isTipJarOpen: true });
+        window.localStorage.setItem('hasAutoOpenedTipJar', 'true');
+      }, 30000);
+    }
+
+    return <React.Fragment />;
   }
 
   openPhoto(identifier: string): void {
@@ -178,15 +190,7 @@ class MapPane extends React.Component<Props & RouteComponentProps, State> {
           overlay={overlay}
         />
         <ExperimentVariantsConsumer experimentId="7HO_TOnxTeSe9EhSG64nDg">
-          {([variant] = [0]) => {
-            if (!this.tipJarTimerHandle && variant > 0) {
-              this.tipJarTimerHandle = setTimeout(() => {
-                if (!hasAutoOpenedTipJar) this.setState({ isTipJarOpen: true });
-                hasAutoOpenedTipJar = true;
-              }, 30000);
-            }
-            return <React.Fragment />;
-          }}
+          {this.handlePopupExperiment}
         </ExperimentVariantsConsumer>
       </div>
     );
