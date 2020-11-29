@@ -83,10 +83,13 @@ class MapPane extends React.Component<Props & RouteComponentProps, State> {
   handlePopupExperiment([variant] = [0]): JSX.Element {
     const hasAutoOpenedTipJar =
       window.localStorage.getItem('hasAutoOpenedTipJar') === 'true';
+    const hasTipped = window.localStorage.getItem('hasTipped') === 'true';
     if (!this.tipJarTimerHandle && variant > 0) {
       this.tipJarTimerHandle = setTimeout(() => {
-        if (!hasAutoOpenedTipJar) this.setState({ isTipJarOpen: true });
-        window.localStorage.setItem('hasAutoOpenedTipJar', 'true');
+        if (!hasAutoOpenedTipJar && !hasTipped) {
+          this.setState({ isTipJarOpen: true });
+          window.localStorage.setItem('hasAutoOpenedTipJar', 'true');
+        }
       }, 120000);
     }
 
