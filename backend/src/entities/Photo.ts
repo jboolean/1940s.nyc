@@ -7,6 +7,9 @@ export default class Photo {
   identifier: string;
 
   @Column()
+  collection: string;
+
+  @Column()
   date?: string;
 
   @Column()
