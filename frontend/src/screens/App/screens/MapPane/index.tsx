@@ -87,7 +87,7 @@ class MapPane extends React.Component<Props & RouteComponentProps, State> {
       this.tipJarTimerHandle = setTimeout(() => {
         if (!hasAutoOpenedTipJar) this.setState({ isTipJarOpen: true });
         window.localStorage.setItem('hasAutoOpenedTipJar', 'true');
-      }, 30000);
+      }, 120000);
     }
 
     return <React.Fragment />;
