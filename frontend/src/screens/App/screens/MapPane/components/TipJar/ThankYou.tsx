@@ -19,6 +19,7 @@ export default function ThankYou({
       value: Number(tipAmount),
       nonInteraction: true,
     });
+    window.localStorage.setItem('hasTipped', 'true');
 
     // Remove query from url
     history.replace({
