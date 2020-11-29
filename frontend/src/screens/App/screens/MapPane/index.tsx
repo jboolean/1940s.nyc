@@ -20,6 +20,7 @@ import recordEvent from 'shared/utils/recordEvent';
 import ExternalIcon from '!file-loader!./assets/external.svg';
 import NumberFormat from 'react-number-format';
 import useAmountPresets from './components/TipJar/useAmountPresets';
+import { ExperimentVariantsConsumer } from 'shared/utils/OptimizeExperiments';
 
 function SuggestedTip(): JSX.Element {
   const [lowestAmount] = useAmountPresets();
@@ -38,6 +39,7 @@ interface State {
 class MapPane extends React.Component<Props & RouteComponentProps, State> {
   map?: typeof MainMap;
   private idPrefix: string;
+  private tipJarTimerHandle: ReturnType<typeof setTimeout> | null = null;
 
   constructor(props: Props & RouteComponentProps) {
     super(props);
@@ -53,6 +55,11 @@ class MapPane extends React.Component<Props & RouteComponentProps, State> {
     );
     this.handleGeolocated = this.handleGeolocated.bind(this);
     this.openPhoto = this.openPhoto.bind(this);
+    this.handlePopupExperiment = this.handlePopupExperiment.bind(this);
+  }
+
+  componentWillUnmount(): void {
+    if (this.tipJarTimerHandle) clearTimeout(this.tipJarTimerHandle);
   }
 
   handleOverlayChange(overlay: OverlayId): void {
@@ -71,6 +78,19 @@ class MapPane extends React.Component<Props & RouteComponentProps, State> {
   handleGeolocated(position: { lat: number; lng: number }): void {
     this.map.goTo(position);
     closest(position).then(this.openPhoto, noop);
+  }
+
+  handlePopupExperiment([variant] = [0]): JSX.Element {
+    const hasAutoOpenedTipJar =
+      window.localStorage.getItem('hasAutoOpenedTipJar') === 'true';
+    if (!this.tipJarTimerHandle && variant > 0) {
+      this.tipJarTimerHandle = setTimeout(() => {
+        if (!hasAutoOpenedTipJar) this.setState({ isTipJarOpen: true });
+        window.localStorage.setItem('hasAutoOpenedTipJar', 'true');
+      }, 120000);
+    }
+
+    return <React.Fragment />;
   }
 
   openPhoto(identifier: string): void {
@@ -169,6 +189,9 @@ class MapPane extends React.Component<Props & RouteComponentProps, State> {
           panOnClick={false}
           overlay={overlay}
         />
+        <ExperimentVariantsConsumer experimentId="7HO_TOnxTeSe9EhSG64nDg">
+          {this.handlePopupExperiment}
+        </ExperimentVariantsConsumer>
       </div>
     );
   }

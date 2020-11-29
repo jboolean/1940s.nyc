@@ -94,6 +94,22 @@ export function OptimizeExperimentsProvider({
   );
 }
 
+export function ExperimentVariantsConsumer({
+  experimentId,
+  children,
+}: {
+  experimentId: string;
+  children: (variants: number[]) => JSX.Element;
+}): JSX.Element {
+  return (
+    <ExperimentAssignmentsContext.Consumer>
+      {(assignmentsByExperimentId) =>
+        children(assignmentsByExperimentId[experimentId])
+      }
+    </ExperimentAssignmentsContext.Consumer>
+  );
+}
+
 export function useExperimentVariants(
   experimentId: string
 ): number[] | undefined {
