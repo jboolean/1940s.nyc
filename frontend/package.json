@@ -44,7 +44,7 @@
     "@babel/preset-react": "^7.0.0",
     "@types/autoprefixer": "^9.7.2",
     "@types/axios": "^0.14.0",
-    "@types/babel__core": "^7.1.9",
+    "@types/babel__core": "^7.1.12",
     "@types/babel__preset-env": "^7.9.0",
     "@types/classnames": "^2.2.9",
     "@types/copy-webpack-plugin": "^6.0.0",
