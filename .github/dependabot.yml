@@ -7,11 +7,17 @@ updates:
     directory: "/frontend"
     schedule:
       interval: "weekly"
+    assignees:
+      - "jboolean"
   - package-ecosystem: "npm"
     directory: "/backend"
     schedule:
       interval: "weekly"
+    assignees:
+      - "jboolean"
   - package-ecosystem: "npm"
     directory: "/edge"
     schedule:
       interval: "weekly"
+    assignees:
+      - "jboolean"

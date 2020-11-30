@@ -8,6 +8,9 @@
 		},
 		{
 			"path": "edge"
+		},
+		{
+			"path": ".github"
 		}
 	],
 	"settings": {
