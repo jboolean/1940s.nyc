@@ -9,7 +9,7 @@ const PORTRAIT_WIDTH = 220;
 
 const PORTRAIT_THRESHOLD = 25;
 
-export default async function isLaserdiscVideoFrame(
+export async function isLaserdiscVideoFrame(
   input: SharpInput
 ): Promise<boolean> {
   const meta = await sharp(input).metadata();

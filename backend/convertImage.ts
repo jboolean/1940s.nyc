@@ -1,11 +1,13 @@
-const sharp = require('sharp');
-const AWS = require('aws-sdk');
+import sharp from 'sharp';
+import AWS from 'aws-sdk';
 
-const LaserdiscUtils = require('./src/image-processing/LaserdiscUtils');
+import * as LaserdiscUtils from './src/image-processing/LaserdiscUtils';
 
 const s3 = new AWS.S3();
 
-const FILENAMES = {
+type Template = { prefix: string; suffix: string };
+
+const FILENAMES: Record<string, Template> = {
   jpeg: {
     prefix: 'jpg/',
     suffix: '.jpg',
@@ -16,15 +18,15 @@ const FILENAMES = {
   },
 };
 
-const makeFilename = (template, rootKey) =>
+const makeFilename = (template: Template, rootKey: string): string =>
   template.prefix + rootKey + template.suffix;
 
 const INPUT_PREFIX = 'originals/';
 
-const getRootKey = (srcKey) =>
+const getRootKey = (srcKey: string): string =>
   srcKey.substring(INPUT_PREFIX.length).replace(/\.\w+$/, '');
 
-module.exports.handler = async (event) => {
+export const handler = async (event): Promise<unknown> => {
   const srcBucket = event.Records[0].s3.bucket.name;
   const srcKey = event.Records[0].s3.object.key;
 
@@ -42,7 +44,7 @@ module.exports.handler = async (event) => {
     })
     .promise();
 
-  let inputBuffer = inputObject.Body;
+  let inputBuffer = inputObject.Body as Buffer;
 
   // Crop laserdisc video frames to eliminate borders and superimposed banner
   if (await LaserdiscUtils.isLaserdiscVideoFrame(inputBuffer)) {
@@ -98,7 +100,7 @@ module.exports.handler = async (event) => {
   ]);
 };
 
-module.exports.deletionHandler = async (event) => {
+export const deletionHandler = async (event): Promise<unknown> => {
   const srcBucket = event.Records[0].s3.bucket.name;
   const srcKey = event.Records[0].s3.object.key;
 
