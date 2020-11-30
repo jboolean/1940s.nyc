@@ -43,7 +43,7 @@ export default class Geolocate extends React.Component<Props, State> {
     );
   }
 
-  handleGeolocatedSuccess(position: Position): void {
+  handleGeolocatedSuccess(position: GeolocationPosition): void {
     const { onGeolocated } = this.props;
     const { coords } = position;
     this.setState({
@@ -56,7 +56,7 @@ export default class Geolocate extends React.Component<Props, State> {
     });
   }
 
-  handleGeolocatedError(error: PositionError): void {
+  handleGeolocatedError(error: GeolocationPositionError): void {
     this.setState({
       loading: false,
     });
