@@ -23,7 +23,7 @@
     "@types/node": "^13.1.4",
     "@types/pg": "^7.14.4",
     "@types/prettier": "^1.19.1",
-    "@types/serverless": "^1.72.5",
+    "@types/serverless": "^1.78.11",
     "@types/sharp": "^0.23.1",
     "@types/source-map-support": "^0.5.2",
     "@types/stripe": "^7.13.24",
