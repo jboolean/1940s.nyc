@@ -65,7 +65,7 @@ router.get('/:identifier/buy-prints', async (req, res) => {
   }
 
   const formParams = {
-    collection: '1940',
+    collection: photo.collection,
     lot: photo.lot ? Number(photo.lot) : undefined,
     streetName: photo.streetName,
     imageIdentifier: photo.identifier,
