@@ -32,7 +32,7 @@ interface Props {
 type PropsWithRouter = Props & RouteComponentProps<{ identifier?: string }>;
 
 class MainMap extends React.PureComponent<PropsWithRouter> {
-  private mapContainer: Element;
+  private mapContainer: HTMLElement;
   private map: mapboxgl.Map;
 
   componentDidMount(): void {
