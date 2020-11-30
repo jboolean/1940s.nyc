@@ -27,7 +27,7 @@
     "@types/sharp": "^0.23.1",
     "@types/source-map-support": "^0.5.2",
     "@types/stripe": "^7.13.24",
-    "@typescript-eslint/eslint-plugin": "^2.14.0",
+    "@typescript-eslint/eslint-plugin": "^2.34.0",
     "@typescript-eslint/parser": "^2.14.0",
     "eslint": "^6.5.1",
     "eslint-config-prettier": "^6.9.0",
