@@ -8,28 +8,18 @@ import Photo from '../entities/Photo';
 
 const PHOTO_PURCHASE_FORM_URL = 'https://www1.nyc.gov/dorforms/photoform.htm';
 
-// Get photos by matching lngLat
+// Get photos by matching lng,lat
 router.get('/', async (req, res) => {
   const photoRepo = getRepository(Photo);
 
-  const { lngLat } = req.query;
-  if (!lngLat) {
+  const { lng, lat } = req.query;
+  if (!lng || !lat) {
     res.status(401).send('lngLat required');
     return;
   }
-  let x, y;
-  try {
-    const parsedLngLat = JSON.parse(lngLat) as { x: number; y: number };
-    x = parsedLngLat.x;
-    y = parsedLngLat.y;
-    if (typeof x !== 'number' || typeof y !== 'number')
-      throw new Error('Not numbers');
-  } catch {
-    res.status(401).send('Cannot parse lngLat');
-  }
   const result = await photoRepo.query(
     'select identifier from effective_geocodes_view where lng_lat ~= point($1, $2)',
-    [x, y]
+    [lng, lat]
   );
 
   const ids = result.map((r) => r.identifier);
