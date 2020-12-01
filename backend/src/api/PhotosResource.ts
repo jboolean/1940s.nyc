@@ -11,8 +11,8 @@ const PHOTO_PURCHASE_FORM_URL = 'https://www1.nyc.gov/dorforms/photoform.htm';
 router.get('/closest', async (req, res) => {
   const photoRepo = getRepository(Photo);
   const result = await photoRepo.query(
-    'SELECT *, lng_lat<@>point($1, $2) AS distance FROM effective_geocodes_view order by distance limit 1',
-    [req.query.lng, req.query.lat]
+    'SELECT *, lng_lat<@>point($1, $2) AS distance FROM effective_geocodes_view WHERE collection = $3 ORDER BY distance LIMIT 1',
+    [req.query.lng, req.query.lat, req.query.collection ?? '1940']
   );
 
   if (!result.length) {
@@ -29,7 +29,7 @@ router.get('/outtake-summaries', async (req, res) => {
   const photoRepo = getRepository(Photo);
 
   const photos = await photoRepo.find({
-    where: { isOuttake: true },
+    where: { isOuttake: true, collection: req.query.collection ?? '1940' },
     select: ['identifier'],
     order: {
       identifier: 'ASC',
