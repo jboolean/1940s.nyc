@@ -83,7 +83,7 @@ export const handler = async (event): Promise<unknown> => {
       ),
 
     sharp(inputBuffer)
-      .resize(420)
+      .resize(420, undefined, { withoutEnlargement: true })
       .jpeg()
       .toBuffer()
       .then((outputBuffer) =>
