@@ -8,6 +8,26 @@ import Photo from '../entities/Photo';
 
 const PHOTO_PURCHASE_FORM_URL = 'https://www1.nyc.gov/dorforms/photoform.htm';
 
+// Get photos by matching lng,lat
+router.get('/', async (req, res) => {
+  const photoRepo = getRepository(Photo);
+
+  const { lng, lat } = req.query;
+  if (!lng || !lat) {
+    res.status(401).send('lngLat required');
+    return;
+  }
+  const result = await photoRepo.query(
+    'select identifier from effective_geocodes_view where lng_lat ~= point($1, $2)',
+    [lng, lat]
+  );
+
+  const ids = result.map((r) => r.identifier);
+
+  const photos = await photoRepo.findByIds(ids, { order: { address: 'ASC' } });
+  res.send(photos);
+});
+
 router.get('/closest', async (req, res) => {
   const photoRepo = getRepository(Photo);
   const result = await photoRepo.query(
