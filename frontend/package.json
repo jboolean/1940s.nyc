@@ -60,7 +60,7 @@
     "@types/mapbox-gl": "^1.12.8",
     "@types/mini-css-extract-plugin": "^1.2.2",
     "@types/modernizr": "^3.5.3",
-    "@types/prettier": "^1.19.1",
+    "@types/prettier": "^2.1.5",
     "@types/prop-types": "^15.7.3",
     "@types/qs": "^6.9.4",
     "@types/react": "^16.9.2",
