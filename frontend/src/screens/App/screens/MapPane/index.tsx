@@ -20,7 +20,8 @@ import recordEvent from 'shared/utils/recordEvent';
 import ExternalIcon from '!file-loader!./assets/external.svg';
 import NumberFormat from 'react-number-format';
 import useAmountPresets from './components/TipJar/useAmountPresets';
-import { ExperimentVariantsConsumer } from 'shared/utils/OptimizeExperiments';
+
+const TIP_JAR_DELAY = 120000;
 
 function SuggestedTip(): JSX.Element {
   const [lowestAmount] = useAmountPresets();
@@ -55,7 +56,7 @@ class MapPane extends React.Component<Props & RouteComponentProps, State> {
     );
     this.handleGeolocated = this.handleGeolocated.bind(this);
     this.openPhoto = this.openPhoto.bind(this);
-    this.handlePopupExperiment = this.handlePopupExperiment.bind(this);
+    this.setupTipJarPopup();
   }
 
   componentWillUnmount(): void {
@@ -80,20 +81,18 @@ class MapPane extends React.Component<Props & RouteComponentProps, State> {
     closest(position).then(this.openPhoto, noop);
   }
 
-  handlePopupExperiment([variant] = [0]): JSX.Element {
+  setupTipJarPopup(): void {
     const hasAutoOpenedTipJar =
       window.localStorage.getItem('hasAutoOpenedTipJar') === 'true';
     const hasTipped = window.localStorage.getItem('hasTipped') === 'true';
-    if (!this.tipJarTimerHandle && variant > 0) {
+    if (!this.tipJarTimerHandle) {
       this.tipJarTimerHandle = setTimeout(() => {
         if (!hasAutoOpenedTipJar && !hasTipped) {
           this.setState({ isTipJarOpen: true });
           window.localStorage.setItem('hasAutoOpenedTipJar', 'true');
         }
-      }, 120000);
+      }, TIP_JAR_DELAY);
     }
-
-    return <React.Fragment />;
   }
 
   openPhoto(identifier: string): void {
@@ -192,9 +191,6 @@ class MapPane extends React.Component<Props & RouteComponentProps, State> {
           panOnClick={false}
           overlay={overlay}
         />
-        <ExperimentVariantsConsumer experimentId="7HO_TOnxTeSe9EhSG64nDg">
-          {this.handlePopupExperiment}
-        </ExperimentVariantsConsumer>
       </div>
     );
   }
