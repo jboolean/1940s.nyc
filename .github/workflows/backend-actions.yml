@@ -9,7 +9,7 @@ defaults:
     working-directory: backend
 jobs:
   dryDeploy:
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
