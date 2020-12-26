@@ -5,12 +5,13 @@
   "main": "index.js",
   "scripts": {
     "start": "serverless offline start --stage dev --host dev.1940s.nyc",
-    "deploy": "npm run lint:strict && serverless deploy --stage production",
-    "deploy:dry": "npm run lint:strict && serverless deploy --stage production --noDeploy", 
+    "deploy:dry": "npm run deploy -- --noDeploy", 
+    "deploy": "npm run install-aws-sharp && npm run lint:strict && serverless deploy --stage production",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint --ext .js --ext .ts src",
     "lint:fix": "npm run lint -- --fix",
-    "lint:strict": "npm run lint -- --max-warnings 0"
+    "lint:strict": "npm run lint -- --max-warnings 0",
+    "install-aws-sharp": "rm -rf node_modules/sharp && SHARP_IGNORE_GLOBAL_LIBVIPS=1 npm install --arch=x64 --platform=linux sharp"
   },
   "author": "Julian Boilen",
   "license": "ISC",
@@ -23,28 +24,27 @@
     "@types/lodash": "^4.14.159",
     "@types/node": "^13.1.4",
     "@types/pg": "^7.14.4",
-    "@types/prettier": "^1.19.1",
-    "@types/serverless": "^1.72.5",
+    "@types/prettier": "^2.1.6",
+    "@types/serverless": "^1.78.11",
     "@types/sharp": "^0.23.1",
-    "@types/source-map-support": "^0.5.2",
-    "@types/stripe": "^7.13.24",
-    "@typescript-eslint/eslint-plugin": "^2.14.0",
+    "@types/source-map-support": "^0.5.3",
+    "@types/stripe": "^8.0.296",
+    "@typescript-eslint/eslint-plugin": "^2.34.0",
     "@typescript-eslint/parser": "^2.14.0",
-    "eslint": "^6.5.1",
-    "eslint-config-prettier": "^6.9.0",
+    "eslint": "^6.8.0",
+    "eslint-config-prettier": "^6.15.0",
     "eslint-config-squarespace": "^1.0.1",
-    "eslint-plugin-prettier": "^3.1.2",
-    "husky": "^3.1.0",
-    "lint-staged": "^9.5.0",
+    "eslint-plugin-prettier": "^3.3.0",
+    "lint-staged": "^10.5.3",
     "prettier": "^2.2.1",
-    "serverless": "^1.53.0",
+    "serverless": "^2.16.0",
     "serverless-domain-manager": "^5.1.0",
-    "serverless-lambda-edge-pre-existing-cloudfront": "^1.1.1",
+    "serverless-lambda-edge-pre-existing-cloudfront": "^1.1.5",
     "serverless-offline": "^5.12.1",
     "serverless-plugin-select": "^2.0.0-rc.1",
     "serverless-plugin-typescript": "^1.1.9",
     "serverless-secrets-plugin": "^0.1.0",
-    "typescript": "^3.7.4"
+    "typescript": "^4.1.3"
   },
   "dependencies": {
     "aws-sdk": "^2.541.0",
@@ -53,12 +53,12 @@
     "geojson": "^0.5.0",
     "pg": "^8.5.1",
     "reflect-metadata": "^0.1.13",
-    "serverless-http": "^2.3.0",
-    "sharp": "^0.23.1",
-    "source-map-support": "^0.5.16",
-    "stripe": "^8.88.0",
+    "serverless-http": "^2.6.0",
+    "sharp": "^0.26.3",
+    "source-map-support": "^0.5.19",
+    "stripe": "^8.129.0",
     "typeorm": "^0.2.22",
-    "typeorm-naming-strategies": "^1.1.0"
+    "typeorm-naming-strategies": "^2.0.0"
   },
   "husky": {
     "hooks": {
@@ -67,8 +67,7 @@
   },
   "lint-staged": {
     "src/**/*.{js,jsx,ts,tsx}": [
-      "eslint --fix --max-warnings 0",
-      "git add"
+      "eslint --fix --max-warnings 0"
     ]
   }
 }

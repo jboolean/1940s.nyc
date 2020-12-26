@@ -8,11 +8,31 @@ import Photo from '../entities/Photo';
 
 const PHOTO_PURCHASE_FORM_URL = 'https://www1.nyc.gov/dorforms/photoform.htm';
 
+// Get photos by matching lng,lat
+router.get('/', async (req, res) => {
+  const photoRepo = getRepository(Photo);
+
+  const { lng, lat } = req.query;
+  if (!lng || !lat) {
+    res.status(401).send('lngLat required');
+    return;
+  }
+  const result = await photoRepo.query(
+    'select identifier from effective_geocodes_view where lng_lat ~= point($1, $2)',
+    [lng, lat]
+  );
+
+  const ids = result.map((r) => r.identifier);
+
+  const photos = await photoRepo.findByIds(ids, { order: { address: 'ASC' } });
+  res.send(photos);
+});
+
 router.get('/closest', async (req, res) => {
   const photoRepo = getRepository(Photo);
   const result = await photoRepo.query(
-    'SELECT *, lng_lat<@>point($1, $2) AS distance FROM effective_geocodes_view order by distance limit 1',
-    [req.query.lng, req.query.lat]
+    'SELECT *, lng_lat<@>point($1, $2) AS distance FROM effective_geocodes_view WHERE collection = $3 ORDER BY distance LIMIT 1',
+    [req.query.lng, req.query.lat, req.query.collection ?? '1940']
   );
 
   if (!result.length) {
@@ -29,7 +49,7 @@ router.get('/outtake-summaries', async (req, res) => {
   const photoRepo = getRepository(Photo);
 
   const photos = await photoRepo.find({
-    where: { isOuttake: true },
+    where: { isOuttake: true, collection: req.query.collection ?? '1940' },
     select: ['identifier'],
     order: {
       identifier: 'ASC',
@@ -65,7 +85,7 @@ router.get('/:identifier/buy-prints', async (req, res) => {
   }
 
   const formParams = {
-    collection: '1940',
+    collection: photo.collection,
     lot: photo.lot ? Number(photo.lot) : undefined,
     streetName: photo.streetName,
     imageIdentifier: photo.identifier,

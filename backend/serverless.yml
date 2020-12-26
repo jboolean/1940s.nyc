@@ -91,12 +91,6 @@ functions:
           path: /{proxy+}
           method: ANY
     environment: ${file(secrets.${opt:stage, self:provider.stage}.yml)}
-    vpc:
-      subnetIds:
-        - subnet-060bcc99cdb49b887
-        - subnet-0f1d4c7897a917537
-      securityGroupIds:
-        - sg-989df5e0
   convertImage:
     stages:
       - production

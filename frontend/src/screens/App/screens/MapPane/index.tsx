@@ -21,6 +21,8 @@ import ExternalIcon from '!file-loader!./assets/external.svg';
 import NumberFormat from 'react-number-format';
 import useAmountPresets from './components/TipJar/useAmountPresets';
 
+const TIP_JAR_DELAY = 120000;
+
 function SuggestedTip(): JSX.Element {
   const [lowestAmount] = useAmountPresets();
   return <NumberFormat displayType="text" prefix="$" value={lowestAmount} />;
@@ -38,6 +40,7 @@ interface State {
 class MapPane extends React.Component<Props & RouteComponentProps, State> {
   map?: typeof MainMap;
   private idPrefix: string;
+  private tipJarTimerHandle: ReturnType<typeof setTimeout> | null = null;
 
   constructor(props: Props & RouteComponentProps) {
     super(props);
@@ -53,6 +56,11 @@ class MapPane extends React.Component<Props & RouteComponentProps, State> {
     );
     this.handleGeolocated = this.handleGeolocated.bind(this);
     this.openPhoto = this.openPhoto.bind(this);
+    this.setupTipJarPopup();
+  }
+
+  componentWillUnmount(): void {
+    if (this.tipJarTimerHandle) clearTimeout(this.tipJarTimerHandle);
   }
 
   handleOverlayChange(overlay: OverlayId): void {
@@ -71,6 +79,20 @@ class MapPane extends React.Component<Props & RouteComponentProps, State> {
   handleGeolocated(position: { lat: number; lng: number }): void {
     this.map.goTo(position);
     closest(position).then(this.openPhoto, noop);
+  }
+
+  setupTipJarPopup(): void {
+    const hasAutoOpenedTipJar =
+      window.localStorage.getItem('hasAutoOpenedTipJar') === 'true';
+    const hasTipped = window.localStorage.getItem('hasTipped') === 'true';
+    if (!this.tipJarTimerHandle) {
+      this.tipJarTimerHandle = setTimeout(() => {
+        if (!hasAutoOpenedTipJar && !hasTipped) {
+          this.setState({ isTipJarOpen: true });
+          window.localStorage.setItem('hasAutoOpenedTipJar', 'true');
+        }
+      }, TIP_JAR_DELAY);
+    }
   }
 
   openPhoto(identifier: string): void {

@@ -1,0 +1,20 @@
+{
+  "name": "1940s.nyc",
+  "version": "1.0.0",
+  "description": "Street view of 1940s New York City (monorepo)",
+  "main": "index.js",
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jboolean/1940s.nyc.git"
+  },
+  "author": "Julian Boilen",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jboolean/1940s.nyc/issues"
+  },
+  "homepage": "https://github.com/jboolean/1940s.nyc#readme",
+  "devDependencies": {
+    "husky": "^4.3.6"
+  }
+}
