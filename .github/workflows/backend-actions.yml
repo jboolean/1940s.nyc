@@ -16,6 +16,6 @@ jobs:
       - run: npm ci
       - name: Decrypt secrets
         env:
-          SERVERLESS_SECRETS_PASSWORD: :${{ secrets.SERVERLESS_SECRETS_PASSWORD}}
+          SERVERLESS_SECRETS_PASSWORD: ${{ secrets.SERVERLESS_SECRETS_PASSWORD}}
         run: npx serverless decrypt --stage production --password "$SERVERLESS_SECRETS_PASSWORD"
       - run: npm run deploy:dry
