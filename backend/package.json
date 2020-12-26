@@ -55,7 +55,7 @@
     "serverless-http": "^2.6.0",
     "sharp": "^0.26.3",
     "source-map-support": "^0.5.19",
-    "stripe": "^8.88.0",
+    "stripe": "^8.129.0",
     "typeorm": "^0.2.22",
     "typeorm-naming-strategies": "^2.0.0"
   },
