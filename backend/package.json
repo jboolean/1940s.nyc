@@ -23,7 +23,7 @@
     "@types/lodash": "^4.14.159",
     "@types/node": "^13.1.4",
     "@types/pg": "^7.14.4",
-    "@types/prettier": "^2.1.5",
+    "@types/prettier": "^2.1.6",
     "@types/serverless": "^1.78.11",
     "@types/sharp": "^0.23.1",
     "@types/source-map-support": "^0.5.3",
