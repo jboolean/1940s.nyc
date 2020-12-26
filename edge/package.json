@@ -10,11 +10,11 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "serverless": "^2.16.0",
+    "serverless": "^2.16.1",
     "serverless-lambda-edge-pre-existing-cloudfront": "^1.1.5"
   },
   "dependencies": {
-    "axios": "^0.21.0",
-    "sharp": "^0.26.3"
+    "axios": "^0.21.1",
+    "sharp": "^0.27.0"
   }
 }
