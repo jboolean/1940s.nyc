@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "serverless offline start --stage dev --host dev.1940s.nyc",
+    "start": "serverless offline start --stage dev --host dev.1940s.nyc --noPrependStageInUrl",
     "deploy:dry": "npm run deploy -- --noDeploy", 
     "deploy": "npm run install-aws-sharp && npm run lint:strict && serverless deploy --stage production",
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -40,7 +40,7 @@
     "serverless": "^2.17.0",
     "serverless-domain-manager": "^5.1.0",
     "serverless-lambda-edge-pre-existing-cloudfront": "^1.1.5",
-    "serverless-offline": "^5.12.1",
+    "serverless-offline": "^6.8.0",
     "serverless-plugin-select": "^2.0.0-rc.1",
     "serverless-plugin-typescript": "^1.1.9",
     "serverless-secrets-plugin": "^0.1.0",
