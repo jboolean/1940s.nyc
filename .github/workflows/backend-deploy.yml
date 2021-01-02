@@ -1,6 +1,8 @@
-name: backend-actions
+name: backend-deploy
 on:
-  pull_request:
+  push:
+    branches:
+      - master
     paths:
       - "backend/**"
 defaults:
@@ -8,7 +10,7 @@ defaults:
     shell: bash
     working-directory: backend
 jobs:
-  dryDeploy:
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -18,8 +20,8 @@ jobs:
         env:
           SERVERLESS_SECRETS_PASSWORD: ${{ secrets.SERVERLESS_SECRETS_PASSWORD}}
         run: npx serverless decrypt --stage production --password "$SERVERLESS_SECRETS_PASSWORD"
-      - name: Deploy dry run 
+      - name: Deploy
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID}}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY}}
-        run: npm run deploy:dry
+        run: npm run deploy
