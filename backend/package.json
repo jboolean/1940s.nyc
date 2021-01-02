@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "serverless offline start --stage dev --host dev.1940s.nyc",
+    "start": "serverless offline start --stage dev --host dev.1940s.nyc --noPrependStageInUrl",
     "deploy:dry": "npm run deploy -- --noDeploy", 
     "deploy": "npm run install-aws-sharp && npm run lint:strict && serverless deploy --stage production",
     "test": "echo \"Error: no test specified\" && exit 1",
