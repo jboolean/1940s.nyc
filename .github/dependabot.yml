@@ -21,12 +21,12 @@ updates:
       timezone: "America/New_York"
     assignees:
       - "jboolean"
-  - package-ecosystem: "npm"
-    directory: "/edge"
-    schedule:
-      interval: "weekly"
-      day: "saturday"
-      time: "09:00"
-      timezone: "America/New_York"
-    assignees:
-      - "jboolean"
+  # - package-ecosystem: "npm"
+  #   directory: "/edge"
+  #   schedule:
+  #     interval: "weekly"
+  #     day: "saturday"
+  #     time: "09:00"
+  #     timezone: "America/New_York"
+  #   assignees:
+  #     - "jboolean"
