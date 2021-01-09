@@ -68,7 +68,7 @@
     "@types/react-dom": "^16.9.0",
     "@types/react-modal": "^3.10.6",
     "@types/react-router-dom": "^5.1.5",
-    "@types/react-transition-group": "^4.2.3",
+    "@types/react-transition-group": "^4.4.0",
     "@types/react-virtualized-auto-sizer": "^1.0.0",
     "@types/react-window": "^1.8.2",
     "@types/uglifyjs-webpack-plugin": "^1.1.0",
