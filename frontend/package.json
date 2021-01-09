@@ -84,7 +84,7 @@
     "copy-webpack-plugin": "^6.4.0",
     "css-loader": "^5.0.1",
     "eslint": "^6.4.0",
-    "eslint-config-prettier": "^6.3.0",
+    "eslint-config-prettier": "^6.15.0",
     "eslint-config-squarespace": "^1.0.1",
     "eslint-import-resolver-webpack": "^0.13.0",
     "eslint-loader": "^4.0.2",
