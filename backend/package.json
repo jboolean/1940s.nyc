@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "serverless offline start --stage dev --host dev.1940s.nyc --noPrependStageInUrl",
-    "deploy:dry": "npm run deploy -- --noDeploy", 
+    "deploy:dry": "npm run deploy -- --noDeploy",
     "deploy": "npm run install-aws-sharp && npm run lint:strict && serverless deploy --stage production",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint --ext .js --ext .ts src",
@@ -22,8 +22,8 @@
     "@types/express": "^4.17.2",
     "@types/geojson": "^7946.0.7",
     "@types/lodash": "^4.14.167",
-    "@types/node": "^13.1.4",
     "@types/pg": "^7.14.8",
+    "@types/node": "^10.17.51",
     "@types/prettier": "^2.1.6",
     "@types/serverless": "^1.78.19",
     "@types/sharp": "^0.27.1",
