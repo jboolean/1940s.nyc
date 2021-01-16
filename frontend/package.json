@@ -28,7 +28,7 @@
     "prop-types": "^15.6.2",
     "qs": "^6.9.4",
     "react": "^16.14.0",
-    "react-autosuggest": "^10.0.4",
+    "react-autosuggest": "^10.1.0",
     "react-dom": "^16.14.0",
     "react-modal": "^3.12.1",
     "react-number-format": "^4.4.1",
