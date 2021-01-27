@@ -44,7 +44,14 @@ export default function TipJar({
       <p>
         I’ve received a surprisingly large amount of traffic on this site
         recently. It costs money to serve up photos and maps. If you enjoy my
-        site, consider pitching in a few dollars to keep it online.
+        site, consider pitching in a few dollars to keep it online.{' '}
+        <a
+          href="https://paypal.me/julianboilen"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          I’m also on PayPal.
+        </a>
       </p>
       <p>
         Thank you, <br />
