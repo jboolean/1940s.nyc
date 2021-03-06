@@ -1,6 +1,6 @@
 {
   "extends": [
-    "squarespace/vanilla",
+    "squarespace",
     "prettier",
     "plugin:prettier/recommended",
     "plugin:@typescript-eslint/recommended",
