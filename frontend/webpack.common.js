@@ -30,17 +30,6 @@ module.exports = {
   ],
   module: {
     rules: [
-      // {
-      //   test: path.resolve(__dirname, './Modernizr.js'),
-      //   use: [
-      //     {
-      //       loader: 'expose-loader',
-      //       options: {
-      //         exposes: ['Modernizr'],
-      //       },
-      //     },
-      //   ],
-      // },
       {
         test: /\.jsx?$/,
         exclude: /node_modules/,
@@ -96,14 +85,6 @@ module.exports = {
           classIdPrefix: '[name]-[hash:8]__',
         },
       },
-      // {
-      //   test: /\.modernizrrc.js$/,
-      //   loader: 'modernizr-loader',
-      // },
-      // {
-      //   test: /\.modernizrrc(\.json)?$/,
-      //   loader: 'modernizr-loader!json-loader',
-      // },
     ],
   },
   resolve: {
