@@ -47,7 +47,7 @@ export default function AnnouncementBanner(): JSX.Element | null {
       >
         Free virtual presentation
       </a>{' '}
-      on 1940s.nyc and Bloomingdale neighborhood history Tuesday at 5:30pm EDT
+      on 1940s.nyc and Bloomingdale neighborhood history tonight at 5:30pm EDT
     </div>
   );
 }
