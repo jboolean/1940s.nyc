@@ -7,7 +7,7 @@ import MapPane from './screens/MapPane';
 import Welcome from './screens/Welcome';
 import Shutdown from './screens/Shutdown';
 import ThankYou from './screens/MapPane/components/TipJar/ThankYou';
-import BestOfBoroughBanner from './screens/BestOfBoroughBanner';
+import AnnouncementBanner from './screens/AnnouncementBanner';
 
 import stylesheet from './App.less';
 import Outtakes from './screens/ImageGrid';
@@ -35,7 +35,7 @@ export default function App(): JSX.Element {
   return (
     <OptimizeExperimentsProvider>
       <div className={stylesheet.outermostContainer}>
-        <BestOfBoroughBanner />
+        <AnnouncementBanner />
         <Router history={history}>
           <div className={stylesheet.mainContentWrapper}>
             <div className={stylesheet.mainContentContainer}>
