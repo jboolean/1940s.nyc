@@ -8,7 +8,7 @@ const PRESET_OPTIONS_BY_VARIANT: Record<number, number[]> = {
 
 export default function useAmountPresets(): number[] {
   const [presetsVariant] = useExperimentVariants('3ZKjTkKGTCKl8Rk7a47wlQ') ||
-    useExperimentVariants('9aFn172cRMOw0u3TsLuLIA') || [0];
+    useExperimentVariants('9aFn172cRMOw0u3TsLuLIA') || [2];
   const amountPresets = PRESET_OPTIONS_BY_VARIANT[presetsVariant];
 
   return amountPresets;
