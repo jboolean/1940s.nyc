@@ -1,6 +1,5 @@
 {
-  "extends": ["squarespace",
-    "squarespace/react",
+  "extends": ["eslint-config-squarespace",
     "prettier",
     "plugin:prettier/recommended",
     
