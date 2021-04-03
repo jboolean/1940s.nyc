@@ -54,7 +54,7 @@
     "pg": "^8.5.1",
     "reflect-metadata": "^0.1.13",
     "serverless-http": "^2.7.0",
-    "sharp": "^0.27.2",
+    "sharp": "^0.28.0",
     "source-map-support": "^0.5.19",
     "stripe": "^8.138.0",
     "typeorm": "^0.2.31",
