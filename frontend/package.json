@@ -64,7 +64,7 @@
     "@types/prop-types": "^15.7.3",
     "@types/qs": "^6.9.4",
     "@types/react": "^16.9.2",
-    "@types/react-autosuggest": "^10.0.1",
+    "@types/react-autosuggest": "^10.1.4",
     "@types/react-dom": "^16.9.0",
     "@types/react-modal": "^3.12.0",
     "@types/react-router-dom": "^5.1.7",
