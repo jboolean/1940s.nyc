@@ -25,7 +25,7 @@
     "@types/pg": "^7.14.11",
     "@types/node": "^10.17.51",
     "@types/prettier": "^2.2.3",
-    "@types/serverless": "^1.78.23",
+    "@types/serverless": "^1.78.32",
     "@types/sharp": "^0.28.3",
     "@types/source-map-support": "^0.5.3",
     "@types/stripe": "^8.0.296",
