@@ -46,7 +46,7 @@
     "@types/autoprefixer": "^9.7.2",
     "@types/axios": "^0.14.0",
     "@types/babel__core": "^7.1.14",
-    "@types/babel__preset-env": "^7.9.0",
+    "@types/babel__preset-env": "^7.9.2",
     "@types/classnames": "^2.2.11",
     "@types/copy-webpack-plugin": "^6.4.0",
     "@types/core-js": "^2.5.4",
