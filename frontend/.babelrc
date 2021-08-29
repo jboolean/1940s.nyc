@@ -4,12 +4,9 @@
   ],
   "presets": [
     ["@babel/env", { 
-      "targets": {
-        "browsers": ["> 5% in US", "last 2 versions"]
-      },
       "exclude": ["transform-regenerator"],
       "useBuiltIns": "usage",
-      "corejs": 3
+      "corejs": "3.6"
     }],
     "@babel/preset-react"
   ]
