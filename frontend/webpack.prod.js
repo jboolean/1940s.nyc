@@ -5,17 +5,14 @@ const common = require('./webpack.common.js');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const path = require('path');
 
-const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
-
 // Webpack configuration
 module.exports = merge(common, {
-  output: {
-    // publicPath: '//takomaradio.org/s/'
+  mode: 'production',
+  output: {},
+  optimization: {
+    minimize: true,
   },
   plugins: [
-    new UglifyJSPlugin({
-      sourceMap: true,
-    }),
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': JSON.stringify('production'),
       __DEV__: false,
