@@ -8,9 +8,10 @@ const path = require('path');
 module.exports = merge(common, {
   entry: ['react-hot-loader/patch'],
   devtool: 'inline-source-map',
+  optimization: {
+    moduleIds: 'named',
+  },
   plugins: [
-    new webpack.NamedModulesPlugin(),
-    // new webpack.HotModuleReplacementPlugin(),
     new webpack.DefinePlugin({
       __DEV__: true,
     }),

@@ -23,7 +23,7 @@ module.exports = {
     new MiniCssExtractPlugin({
       filename: '[name].[hash].css',
     }),
-    new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
+    new webpack.IgnorePlugin({ resourceRegExp: /^\.\/locale$/ }),
     new CopyPlugin({
       patterns: [{ from: '_redirects' }],
     }),
@@ -56,7 +56,7 @@ module.exports = {
             loader: 'css-loader',
             options: {
               modules: {
-                localIdentName: '[name]-[local]-[hash:base64:5]',
+                localIdentName: '[name]-[local]-[contenthash:base64:5]',
               },
               importLoaders: 2,
             },
@@ -71,7 +71,7 @@ module.exports = {
           {
             loader: 'file-loader',
             options: {
-              name: '[name]-[hash:base64:5].[ext]',
+              name: '[name]-[contenthash:base64:5].[ext]',
             },
           },
         ],
@@ -81,8 +81,8 @@ module.exports = {
         issuer: /\.(j|t)sx$/,
         exclude: /node_modules/,
         loader: 'svg-react-loader',
-        query: {
-          classIdPrefix: '[name]-[hash:8]__',
+        options: {
+          classIdPrefix: '[name]-[contenthash:8]__',
         },
       },
     ],
