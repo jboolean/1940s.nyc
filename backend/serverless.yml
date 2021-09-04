@@ -31,7 +31,7 @@ custom:
 
 provider:
   name: aws
-  runtime: nodejs10.x
+  runtime: nodejs14.x
   stage: production
   region: us-east-1
   iamRoleStatements:
