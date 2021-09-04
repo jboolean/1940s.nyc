@@ -72,5 +72,8 @@
     "src/**/*.{js,jsx,ts,tsx}": [
       "eslint --fix --max-warnings 0"
     ]
+  },
+  "engines": {
+    "node": "^14"
   }
 }
