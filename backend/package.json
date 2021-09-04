@@ -53,7 +53,7 @@
     "express": "^4.17.1",
     "geojson": "^0.5.0",
     "geojson-precision": "^1.0.0",
-    "pg": "^8.5.1",
+    "pg": "^8.7.1",
     "pg-query-stream": "^4.1.0",
     "reflect-metadata": "^0.1.13",
     "serverless-http": "^2.7.0",
