@@ -37,7 +37,7 @@
     "eslint-plugin-prettier": "^3.4.1",
     "lint-staged": "^10.5.4",
     "prettier": "^2.2.1",
-    "serverless": "^2.30.3",
+    "serverless": "^2.57.0",
     "serverless-domain-manager": "^5.1.5",
     "serverless-lambda-edge-pre-existing-cloudfront": "^1.1.5",
     "serverless-offline": "^6.9.0",
