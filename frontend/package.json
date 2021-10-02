@@ -17,7 +17,7 @@
   "author": "Julian Boilen",
   "license": "UNLICENSED",
   "dependencies": {
-    "@stripe/stripe-js": "^1.11.0",
+    "@stripe/stripe-js": "^1.19.0",
     "axios": "^0.21.2",
     "classnames": "^2.2.6",
     "core-js": "^3.17.2",
