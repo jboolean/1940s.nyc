@@ -58,7 +58,7 @@
     "reflect-metadata": "^0.1.13",
     "serverless-http": "^2.7.0",
     "sharp": "^0.28.3",
-    "source-map-support": "^0.5.19",
+    "source-map-support": "^0.5.20",
     "stripe": "^8.174.0",
     "typeorm": "^0.2.34",
     "typeorm-naming-strategies": "^2.0.0"
