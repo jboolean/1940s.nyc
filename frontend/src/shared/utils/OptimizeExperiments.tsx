@@ -73,10 +73,8 @@ export default function listenToGoogleOptimize(
 export function OptimizeExperimentsProvider({
   children,
 }: PropsWithChildren<{}>): JSX.Element {
-  const [
-    assignmentsByExperimentId,
-    setAssignmentsByExperimentId,
-  ] = React.useState<Record<string, VariantAssignments>>({});
+  const [assignmentsByExperimentId, setAssignmentsByExperimentId] =
+    React.useState<Record<string, VariantAssignments>>({});
   React.useEffect(() => {
     return listenToGoogleOptimize((experimentId, variants) => {
       console.log('Updated experiment', experimentId, variants);
