@@ -57,7 +57,7 @@
     "@types/gtag.js": "0.0.4",
     "@types/html-webpack-plugin": "^3.2.6",
     "@types/less": "^3.0.2",
-    "@types/lodash": "^4.14.165",
+    "@types/lodash": "^4.14.178",
     "@types/mapbox-gl": "^1.13.0",
     "@types/mini-css-extract-plugin": "^1.2.2",
     "@types/prettier": "^2.3.2",
