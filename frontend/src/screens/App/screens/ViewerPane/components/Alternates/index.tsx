@@ -37,7 +37,10 @@ export default function Alternates({
         exit: 0,
       }}
     >
-      <div className={classnames(stylesheet.container, className)}>
+      <div
+        className={classnames(stylesheet.container, className)}
+        title="Alternate photos at this location"
+      >
         <div className={classnames(stylesheet.filmstrip)}>
           {alternatePhotos.map(({ identifier, collection }) => (
             <Link to={identifier} key={identifier} className={stylesheet.link}>
