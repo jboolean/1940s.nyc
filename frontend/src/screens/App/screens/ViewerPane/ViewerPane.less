@@ -16,14 +16,16 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 
     .closeButton,
-    .credit {
+    .credit,
+    .alternates {
       opacity: 0;
       transition: opacity 150ms ease;
     }
 
     &:hover {
       .closeButton,
-      .credit {
+      .credit,
+      .alternates {
         opacity: 1;
       }
     }
@@ -56,6 +58,14 @@
     cursor: pointer;
   }
 
+  .alternates {
+    z-index: 2;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 77px;
+  }
+
   .credit {
     position: absolute;
     bottom: 0;
@@ -69,10 +79,6 @@
     display: inline-block;
     color: inherit;
     text-decoration: underline;
-    // padding: 5px;
-    // border: 1px solid white;
-    // border-radius: 3px;
-    // margin: 5.5px;
   }
 
   .imageEnter {

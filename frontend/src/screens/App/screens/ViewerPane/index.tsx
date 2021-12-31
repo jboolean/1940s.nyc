@@ -8,6 +8,7 @@ import { API_BASE } from 'utils/apiConstants';
 
 import stylesheet from './ViewerPane.less';
 import { useHistory, useParams } from 'react-router';
+import Alternates from './components/Alternates';
 
 export default function ViewerPane({
   className,
@@ -15,9 +16,23 @@ export default function ViewerPane({
   className: string;
 }): JSX.Element {
   const history = useHistory();
+
+  const [isHovering, setIsHovering] = React.useState(false);
+  const handleMouseOver = (): void => {
+    setIsHovering(true);
+  };
+
+  const handleMouseOut = (): void => {
+    setIsHovering(false);
+  };
+
   const { identifier: photoIdentifier } = useParams<{ identifier?: string }>();
   return (
-    <div className={classnames(stylesheet.container, className)}>
+    <div
+      className={classnames(stylesheet.container, className)}
+      onMouseOver={handleMouseOver}
+      onMouseLeave={handleMouseOut}
+    >
       <button
         className={stylesheet.closeButton}
         onClick={() =>
@@ -26,6 +41,14 @@ export default function ViewerPane({
       >
         Close
       </button>
+
+      {/* showing this results in API calls and photo loading - only do it if hovered */}
+      {isHovering ? (
+        <Alternates
+          className={stylesheet.alternates}
+          originalIdentifier={photoIdentifier}
+        />
+      ) : null}
 
       <p className={stylesheet.credit}>
         Photo © NYC Municipal Archives{' '}
