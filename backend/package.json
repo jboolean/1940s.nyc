@@ -39,7 +39,7 @@
     "prettier": "^2.2.1",
     "serverless": "^2.62.0",
     "serverless-domain-manager": "^5.1.5",
-    "serverless-lambda-edge-pre-existing-cloudfront": "^1.1.5",
+    "serverless-lambda-edge-pre-existing-cloudfront": "^1.2.0",
     "serverless-offline": "^6.9.0",
     "serverless-plugin-select": "^2.0.0-rc.1",
     "serverless-plugin-typescript": "^2.0.0",
