@@ -44,10 +44,9 @@ export default function ViewerPane({
 
       {/* showing this results in API calls and photo loading - only do it if hovered */}
       {isHovering ? (
-        <Alternates
-          className={stylesheet.alternates}
-          originalIdentifier={photoIdentifier}
-        />
+        <div className={stylesheet.alternates}>
+          <Alternates originalIdentifier={photoIdentifier} />
+        </div>
       ) : null}
 
       <p className={stylesheet.credit}>

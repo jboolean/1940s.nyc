@@ -69,4 +69,26 @@
       border: 2px solid @red;
     }
   }
+
+  // transitions
+
+  .container {
+    // hide until shown
+    opacity: 0;
+    &.enter,
+    &.exit {
+      transition: opacity 150ms ease-in;
+      opacity: 0;
+    }
+
+    &.enterActive,
+    &.enterDone {
+      opacity: 1;
+    }
+
+    &.exitActive,
+    &.exitDone {
+      opacity: 0;
+    }
+  }
 }
