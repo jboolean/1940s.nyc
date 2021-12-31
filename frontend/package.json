@@ -92,7 +92,7 @@
     "html-webpack-plugin": "^5.3.2",
     "json-loader": "^0.5.7",
     "less": "^4.1.2",
-    "less-loader": "^7.3.0",
+    "less-loader": "^10.2.0",
     "lint-staged": "^11.2.1",
     "mini-css-extract-plugin": "^1.6.2",
     "postcss-loader": "^4.1.0",
