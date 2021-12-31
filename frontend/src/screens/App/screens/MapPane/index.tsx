@@ -51,9 +51,8 @@ class MapPane extends React.Component<Props & RouteComponentProps, State> {
     this.idPrefix = uniqueId('MapPane-');
 
     this.handleOverlayChange = this.handleOverlayChange.bind(this);
-    this.handleSearchFeatureSelected = this.handleSearchFeatureSelected.bind(
-      this
-    );
+    this.handleSearchFeatureSelected =
+      this.handleSearchFeatureSelected.bind(this);
     this.handleGeolocated = this.handleGeolocated.bind(this);
     this.openPhoto = this.openPhoto.bind(this);
     this.setupTipJarPopup();
@@ -154,16 +153,18 @@ class MapPane extends React.Component<Props & RouteComponentProps, State> {
           <Geolocate onGeolocated={this.handleGeolocated} />
         </div>
         <div className={stylesheet.overlays}>
-          {([
-            { name: 'Street', value: 'default-map' },
-            { name: 'Arial', value: 'default-arial' },
-            // { name: 'Street (1937)', value: 'district' },
-            // { name: 'Buildings (1916)', value: 'atlas-1916' },
-            // { name: 'Buildings (1930)', value: 'atlas-1930' },
-            // { name: 'Buildings (1956)', value: 'atlas-1956' },
-            // { name: 'Arial (1924)', value: 'arial-1924' },
-            // { name: 'Arial (1951)', value: 'arial-1951' },
-          ] as { name: string; value: OverlayId | null }[]).map((option) => (
+          {(
+            [
+              { name: 'Street', value: 'default-map' },
+              { name: 'Arial', value: 'default-arial' },
+              // { name: 'Street (1937)', value: 'district' },
+              // { name: 'Buildings (1916)', value: 'atlas-1916' },
+              // { name: 'Buildings (1930)', value: 'atlas-1930' },
+              // { name: 'Buildings (1956)', value: 'atlas-1956' },
+              // { name: 'Arial (1924)', value: 'arial-1924' },
+              // { name: 'Arial (1951)', value: 'arial-1951' },
+            ] as { name: string; value: OverlayId | null }[]
+          ).map((option) => (
             <React.Fragment key={option.value}>
               <input
                 id={this.idPrefix + option.value}

@@ -161,7 +161,7 @@ function withRouterRef<
   });
 }
 
-export default (withRouterRef<Props>(
-  MainMap
-) as unknown) as React.ComponentType<Props & React.RefAttributes<MainMap>> &
+export default withRouterRef<Props>(MainMap) as unknown as React.ComponentType<
+  Props & React.RefAttributes<MainMap>
+> &
   Pick<MainMap, 'goTo'>;

@@ -47,10 +47,7 @@ const NYPL_ATTRIBUTION =
   'The Lionel Pincus & Princess Firyal Map Division, NYPL';
 
 const MANHATTAN = [
-  -74.04772962763064,
-  40.68291694544512,
-  -73.90665099539478,
-  40.87903804730722,
+  -74.04772962763064, 40.68291694544512, -73.90665099539478, 40.87903804730722,
 ];
 
 export const installLayers = (map: mapboxgl.Map, photoLayer: string): void => {
