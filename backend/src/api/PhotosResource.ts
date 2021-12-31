@@ -22,8 +22,6 @@ router.get('/', async (req, res) => {
       [withSameLngLatByIdentifier]
     );
 
-    console.log(lngLatForFromIdentifierResult);
-
     if (!lngLatForFromIdentifierResult) {
       res.status(401).send('cannot find by identifier');
       return;
@@ -33,7 +31,6 @@ router.get('/', async (req, res) => {
     lng = lngLatForFromIdentifierResult.lng_lat.x;
     lat = lngLatForFromIdentifierResult.lng_lat.y;
   }
-  console.log(lng, lat);
 
   if (!lng || !lat) {
     res.status(401).send('lngLat required');
