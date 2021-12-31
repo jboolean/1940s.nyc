@@ -12,7 +12,26 @@ const PHOTO_PURCHASE_FORM_URL = 'https://www1.nyc.gov/dorforms/photoform.htm';
 router.get('/', async (req, res) => {
   const photoRepo = getRepository(Photo);
 
-  const { lng, lat } = req.query;
+  let { lng, lat } = req.query;
+
+  const { withSameLngLatByIdentifier } = req.query;
+
+  if (withSameLngLatByIdentifier) {
+    const [lngLatForFromIdentifierResult] = await photoRepo.query(
+      'select lng_lat from effective_geocodes_view where identifier = $1',
+      [withSameLngLatByIdentifier]
+    );
+
+    if (!lngLatForFromIdentifierResult) {
+      res.status(401).send('cannot find by identifier');
+      return;
+    }
+
+    // Use lng, lat from this photo instead of lng, lat parameters
+    lng = lngLatForFromIdentifierResult.lng_lat.x;
+    lat = lngLatForFromIdentifierResult.lng_lat.y;
+  }
+
   if (!lng || !lat) {
     res.status(401).send('lngLat required');
     return;
@@ -24,7 +43,11 @@ router.get('/', async (req, res) => {
 
   const ids = result.map((r) => r.identifier);
 
-  const photos = await photoRepo.findByIds(ids, { order: { address: 'ASC' } });
+  const photos = await photoRepo.findByIds(ids, {
+    order: { collection: 'ASC' },
+    relations: ['geocodeResults'],
+    loadEagerRelations: true,
+  });
   res.send(photos);
 });
 
