@@ -8,11 +8,21 @@
 
     // background-color: @font-color-dark;
     // border-radius: 4px;
-    border-bottom: 2px solid white;
+    // border-bottom: 2px solid white;
     padding: (11px/2);
 
     // fade out right edge
     mask-image: linear-gradient(to left, transparent, black @fade-out-size);
+
+    &::-webkit-scrollbar {
+      height: 5px;
+      &-track {
+        background-color: black;
+      }
+      &-thumb {
+        background-color: white;
+      }
+    }
   }
 
   .filmstrip {
