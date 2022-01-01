@@ -60,7 +60,7 @@
     "sharp": "^0.28.3",
     "source-map-support": "^0.5.20",
     "stripe": "^8.195.0",
-    "typeorm": "^0.2.38",
+    "typeorm": "^0.2.41",
     "typeorm-naming-strategies": "^2.0.0"
   },
   "husky": {
