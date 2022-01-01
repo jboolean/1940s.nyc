@@ -5,7 +5,7 @@
   display: block;
   background-color: @green-lighter;
   color: @font-color-dark;
-  
+
   margin: auto;
   box-sizing: border-box;
 
@@ -17,12 +17,11 @@
   max-width: 90%;
   max-height: 90%;
 
-
   &.large {
     @modal-width: 55rem;
     @modal-height: 35rem;
 
-    top: calc(50% - (@modal-height/2));
+    top: calc(50% - (@modal-height / 2));
     width: @modal-width;
     height: @modal-height;
   }
@@ -42,7 +41,6 @@
   }
 }
 
-
 .bodyOpen {
   overflow: hidden;
 }
@@ -58,8 +56,7 @@
   backdrop-filter: grayscale(70%);
   background-color: hsla(0, 0, 10%, 5%);
 
-  text-align: center;;
-
+  text-align: center;
 
   h1 {
     font-size: 34px;
@@ -102,8 +99,8 @@
 }
 
 @media screen and (max-width: 800px), screen and (max-height: 600px) {
-
-  .modal.small, .modal.large {
+  .modal.small,
+  .modal.large {
     display: block;
     position: relative;
     transform: none;

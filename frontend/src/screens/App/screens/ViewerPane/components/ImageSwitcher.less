@@ -1,5 +1,4 @@
 :local {
-
   .unfaded {
     filter: contrast(1);
   }
@@ -8,14 +7,17 @@
     filter: contrast(0);
   }
 
-  .enter, .appear {
+  .enter,
+  .appear {
     .faded();
   }
-  .enterActive, .appearActive {
+  .enterActive,
+  .appearActive {
     transition: filter 150ms ease-in;
     .unfaded();
   }
-  .enterDone, .appearDone {
+  .enterDone,
+  .appearDone {
     .unfaded();
   }
   .exit {

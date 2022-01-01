@@ -24,7 +24,6 @@
   display: flex;
   width: 20rem;
 
-  
   .search {
     flex-grow: 1;
     width: 100%;
@@ -33,7 +32,7 @@
 }
 
 .overlayInput {
-  composes: visuallyhidden from '../../../../shared/styles/utils.less'
+  composes: visuallyhidden from '../../../../shared/styles/utils.less';
 }
 
 .overlayLabel {
@@ -43,14 +42,13 @@
   composes: floating from '../../../../shared/styles/ui.less';
 
   box-sizing: border-box;
-  
+
   background-position: center;
   background-size: cover;
   background-repeat: no-repeat;
 
   text-indent: -999999px;
-  
-  
+
   text-align: center;
   cursor: pointer;
 
@@ -76,26 +74,26 @@
   text-align: center;
 }
 
-
-.outtakesLink, .eightiesLink, .tipMeButton {
-    display: block;
-    border: none;
-    composes: floating from '../../../../shared/styles/ui.less';
-    z-index: 1;
-    box-sizing: border-box;
-    height: 2rem;
-    padding: 0.5rem 1rem;
-    text-decoration: none;
-    margin-bottom: 0.5rem;
-    cursor: pointer;
-    outline: 0;
+.outtakesLink,
+.eightiesLink,
+.tipMeButton {
+  display: block;
+  border: none;
+  composes: floating from '../../../../shared/styles/ui.less';
+  z-index: 1;
+  box-sizing: border-box;
+  height: 2rem;
+  padding: 0.5rem 1rem;
+  text-decoration: none;
+  margin-bottom: 0.5rem;
+  cursor: pointer;
+  outline: 0;
 }
 
 .externalIcon {
   height: 1.2ex;
   vertical-align: super;
 }
-
 
 @media screen and (max-width: 480px) {
   .topControls {
@@ -120,4 +118,3 @@
     flex-direction: column-reverse;
   }
 }
-
