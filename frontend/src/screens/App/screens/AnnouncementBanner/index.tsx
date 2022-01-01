@@ -2,9 +2,8 @@ import React from 'react';
 
 import stylesheet from './AnnouncementBanner.less';
 
-const EVENT_TIME = new Date(1616536800000);
-const HIDE_KEY = 'hideBloomingdaleBanner';
-const HIDE_ON_CLICK = false;
+const DISPLAY_UNTIL = new Date(2022, 4);
+const HIDE_KEY = 'alternatesBanner';
 
 export default function AnnouncementBanner(): JSX.Element | null {
   const [now, setNow] = React.useState(Date.now());
@@ -20,12 +19,11 @@ export default function AnnouncementBanner(): JSX.Element | null {
   }, []);
 
   const hide = (): void => {
-    if (!HIDE_ON_CLICK) return;
     localStorage.setItem(HIDE_KEY, 'true');
     setHidden(true);
   };
 
-  const diffS = (EVENT_TIME.getTime() - now) / 1000;
+  const diffS = (DISPLAY_UNTIL.getTime() - now) / 1000;
 
   if (diffS < 0 || hidden) return null;
 
@@ -39,15 +37,11 @@ export default function AnnouncementBanner(): JSX.Element | null {
 
   return (
     <div className={stylesheet.container}>
-      <a
-        href="http://bit.ly/3f2mm25"
-        target="_blank"
-        rel="noopener noreferrer"
-        onClick={hide}
-      >
-        Free virtual presentation
-      </a>{' '}
-      on 1940s.nyc and Bloomingdale neighborhood history tonight at 5:30pm EDT
+      New: Hover over an image for more photos of the same location, where
+      available.{' '}
+      <button className={stylesheet.hideButton} onClick={hide}>
+        Hide
+      </button>
     </div>
   );
 }
