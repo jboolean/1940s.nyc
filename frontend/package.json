@@ -25,7 +25,6 @@
     "lodash": "^4.17.21",
     "mapbox-gl": "^2.4.1",
     "normalize.css": "^8.0.1",
-    "prop-types": "^15.6.2",
     "qs": "^6.10.1",
     "react": "^16.14.0",
     "react-autosuggest": "^10.1.0",
@@ -35,8 +34,7 @@
     "react-router-dom": "^5.2.0",
     "react-transition-group": "^4.4.1",
     "react-virtualized-auto-sizer": "^1.0.2",
-    "react-window": "^1.8.6",
-    "tslib": "^2.3.1"
+    "react-window": "^1.8.6"
   },
   "devDependencies": {
     "@babel/core": "^7.16.5",
@@ -60,7 +58,6 @@
     "@types/mapbox-gl": "^1.13.0",
     "@types/mini-css-extract-plugin": "^2.4.0",
     "@types/prettier": "^2.3.2",
-    "@types/prop-types": "^15.7.3",
     "@types/qs": "^6.9.4",
     "@types/react": "^16.9.2",
     "@types/react-autosuggest": "^10.1.4",
