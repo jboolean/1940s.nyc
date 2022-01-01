@@ -5,11 +5,11 @@
   display: flex;
   background-color: @green-lighter;
   color: @font-color-dark;
-  
+
   @modal-width: 55rem;
   @modal-height: 35rem;
 
-  top: calc(50% - (@modal-height/2));
+  top: calc(50% - (@modal-height / 2));
   width: @modal-width;
   max-width: 90%;
   height: @modal-height;
@@ -49,7 +49,7 @@
   height: 100%;
   width: 100%;
   object-fit: cover;
-  transform: scale(1.10);
+  transform: scale(1.1);
 }
 
 .textContainer {
@@ -106,7 +106,6 @@
 .explore {
   display: inline-block;
 
-
   padding: 1rem 2rem;
 
   background-color: @creme;
@@ -116,7 +115,6 @@
 }
 
 @media screen and (max-width: 800px), screen and (max-height: 600px) {
-
   @visible-text-height: 200px;
   @photo-padding: calc(100vh - @visible-text-height);
 
@@ -148,7 +146,8 @@
     overflow-y: scroll;
   }
 
-  .text, .buttonContainer {
+  .text,
+  .buttonContainer {
     background: @creme;
     text-align: left;
   }
