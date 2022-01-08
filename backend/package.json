@@ -26,7 +26,7 @@
     "@types/node": "^10.17.51",
     "@types/prettier": "^2.4.2",
     "@types/serverless": "^1.78.40",
-    "@types/sharp": "^0.28.3",
+    "@types/sharp": "^0.29.5",
     "@types/source-map-support": "^0.5.4",
     "@types/stripe": "^8.0.296",
     "@typescript-eslint/eslint-plugin": "^2.34.0",
