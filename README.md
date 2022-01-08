@@ -8,6 +8,8 @@ This is a monorepo containing these modules:
 The serverless API for search, photo metadata, and payments. 
 Also, s3 event lambdas used for processing images as part of ingesting from the initial photo scrape.
 
+![backend deploy](https://github.com/jboolean/1940s.nyc/actions/workflows/backend-deploy.yml/badge.svg)
+
 ## frontend
 The frontend, a React app.
 
