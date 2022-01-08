@@ -1,0 +1,104 @@
+@import '../../../../../../shared/styles/colors.less';
+
+:local {
+  @fade-out-size: 11px;
+
+  .container {
+    overflow: scroll hidden;
+
+    // background-color: @font-color-dark;
+    // border-radius: 4px;
+    // border-bottom: 2px solid white;
+    padding: (11px/2);
+
+    // fade out right edge
+    mask-image: linear-gradient(to left, transparent, black @fade-out-size);
+
+    &::-webkit-scrollbar {
+      height: 5px;
+      &-track {
+        background-color: black;
+      }
+      &-thumb {
+        background-color: white;
+      }
+    }
+  }
+
+  .filmstrip {
+    display: grid;
+    grid-auto-columns: 11px * 10;
+    grid-auto-rows: 11px * 7.5;
+    column-gap: 11px;
+    grid-auto-flow: column;
+
+    // Right padding does not work in scroll container.
+    // Add element to take up space so photo is not faded out when scrolled to the right
+    &:last-child img {
+      margin-right: @fade-out-size;
+    }
+  }
+
+  .thumbnail {
+    object-fit: cover;
+    height: 100%;
+    width: 100%;
+  }
+
+  .link {
+    position: relative;
+  }
+
+  .collectionTag {
+    position: absolute;
+    margin: 5.5px 11px;
+    z-index: 2;
+    color: white;
+    font-size: 2em;
+    bottom: 0;
+    text-shadow: hsva(0, 0, 0.5, 0.5) 0 0 5px;
+  }
+
+  // TODO dedupe from image-grid
+  .thumbnail {
+    object-fit: cover;
+    background-color: grey;
+    transition: opacity 150ms ease-in;
+    box-sizing: border-box;
+    border: 2px solid black;
+    border-radius: 4px;
+
+    cursor: pointer;
+
+    &:hover,
+    &.selected {
+      filter: brightness(1.4);
+    }
+
+    &.selected {
+      border: 2px solid @red;
+    }
+  }
+
+  // transitions
+
+  .container {
+    // hide until shown
+    opacity: 0;
+    &.enter,
+    &.exit {
+      transition: opacity 150ms ease-in;
+      opacity: 0;
+    }
+
+    &.enterActive,
+    &.enterDone {
+      opacity: 1;
+    }
+
+    &.exitActive,
+    &.exitDone {
+      opacity: 0;
+    }
+  }
+}
