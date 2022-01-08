@@ -37,7 +37,7 @@ export default function AnnouncementBanner(): JSX.Element | null {
 
   return (
     <div className={stylesheet.container}>
-      New: Hover over an image for more photos of the same location, where
+      New: Hover or tap on an image for more photos of the same location, where
       available.{' '}
       <button className={stylesheet.hideButton} onClick={hide}>
         Hide
