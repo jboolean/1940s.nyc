@@ -90,7 +90,7 @@
     "json-loader": "^0.5.7",
     "less": "^4.1.2",
     "less-loader": "^10.2.0",
-    "lint-staged": "^12.1.4",
+    "lint-staged": "^13.0.0",
     "mini-css-extract-plugin": "^2.4.5",
     "postcss-loader": "^4.1.0",
     "prettier": "^2.5.1",
