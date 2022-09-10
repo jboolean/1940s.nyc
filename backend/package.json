@@ -57,7 +57,7 @@
     "pg-query-stream": "^4.2.1",
     "reflect-metadata": "^0.1.13",
     "serverless-http": "^2.7.0",
-    "sharp": "^0.28.3",
+    "sharp": "^0.31.0",
     "source-map-support": "^0.5.20",
     "stripe": "^8.195.0",
     "typeorm": "^0.2.41",
