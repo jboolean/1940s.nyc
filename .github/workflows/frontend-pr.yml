@@ -8,7 +8,7 @@ defaults:
     shell: bash
     working-directory: frontend
 jobs:
-  check:
+  lint:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2

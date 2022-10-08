@@ -1,0 +1,11 @@
+name: frontend-pr
+on:
+  pull_request:
+    paths-ignore:
+      - "backend/**"
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - run: 'echo "No build required" '

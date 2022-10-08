@@ -1,0 +1,11 @@
+name: backend-pr
+on:
+  pull_request:
+    paths-ignore:
+      - "backend/**"
+
+jobs:
+  dryDeploy:
+    runs-on: ubuntu-latest
+    steps:
+      - run: 'echo "No build required" '
