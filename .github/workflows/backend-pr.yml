@@ -16,10 +16,6 @@ jobs:
         with:
           node-version: '14'
       - run: npm ci
-      - name: Decrypt secrets
-        env:
-          SERVERLESS_SECRETS_PASSWORD: ${{ secrets.SERVERLESS_SECRETS_PASSWORD}}
-        run: npx serverless decrypt --stage production --password "$SERVERLESS_SECRETS_PASSWORD"
       - name: Deploy dry run 
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID}}
