@@ -19,7 +19,6 @@ service: fourtiesnyc
 # You can pin your service to only deploy with a specific Serverless version
 # Check out our docs for more details
 # frameworkVersion: "=X.X.X"
-variablesResolutionMode: 20210326
 
 package:
   individually: false
@@ -36,18 +35,20 @@ provider:
   runtime: nodejs14.x
   stage: production
   region: us-east-1
-  iamRoleStatements:
-    - Effect: Allow
-      Action: 
-        - s3:*
-        # - s3:GetObject
-        # - s3:PutObject
-      Resource: "*"
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action: 
+            - s3:*
+            # - s3:GetObject
+            # - s3:PutObject
+          Resource: "*"
 
-        # Fn::Join:
-        #   - ''
-        #   - - 'arn:aws:s3:::'
-        #     - Ref: S3BucketFourtiesPhotos
+            # Fn::Join:
+            #   - ''
+            #   - - 'arn:aws:s3:::'
+            #     - Ref: S3BucketFourtiesPhotos
 plugins:
   - serverless-plugin-select
   - serverless-offline
