@@ -19,6 +19,8 @@ service: fourtiesnyc
 # You can pin your service to only deploy with a specific Serverless version
 # Check out our docs for more details
 # frameworkVersion: "=X.X.X"
+variablesResolutionMode: 20210326
+
 package:
   individually: false
 custom:
@@ -50,7 +52,6 @@ plugins:
   - serverless-plugin-select
   - serverless-offline
   - serverless-plugin-typescript
-  - serverless-secrets-plugin
   - serverless-domain-manager
  
 # you can add statements to the Lambda function's IAM Role here
@@ -90,7 +91,13 @@ functions:
       - http:
           path: /{proxy+}
           method: ANY
-    environment: ${file(secrets.${opt:stage, self:provider.stage}.yml)}
+    environment:
+      DB_HOST: ${ssm:/${self:service}-${sls:stage}-db-host}
+      DB_PORT: ${ssm:/${self:service}-${sls:stage}-db-port}
+      DB_USERNAME: ${ssm:/${self:service}-${sls:stage}-db-username}
+      DB_PASSWORD: ${ssm:/${self:service}-${sls:stage}-db-password}
+      DB_DATABASE: ${ssm:/${self:service}-${sls:stage}-db-database}
+      STRIPE_SK: ${ssm:/${self:service}-${sls:stage}-stripe-sk}
   convertImage:
     stages:
       - production
