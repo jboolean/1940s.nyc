@@ -2,7 +2,7 @@ name: frontend-pr
 on:
   pull_request:
     paths-ignore:
-      - "backend/**"
+      - "frontend/**"
 
 jobs:
   lint:
