@@ -6,6 +6,7 @@ const path = require('path');
 
 // Webpack configuration
 module.exports = merge(common, {
+  mode: 'development',
   entry: ['react-hot-loader/patch'],
   devtool: 'inline-source-map',
   optimization: {
