@@ -1,7 +1,7 @@
 import React from 'react';
 import Modal from 'components/Modal';
 import redirectToCheckout from './redirectToCheckout';
-import NumberFormat from 'react-number-format';
+import { NumericFormat } from 'react-number-format';
 import classnames from 'classnames';
 
 import stylesheet from './TipJar.less';
@@ -67,12 +67,12 @@ export default function TipJar({
               [stylesheet.active]: presetAmount === amountDollars,
             })}
           >
-            <NumberFormat displayType="text" prefix="$" value={presetAmount} />
+            <NumericFormat displayType="text" prefix="$" value={presetAmount} />
           </button>
         ))}
       </div>
       <div className={stylesheet.tipForm}>
-        <NumberFormat
+        <NumericFormat
           value={amountDollars}
           placeholder="$0"
           decimalScale={2}
