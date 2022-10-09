@@ -18,14 +18,14 @@ import { Link } from 'react-router-dom';
 
 import recordEvent from 'shared/utils/recordEvent';
 import ExternalIcon from '!file-loader!./assets/external.svg';
-import NumberFormat from 'react-number-format';
+import { NumericFormat } from 'react-number-format';
 import useAmountPresets from './components/TipJar/useAmountPresets';
 
 const TIP_JAR_DELAY = 120000;
 
 function SuggestedTip(): JSX.Element {
   const [lowestAmount] = useAmountPresets();
-  return <NumberFormat displayType="text" prefix="$" value={lowestAmount} />;
+  return <NumericFormat displayType="text" prefix="$" value={lowestAmount} />;
 }
 
 interface Props {
