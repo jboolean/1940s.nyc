@@ -8,8 +8,9 @@ This repo is my starting place for new frontend apps.
 
 ## Pre-requisites
 
-This project was developed with NPM 6 and Node 10.
-Ensure these are installed with `node --version` and `npm --version`, or `nvm use`.
+This project was developed with node version specified in in .nvmrc
+
+With `nvm` installed, run `nvm use`
 
 ## Development
 
