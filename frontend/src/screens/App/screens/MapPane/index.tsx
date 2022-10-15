@@ -72,12 +72,12 @@ class MapPane extends React.Component<Props & RouteComponentProps, State> {
     const [lng, lat] = feature.geometry.coordinates;
     this.map.goTo({ lng, lat });
 
-    closest({ lng, lat }).then(this.openPhoto.bind(this), noop);
+    closest({ lng, lat }).then(this.openPhoto, noop);
   }
 
   handleGeolocated(position: { lat: number; lng: number }): void {
     this.map.goTo(position);
-    closest(position).then(this.openPhoto.bind(this), noop);
+    closest(position).then(this.openPhoto, noop);
   }
 
   setupTipJarPopup(): void {
@@ -147,10 +147,10 @@ class MapPane extends React.Component<Props & RouteComponentProps, State> {
         </div>
         <div className={stylesheet.topControls}>
           <Search
-            onFeatureSelected={this.handleSearchFeatureSelected.bind(this)}
+            onFeatureSelected={this.handleSearchFeatureSelected}
             className={stylesheet.search}
           />
-          <Geolocate onGeolocated={this.handleGeolocated.bind(this)} />
+          <Geolocate onGeolocated={this.handleGeolocated} />
         </div>
         <div className={stylesheet.overlays}>
           {(
