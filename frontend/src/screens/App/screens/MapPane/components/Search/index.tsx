@@ -85,7 +85,7 @@ export default class Search extends React.Component<Props, State> {
 
   // Autosuggest will call this function every time you need to clear suggestions.
   onSuggestionsClearRequested = (): void => {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     this.fetchSuggestionsThrottled.cancel();
 
