@@ -37,13 +37,13 @@
     "react-window": "^1.8.6"
   },
   "devDependencies": {
-    "@babel/core": "^7.16.5",
+    "@babel/core": "^7.19.3",
     "@babel/plugin-proposal-class-properties": "^7.16.7",
     "@babel/preset-env": "^7.13.9",
     "@babel/preset-react": "^7.12.10",
     "@types/autoprefixer": "^9.7.2",
     "@types/axios": "^0.14.0",
-    "@types/babel__core": "^7.1.17",
+    "@types/babel__core": "^7.1.19",
     "@types/babel__preset-env": "^7.9.2",
     "@types/copy-webpack-plugin": "^6.4.0",
     "@types/core-js": "^2.5.4",
