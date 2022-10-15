@@ -1,7 +1,7 @@
 {
   "name": "julianboilen-base-app",
   "version": "1.1.2",
-  "description": "Audio components for takomaradio.org",
+  "description": "1940s.nyc",
   "main": "dist/app.bundle.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -47,7 +47,7 @@
     "@types/babel__preset-env": "^7.9.2",
     "@types/copy-webpack-plugin": "^6.4.0",
     "@types/core-js": "^2.5.4",
-    "@types/eslint": "^6.8.1",
+    "@types/eslint": "^7.29.0",
     "@types/eslint-plugin-prettier": "^3.1.0",
     "@types/file-loader": "^5.0.1",
     "@types/geojson": "^7946.0.8",
@@ -79,7 +79,7 @@
     "babel-loader": "^8.2.2",
     "copy-webpack-plugin": "^6.4.0",
     "css-loader": "^5.2.7",
-    "eslint": "^6.8.0",
+    "eslint": "^7.32.0",
     "eslint-config-prettier": "^6.15.0",
     "eslint-config-squarespace": "^1.0.1",
     "eslint-import-resolver-webpack": "^0.13.1",
