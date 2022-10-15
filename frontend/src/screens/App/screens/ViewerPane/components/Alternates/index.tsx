@@ -23,7 +23,7 @@ export default function Alternates({
 
   React.useEffect(() => {
     // setAlternatePhotos([]);
-    getAlternatePhotos(originalIdentifier).then(setAlternatePhotos);
+    void getAlternatePhotos(originalIdentifier).then(setAlternatePhotos);
   }, [originalIdentifier]);
 
   return (

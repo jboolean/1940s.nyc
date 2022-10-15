@@ -163,11 +163,11 @@ class MapPane extends React.Component<Props & RouteComponentProps, State> {
               // { name: 'Buildings (1956)', value: 'atlas-1956' },
               // { name: 'Arial (1924)', value: 'arial-1924' },
               // { name: 'Arial (1951)', value: 'arial-1951' },
-            ] as { name: string; value: OverlayId | null }[]
+            ] as { name: string; value: OverlayId }[]
           ).map((option) => (
             <React.Fragment key={option.value}>
               <input
-                id={this.idPrefix + option.value}
+                id={`${this.idPrefix}${option.value}`}
                 key={option.value || 'default'}
                 type="radio"
                 name="overlay"

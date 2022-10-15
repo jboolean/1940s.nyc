@@ -15,8 +15,10 @@ export default function AnnouncementBanner(): JSX.Element | null {
     const handle = setInterval(() => {
       setNow(Date.now());
     }, 1000);
-    return () => clearInterval(handle);
-  }, []);
+    return () => {
+      clearInterval(handle);
+    };
+  });
 
   const hide = (): void => {
     localStorage.setItem(HIDE_KEY, 'true');

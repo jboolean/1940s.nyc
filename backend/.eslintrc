@@ -1,40 +1,11 @@
 {
   "extends": [
-    "squarespace",
-    "plugin:prettier/recommended",
-    "plugin:@typescript-eslint/recommended",
+    "jboolean"
   ],
-  "parser": "@typescript-eslint/parser",
   "env": {
     "node": true
   },
-  "plugins": [
-    "@typescript-eslint"
-  ],
-  "globals": {
-    "__DEV__": true
-  },
-  "rules": {
-    "no-var": "error",
-    "prefer-const": "warn"
-  },
-  "overrides": [
-    {
-      // enable the rule specifically for TypeScript files
-      "files": [
-        "*.ts",
-        "*.tsx"
-      ],
-      "rules": {
-        "@typescript-eslint/explicit-function-return-type": [
-          "error",
-          {
-            "allowExpressions": true
-          }
-        ],
-        "no-use-before-define": "off",
-        "@typescript-eslint/no-use-before-define": "warn"
-      }
-    }
-  ]
+  "parserOptions": {
+    "project": "./tsconfig.json"
+  }
 }

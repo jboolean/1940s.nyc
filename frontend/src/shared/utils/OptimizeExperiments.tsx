@@ -85,7 +85,7 @@ export function OptimizeExperimentsProvider({
         [experimentId]: variants,
       });
     });
-  }, []);
+  }, [assignmentsByExperimentId]);
 
   return (
     <ExperimentAssignmentsContext.Provider value={assignmentsByExperimentId}>

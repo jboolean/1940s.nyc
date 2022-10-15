@@ -49,11 +49,11 @@ function Grid({
 
   React.useEffect(() => {
     if (photoSummaries.length) return;
-    getOuttakeSummaries().then((data) => {
+    void getOuttakeSummaries().then((data) => {
       photoSummaries = data;
       forceUpdate();
     });
-  }, []);
+  });
 
   const history = useHistory();
   const { identifier: selectedIdentifier } = useParams<{
@@ -70,7 +70,8 @@ function Grid({
     const imageI = visibleImageIRef.current;
     if (isNil(imageI)) return;
     const rowI = imageI / itemsPerRow;
-    listRef.current.scrollToItem(rowI, 'start');
+    listRef.current?.scrollToItem(rowI, 'start');
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- otherwise it will scroll on every click
   }, [itemsPerRow]);
 
   return (

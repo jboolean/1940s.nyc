@@ -10,9 +10,10 @@ export default function ThankYou({
 }: Pick<ReactModal.Props, 'isOpen' | 'onRequestClose'>): JSX.Element {
   const history = useHistory();
   const { tipAmount } = qs.parse(window.location.search);
+  const hasRecordedRef = React.useRef(false);
 
   React.useEffect(() => {
-    if (!isOpen) return;
+    if (!isOpen || hasRecordedRef.current) return;
     recordEvent({
       action: 'Completes Tip',
       category: 'Tip Jar',
@@ -26,7 +27,8 @@ export default function ThankYou({
       pathname: history.location.pathname,
       hash: history.location.hash,
     });
-  }, [tipAmount, isOpen]);
+    hasRecordedRef.current = true;
+  }, [tipAmount, isOpen, history]);
 
   return (
     <Modal size="small" isOpen={isOpen} onRequestClose={onRequestClose}>

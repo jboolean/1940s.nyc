@@ -26,10 +26,13 @@ export type OverlayId =
 
 // Overlays are collections of layers
 const overlaysToLayers: { [overlay in OverlayId]: LayerId[] } = {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   get 'default-map'() {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return
     return this['atlas-1930'];
   },
   get 'default-arial'() {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-return
     return [...this['default-map'], ...this['arial-1951']];
   },
   'arial-1924': ['arial-1924', 'nyc-label'],

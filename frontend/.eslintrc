@@ -1,19 +1,11 @@
 {
-  "extends": ["squarespace",
-    "squarespace/react",
-    "plugin:prettier/recommended",
-    "plugin:@typescript-eslint/recommended",
+  "extends": ["jboolean", "jboolean/react"
   ],
-  "parser": "@typescript-eslint/parser",
   "env": {
     "browser": true,
     "mocha": true,
     "node": true
   },
-  "plugins": [
-    "react",
-    "@typescript-eslint"
-  ],
   "globals": {
     "__DEV__": true
   },
@@ -27,25 +19,7 @@
       "version": "detect"
     }
   },
-  "rules": {
-    "no-var": "error",
-    "prefer-const": "warn"
-  },
-  "overrides": [
-    {
-      // enable the rule specifically for TypeScript files
-      "files": [
-        "*.ts",
-        "*.tsx"
-      ],
-      "rules": {
-        "@typescript-eslint/explicit-function-return-type": [
-          "error",
-          { "allowExpressions": true }
-        ],
-        "no-use-before-define": "off",
-        "@typescript-eslint/no-use-before-define": "warn"
-      }
-    }
-  ]
+  "parserOptions": {
+    "project": "./tsconfig.json" 
+  }
 }

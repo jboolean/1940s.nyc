@@ -9,7 +9,9 @@ export async function closest(latLng: {
   lat: number;
   lng: number;
 }): Promise<string> {
-  const resp = await api.get('/photos/closest', { params: latLng });
+  const resp = await api.get<PhotoSummary>('/photos/closest', {
+    params: latLng,
+  });
   return resp.data.identifier;
 }
 
