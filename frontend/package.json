@@ -81,7 +81,6 @@
     "eslint": "^8.25.0",
     "eslint-config-jboolean": "^0.1.0",
     "eslint-config-prettier": "^8.5.0",
-    "eslint-config-squarespace": "^1.0.1",
     "eslint-import-resolver-webpack": "^0.13.1",
     "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-react": "^7.28.0",
