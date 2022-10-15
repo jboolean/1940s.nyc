@@ -20,7 +20,7 @@ function preloadImage(url: string, callback: () => void): void {
   img.addEventListener('error', callback);
 }
 
-export default class ImageSwitcher<T> extends React.Component<Props, State> {
+export default class ImageSwitcher extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
