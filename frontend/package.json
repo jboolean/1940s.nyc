@@ -33,7 +33,7 @@
     "react-number-format": "^5.0.1",
     "react-router-dom": "^5.2.0",
     "react-transition-group": "^4.4.1",
-    "react-virtualized-auto-sizer": "^1.0.2",
+    "react-virtualized-auto-sizer": "^1.0.7",
     "react-window": "^1.8.6"
   },
   "devDependencies": {
@@ -65,7 +65,7 @@
     "@types/react-modal": "^3.12.0",
     "@types/react-router-dom": "^5.1.7",
     "@types/react-transition-group": "^4.4.2",
-    "@types/react-virtualized-auto-sizer": "^1.0.0",
+    "@types/react-virtualized-auto-sizer": "^1.0.1",
     "@types/react-window": "^1.8.5",
     "@types/webpack": "^5.28.0",
     "@types/webpack-bundle-analyzer": "^4.6.0",
