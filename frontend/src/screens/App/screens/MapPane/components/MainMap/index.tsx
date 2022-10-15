@@ -147,8 +147,7 @@ function withRouterRef<
     const location = useLocation();
     const history = useHistory();
     return (
-      // I give up on types
-      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- I give up on types
       // @ts-ignore
       <Component
         ref={ref}

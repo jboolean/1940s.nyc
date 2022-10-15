@@ -72,7 +72,7 @@ export default function listenToGoogleOptimize(
 
 export function OptimizeExperimentsProvider({
   children,
-}: PropsWithChildren<{}>): JSX.Element {
+}: PropsWithChildren<never>): JSX.Element {
   const [assignmentsByExperimentId, setAssignmentsByExperimentId] =
     React.useState<Record<string, VariantAssignments>>({});
   React.useEffect(() => {

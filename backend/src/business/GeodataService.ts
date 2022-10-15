@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import JSONStream from 'JSONStream';
 import { Transform } from 'stream';
 import type stream from 'stream';
