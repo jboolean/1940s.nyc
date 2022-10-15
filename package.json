@@ -3,7 +3,10 @@
   "version": "1.0.0",
   "description": "Street view of 1940s New York City (monorepo)",
   "main": "index.js",
-  "scripts": {},
+  "scripts": {
+    "prepare": "husky install",
+    "lint-all": "./lint.sh"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/jboolean/1940s.nyc.git"
@@ -15,6 +18,6 @@
   },
   "homepage": "https://github.com/jboolean/1940s.nyc#readme",
   "devDependencies": {
-    "husky": "^4.3.8"
+    "husky": "^8.0.0"
   }
 }
