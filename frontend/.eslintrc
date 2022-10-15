@@ -1,12 +1,8 @@
 {
   "extends": ["squarespace",
     "squarespace/react",
-    "prettier",
     "plugin:prettier/recommended",
-    
     "plugin:@typescript-eslint/recommended",
-    "prettier/@typescript-eslint",
-    "prettier/react"
   ],
   "parser": "@typescript-eslint/parser",
   "env": {
