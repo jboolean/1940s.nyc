@@ -26,6 +26,9 @@
       "webpack": {
         "config": "webpack.prod.js"
       }
+    },
+    "react": {
+      "version": "detect"
     }
   },
   "rules": {
