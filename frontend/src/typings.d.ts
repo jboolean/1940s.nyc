@@ -21,6 +21,6 @@ declare module '*.svg' {
 }
 
 declare module '*.svg?asset' {
-  const content: any;
+  const content: string;
   export default content;
 }

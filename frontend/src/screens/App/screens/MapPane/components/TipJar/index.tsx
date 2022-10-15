@@ -33,7 +33,8 @@ export default function TipJar({
       // Input is dollars, convert to cents
       await redirectToCheckout(amountDollars * 100);
     } catch (error) {
-      setErrorMessage(error.message || 'Something went wrong');
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
+      setErrorMessage(error?.message || 'Something went wrong');
     } finally {
       setIsSubmitting(false);
     }

@@ -20,7 +20,9 @@
         "allowSyntheticDefaultImports": true,
         "sourceMap": true,
         "esModuleInterop": true,
-        "resolveJsonModule": true
+        "resolveJsonModule": true,
+        "strictNullChecks": false,
+        "strictBindCallApply": true
     },
     "include": [
         "src"

@@ -49,7 +49,7 @@ function Grid({
 
   React.useEffect(() => {
     if (photoSummaries.length) return;
-    getOuttakeSummaries().then((data) => {
+    void getOuttakeSummaries().then((data) => {
       photoSummaries = data;
       forceUpdate();
     });
@@ -70,7 +70,7 @@ function Grid({
     const imageI = visibleImageIRef.current;
     if (isNil(imageI)) return;
     const rowI = imageI / itemsPerRow;
-    listRef.current.scrollToItem(rowI, 'start');
+    listRef.current?.scrollToItem(rowI, 'start');
   }, [itemsPerRow]);
 
   return (

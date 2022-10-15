@@ -2,6 +2,8 @@ import React, { ImgHTMLAttributes } from 'react';
 
 import { CSSTransition } from 'react-transition-group';
 
+import Require from 'utils/Require';
+
 interface State {
   lastSrc: string;
   visibleSrc: string;
@@ -9,7 +11,7 @@ interface State {
   loaded: boolean;
 }
 
-type Props = ImgHTMLAttributes<unknown>;
+type Props = Require<ImgHTMLAttributes<unknown>, 'src'>;
 
 import stylesheet from './ImageSwitcher.less';
 

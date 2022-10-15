@@ -51,8 +51,9 @@ class MainMap extends React.PureComponent<PropsWithRouter> {
     map.on('click', PHOTO_LAYER, (e) => {
       const { panOnClick } = this.props;
       if (panOnClick) map.panTo(e.lngLat);
+      if (!e || !e.features) return;
       const feature = e.features[0];
-      const identifier = feature.properties.photoIdentifier;
+      const identifier = feature.properties?.photoIdentifier as string;
       this.props.history.push({
         pathname: '/map/photo/' + identifier,
         hash: window.location.hash,

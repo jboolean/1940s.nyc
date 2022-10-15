@@ -72,12 +72,12 @@ class MapPane extends React.Component<Props & RouteComponentProps, State> {
     const [lng, lat] = feature.geometry.coordinates;
     this.map.goTo({ lng, lat });
 
-    closest({ lng, lat }).then(this.openPhoto, noop);
+    closest({ lng, lat }).then(this.openPhoto.bind(this), noop);
   }
 
   handleGeolocated(position: { lat: number; lng: number }): void {
     this.map.goTo(position);
-    closest(position).then(this.openPhoto, noop);
+    closest(position).then(this.openPhoto.bind(this), noop);
   }
 
   setupTipJarPopup(): void {
@@ -147,10 +147,10 @@ class MapPane extends React.Component<Props & RouteComponentProps, State> {
         </div>
         <div className={stylesheet.topControls}>
           <Search
-            onFeatureSelected={this.handleSearchFeatureSelected}
+            onFeatureSelected={this.handleSearchFeatureSelected.bind(this)}
             className={stylesheet.search}
           />
-          <Geolocate onGeolocated={this.handleGeolocated} />
+          <Geolocate onGeolocated={this.handleGeolocated.bind(this)} />
         </div>
         <div className={stylesheet.overlays}>
           {(
@@ -163,11 +163,11 @@ class MapPane extends React.Component<Props & RouteComponentProps, State> {
               // { name: 'Buildings (1956)', value: 'atlas-1956' },
               // { name: 'Arial (1924)', value: 'arial-1924' },
               // { name: 'Arial (1951)', value: 'arial-1951' },
-            ] as { name: string; value: OverlayId | null }[]
+            ] as { name: string; value: OverlayId }[]
           ).map((option) => (
             <React.Fragment key={option.value}>
               <input
-                id={this.idPrefix + option.value}
+                id={`${this.idPrefix}${option.value}`}
                 key={option.value || 'default'}
                 type="radio"
                 name="overlay"

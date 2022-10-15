@@ -25,10 +25,10 @@ interface State {
 }
 
 const getSuggestionValue = (suggestion: Feature<Point>): string =>
-  startCase(suggestion.properties.name.toLowerCase());
+  startCase((suggestion.properties.name as string).toLowerCase());
 
 const renderSuggestion = (suggestion: Feature<Point>): JSX.Element => (
-  <div>{startCase(suggestion.properties.name.toLowerCase())}</div>
+  <div>{startCase((suggestion.properties.name as string).toLowerCase())}</div>
 );
 
 const getCoordinates = property('geometry.coordinates');
@@ -46,7 +46,7 @@ export default class Search extends React.Component<Props, State> {
       isSuggestionHighlighted: false,
     };
     this.fetchSuggestionsThrottled = throttle(
-      this.fetchSuggestions.bind(this),
+      void this.fetchSuggestions.bind(this),
       200
     );
   }
@@ -87,6 +87,7 @@ export default class Search extends React.Component<Props, State> {
   onSuggestionsClearRequested = (): void => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     this.fetchSuggestionsThrottled.cancel();
 
     this.setState({
