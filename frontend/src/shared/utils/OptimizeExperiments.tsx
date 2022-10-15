@@ -1,6 +1,6 @@
-import React, { PropsWithChildren } from 'react';
-import memoize from 'lodash/memoize';
 import debounce from 'lodash/debounce';
+import memoize from 'lodash/memoize';
+import React from 'react';
 
 /**
  * Supports multivariate tests.
@@ -72,7 +72,9 @@ export default function listenToGoogleOptimize(
 
 export function OptimizeExperimentsProvider({
   children,
-}: PropsWithChildren<never>): JSX.Element {
+}: {
+  children?: React.ReactNode;
+}): JSX.Element {
   const [assignmentsByExperimentId, setAssignmentsByExperimentId] =
     React.useState<Record<string, VariantAssignments>>({});
   React.useEffect(() => {
