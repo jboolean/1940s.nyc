@@ -46,7 +46,7 @@ export default class Search extends React.Component<Props, State> {
       isSuggestionHighlighted: false,
     };
     this.handleFetchSuggestionsThrottled = throttle(
-      void this.fetchSuggestions.bind(this),
+      this.fetchSuggestions.bind(this),
       200
     );
   }

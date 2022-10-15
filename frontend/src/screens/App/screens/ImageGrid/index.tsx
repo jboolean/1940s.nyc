@@ -53,7 +53,7 @@ function Grid({
       photoSummaries = data;
       forceUpdate();
     });
-  }, [forceUpdate]);
+  });
 
   const history = useHistory();
   const { identifier: selectedIdentifier } = useParams<{
@@ -71,7 +71,8 @@ function Grid({
     if (isNil(imageI)) return;
     const rowI = imageI / itemsPerRow;
     listRef.current?.scrollToItem(rowI, 'start');
-  }, [itemsPerRow, listRef]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- otherwise it will scroll on every click
+  }, [itemsPerRow]);
 
   return (
     <List
