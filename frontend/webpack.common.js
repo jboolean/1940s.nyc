@@ -4,6 +4,7 @@ const path = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const webpack = require('webpack');
 const CopyPlugin = require('copy-webpack-plugin');
+const ESLintPlugin = require('eslint-webpack-plugin');
 
 // Constant with our paths
 const paths = {
@@ -27,21 +28,14 @@ module.exports = {
     new CopyPlugin({
       patterns: [{ from: '_redirects' }],
     }),
+    new ESLintPlugin({ fix: true }),
   ],
   module: {
     rules: [
       {
         test: /\.jsx?$/,
         exclude: /node_modules/,
-        use: [
-          'babel-loader',
-          {
-            loader: 'eslint-loader',
-            options: {
-              fix: true,
-            },
-          },
-        ],
+        use: ['babel-loader'],
       },
       {
         test: /\.tsx?$/,
