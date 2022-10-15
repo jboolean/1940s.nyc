@@ -26,12 +26,36 @@ if (noWelcome)
     hash: history.location.hash,
   });
 
-export default function App(): JSX.Element {
+function Modals(): JSX.Element {
   const [isThankYouOpen, setThankYouOpen] = React.useState(thankYouInitial);
   const [isWelcomeOpen, setWelcomeOpen] = React.useState(
     !isThankYouOpen && !noWelcome
   );
 
+  return (
+    <>
+      {IS_SHUTDOWN ? (
+        <Shutdown isOpen={true} />
+      ) : (
+        <Welcome
+          isOpen={isWelcomeOpen}
+          onRequestClose={() => {
+            setWelcomeOpen(false);
+          }}
+        />
+      )}
+
+      <ThankYou
+        isOpen={isThankYouOpen}
+        onRequestClose={() => {
+          setThankYouOpen(false);
+        }}
+      />
+    </>
+  );
+}
+
+export default function App(): JSX.Element {
   return (
     <OptimizeExperimentsProvider>
       <div className={stylesheet.outermostContainer}>
@@ -39,23 +63,7 @@ export default function App(): JSX.Element {
         <Router history={history}>
           <div className={stylesheet.mainContentWrapper}>
             <div className={stylesheet.mainContentContainer}>
-              {IS_SHUTDOWN ? (
-                <Shutdown isOpen={true} />
-              ) : (
-                <Welcome
-                  isOpen={isWelcomeOpen}
-                  onRequestClose={() => {
-                    setWelcomeOpen(false);
-                  }}
-                />
-              )}
-
-              <ThankYou
-                isOpen={isThankYouOpen}
-                onRequestClose={() => {
-                  setThankYouOpen(false);
-                }}
-              />
+              <Modals />
 
               <Route path="/*/photo/:identifier">
                 <ViewerPane className={stylesheet.viewer} />
