@@ -26,7 +26,7 @@ export default function ThankYou({
       pathname: history.location.pathname,
       hash: history.location.hash,
     });
-  }, [tipAmount, isOpen]);
+  }, [tipAmount, isOpen, history]);
 
   return (
     <Modal size="small" isOpen={isOpen} onRequestClose={onRequestClose}>

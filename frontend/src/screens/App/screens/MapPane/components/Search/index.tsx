@@ -36,7 +36,7 @@ const uniqByPoint = (features: Feature<Point>[]): Feature<Point>[] =>
   uniqWith(features, (a, b) => isEqual(getCoordinates(a), getCoordinates(b)));
 
 export default class Search extends React.Component<Props, State> {
-  fetchSuggestionsThrottled: (a: { value: string }) => void;
+  handleFetchSuggestionsThrottled: (a: { value: string }) => void;
 
   constructor(props: Props) {
     super(props);
@@ -45,7 +45,7 @@ export default class Search extends React.Component<Props, State> {
       suggestions: [],
       isSuggestionHighlighted: false,
     };
-    this.fetchSuggestionsThrottled = throttle(
+    this.handleFetchSuggestionsThrottled = throttle(
       void this.fetchSuggestions.bind(this),
       200
     );
@@ -84,11 +84,11 @@ export default class Search extends React.Component<Props, State> {
   }
 
   // Autosuggest will call this function every time you need to clear suggestions.
-  onSuggestionsClearRequested = (): void => {
+  handleSuggestionsClearRequested = (): void => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-    this.fetchSuggestionsThrottled.cancel();
+    this.handleFetchSuggestionsThrottled.cancel();
 
     this.setState({
       suggestions: [],
@@ -107,8 +107,8 @@ export default class Search extends React.Component<Props, State> {
           container: classnames(this.props.className, stylesheet.container),
         }}
         suggestions={suggestions}
-        onSuggestionsFetchRequested={this.fetchSuggestionsThrottled}
-        onSuggestionsClearRequested={this.onSuggestionsClearRequested}
+        onSuggestionsFetchRequested={this.handleFetchSuggestionsThrottled}
+        onSuggestionsClearRequested={this.handleSuggestionsClearRequested}
         getSuggestionValue={getSuggestionValue}
         onSuggestionSelected={(_e, { suggestion }) =>
           onFeatureSelected(suggestion)

@@ -143,7 +143,7 @@ function withRouterRef<
   OuterProps,
   C = React.ComponentType<OuterProps & RouteComponentProps>
 >(Component: C) {
-  return React.forwardRef<C, OuterProps>((props, ref) => {
+  return React.forwardRef<C, OuterProps>(function WithRouterRef(props, ref) {
     const match = useRouteMatch();
     const location = useLocation();
     const history = useHistory();

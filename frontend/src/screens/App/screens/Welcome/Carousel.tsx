@@ -26,7 +26,7 @@ export default function Carousel({
     return () => {
       clearInterval(handle);
     };
-  }, []);
+  }, [images.length]);
 
   const image = images[i];
 

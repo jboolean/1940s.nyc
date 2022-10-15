@@ -53,7 +53,7 @@ function Grid({
       photoSummaries = data;
       forceUpdate();
     });
-  }, []);
+  }, [forceUpdate]);
 
   const history = useHistory();
   const { identifier: selectedIdentifier } = useParams<{
@@ -71,7 +71,7 @@ function Grid({
     if (isNil(imageI)) return;
     const rowI = imageI / itemsPerRow;
     listRef.current?.scrollToItem(rowI, 'start');
-  }, [itemsPerRow]);
+  }, [itemsPerRow, listRef]);
 
   return (
     <List
