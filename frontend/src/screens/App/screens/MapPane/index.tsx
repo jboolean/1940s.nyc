@@ -17,7 +17,7 @@ import { withRouter, RouteComponentProps } from 'react-router';
 import { Link } from 'react-router-dom';
 
 import recordEvent from 'shared/utils/recordEvent';
-import ExternalIcon from '!file-loader!./assets/external.svg';
+import ExternalIcon from './assets/external.svg?asset';
 import { NumericFormat } from 'react-number-format';
 import useAmountPresets from './components/TipJar/useAmountPresets';
 

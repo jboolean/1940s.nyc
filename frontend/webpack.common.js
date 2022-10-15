@@ -19,6 +19,7 @@ module.exports = {
     path: paths.DIST,
     filename: 'app.bundle.js',
     publicPath: '/',
+    assetModuleFilename: '[name]-[hash][ext]',
   },
   plugins: [
     new MiniCssExtractPlugin({
@@ -61,20 +62,14 @@ module.exports = {
       },
       {
         test: /\.(png|jpg|gif|svg)$/,
-        use: [
-          {
-            loader: 'file-loader',
-            options: {
-              name: '[name]-[contenthash:base64:5].[ext]',
-            },
-          },
-        ],
+        type: 'asset/resource',
       },
       {
         test: /\.svg$/,
         issuer: /\.(j|t)sx$/,
         exclude: /node_modules/,
         loader: 'svg-react-loader',
+        resourceQuery: { not: [/asset/] },
         options: {
           classIdPrefix: '[name]-[contenthash:8]__',
         },
