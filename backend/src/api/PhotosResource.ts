@@ -11,7 +11,8 @@ import querystring from 'querystring';
 import { getRepository } from 'typeorm';
 import Photo from '../entities/Photo';
 
-const PHOTO_PURCHASE_FORM_URL = 'https://www1.nyc.gov/dorforms/photoform.htm';
+const PHOTO_PURCHASE_FORM_URL =
+  'https://dorisorders.nyc.gov/dorisorders/ui/order-reproductions';
 
 // Get photos by matching lng,lat
 router.get('/', async (req, res) => {
@@ -113,7 +114,6 @@ router.get('/:identifier/buy-prints', async (req, res) => {
   }
 
   const formParams = {
-    collection: photo.collection,
     lot: photo.lot ? Number(photo.lot) : undefined,
     streetName: photo.streetName,
     imageIdentifier: photo.identifier,
