@@ -29,7 +29,7 @@
     "@types/sharp": "^0.31.0",
     "@types/source-map-support": "^0.5.4",
     "@types/stripe": "^8.0.296",
-    "@typescript-eslint/eslint-plugin": "^5.40.0",
+    "@typescript-eslint/eslint-plugin": "^5.40.1",
     "@typescript-eslint/parser": "^5.40.1",
     "eslint": "^8.25.0",
     "eslint-config-jboolean": "^0.1.0",
