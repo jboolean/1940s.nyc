@@ -55,13 +55,13 @@ router.post<unknown, StoryDraftResponse | ErrorResponse, NewStoryRequest>(
 );
 
 router.put<
-  { id: string },
+  { id: number },
   StoryDraftResponse | ErrorResponse,
   StoryUpdateRequest
 >('/:id', async (req, res) => {
   const id = req.params.id;
 
-  let story = await StoryRepository.findOne(id);
+  let story = await StoryRepository.findOneBy({ id });
 
   if (!story) {
     res.status(404).json({ error: 'Not found' });
