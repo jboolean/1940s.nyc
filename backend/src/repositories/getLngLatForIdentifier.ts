@@ -7,7 +7,7 @@ export default async function getLngLatForIdentifier(
 ): Promise<Point | null> {
   const geocodeRepo = getRepository(EffectiveGeocode);
 
-  const lngLatForFromIdentifierResult = await geocodeRepo.findOne({
+  const lngLatForFromIdentifierResult = await geocodeRepo.findOneBy({
     identifier,
   });
 

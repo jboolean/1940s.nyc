@@ -9,7 +9,7 @@ const router = express.Router();
 import querystring from 'querystring';
 
 import { getRepository, In } from 'typeorm';
-import getLngLatForIdentifier from '../business/getLngLatForIdentifier';
+import getLngLatForIdentifier from '../repositories/getLngLatForIdentifier';
 import Photo from '../entities/Photo';
 import ErrorResponse from './ErrorResponse';
 

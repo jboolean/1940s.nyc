@@ -7,6 +7,7 @@ import createConnection from './createConnection';
 import PhotosResource from './api/PhotosResource';
 import TipsResource from './api/TipsResource';
 import GeodataResource from './api/GeodataResource';
+import StoriesResource from './api/stories/StoriesResource';
 
 app.use(express.json());
 
@@ -29,6 +30,7 @@ app.use(async (req, res, next) => {
 app.use('/photos', PhotosResource);
 app.use('/tips', TipsResource);
 app.use('/geodata', GeodataResource);
+app.use('/stories', StoriesResource);
 
 app.use(function (req, res) {
   res.status(404).send("Sorry can't find that!");

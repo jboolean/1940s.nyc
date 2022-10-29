@@ -1,11 +1,9 @@
 import express from 'express';
 import map from 'lodash/map';
-import { Brackets } from 'typeorm';
-import getLngLatForIdentifier from '../../business/getLngLatForIdentifier';
 
 import Story from '../../entities/Story';
-import StoryState from '../../entities/StoryState';
-import StoryType from '../../entities/StoryType';
+import StoryState from '../../enum/StoryState';
+import StoryType from '../../enum/StoryType';
 import StoryRepository from '../../repositories/StoryRepository';
 import ErrorResponse from '../ErrorResponse';
 import {
@@ -46,7 +44,7 @@ router.post<unknown, StoryDraftResponse | ErrorResponse, NewStoryRequest>(
     story.state = StoryState.DRAFT;
     story.textContent = storyRequest.textContent;
 
-    story = await StoryRepository.save(story);
+    story = await StoryRepository().save(story);
 
     const resp: StoryDraftResponse = toDraftStoryResponse(story);
 
@@ -61,7 +59,7 @@ router.put<
 >('/:id', async (req, res) => {
   const id = req.params.id;
 
-  let story = await StoryRepository.findOneBy({ id });
+  let story = await StoryRepository().findOneBy({ id });
 
   if (!story) {
     res.status(404).json({ error: 'Not found' });
@@ -81,7 +79,7 @@ router.put<
     res
       .status(400)
       .json({
-        error: `Not valid status transition: ${story.state}=>${updates.state}`,
+        error: `Not valid state transition: ${story.state}=>${updates.state}`,
       })
       .end();
     return;
@@ -99,7 +97,7 @@ router.put<
   }
   story.state = updates.state;
 
-  story = await StoryRepository.save(story);
+  story = await StoryRepository().save(story);
 
   res.json(toDraftStoryResponse(story));
 });
@@ -112,29 +110,11 @@ router.get<
   { forPhotoIdentifier: string }
 >('/', async (req, res) => {
   const { forPhotoIdentifier: identifier } = req.query;
-
-  // Get the lng,lat for this photo, so we can return stories
-  // for this photo and stories for other photos in the same location
-  const maybeLngLat = await getLngLatForIdentifier(identifier);
-
-  const stories = await StoryRepository.createQueryBuilder('story')
-    .where({ state: StoryState.PUBLISHED })
-    .andWhere(
-      new Brackets((qb) => {
-        qb.where({ photo: identifier });
-
-        if (maybeLngLat) {
-          const [lng, lat] = maybeLngLat.coordinates;
-          qb.andWhere('story.lng_lat ~= point(:lng, :lat)', {
-            lng,
-            lat,
-          });
-        }
-      })
-    )
-    .getMany();
+  const stories = await StoryRepository().findForPhotoIdentifier(identifier);
 
   const storiesResp = map(stories, toPublicStoryResponse);
 
   res.json(storiesResp);
 });
+
+export default router;

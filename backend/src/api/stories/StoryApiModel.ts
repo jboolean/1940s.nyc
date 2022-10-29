@@ -1,6 +1,6 @@
 import { Point } from 'geojson';
-import StoryState from '../../entities/StoryState';
-import StoryType from '../../entities/StoryType';
+import StoryState from '../../enum/StoryState';
+import StoryType from '../../enum/StoryType';
 
 type Optional<T, P extends keyof T> = Omit<T, P> & Partial<Pick<T, P>>;
 

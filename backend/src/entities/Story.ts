@@ -1,10 +1,10 @@
 import { Point } from 'geojson';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
-import StoryState from './StoryState';
-import StoryType from './StoryType';
+import StoryState from '../enum/StoryState';
+import StoryType from '../enum/StoryType';
 
-@Entity('photos')
-export default class Photo {
+@Entity('stories')
+export default class Story {
   @PrimaryGeneratedColumn()
   id: number;
 
