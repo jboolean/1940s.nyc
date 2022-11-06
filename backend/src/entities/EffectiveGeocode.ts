@@ -45,6 +45,12 @@ export default class EffectiveGeocode {
   @PrimaryColumn()
   method: string;
 
-  @Column({ type: 'point' })
+  @Column({
+    type: 'point',
+    transformer: {
+      from: ({ x, y }) => ({ coordinates: [x, y] }),
+      to: (p: Point) => p,
+    },
+  })
   lngLat: Point | null;
 }
