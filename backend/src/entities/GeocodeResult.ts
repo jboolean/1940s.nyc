@@ -5,10 +5,9 @@ import Photo from './Photo';
 
 @Entity('geocode_results')
 export default class GeocodeResult {
-  @PrimaryColumn({ name: 'photo' })
-  photoId: string;
-
-  @ManyToOne(() => Photo, (photo) => photo.geocodeResults)
+  @ManyToOne(() => Photo, (photo) => photo.geocodeResults, {
+    primary: true,
+  })
   @JoinColumn({ name: 'photo' })
   photo: Photo;
 
