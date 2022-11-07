@@ -8,7 +8,7 @@ const router = express.Router();
 
 import querystring from 'querystring';
 
-import { getRepository, In } from 'typeorm';
+import { getRepository } from 'typeorm';
 import Photo from '../entities/Photo';
 
 const PHOTO_PURCHASE_FORM_URL =
@@ -49,8 +49,7 @@ router.get('/', async (req, res) => {
 
   const ids = result.map((r) => r.identifier);
 
-  const photos = await photoRepo.find({
-    where: { identifier: In(ids) },
+  const photos = await photoRepo.findByIds(ids, {
     order: { collection: 'ASC' },
     relations: ['geocodeResults'],
     loadEagerRelations: true,
@@ -71,17 +70,11 @@ router.get('/closest', async (req, res) => {
     return;
   }
 
-  const photo = await photoRepo.findOneBy({ identifier: result[0].identifier });
+  const photo = await photoRepo.findOne(result[0].identifier);
   res.send(photo);
 });
 
-router.get<
-  '/outtake-summaries',
-  never,
-  Photo[],
-  never,
-  { collection?: string }
->('/outtake-summaries', async (req, res) => {
+router.get('/outtake-summaries', async (req, res) => {
   const photoRepo = getRepository(Photo);
 
   const photos = await photoRepo.find({
@@ -98,8 +91,7 @@ router.get<
 router.get('/:identifier', async (req, res) => {
   const photoRepo = getRepository(Photo);
 
-  const photo = await photoRepo.find({
-    where: { identifier: req.params.identifier },
+  const photo = await photoRepo.findOne(req.params.identifier, {
     relations: ['geocodeResults'],
     loadEagerRelations: true,
   });
@@ -114,9 +106,7 @@ router.get('/:identifier', async (req, res) => {
 router.get('/:identifier/buy-prints', async (req, res) => {
   const photoRepo = getRepository(Photo);
 
-  const photo = await photoRepo.findOneBy({
-    identifier: req.params.identifier,
-  });
+  const photo = await photoRepo.findOne(req.params.identifier);
   if (!photo) {
     res.status(404);
     res.send();
