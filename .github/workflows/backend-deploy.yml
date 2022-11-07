@@ -5,6 +5,8 @@ on:
       - master
     paths:
       - "backend/**"
+  workflow_dispatch:
+    
 defaults:
   run:
     shell: bash
