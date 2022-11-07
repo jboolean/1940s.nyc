@@ -5,7 +5,7 @@ import { PublicStoryResponse, StoryDraftResponse } from './StoryApiModel';
 export function toDraftStoryResponse(story: Story): StoryDraftResponse {
   return {
     id: story.id,
-    lngLat: story.lngLat,
+    lngLat: story.lngLat ?? undefined,
     photo: story.photo,
     storyType: story.storyType,
     state: story.state,
@@ -20,7 +20,7 @@ export function toDraftStoryResponse(story: Story): StoryDraftResponse {
 export function toPublicStoryResponse(story: Story): PublicStoryResponse {
   return {
     id: story.id,
-    lngLat: story.lngLat,
+    lngLat: story.lngLat ?? undefined,
     photo: story.photo,
     storyType: story.storyType,
     state: story.state,

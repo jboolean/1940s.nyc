@@ -1,4 +1,4 @@
-import { Point } from 'geojson';
+import LngLat from '../../enum/LngLat';
 import StoryState from '../../enum/StoryState';
 import StoryType from '../../enum/StoryType';
 
@@ -11,7 +11,7 @@ interface StoryApiModel {
   storytellerEmail: string;
   storytellerName: string;
   storytellerSubtitle: string;
-  lngLat?: Point;
+  lngLat?: LngLat;
   photo: string;
   state: StoryState;
   textContent?: string;

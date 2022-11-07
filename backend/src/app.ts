@@ -1,13 +1,21 @@
+import cors from 'cors';
 import express from 'express';
 const app = express();
-import cors from 'cors';
 
 import createConnection from './createConnection';
 
+import { NotFound } from 'http-errors';
+import { RegisterRoutes } from '../tsoa-build/routes';
+import GeodataResource from './api/GeodataResource';
 import PhotosResource from './api/PhotosResource';
 import TipsResource from './api/TipsResource';
-import GeodataResource from './api/GeodataResource';
-import StoriesResource from './api/stories/StoriesResource';
+
+import {
+  NextFunction,
+  Request as ExRequest,
+  Response as ExResponse,
+} from 'express';
+import { ValidateError } from 'tsoa';
 
 app.use(express.json());
 
@@ -30,10 +38,34 @@ app.use(async (req, res, next) => {
 app.use('/photos', PhotosResource);
 app.use('/tips', TipsResource);
 app.use('/geodata', GeodataResource);
-app.use('/stories', StoriesResource);
+
+// Tsoa
+RegisterRoutes(app);
 
 app.use(function (req, res) {
-  res.status(404).send("Sorry can't find that!");
+  throw new NotFound();
+});
+
+app.use(function errorHandler(
+  err: unknown,
+  req: ExRequest,
+  res: ExResponse,
+  next: NextFunction
+): ExResponse | void {
+  if (err instanceof ValidateError) {
+    console.warn(`Caught Validation Error for ${req.path}:`, err.fields);
+    return res.status(422).json({
+      error: 'Validation Failed',
+      details: err?.fields,
+    });
+  }
+  if (err instanceof Error) {
+    return res.status(500).json({
+      error: 'Internal Server Error',
+    });
+  }
+
+  next();
 });
 
 export default app;

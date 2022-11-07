@@ -1,5 +1,6 @@
 import { Point } from 'geojson';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import LngLat from '../enum/LngLat';
 import StoryState from '../enum/StoryState';
 import StoryType from '../enum/StoryType';
 
@@ -26,8 +27,14 @@ export default class Story {
   @Column()
   storytellerSubtitle?: string;
 
-  @Column({ type: 'point' })
-  lngLat?: Point;
+  @Column({
+    type: 'point',
+    transformer: {
+      from: ({ x, y }: { x: number; y: number }) => ({ lng: x, lat: y }),
+      to: ({ lng, lat }: LngLat) => ({ x: lng, y: lat }),
+    },
+  })
+  lngLat: LngLat | null;
 
   @Column()
   photo: string;

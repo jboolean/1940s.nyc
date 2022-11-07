@@ -1,5 +1,6 @@
 import { Entity, Column, PrimaryColumn } from 'typeorm';
 import { Point } from 'geojson';
+import LngLat from '../enum/LngLat';
 
 /**
  * A materialized view summarizing a photo with its best geocode result.
@@ -48,9 +49,9 @@ export default class EffectiveGeocode {
   @Column({
     type: 'point',
     transformer: {
-      from: ({ x, y }) => ({ coordinates: [x, y] }),
-      to: (p: Point) => p,
+      from: ({ x, y }: { x: number; y: number }) => ({ lng: x, lat: y }),
+      to: ({ lng, lat }: LngLat) => ({ x: lng, y: lat }),
     },
   })
-  lngLat: Point | null;
+  lngLat: LngLat | null;
 }
