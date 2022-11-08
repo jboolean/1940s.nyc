@@ -2,8 +2,8 @@ import React from 'react';
 
 import stylesheet from './AnnouncementBanner.less';
 
-const DISPLAY_UNTIL = new Date(2022, 11);
-const HIDE_KEY = 'outage1122';
+const DISPLAY_UNTIL = new Date(2022, 4);
+const HIDE_KEY = 'alternatesBanner';
 
 export default function AnnouncementBanner(): JSX.Element | null {
   const [now, setNow] = React.useState(Date.now());
@@ -39,7 +39,8 @@ export default function AnnouncementBanner(): JSX.Element | null {
 
   return (
     <div className={stylesheet.container}>
-      Some features of 1940s.nyc are unavailable. I&rsquo;m looking into it.{' '}
+      New: Hover or tap on an image for more photos of the same location, where
+      available.{' '}
       <button className={stylesheet.hideButton} onClick={hide}>
         Hide
       </button>
