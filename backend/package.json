@@ -30,7 +30,7 @@
     "@types/source-map-support": "^0.5.6",
     "@types/stripe": "^8.0.296",
     "@typescript-eslint/eslint-plugin": "^5.40.1",
-    "@typescript-eslint/parser": "^5.41.0",
+    "@typescript-eslint/parser": "^5.42.1",
     "eslint": "^8.25.0",
     "eslint-config-jboolean": "^0.1.0",
     "eslint-config-prettier": "^8.5.0",
