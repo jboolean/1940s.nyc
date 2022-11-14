@@ -19,7 +19,7 @@ export default class GeocodeResult {
     type: 'point',
     transformer: {
       from: ({ x, y }: { x: number; y: number }) => ({ lng: x, lat: y }),
-      to: ({ lng, lat }: LngLat) => ({ x: lng, y: lat }),
+      to: ({ lng, lat }: LngLat) => `(${lng}, ${lat})`,
     },
   })
   lngLat: LngLat | null;

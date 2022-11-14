@@ -42,6 +42,7 @@ app.use('/geodata', GeodataResource);
 // Tsoa
 RegisterRoutes(app);
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 app.use(function (req, res) {
   throw new NotFound();
 });
@@ -60,6 +61,7 @@ app.use(function errorHandler(
     });
   }
   if (err instanceof Error) {
+    console.error(err);
     return res.status(500).json({
       error: 'Internal Server Error',
     });

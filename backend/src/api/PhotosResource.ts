@@ -45,7 +45,8 @@ router.get<
     }
 
     // Use lng, lat from this photo instead of lng, lat parameters
-    [lng, lat] = lngLatForFromIdentifierResult.coordinates;
+    lng = lngLatForFromIdentifierResult.lng;
+    lat = lngLatForFromIdentifierResult.lat;
   }
 
   if (!lng || !lat) {

@@ -18,7 +18,7 @@ const StoryRepository = () =>
             qb.where({ photo: identifier });
 
             if (maybeLngLat) {
-              const [lng, lat] = maybeLngLat.coordinates;
+              const { lng, lat } = maybeLngLat;
               qb.orWhere('story.lng_lat ~= point(:lng, :lat)', {
                 lng,
                 lat,

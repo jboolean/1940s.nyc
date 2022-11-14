@@ -1,5 +1,9 @@
-import { Point } from 'geojson';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import LngLat from '../enum/LngLat';
 import StoryState from '../enum/StoryState';
 import StoryType from '../enum/StoryType';
@@ -9,7 +13,7 @@ export default class Story {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @CreateDateColumn()
   createdAt: Date;
 
   @Column()
@@ -31,7 +35,7 @@ export default class Story {
     type: 'point',
     transformer: {
       from: ({ x, y }: { x: number; y: number }) => ({ lng: x, lat: y }),
-      to: ({ lng, lat }: LngLat) => ({ x: lng, y: lat }),
+      to: ({ lng, lat }: LngLat) => `(${lng}, ${lat})`,
     },
   })
   lngLat: LngLat | null;
