@@ -25,7 +25,7 @@
     "lodash": "^4.17.21",
     "mapbox-gl": "^2.4.1",
     "normalize.css": "^8.0.1",
-    "qs": "^6.10.1",
+    "qs": "^6.10.3",
     "react": "^16.14.0",
     "react-autosuggest": "^10.1.0",
     "react-dom": "^16.14.0",
