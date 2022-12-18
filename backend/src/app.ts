@@ -4,7 +4,7 @@ const app = express();
 
 import createConnection from './createConnection';
 
-import { NotFound } from 'http-errors';
+import { NotFound, HttpError } from 'http-errors';
 import { RegisterRoutes } from '../tsoa-build/routes';
 import GeodataResource from './api/GeodataResource';
 import PhotosResource from './api/PhotosResource';
@@ -58,6 +58,11 @@ app.use(function errorHandler(
     return res.status(422).json({
       error: 'Validation Failed',
       details: err?.fields,
+    });
+  }
+  if (err instanceof HttpError) {
+    return res.status(err.statusCode).json({
+      error: err.message,
     });
   }
   if (err instanceof Error) {
