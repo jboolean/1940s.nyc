@@ -61,7 +61,7 @@ app.use(function errorHandler(
     });
   }
   if (err instanceof Error) {
-    console.error(err);
+    console.error('Unhandled error', err);
     return res.status(500).json({
       error: 'Internal Server Error',
     });
