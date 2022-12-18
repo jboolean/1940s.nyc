@@ -17,23 +17,31 @@ interface StoryApiModel {
   textContent?: string;
 }
 
+// Can never be set by user
+type NonUserSettableFields = 'id' | 'createdAt';
+
+// some fields are optional when it's a draft
+type DraftOptionalFields =
+  | 'storytellerEmail'
+  | 'storytellerName'
+  | 'storytellerSubtitle';
+
+type NonPublicFields = 'storytellerEmail';
+
 type NewStoryRequest = Pick<
   StoryApiModel,
   'lngLat' | 'photo' | 'storyType' | 'textContent'
 >;
 
 // some fields are optional when it's a draft
-type StoryDraftResponse = Optional<
-  StoryApiModel,
-  'storytellerEmail' | 'storytellerName' | 'storytellerSubtitle'
->;
+type StoryDraftResponse = Optional<StoryApiModel, DraftOptionalFields>;
 
 type StoryUpdateRequest = Omit<
   StoryApiModel,
-  'id' | 'lngLat' | 'photo' | 'createdAt'
+  (NonUserSettableFields & 'lngLat') | 'photo'
 >;
 
-type PublicStoryResponse = Omit<StoryApiModel, 'storytellerEmail'>;
+type PublicStoryResponse = Omit<StoryApiModel, NonPublicFields>;
 
 export {
   StoryApiModel,
