@@ -11,7 +11,8 @@
     "lint": "eslint --ext .js --ext .ts src",
     "lint:fix": "npm run lint -- --fix",
     "lint:strict": "npm run lint -- --max-warnings 0",
-    "install-aws-sharp": "rm -rf node_modules/sharp && SHARP_IGNORE_GLOBAL_LIBVIPS=1 npm install --arch=x64 --platform=linux sharp"
+    "install-aws-sharp": "rm -rf node_modules/sharp && SHARP_IGNORE_GLOBAL_LIBVIPS=1 npm install --arch=x64 --platform=linux sharp",
+    "types": "tsc"
   },
   "author": "Julian Boilen",
   "license": "ISC",
