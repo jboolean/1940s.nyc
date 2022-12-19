@@ -40,9 +40,9 @@ export default function FourtiesModal({
             onClick={props.onRequestClose}
             title="Close"
           />
-          {children}
         </>
       )}
+      {children}
     </ReactModal>
   );
 }

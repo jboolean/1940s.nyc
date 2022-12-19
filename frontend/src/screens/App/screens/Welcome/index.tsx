@@ -1,6 +1,6 @@
 import React from 'react';
 
-import Modal from 'react-modal';
+import FourtiesModal from 'shared/components/Modal';
 import Carousel from './Carousel';
 import carouselImages from './carouselImages';
 
@@ -15,14 +15,14 @@ export default function Welcome({
   onRequestClose,
 }: Props): JSX.Element {
   return (
-    <Modal
+    <FourtiesModal
       isOpen={isOpen}
       className={stylesheet.welcomeModal}
-      bodyOpenClassName={stylesheet.bodyOpen}
-      overlayClassName={stylesheet.overlay}
       onRequestClose={onRequestClose}
       shouldCloseOnOverlayClick={false}
       shouldCloseOnEsc
+      size="large"
+      isCloseButtonVisible={false}
     >
       <div className={stylesheet.imageContainer}>
         <Carousel className={stylesheet.image} images={carouselImages} />
@@ -93,6 +93,6 @@ export default function Welcome({
           </button>
         </div>
       </div>
-    </Modal>
+    </FourtiesModal>
   );
 }
