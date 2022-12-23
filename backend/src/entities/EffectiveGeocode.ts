@@ -1,5 +1,4 @@
-import { Entity, Column, PrimaryColumn } from 'typeorm';
-import { Point } from 'geojson';
+import { Column, Entity, PrimaryColumn } from 'typeorm';
 import LngLat from '../enum/LngLat';
 
 /**
