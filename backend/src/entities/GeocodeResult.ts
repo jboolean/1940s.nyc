@@ -18,7 +18,8 @@ export default class GeocodeResult {
   @Column({
     type: 'point',
     transformer: {
-      from: ({ x, y }: { x: number; y: number }) => ({ lng: x, lat: y }),
+      from: (coords: { x: number; y: number } | null) =>
+        coords ? { lng: coords.x, lat: coords.y } : null,
       to: ({ lng, lat }: LngLat) => `(${lng}, ${lat})`,
     },
   })

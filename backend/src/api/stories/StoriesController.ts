@@ -5,6 +5,7 @@ import { BadRequest, NotFound } from 'http-errors';
 import Story from '../../entities/Story';
 import StoryState from '../../enum/StoryState';
 import StoryType from '../../enum/StoryType';
+import getLngLatForIdentifier from '../../repositories/getLngLatForIdentifier';
 import StoryRepository from '../../repositories/StoryRepository';
 import {
   NewStoryRequest,
@@ -14,6 +15,22 @@ import {
 } from './StoryApiModel';
 import { toDraftStoryResponse, toPublicStoryResponse } from './storyToApi';
 
+function validateSubmittable(story: Story): boolean {
+  return !!(
+    story.storytellerEmail &&
+    story.storytellerName &&
+    story.storytellerSubtitle &&
+    story.storyType &&
+    story.photo &&
+    story.lngLat &&
+    (story.storyType !== StoryType.TEXT || story.textContent)
+  );
+}
+
+function normalizeEmail(email: string): string {
+  return email.toLocaleLowerCase();
+}
+
 @Route('stories')
 export class StoriesController extends Controller {
   @Post('/')
@@ -21,7 +38,8 @@ export class StoriesController extends Controller {
     @Body() storyRequest: NewStoryRequest
   ): Promise<StoryDraftResponse> {
     let story = new Story();
-    story.lngLat = storyRequest.lngLat ?? null;
+    story.lngLat =
+      storyRequest.lngLat ?? (await getLngLatForIdentifier(storyRequest.photo));
     story.photo = storyRequest.photo;
     story.storyType = storyRequest.storyType;
     story.state = StoryState.DRAFT;
@@ -81,20 +99,4 @@ export class StoriesController extends Controller {
 
     return map(stories, toPublicStoryResponse);
   }
-}
-
-function validateSubmittable(story: Story): boolean {
-  return !!(
-    story.storytellerEmail &&
-    story.storytellerName &&
-    story.storytellerSubtitle &&
-    story.storyType &&
-    story.photo &&
-    story.lngLat &&
-    (story.storyType !== StoryType.TEXT || story.textContent)
-  );
-}
-
-function normalizeEmail(email: string): string {
-  return email.toLocaleLowerCase();
 }

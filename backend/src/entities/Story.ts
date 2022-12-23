@@ -35,7 +35,8 @@ export default class Story {
     type: 'point',
     transformer: {
       from: ({ x, y }: { x: number; y: number }) => ({ lng: x, lat: y }),
-      to: ({ lng, lat }: LngLat) => `(${lng}, ${lat})`,
+      to: (lngLat: LngLat | null) =>
+        lngLat ? `(${lngLat.lng}, ${lngLat.lat})` : null,
     },
   })
   lngLat: LngLat | null;

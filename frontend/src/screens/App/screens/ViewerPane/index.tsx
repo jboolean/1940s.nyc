@@ -12,6 +12,8 @@ import { useHistory, useParams } from 'react-router';
 import Alternates from './components/Alternates';
 import Overlay from './components/Overlay';
 
+import { useStoryDraftStore } from '../SubmitStoryWizard';
+
 export default function ViewerPane({
   className,
 }: {
@@ -19,6 +21,7 @@ export default function ViewerPane({
 }): JSX.Element {
   const { identifier: photoIdentifier } = useParams<{ identifier?: string }>();
   const history = useHistory();
+  const initializeStoryDraft = useStoryDraftStore((state) => state.initialize);
 
   return (
     <div className={classnames(stylesheet.container, className)}>
@@ -46,6 +49,13 @@ export default function ViewerPane({
           >
             Buy Prints
           </a>
+          <button
+            onClick={() => {
+              initializeStoryDraft(photoIdentifier);
+            }}
+          >
+            Share Story
+          </button>
         </p>
       </Overlay>
       <ImageSwitcher
