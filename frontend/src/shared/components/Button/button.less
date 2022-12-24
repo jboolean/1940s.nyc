@@ -1,0 +1,41 @@
+@import '../../styles/colors.less';
+
+.button {
+  display: inline-block;
+
+  outline: none;
+  cursor: pointer;
+
+  padding: 1rem 2rem;
+  transition: background-color 200ms ease-in-out, color 200ms ease-in-out;
+
+  &.secondary {
+    border: 2px solid @font-color-dark;
+    background-color: transparent;
+    border: 2px solid @font-color-dark;
+  }
+
+  &.primary {
+    background-color: @creme;
+    outline: none;
+    border: none;
+  }
+
+  &:disabled {
+    cursor: default;
+    opacity: 0.85;
+  }
+
+  &.active,
+  &:hover {
+    background-color: @font-color-dark;
+    color: @creme;
+  }
+
+  @media screen and (max-width: 800px), screen and (max-height: 600px) {
+    &.primary {
+      background-color: @red;
+      color: @creme;
+    }
+  }
+}

@@ -1,4 +1,5 @@
 import React from 'react';
+import Button from 'shared/components/Button';
 
 import FourtiesModal from 'shared/components/Modal';
 import Carousel from './Carousel';
@@ -88,9 +89,9 @@ export default function Welcome({
           </p>
         </div>
         <div className={stylesheet.buttonContainer} onClick={onRequestClose}>
-          <button type="button" className={stylesheet.explore}>
+          <Button buttonStyle="primary" className={stylesheet.explore}>
             Start Exploring
-          </button>
+          </Button>
         </div>
       </div>
     </FourtiesModal>

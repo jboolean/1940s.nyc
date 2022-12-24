@@ -1,11 +1,11 @@
-import React from 'react';
 import Modal from 'components/Modal';
-import redirectToCheckout from './redirectToCheckout';
+import React from 'react';
 import { NumericFormat } from 'react-number-format';
-import classnames from 'classnames';
+import redirectToCheckout from './redirectToCheckout';
 
-import stylesheet from './TipJar.less';
+import Button from 'shared/components/Button';
 import recordEvent from 'shared/utils/recordEvent';
+import stylesheet from './TipJar.less';
 import useAmountPresets from './useAmountPresets';
 
 export default function TipJar({
@@ -60,16 +60,14 @@ export default function TipJar({
       </p>
       <div className={stylesheet.presets}>
         {amountPresets.map((presetAmount) => (
-          <button
+          <Button
+            buttonStyle="secondary"
             key={presetAmount}
-            type="button"
             onClick={() => setAmountDollars(presetAmount)}
-            className={classnames(stylesheet.preset, {
-              [stylesheet.active]: presetAmount === amountDollars,
-            })}
+            isActive={presetAmount === amountDollars}
           >
             <NumericFormat displayType="text" prefix="$" value={presetAmount} />
-          </button>
+          </Button>
         ))}
       </div>
       <div className={stylesheet.tipForm}>
@@ -85,14 +83,13 @@ export default function TipJar({
             setAmountDollars(floatValue);
           }}
         />
-        <button
-          type="button"
+        <Button
+          buttonStyle="primary"
           onClick={handleSubmitClick}
           disabled={!amountDollars || isSubmitting}
-          className={stylesheet.submitButton}
         >
           Leave Tip
-        </button>
+        </Button>
       </div>
       {errorMessage && <div>{errorMessage}</div>}
     </Modal>
