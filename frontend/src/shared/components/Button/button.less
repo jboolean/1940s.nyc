@@ -8,36 +8,41 @@
   cursor: pointer;
 
   padding: 1rem 2rem;
-  transition: background-color 200ms ease-in-out, color 200ms ease-in-out;
+  transition: background-color 200ms ease-in-out, color 200ms ease-in-out,
+    border-color 200ms ease-in-out;
+
+  border-width: 2px;
+  border-style: solid;
 
   &.secondary {
-    border: 2px solid @font-color-dark;
+    border-color: @font-color-dark;
     background-color: transparent;
-    border: 2px solid @font-color-dark;
   }
 
   &.primary {
     background-color: @creme;
+    border-color: @creme;
     outline: none;
-    border: none;
-  }
-
-  &:disabled {
-    cursor: default;
-    opacity: 0.85;
-  }
-
-  &.active,
-  &:hover {
-    background-color: @font-color-dark;
-    color: @creme;
   }
 
   @media screen and (max-width: @modal-width-max),
     screen and (max-height: @modal-height-max) {
     &.primary {
       background-color: @red;
+      border-color: @red;
       color: @creme;
     }
+  }
+
+  &.active,
+  &:hover&:not(:disabled) {
+    background-color: @font-color-dark;
+    border-color: @font-color-dark;
+    color: @creme;
+  }
+
+  &:disabled {
+    cursor: default;
+    opacity: 0.85;
   }
 }
