@@ -5,15 +5,34 @@ import { BadRequest, NotFound } from 'http-errors';
 import Story from '../../entities/Story';
 import StoryState from '../../enum/StoryState';
 import StoryType from '../../enum/StoryType';
-import getLngLatForIdentifier from '../../repositories/getLngLatForIdentifier';
 import StoryRepository from '../../repositories/StoryRepository';
 import {
-  NewStoryRequest,
   PublicStoryResponse,
+  StoryDraftRequest,
   StoryDraftResponse,
-  StoryUpdateRequest,
 } from './StoryApiModel';
 import { toDraftStoryResponse, toPublicStoryResponse } from './storyToApi';
+import getLngLatForIdentifier from '../../repositories/getLngLatForIdentifier';
+
+function normalizeEmail(email: string): string {
+  return email.toLocaleLowerCase();
+}
+
+function updateModelFromRequest(
+  story: Story,
+  storyRequest: StoryDraftRequest
+): void {
+  story.lngLat = storyRequest.lngLat ?? null;
+  story.photo = storyRequest.photo;
+  story.storyType = storyRequest.storyType;
+  story.textContent = storyRequest.textContent;
+
+  story.storytellerEmail = storyRequest.storytellerEmail
+    ? normalizeEmail(storyRequest.storytellerEmail)
+    : undefined;
+  story.storytellerName = storyRequest.storytellerName;
+  story.storytellerSubtitle = storyRequest.storytellerSubtitle;
+}
 
 function validateSubmittable(story: Story): boolean {
   return !!(
@@ -27,23 +46,20 @@ function validateSubmittable(story: Story): boolean {
   );
 }
 
-function normalizeEmail(email: string): string {
-  return email.toLocaleLowerCase();
-}
-
 @Route('stories')
 export class StoriesController extends Controller {
   @Post('/')
   public async createStory(
-    @Body() storyRequest: NewStoryRequest
+    @Body() storyRequest: StoryDraftRequest
   ): Promise<StoryDraftResponse> {
     let story = new Story();
-    story.lngLat =
-      storyRequest.lngLat ?? (await getLngLatForIdentifier(storyRequest.photo));
-    story.photo = storyRequest.photo;
-    story.storyType = storyRequest.storyType;
+    updateModelFromRequest(story, storyRequest);
     story.state = StoryState.DRAFT;
-    story.textContent = storyRequest.textContent;
+
+    // If lat/lng is not provided, try to get it from the photo
+    if (!story.lngLat) {
+      story.lngLat = await getLngLatForIdentifier(story.photo);
+    }
 
     story = await StoryRepository().save(story);
 
@@ -54,7 +70,7 @@ export class StoriesController extends Controller {
 
   @Put('/{id}')
   public async updateStory(
-    @Body() updates: StoryUpdateRequest,
+    @Body() updates: StoryDraftRequest,
     @Path('id') id: number
   ): Promise<StoryDraftResponse> {
     let story = await StoryRepository().findOneBy({ id });
@@ -75,11 +91,7 @@ export class StoriesController extends Controller {
       );
     }
 
-    story.storyType = updates.storyType;
-    story.storytellerName = updates.storytellerName;
-    story.storytellerEmail = normalizeEmail(updates.storytellerEmail);
-    story.storytellerSubtitle = updates.storytellerSubtitle;
-    story.textContent = updates.textContent;
+    updateModelFromRequest(story, updates);
 
     if (updates.state !== StoryState.DRAFT && !validateSubmittable(story)) {
       throw new BadRequest('Story is not valid for submission');

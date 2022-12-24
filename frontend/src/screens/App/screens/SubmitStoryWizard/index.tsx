@@ -15,7 +15,7 @@ const StoryWizardContent = (): JSX.Element | null => {
   const {
     step,
     draftStory,
-    isSubmitting,
+    isSaving,
 
     beginTextStory,
     setTextContent,
@@ -39,7 +39,7 @@ const StoryWizardContent = (): JSX.Element | null => {
           textContent={draftStory.textContent ?? ''}
           onTextContentChange={setTextContent}
           onSubmit={saveContent}
-          isSubmitting={isSubmitting}
+          isSubmitting={isSaving}
           isValidToSave={isValidToSaveContentDraft}
         />
       );
@@ -53,7 +53,7 @@ const StoryWizardContent = (): JSX.Element | null => {
           onStorytellerSubtitleChange={setStorytellerSubtitle}
           onStorytellerEmailChange={setStorytellerEmail}
           onSubmit={submitStorytellerInfo}
-          isSubmitting={isSubmitting}
+          isSubmitting={isSaving}
           isStoryValidToSubmit={isValidToSubmit}
         />
       );

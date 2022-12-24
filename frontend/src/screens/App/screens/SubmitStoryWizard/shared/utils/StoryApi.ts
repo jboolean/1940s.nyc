@@ -1,17 +1,18 @@
 import api from 'shared/utils/api';
-import { Story } from '../types/Story';
+import { Story, StoryDraftRequest } from '../types/Story';
 
-type NewStoryRequest = Pick<
-  Story,
-  'lngLat' | 'photo' | 'storyType' | 'textContent'
->;
-
-export async function createStory(newStory: NewStoryRequest): Promise<Story> {
+export async function createStory(newStory: StoryDraftRequest): Promise<Story> {
   const resp = await api.post<Story>('/stories', newStory);
   return resp.data;
 }
 
-export async function updateStory(updatedStory: Story): Promise<Story> {
+export async function updateStory(
+  updatedStory: StoryDraftRequest | Story
+): Promise<Story> {
+  if (!updatedStory.id) {
+    throw new Error('Story must already be persisted to update ito');
+  }
+
   const resp = await api.put<Story>(
     `/stories/${updatedStory.id}`,
     updatedStory

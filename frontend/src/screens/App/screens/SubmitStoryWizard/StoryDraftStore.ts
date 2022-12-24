@@ -3,13 +3,18 @@ import create from 'zustand';
 import { immer } from 'zustand/middleware/immer';
 
 import Step from './shared/types/Step';
-import { Story, StoryState, StoryType } from './shared/types/Story';
+import {
+  Story,
+  StoryDraftRequest,
+  StoryState,
+  StoryType,
+} from './shared/types/Story';
 import { createStory, updateStory } from './shared/utils/StoryApi';
 
 interface State {
   isOpen: boolean;
   step: Step;
-  isSubmitting: boolean;
+  isSaving: boolean;
 
   draftStory: Partial<Story>;
 }
@@ -53,8 +58,10 @@ const useStoryDraftStore = create(
   immer<State & Actions>((set, get) => ({
     isOpen: false,
     step: Step.INTRO,
-    draftStory: {},
-    isSubmitting: false,
+    draftStory: {
+      state: StoryState.DRAFT,
+    },
+    isSaving: false,
 
     initialize: (photo: string) =>
       set((draft) => {
@@ -62,7 +69,7 @@ const useStoryDraftStore = create(
         draft.draftStory.photo = photo;
         draft.isOpen = true;
         draft.step = Step.INTRO;
-        draft.isSubmitting = false;
+        draft.isSaving = false;
       }),
 
     close: () =>
@@ -82,28 +89,40 @@ const useStoryDraftStore = create(
       }),
 
     saveContent: async () => {
-      const { lngLat, storyType, textContent, photo } = get().draftStory;
+      const draftStory = get().draftStory;
+      const { lngLat, storyType, textContent, photo } = draftStory;
 
       try {
         set((draft) => {
-          draft.isSubmitting = true;
+          draft.isSaving = true;
         });
 
         // create if not yet created, otherwise update
+        if (isNil(draftStory.id)) {
+          const createdStory = await createStory({
+            lngLat,
+            storyType,
+            textContent,
+            photo,
+            state: StoryState.DRAFT,
+          });
 
-        const createdStory = await createStory({
-          lngLat,
-          storyType,
-          textContent,
-          photo,
-        });
-        set((draft) => {
-          draft.draftStory = createdStory;
-          draft.step = Step.STORYTELLER_INFO;
-        });
+          set((draft) => {
+            draft.draftStory = createdStory;
+            draft.step = Step.STORYTELLER_INFO;
+          });
+        } else {
+          const updatedStory = await updateStory(
+            draftStory as StoryDraftRequest
+          );
+          set((draft) => {
+            draft.draftStory = updatedStory;
+            draft.step = Step.STORYTELLER_INFO;
+          });
+        }
       } finally {
         set((draft) => {
-          draft.isSubmitting = false;
+          draft.isSaving = false;
         });
       }
     },
@@ -146,7 +165,7 @@ const useStoryDraftStore = create(
       }
       try {
         set((draft) => {
-          draft.isSubmitting = true;
+          draft.isSaving = true;
         });
         const updatedStory = await updateStory({
           ...draftStory,
@@ -158,7 +177,7 @@ const useStoryDraftStore = create(
         });
       } finally {
         set((draft) => {
-          draft.isSubmitting = false;
+          draft.isSaving = false;
         });
       }
     },

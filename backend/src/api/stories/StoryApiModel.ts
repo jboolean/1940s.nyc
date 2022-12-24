@@ -23,7 +23,7 @@ interface StoryApiModel {
 }
 
 // Can never be set by user
-type NonUserSettableFields = 'id' | 'createdAt';
+// type NonUserSettableFields = 'id' | 'createdAt';
 
 // some fields are optional when it's a draft
 type DraftOptionalFields =
@@ -33,25 +33,29 @@ type DraftOptionalFields =
 
 type NonPublicFields = 'storytellerEmail';
 
-type NewStoryRequest = Pick<
-  StoryApiModel,
-  'lngLat' | 'photo' | 'storyType' | 'textContent'
->;
+// type StoryDraftRequest = Optional<
+//   Omit<StoryApiModel, NonUserSettableFields>,
+//   DraftOptionalFields
+// >;
 
-// some fields are optional when it's a draft
+type StoryDraftRequest = {
+  storyType: StoryType;
+  storytellerEmail?: string;
+  storytellerName?: string;
+  storytellerSubtitle?: string;
+  lngLat?: LngLat;
+  photo: string;
+  state: StoryState;
+  textContent?: string;
+};
+
 type StoryDraftResponse = Optional<StoryApiModel, DraftOptionalFields>;
-
-type StoryUpdateRequest = Omit<
-  StoryApiModel,
-  (NonUserSettableFields & 'lngLat') | 'photo'
->;
 
 type PublicStoryResponse = Omit<StoryApiModel, NonPublicFields>;
 
 export {
   StoryApiModel,
-  NewStoryRequest,
+  StoryDraftRequest,
   StoryDraftResponse,
-  StoryUpdateRequest,
   PublicStoryResponse,
 };

@@ -26,3 +26,15 @@ export interface Story {
   state: StoryState;
   textContent?: string;
 }
+
+export type StoryDraftRequest = {
+  id?: number;
+  storyType: StoryType;
+  storytellerEmail?: string;
+  storytellerName?: string;
+  storytellerSubtitle?: string;
+  lngLat?: LngLat;
+  photo: string;
+  state: StoryState.DRAFT;
+  textContent?: string;
+};
