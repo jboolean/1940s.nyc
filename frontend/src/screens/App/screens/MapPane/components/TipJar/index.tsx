@@ -7,6 +7,7 @@ import Button from 'shared/components/Button';
 import recordEvent from 'shared/utils/recordEvent';
 import stylesheet from './TipJar.less';
 import useAmountPresets from './useAmountPresets';
+import CurrencyInput from 'shared/components/CurrencyInput';
 
 export default function TipJar({
   isOpen,
@@ -71,14 +72,10 @@ export default function TipJar({
         ))}
       </div>
       <div className={stylesheet.tipForm}>
-        <NumericFormat
+        <CurrencyInput
           value={amountDollars}
-          placeholder="$0"
-          decimalScale={2}
-          prefix="$"
-          thousandSeparator
           allowNegative={false}
-          className={stylesheet.amountInput}
+          placeholder="$0"
           onValueChange={({ floatValue }) => {
             setAmountDollars(floatValue);
           }}
