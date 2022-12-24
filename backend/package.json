@@ -22,7 +22,7 @@
     "@types/eslint-plugin-prettier": "^3.1.0",
     "@types/express": "^4.17.14",
     "@types/geojson": "^7946.0.10",
-    "@types/lodash": "^4.14.188",
+    "@types/lodash": "^4.14.191",
     "@types/node": "^10.17.51",
     "@types/pg": "^8.6.5",
     "@types/prettier": "^2.7.1",
