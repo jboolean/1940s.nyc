@@ -23,6 +23,14 @@ export default function TextContent({
     onTextContentChange(event.target.value);
   };
 
+  const textInputRef = React.useRef<HTMLTextAreaElement>(null);
+
+  React.useEffect(() => {
+    if (textInputRef.current) {
+      textInputRef.current.focus();
+    }
+  }, []);
+
   return (
     <div className={stylesheet.content}>
       <h1>Add your story</h1>
@@ -31,6 +39,7 @@ export default function TextContent({
         placeholder="Share as little or much as you&rsquo;d like about this photo and surrounding area"
         value={textContent ?? ''}
         onChange={handleTextContentChange}
+        ref={textInputRef}
       />
       <div>
         <Button

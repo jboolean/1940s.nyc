@@ -8,14 +8,16 @@ interface TextAreaProps
   className?: string;
 }
 
-export default function TextArea({
-  className,
-  ...props
-}: TextAreaProps): JSX.Element {
-  return (
-    <textarea
-      {...props}
-      className={classNames(stylesheet.textarea, className)}
-    />
-  );
-}
+const TextArea = React.forwardRef<HTMLTextAreaElement, TextAreaProps>(
+  function TextArea({ className, ...props }, ref) {
+    return (
+      <textarea
+        ref={ref}
+        {...props}
+        className={classNames(stylesheet.textarea, className)}
+      />
+    );
+  }
+);
+
+export default TextArea;

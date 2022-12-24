@@ -79,6 +79,7 @@ export default function TipJar({
           onValueChange={({ floatValue }) => {
             setAmountDollars(floatValue);
           }}
+          className={stylesheet.amountInput}
         />
         <Button
           buttonStyle="primary"
