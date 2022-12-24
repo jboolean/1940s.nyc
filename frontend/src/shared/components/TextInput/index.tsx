@@ -12,6 +12,10 @@ export default function TextInput({
   ...props
 }: TextInputProps): JSX.Element {
   return (
-    <input {...props} className={classNames(stylesheet.input, className)} />
+    <input
+      {...props}
+      type="text"
+      className={classNames(stylesheet.input, className)}
+    />
   );
 }

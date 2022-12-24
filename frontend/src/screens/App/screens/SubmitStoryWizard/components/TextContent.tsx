@@ -1,4 +1,8 @@
 import React, { ChangeEventHandler } from 'react';
+import Button from 'shared/components/Button';
+import TextArea from 'shared/components/TextArea';
+
+import stylesheet from './textContent.less';
 
 export default function TextContent({
   textContent,
@@ -20,11 +24,23 @@ export default function TextContent({
   };
 
   return (
-    <div>
-      <textarea value={textContent ?? ''} onChange={handleTextContentChange} />
-      <button onClick={onSubmit} disabled={isSubmitting || !isValidToSave}>
-        Save & Continue
-      </button>
+    <div className={stylesheet.content}>
+      <h1>Add your story</h1>
+      <TextArea
+        className={stylesheet.writingArea}
+        placeholder="Share as little or much as you&rsquo;d like"
+        value={textContent ?? ''}
+        onChange={handleTextContentChange}
+      />
+      <div>
+        <Button
+          buttonStyle="primary"
+          onClick={onSubmit}
+          disabled={isSubmitting || !isValidToSave}
+        >
+          Save & Continue
+        </Button>
+      </div>
     </div>
   );
 }
