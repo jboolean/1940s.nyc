@@ -34,6 +34,7 @@ interface Actions {
   setStorytellerSubtitle: (newStorytellerSubtitle: string) => void;
   setStorytellerEmail: (newStorytellerEmail: string) => void;
   submitStorytellerInfo: () => void;
+  goBackToContentStep: () => void;
 }
 
 const isEmail = (email: string): boolean => {
@@ -180,6 +181,21 @@ const useStoryDraftStore = create(
           draft.isSaving = false;
         });
       }
+    },
+
+    goBackToContentStep: () => {
+      if (get().draftStory.state !== StoryState.DRAFT) {
+        throw new Error(
+          'Cannot go back to content step, as it is already submitted.'
+        );
+      }
+      set((draft) => {
+        if (draft.draftStory.storyType === StoryType.TEXT) {
+          draft.step = Step.CONTENT_TEXT;
+        } else {
+          throw new Error('No step for story type');
+        }
+      });
     },
   }))
 );

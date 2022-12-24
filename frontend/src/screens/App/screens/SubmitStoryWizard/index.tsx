@@ -24,6 +24,7 @@ const StoryWizardContent = (): JSX.Element | null => {
     setStorytellerSubtitle,
     setStorytellerEmail,
     submitStorytellerInfo,
+    goBackToContentStep,
     close,
   } = useStoryDraftStore();
 
@@ -49,6 +50,7 @@ const StoryWizardContent = (): JSX.Element | null => {
           storytellerName={draftStory.storytellerName}
           storytellerSubtitle={draftStory.storytellerSubtitle}
           storytellerEmail={draftStory.storytellerEmail}
+          onGoBackToToContentStepClick={goBackToContentStep}
           onStorytellerNameChange={setStorytellerName}
           onStorytellerSubtitleChange={setStorytellerSubtitle}
           onStorytellerEmailChange={setStorytellerEmail}

@@ -10,6 +10,7 @@ export default function StorytellerInfo({
   onStorytellerEmailChange,
   onStorytellerNameChange,
   onStorytellerSubtitleChange,
+  onGoBackToToContentStepClick,
   onSubmit,
 }: {
   storytellerName: string;
@@ -21,6 +22,7 @@ export default function StorytellerInfo({
   onStorytellerNameChange: (newStorytellerName: string) => void;
   onStorytellerSubtitleChange: (newStorytellerSubtitle: string) => void;
   onStorytellerEmailChange: (newStorytellerEmail: string) => void;
+  onGoBackToToContentStepClick: () => void;
   onSubmit: () => void;
 }): JSX.Element {
   return (
@@ -60,6 +62,10 @@ export default function StorytellerInfo({
         disabled={isSubmitting || !isStoryValidToSubmit}
       >
         Submit
+      </button>
+
+      <button onClick={onGoBackToToContentStepClick} disabled={isSubmitting}>
+        Back
       </button>
     </div>
   );
