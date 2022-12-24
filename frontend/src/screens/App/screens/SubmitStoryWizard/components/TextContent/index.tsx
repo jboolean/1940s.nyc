@@ -28,7 +28,7 @@ export default function TextContent({
       <h1>Add your story</h1>
       <TextArea
         className={stylesheet.writingArea}
-        placeholder="Share as little or much as you&rsquo;d like"
+        placeholder="Share as little or much as you&rsquo;d like about this photo and surrounding area"
         value={textContent ?? ''}
         onChange={handleTextContentChange}
       />
