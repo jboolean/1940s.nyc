@@ -1,4 +1,5 @@
 @import '../../styles/colors.less';
+@import '../../styles/viewport.less';
 
 .button {
   display: inline-block;
@@ -32,7 +33,8 @@
     color: @creme;
   }
 
-  @media screen and (max-width: 800px), screen and (max-height: 600px) {
+  @media screen and (max-width: @modal-width-max),
+    screen and (max-height: @modal-height-max) {
     &.primary {
       background-color: @red;
       color: @creme;

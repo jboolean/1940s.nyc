@@ -1,4 +1,5 @@
-@import '../../../../shared//styles/colors.less';
+@import '../../../../shared/styles/colors.less';
+@import '../../../../shared/styles/viewport.less';
 
 .mailchimp {
   margin: 1rem 0;
@@ -39,7 +40,8 @@
   }
 }
 
-@media screen and (max-width: 800px), screen and (max-height: 600px) {
+@media screen and (max-width: @modal-width-max),
+  screen and (max-height: @modal-height-max) {
   .mailchimp :global {
     input[type='submit'] {
       background-color: @red;
