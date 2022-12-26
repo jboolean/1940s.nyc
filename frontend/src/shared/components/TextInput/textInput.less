@@ -1,0 +1,20 @@
+@import '../../styles/colors.less';
+
+.input {
+  outline: none;
+  border: none;
+
+  font-size: 100%;
+  background-color: transparent;
+
+  border: none;
+  border-bottom: 1px solid @font-color-dark;
+  vertical-align: bottom;
+
+  padding: (11px/2) 0;
+
+  // when focused, give subtle white background
+  &:focus {
+    background-color: fade(@creme, 10%);
+  }
+}

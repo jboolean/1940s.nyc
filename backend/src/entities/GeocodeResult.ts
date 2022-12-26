@@ -1,5 +1,5 @@
-import { Entity, ManyToOne, PrimaryColumn, Column, JoinColumn } from 'typeorm';
-import { Point } from 'geojson';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
+import LngLat from '../enum/LngLat';
 
 import Photo from './Photo';
 
@@ -15,6 +15,13 @@ export default class GeocodeResult {
   @PrimaryColumn()
   method: string;
 
-  @Column({ type: 'point' })
-  lngLat: Point | null;
+  @Column({
+    type: 'point',
+    transformer: {
+      from: (coords: { x: number; y: number } | null) =>
+        coords ? { lng: coords.x, lat: coords.y } : null,
+      to: ({ lng, lat }: LngLat) => `(${lng}, ${lat})`,
+    },
+  })
+  lngLat: LngLat | null;
 }

@@ -20,6 +20,8 @@ jobs:
         with:
           node-version: '16'
       - run: npm ci
+      - name: Generate routes
+        run: npm run routes
       - name: Lint
         run: npm run lint:strict
       - name: Types

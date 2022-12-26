@@ -1,4 +1,5 @@
-@import '../../../../shared//styles//colors.less';
+@import '../../../../shared/styles/colors.less';
+@import '../../../../shared/styles/viewport.less';
 
 .shutdownModal {
   position: relative;
@@ -68,7 +69,8 @@
   font-size: 12px;
 }
 
-@media screen and (max-width: 800px), screen and (max-height: 600px) {
+@media screen and (max-width: @modal-width-max),
+  screen and (max-height: @modal-height-max) {
   @visible-text-height: 200px;
   @photo-padding: calc(100vh - @visible-text-height);
 

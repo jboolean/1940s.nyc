@@ -4,13 +4,14 @@
     "strictNullChecks": true,
     "sourceMap": true,
     "allowJs": true,
-    "target": "es5",
+    "target": "ES2021",
     "outDir": ".build",
     "moduleResolution": "node",
-    "lib": ["es2015", "ES6"],
+    "lib": ["es2021"],
     "rootDir": "./",
     "esModuleInterop": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
+    "module": "commonjs"
   }
 }

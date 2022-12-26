@@ -1,6 +1,9 @@
 import React from 'react';
+import { useFeatureFlag } from 'screens/App/shared/stores/FeatureFlagsStore';
+import FeatureFlag from 'screens/App/shared/types/FeatureFlag';
+import Button from 'shared/components/Button';
 
-import Modal from 'react-modal';
+import FourtiesModal from 'shared/components/Modal';
 import Carousel from './Carousel';
 import carouselImages from './carouselImages';
 
@@ -14,15 +17,18 @@ export default function Welcome({
   isOpen,
   onRequestClose,
 }: Props): JSX.Element {
+  // Used to hide this annoying modal in development
+  const isWelcomeDisabled = useFeatureFlag(FeatureFlag.DISABLE_WELCOME_MODAL);
+
   return (
-    <Modal
-      isOpen={isOpen}
+    <FourtiesModal
+      isOpen={isOpen && !isWelcomeDisabled}
       className={stylesheet.welcomeModal}
-      bodyOpenClassName={stylesheet.bodyOpen}
-      overlayClassName={stylesheet.overlay}
       onRequestClose={onRequestClose}
       shouldCloseOnOverlayClick={false}
       shouldCloseOnEsc
+      size="large"
+      isCloseButtonVisible={false}
     >
       <div className={stylesheet.imageContainer}>
         <Carousel className={stylesheet.image} images={carouselImages} />
@@ -88,11 +94,11 @@ export default function Welcome({
           </p>
         </div>
         <div className={stylesheet.buttonContainer} onClick={onRequestClose}>
-          <button type="button" className={stylesheet.explore}>
+          <Button buttonStyle="primary" className={stylesheet.explore}>
             Start Exploring
-          </button>
+          </Button>
         </div>
       </div>
-    </Modal>
+    </FourtiesModal>
   );
 }

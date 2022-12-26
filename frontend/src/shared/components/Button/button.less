@@ -1,0 +1,49 @@
+@import '../../styles/colors.less';
+@import '../../styles/viewport.less';
+
+.button {
+  display: inline-block;
+
+  outline: none;
+  cursor: pointer;
+
+  padding: 1rem 2rem;
+  transition: background-color 200ms ease-in-out, color 200ms ease-in-out,
+    border-color 200ms ease-in-out;
+
+  border-width: 2px;
+  border-style: solid;
+
+  &.secondary {
+    color: @font-color-dark;
+    border-color: @font-color-dark;
+    background-color: transparent;
+  }
+
+  &.primary {
+    background-color: @creme;
+    border-color: @creme;
+    outline: none;
+  }
+
+  @media screen and (max-width: @modal-width-max),
+    screen and (max-height: @modal-height-max) {
+    &.primary {
+      background-color: @red;
+      border-color: @red;
+      color: @creme;
+    }
+  }
+
+  &.active,
+  &:hover&:not(:disabled) {
+    background-color: @font-color-dark;
+    border-color: @font-color-dark;
+    color: @creme;
+  }
+
+  &:disabled {
+    cursor: default;
+    opacity: 0.85;
+  }
+}

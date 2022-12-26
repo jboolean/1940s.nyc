@@ -9,13 +9,25 @@ const router = express.Router();
 import querystring from 'querystring';
 
 import { getRepository, In } from 'typeorm';
+import getLngLatForIdentifier from '../repositories/getLngLatForIdentifier';
 import Photo from '../entities/Photo';
+import ErrorResponse from './ErrorResponse';
 
 const PHOTO_PURCHASE_FORM_URL =
   'https://dorisorders.nyc.gov/dorisorders/ui/order-reproductions';
 
 // Get photos by matching lng,lat
-router.get('/', async (req, res) => {
+router.get<
+  '/',
+  unknown,
+  Photo[] | ErrorResponse,
+  unknown,
+  {
+    withSameLngLatByIdentifier?: string;
+    lng?: string | number;
+    lat?: string | number;
+  }
+>('/', async (req, res) => {
   const photoRepo = getRepository(Photo);
 
   let { lng, lat } = req.query;
@@ -23,23 +35,22 @@ router.get('/', async (req, res) => {
   const { withSameLngLatByIdentifier } = req.query;
 
   if (withSameLngLatByIdentifier) {
-    const [lngLatForFromIdentifierResult] = await photoRepo.query(
-      'select lng_lat from effective_geocodes_view where identifier = $1',
-      [withSameLngLatByIdentifier]
+    const lngLatForFromIdentifierResult = await getLngLatForIdentifier(
+      withSameLngLatByIdentifier
     );
 
     if (!lngLatForFromIdentifierResult) {
-      res.status(401).send('cannot find by identifier');
+      res.status(401).send({ error: 'cannot find by identifier' });
       return;
     }
 
     // Use lng, lat from this photo instead of lng, lat parameters
-    lng = lngLatForFromIdentifierResult.lng_lat.x;
-    lat = lngLatForFromIdentifierResult.lng_lat.y;
+    lng = lngLatForFromIdentifierResult.lng;
+    lat = lngLatForFromIdentifierResult.lat;
   }
 
   if (!lng || !lat) {
-    res.status(401).send('lngLat required');
+    res.status(401).send({ error: 'lngLat required' });
     return;
   }
   const result = await photoRepo.query(

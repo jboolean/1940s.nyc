@@ -1,12 +1,13 @@
-import React from 'react';
 import Modal from 'components/Modal';
-import redirectToCheckout from './redirectToCheckout';
+import React from 'react';
 import { NumericFormat } from 'react-number-format';
-import classnames from 'classnames';
+import redirectToCheckout from './redirectToCheckout';
 
-import stylesheet from './TipJar.less';
+import Button from 'shared/components/Button';
 import recordEvent from 'shared/utils/recordEvent';
+import stylesheet from './TipJar.less';
 import useAmountPresets from './useAmountPresets';
+import CurrencyInput from 'shared/components/CurrencyInput';
 
 export default function TipJar({
   isOpen,
@@ -60,39 +61,33 @@ export default function TipJar({
       </p>
       <div className={stylesheet.presets}>
         {amountPresets.map((presetAmount) => (
-          <button
+          <Button
+            buttonStyle="secondary"
             key={presetAmount}
-            type="button"
             onClick={() => setAmountDollars(presetAmount)}
-            className={classnames(stylesheet.preset, {
-              [stylesheet.active]: presetAmount === amountDollars,
-            })}
+            isActive={presetAmount === amountDollars}
           >
             <NumericFormat displayType="text" prefix="$" value={presetAmount} />
-          </button>
+          </Button>
         ))}
       </div>
       <div className={stylesheet.tipForm}>
-        <NumericFormat
+        <CurrencyInput
           value={amountDollars}
-          placeholder="$0"
-          decimalScale={2}
-          prefix="$"
-          thousandSeparator
           allowNegative={false}
-          className={stylesheet.amountInput}
+          placeholder="$0"
           onValueChange={({ floatValue }) => {
             setAmountDollars(floatValue);
           }}
+          className={stylesheet.amountInput}
         />
-        <button
-          type="button"
+        <Button
+          buttonStyle="primary"
           onClick={handleSubmitClick}
           disabled={!amountDollars || isSubmitting}
-          className={stylesheet.submitButton}
         >
           Leave Tip
-        </button>
+        </Button>
       </div>
       {errorMessage && <div>{errorMessage}</div>}
     </Modal>

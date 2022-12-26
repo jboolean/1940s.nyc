@@ -12,6 +12,10 @@ import { useHistory, useParams } from 'react-router';
 import Alternates from './components/Alternates';
 import Overlay from './components/Overlay';
 
+import { useStoryDraftStore } from '../SubmitStoryWizard';
+import { useFeatureFlag } from 'screens/App/shared/stores/FeatureFlagsStore';
+import FeatureFlag from 'screens/App/shared/types/FeatureFlag';
+
 export default function ViewerPane({
   className,
 }: {
@@ -19,6 +23,8 @@ export default function ViewerPane({
 }): JSX.Element {
   const { identifier: photoIdentifier } = useParams<{ identifier?: string }>();
   const history = useHistory();
+  const initializeStoryDraft = useStoryDraftStore((state) => state.initialize);
+  const isStorytellingEnabled = useFeatureFlag(FeatureFlag.STORYTELLING);
 
   return (
     <div className={classnames(stylesheet.container, className)}>
@@ -46,6 +52,15 @@ export default function ViewerPane({
           >
             Buy Prints
           </a>
+          {isStorytellingEnabled ? (
+            <button
+              onClick={() => {
+                initializeStoryDraft(photoIdentifier);
+              }}
+            >
+              Share Story
+            </button>
+          ) : null}
         </p>
       </Overlay>
       <ImageSwitcher

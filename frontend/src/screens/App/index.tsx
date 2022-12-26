@@ -14,6 +14,8 @@ import Outtakes from './screens/ImageGrid';
 
 import 'utils/optimize';
 import { OptimizeExperimentsProvider } from 'shared/utils/OptimizeExperiments';
+import SubmitStoryWizard from './screens/SubmitStoryWizard';
+import FeatureFlags from './screens/FeatureFlags';
 
 const IS_SHUTDOWN = false;
 
@@ -51,6 +53,7 @@ function Modals(): JSX.Element {
           setThankYouOpen(false);
         }}
       />
+      <SubmitStoryWizard />
     </>
   );
 }
@@ -79,6 +82,9 @@ export default function App(): JSX.Element {
                 )}
                 <Route path={['/outtakes/photo/:identifier', '/outtakes']}>
                   <Outtakes className={stylesheet.outtakesContainer} />
+                </Route>
+                <Route path="/labs">
+                  <FeatureFlags />
                 </Route>
                 {!IS_SHUTDOWN && <Redirect to="/map" />}
               </Switch>
