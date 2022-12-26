@@ -21,7 +21,7 @@ interface Actions {
 
 const useFeatureFlagsStore = create(
   persist(
-    immer<State & Actions>((set, get) => ({
+    immer<State & Actions>((set) => ({
       ...initialFeatureFlags,
 
       setFeatureFlag(feature: FeatureFlag, value: boolean) {
