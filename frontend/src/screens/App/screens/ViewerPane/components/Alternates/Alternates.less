@@ -1,4 +1,5 @@
 @import '../../../../../../shared/styles/colors.less';
+@import '../../../../../../shared/styles/fadeTransition.less';
 
 :local {
   @fade-out-size: 11px;
@@ -83,22 +84,6 @@
   // transitions
 
   .container {
-    // hide until shown
-    opacity: 0;
-    &.enter,
-    &.exit {
-      transition: opacity 150ms ease-in;
-      opacity: 0;
-    }
-
-    &.enterActive,
-    &.enterDone {
-      opacity: 1;
-    }
-
-    &.exitActive,
-    &.exitDone {
-      opacity: 0;
-    }
+    .fadeTransition();
   }
 }

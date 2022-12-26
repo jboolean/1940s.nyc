@@ -1,0 +1,20 @@
+// Description: Fade transition for React Transition Group
+.fadeTransition() {
+  // hide until shown
+  opacity: 0;
+  &.enter,
+  &.exit {
+    transition: opacity 150ms ease-in;
+    opacity: 0;
+  }
+
+  &.enterActive,
+  &.enterDone {
+    opacity: 1;
+  }
+
+  &.exitActive,
+  &.exitDone {
+    opacity: 0;
+  }
+}
