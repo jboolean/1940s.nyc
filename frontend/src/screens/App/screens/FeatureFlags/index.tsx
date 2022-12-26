@@ -3,6 +3,7 @@ import React from 'react';
 import FeatureFlag from 'screens/App/shared/types/FeatureFlag';
 import useFeatureFlagsStore from 'screens/App/shared/stores/FeatureFlagsStore';
 import { Link } from 'react-router-dom';
+import { lowerCase, upperFirst } from 'lodash';
 
 export default function FeatureFlags(): JSX.Element {
   const featureFlags = useFeatureFlagsStore();
@@ -25,7 +26,7 @@ export default function FeatureFlags(): JSX.Element {
                 checked={featureFlags[featureFlag]}
                 onChange={handleFeatureFlagChange(featureFlag)}
               />
-              <code>{featureFlag}</code>
+              <span>{upperFirst(lowerCase(featureFlag))}</span>
             </label>
           </li>
         ))}
