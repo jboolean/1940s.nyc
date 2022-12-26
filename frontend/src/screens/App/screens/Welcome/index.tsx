@@ -1,4 +1,6 @@
 import React from 'react';
+import { useFeatureFlag } from 'screens/App/shared/stores/FeatureFlagsStore';
+import FeatureFlag from 'screens/App/shared/types/FeatureFlag';
 import Button from 'shared/components/Button';
 
 import FourtiesModal from 'shared/components/Modal';
@@ -15,9 +17,12 @@ export default function Welcome({
   isOpen,
   onRequestClose,
 }: Props): JSX.Element {
+  // Used to hide this annoying modal in development
+  const isWelcomeDisabled = useFeatureFlag(FeatureFlag.DISABLE_WELCOME_MODAL);
+
   return (
     <FourtiesModal
-      isOpen={isOpen}
+      isOpen={isOpen && !isWelcomeDisabled}
       className={stylesheet.welcomeModal}
       onRequestClose={onRequestClose}
       shouldCloseOnOverlayClick={false}
