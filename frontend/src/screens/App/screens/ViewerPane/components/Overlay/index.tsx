@@ -26,19 +26,15 @@ export default function Overlay({
     e
   ): void => {
     if (e.pointerType !== 'mouse') {
-      console.log('not mouse');
       return;
     }
-    console.log('mouse over');
     setIsOverlayVisible(true);
   };
 
   const handlePointerDown: React.PointerEventHandler<HTMLDivElement> = (e) => {
     if (e.target !== e.currentTarget) {
-      console.log('not target for pointer down');
       return;
     }
-    console.log('pointer down');
     setIsOverlayVisible(!isOverlayVisible);
   };
 
@@ -46,10 +42,8 @@ export default function Overlay({
     e
   ): void => {
     if (e.pointerType !== 'mouse') {
-      console.log('not mouse');
       return;
     }
-    console.log('mouse out', false);
     setIsOverlayVisible(false);
   };
 
