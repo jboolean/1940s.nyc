@@ -14,21 +14,6 @@
     z-index: 1;
 
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-
-    .closeButton,
-    .credit,
-    .alternates {
-      opacity: 0;
-      transition: opacity 150ms ease;
-    }
-
-    &:hover {
-      .closeButton,
-      .credit,
-      .alternates {
-        opacity: 1;
-      }
-    }
   }
 
   .image {
@@ -79,20 +64,5 @@
     display: inline-block;
     color: inherit;
     text-decoration: underline;
-  }
-
-  .imageEnter {
-    opacity: 0;
-  }
-  .imageEnterActive {
-    opacity: 1;
-    transition: opacity 200ms;
-  }
-  .imageExit {
-    opacity: 1;
-  }
-  .imageExitActive {
-    opacity: 0;
-    transition: opacity 200ms;
   }
 }
