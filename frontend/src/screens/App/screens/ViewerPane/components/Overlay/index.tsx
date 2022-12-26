@@ -9,6 +9,7 @@ export default function Overlay({
   children,
 }: React.PropsWithChildren<unknown>): JSX.Element {
   const [isOverlayVisible, setIsOverlayVisible] = React.useState(false);
+  const timeoutRef = React.useRef<NodeJS.Timeout | null>(null);
 
   // peek in so people can see this overlay exists
   React.useEffect(() => {
@@ -17,10 +18,18 @@ export default function Overlay({
       setIsOverlayVisible(false);
     }, 5_000);
 
+    timeoutRef.current = timeout;
+
     return (): void => {
       clearTimeout(timeout);
     };
   }, []);
+
+  const cancelPeekTimeout = (): void => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+  };
 
   const handleStartHover: React.PointerEventHandler<HTMLDivElement> = (
     e
@@ -29,6 +38,7 @@ export default function Overlay({
       return;
     }
     setIsOverlayVisible(true);
+    cancelPeekTimeout();
   };
 
   const handlePointerDown: React.PointerEventHandler<HTMLDivElement> = (e) => {
@@ -36,6 +46,7 @@ export default function Overlay({
       return;
     }
     setIsOverlayVisible(!isOverlayVisible);
+    cancelPeekTimeout();
   };
 
   const handleEndHover: React.PointerEventHandler<HTMLDivElement> = (
