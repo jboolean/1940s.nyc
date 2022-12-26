@@ -22,33 +22,43 @@ export default function Overlay({
     };
   }, []);
 
-  const handleMouseOver = (): void => {
+  const handleStartHover: React.PointerEventHandler<HTMLDivElement> = (
+    e
+  ): void => {
+    if (e.pointerType !== 'mouse') {
+      console.log('not mouse');
+      return;
+    }
+    console.log('mouse over');
     setIsOverlayVisible(true);
   };
 
-  const handleTouchStart: React.TouchEventHandler<HTMLDivElement> = (e) => {
-    // Touch happens first, prevent mouse events from firing
-    e.preventDefault();
+  const handlePointerDown: React.PointerEventHandler<HTMLDivElement> = (e) => {
+    if (e.target !== e.currentTarget) {
+      console.log('not target for pointer down');
+      return;
+    }
+    console.log('pointer down');
     setIsOverlayVisible(!isOverlayVisible);
   };
 
-  const handleMouseOut = (): void => {
+  const handleEndHover: React.PointerEventHandler<HTMLDivElement> = (
+    e
+  ): void => {
+    if (e.pointerType !== 'mouse') {
+      console.log('not mouse');
+      return;
+    }
     console.log('mouse out', false);
     setIsOverlayVisible(false);
-  };
-
-  // Prevent events on the content from affecting the overlay state
-  const stopPropagation: React.TouchEventHandler<HTMLDivElement> = (e) => {
-    e.stopPropagation();
-    e.preventDefault();
   };
 
   return (
     <div
       className={classnames(stylesheet.overlay, {})}
-      onMouseOver={handleMouseOver}
-      onMouseLeave={handleMouseOut}
-      onTouchStart={handleTouchStart}
+      onPointerOver={handleStartHover}
+      onPointerLeave={handleEndHover}
+      onPointerDown={handlePointerDown}
     >
       <CSSTransition
         in={isOverlayVisible}
@@ -60,7 +70,7 @@ export default function Overlay({
       >
         <div
           className={stylesheet.overlayContent}
-          onTouchStart={stopPropagation}
+          onPointerDown={handlePointerDown}
         >
           {children}
         </div>
