@@ -38,4 +38,6 @@ jobs:
         with:
           node-version: '16'
       - run: npm ci
+      - name: Generate routes
+        run: npm run routes
       - run: npm run types
