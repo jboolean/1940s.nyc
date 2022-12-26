@@ -2,7 +2,7 @@ import React, { ChangeEventHandler } from 'react';
 import Button from 'shared/components/Button';
 import TextArea from 'shared/components/TextArea';
 
-import stylesheet from './textContent.less';
+import stylesheet from './TextContent.less';
 
 export default function TextContent({
   textContent,
