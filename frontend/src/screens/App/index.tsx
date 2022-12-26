@@ -22,11 +22,11 @@ const IS_SHUTDOWN = false;
 const thankYouInitial = window.location.search.includes('tipSuccess');
 const noWelcome = window.location.search.includes('noWelcome');
 
-// if (noWelcome)
-//   history.replace({
-//     pathname: history.location.pathname,
-//     hash: history.location.hash,
-//   });
+if (noWelcome)
+  history.replace({
+    pathname: history.location.pathname,
+    hash: history.location.hash,
+  });
 
 function Modals(): JSX.Element {
   const [isThankYouOpen, setThankYouOpen] = React.useState(thankYouInitial);
