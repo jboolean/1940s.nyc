@@ -1,4 +1,4 @@
-name: backend-deploy
+name: backend-deploy-manual
 on:
   workflow_dispatch:
     inputs:
