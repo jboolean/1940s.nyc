@@ -1,13 +1,6 @@
 service: fourtiesnyc
 package:
   individually: false
-custom:
-  bucket: fourties-photos
-  customDomain:
-    domainName: api.1940s.nyc
-    basePath: ''
-    stage: ${self:provider.stage}
-    createRoute53Record: true
 
 provider:
   name: aws
@@ -62,4 +55,14 @@ functions:
           event: s3:ObjectRemoved:*
           rules:
             - prefix: originals/
-  
+
+custom:
+  bucket: fourties-photos
+  domain:
+    production: api.1940s.nyc
+    staging: api.staging.1940s.nyc
+  customDomain:
+    domainName: ${self:custom.domain.${sls:stage}}
+    basePath: ''
+    stage: ${sls:stage}
+    createRoute53Record: true

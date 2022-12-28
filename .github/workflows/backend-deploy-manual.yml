@@ -1,0 +1,22 @@
+name: backend-deploy
+on:
+  workflow_dispatch:
+    inputs:
+      stage:
+        description: Stage
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - production
+          - staging    
+defaults:
+  run:
+    shell: bash
+    working-directory: backend
+jobs:
+  deployManual:
+    uses: ./.github/workflows/backend-deploy-reusable.yml
+    with:
+      stage: ${{ inputs.stage }}
+    secrets: inherit

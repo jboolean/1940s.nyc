@@ -7,7 +7,7 @@
     "start": "npm run routes && serverless offline start --stage dev --host dev.1940s.nyc --noPrependStageInUrl",
     "routes": "tsoa routes",
     "deploy:dry": "serverless package --stage production",
-    "deploy": "npm run install-aws-sharp && npm run lint:strict && serverless deploy --stage production",
+    "deploy": "npm run install-aws-sharp && npm run lint:strict && serverless deploy --stage $STAGE",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint --ext .js --ext .ts src",
     "lint:fix": "npm run lint -- --fix",
