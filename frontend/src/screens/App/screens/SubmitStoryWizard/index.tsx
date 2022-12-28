@@ -1,4 +1,6 @@
 import React from 'react';
+import { useFeatureFlag } from 'screens/App/shared/stores/FeatureFlagsStore';
+import FeatureFlag from 'screens/App/shared/types/FeatureFlag';
 import FourtiesModal from 'shared/components/Modal';
 
 import Intro from './components/Intro';
@@ -31,6 +33,10 @@ const StoryWizardContent = (): JSX.Element | null => {
   const { isValidToSaveContentDraft, isValidToSubmit } =
     useStoryDraftStoreComputeds();
 
+  const isAudioStorytellingEnabled = useFeatureFlag(
+    FeatureFlag.AUDIO_STORYTELLING
+  );
+
   switch (step) {
     case Step.INTRO:
       return <Intro onBeginTextStory={beginTextStory} />;
@@ -42,6 +48,7 @@ const StoryWizardContent = (): JSX.Element | null => {
           onSubmit={saveContent}
           isSubmitting={isSaving}
           isValidToSave={isValidToSaveContentDraft}
+          isAudioStorytellingEnabled={isAudioStorytellingEnabled}
         />
       );
     case Step.STORYTELLER_INFO:
