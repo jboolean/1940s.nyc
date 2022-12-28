@@ -81,10 +81,19 @@ const useStoryDraftStore = create(
       }
     },
 
-    close: () =>
-      set((draft) => {
-        draft.isOpen = false;
-      }),
+    close: () => {
+      const consentedToClose =
+        get().draftStory.state === StoryState.SUBMITTED ||
+        window.confirm(
+          'Are you sure you want to exit? Your story will not be saved.'
+        );
+
+      if (consentedToClose) {
+        set((draft) => {
+          draft.isOpen = false;
+        });
+      }
+    },
 
     beginTextStory: () =>
       set((draft) => {
