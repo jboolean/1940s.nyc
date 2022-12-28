@@ -5,6 +5,7 @@ import classnames from 'classnames';
 
 import stylesheet from './Overlay.less';
 
+// Encapsulates overlay logic for fading children in and out
 export default function Overlay({
   children,
 }: React.PropsWithChildren<unknown>): JSX.Element {
