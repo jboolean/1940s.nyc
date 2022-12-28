@@ -27,7 +27,7 @@ module.exports = {
     }),
     new webpack.IgnorePlugin({ resourceRegExp: /^\.\/locale$/ }),
     new CopyPlugin({
-      patterns: [{ from: '_redirects' }],
+      patterns: [{ from: '_redirects' }, {from: 'terms.html'}],
     }),
     new ESLintPlugin({ fix: true }),
   ],

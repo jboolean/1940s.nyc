@@ -50,38 +50,40 @@ export default function Welcome({
           <hr />
           <p className={stylesheet.finePrint}>
             The photos on this site are property of the NYC Department of
-            Records, <em>with which this site has no affilliation</em>. Prints
-            and high-resolution digital copies may be ordered directly from the
-            Municipal Archives using the link at the bottom of every photo. Use
-            of these photos is subject to{' '}
-            <a
-              href="https://www1.nyc.gov/site/records/about/terms-and-conditions.page"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Terms & Conditions
-            </a>
-            . Only{' '}
-            <a
-              href="http://nycma.lunaimaging.com/luna/servlet/s/prc646"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              publicly-viewable
-            </a>
-            , low-resolution, watermarked&nbsp;images&nbsp;are&nbsp;shown.{' '}
+            Records, <em>with which this site is not affiliated</em>. Photos
+            were placed on the map in an automated fashion, and may be
+            inaccurate.
+            <br />
+            <br />
             <a
               href="https://www1.nyc.gov/assets/records/pdf/1940s%20Tax%20Department%20photographs_REC%200040_MASTER.pdf"
               target="_blank"
               rel="noopener noreferrer"
             >
-              Collection guide.
+              About the collection
+            </a>{' '}
+            •{' '}
+            <a
+              href="http://nycma.lunaimaging.com/luna/servlet/s/prc646"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Source material
+            </a>{' '}
+            •{' '}
+            <a href="/terms.html" target="_blank">
+              Terms & Conditions
+            </a>{' '}
+            •{' '}
+            <a
+              href="https://www1.nyc.gov/site/records/about/terms-and-conditions.page"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Photo Terms of Use
             </a>
           </p>
-          <p className={stylesheet.finePrint}>
-            Photos were placed on the map via an automatic
-            and&nbsp;imperfect&nbsp;process.
-          </p>
+
           <p className={stylesheet.finePrint}>
             by{' '}
             <a
