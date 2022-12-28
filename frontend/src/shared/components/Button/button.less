@@ -14,32 +14,60 @@
   border-width: 2px;
   border-style: solid;
 
-  &.secondary {
-    color: @font-color-dark;
-    border-color: @font-color-dark;
-    background-color: transparent;
+  text-decoration: none;
+
+  margin-right: 1rem;
+
+  &.modal {
+    &.primary {
+      background-color: @creme;
+      border-color: @creme;
+    }
+    &.secondary {
+      color: @font-color-dark;
+      border-color: @font-color-dark;
+      background-color: transparent;
+    }
   }
 
-  &.primary {
-    background-color: @creme;
-    border-color: @creme;
-    outline: none;
+  &.viewer {
+    border-radius: 4px;
+    padding: 0.5rem 1rem;
+    border-width: 1.5px;
+    backdrop-filter: blur(2px);
+
+    &.secondary,
+    &.primary {
+      color: white;
+      border-color: fade(white, 85%);
+      background-color: fade(@font-color-dark, 10%);
+    }
   }
 
   @media screen and (max-width: @modal-width-max),
     screen and (max-height: @modal-height-max) {
-    &.primary {
+    &.modal.primary {
       background-color: @red;
       border-color: @red;
       color: @creme;
     }
   }
 
-  &.active,
-  &:hover&:not(:disabled) {
-    background-color: @font-color-dark;
-    border-color: @font-color-dark;
-    color: @creme;
+  &.modal {
+    &.active,
+    &:hover&:not(:disabled) {
+      background-color: @font-color-dark;
+      border-color: @font-color-dark;
+      color: @creme;
+    }
+  }
+
+  &.viewer {
+    &.active,
+    &:hover&:not(:disabled) {
+      color: white;
+      background-color: fade(@font-color-dark, 50%);
+    }
   }
 
   &:disabled {

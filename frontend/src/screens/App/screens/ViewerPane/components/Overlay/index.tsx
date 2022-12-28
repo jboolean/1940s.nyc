@@ -9,12 +9,12 @@ export default function Overlay({
   children,
 }: React.PropsWithChildren<unknown>): JSX.Element {
   const [isOverlayVisible, setIsOverlayVisible] = React.useState(false);
-  const timeoutRef = React.useRef<NodeJS.Timeout | null>(null);
+  const timeoutRef = React.useRef<number | null>(null);
 
   // peek in so people can see this overlay exists
   React.useEffect(() => {
     setIsOverlayVisible(true);
-    const timeout = setTimeout(() => {
+    const timeout = window.setTimeout(() => {
       setIsOverlayVisible(false);
     }, 5_000);
 

@@ -4,17 +4,13 @@ import classnames from 'classnames';
 
 import ImageSwitcher from './components/ImageSwitcher';
 
-import { API_BASE } from 'utils/apiConstants';
-
 import stylesheet from './ViewerPane.less';
 
 import { useHistory, useParams } from 'react-router';
 import Alternates from './components/Alternates';
 import Overlay from './components/Overlay';
 
-import { useStoryDraftStore } from '../SubmitStoryWizard';
-import { useFeatureFlag } from 'screens/App/shared/stores/FeatureFlagsStore';
-import FeatureFlag from 'screens/App/shared/types/FeatureFlag';
+import ImageButtons from './components/ImageButtons';
 
 export default function ViewerPane({
   className,
@@ -23,12 +19,12 @@ export default function ViewerPane({
 }): JSX.Element {
   const { identifier: photoIdentifier } = useParams<{ identifier?: string }>();
   const history = useHistory();
-  const initializeStoryDraft = useStoryDraftStore((state) => state.initialize);
-  const isStorytellingEnabled = useFeatureFlag(FeatureFlag.STORYTELLING);
 
   return (
     <div className={classnames(stylesheet.container, className)}>
       <Overlay>
+        <div className={stylesheet.floorFade} />
+
         <button
           className={stylesheet.closeButton}
           onClick={() =>
@@ -42,26 +38,11 @@ export default function ViewerPane({
           <Alternates originalIdentifier={photoIdentifier} />
         </div>
 
-        <p className={stylesheet.credit}>
-          Photo © NYC Municipal Archives{' '}
-          <a
-            href={`${API_BASE}/photos/${photoIdentifier}/buy-prints`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={stylesheet.purchase}
-          >
-            Buy Prints
-          </a>
-          {isStorytellingEnabled ? (
-            <button
-              onClick={() => {
-                initializeStoryDraft(photoIdentifier);
-              }}
-            >
-              Share Story
-            </button>
-          ) : null}
-        </p>
+        <div className={stylesheet.buttons}>
+          <ImageButtons />
+        </div>
+
+        <p className={stylesheet.credit}>Photo © NYC Municipal Archives </p>
       </Overlay>
       <ImageSwitcher
         className={stylesheet.image}
