@@ -15,7 +15,8 @@ module.exports = merge(common, {
   plugins: [
     new webpack.DefinePlugin({
       __DEV__: true,
-      __API_BASE__: JSON.stringify("http://dev.1940s.nyc:3000")
+      __API_BASE__: JSON.stringify("http://dev.1940s.nyc:3000"),
+      __STRIPE_PK__: JSON.stringify("pk_test_51HHaB6FCLBtNZLVl2eku10yXOnLMuYmiXDmK2iMo562DrZePotrkn49Acj7AINohiWzuUrgIp4OUDPRkbuvolmPo00x1AHBQLy")
     }),
     new HtmlWebpackPlugin({
       template: path.join(path.resolve(__dirname, 'src'), 'app.html'),
