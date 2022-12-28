@@ -1,18 +1,19 @@
-import { isNil } from 'lodash';
+import { isNil, pick } from 'lodash';
 import useFeatureFlagsStore from 'screens/App/shared/stores/FeatureFlagsStore';
 import FeatureFlag from 'screens/App/shared/types/FeatureFlag';
 import { executeRecaptcha } from 'shared/utils/grecaptcha';
 import create from 'zustand';
 import { immer } from 'zustand/middleware/immer';
 
-import Step from './shared/types/Step';
+import Step from '../shared/types/Step';
 import {
   Story,
   StoryDraftRequest,
   StoryState,
   StoryType,
-} from './shared/types/Story';
-import { createStory, updateStory } from './shared/utils/StoryApi';
+} from '../shared/types/Story';
+import { createStory, updateStory } from '../shared/utils/StoryApi';
+import useStorytellerInfoStore from './StorytellerInfoStore';
 
 interface State {
   isOpen: boolean;
@@ -69,7 +70,15 @@ const useStoryDraftStore = create(
 
     initialize: (photo: string) => {
       set((draft) => {
-        draft.draftStory = {};
+        const initialStorytellerInfo = pick(
+          useStorytellerInfoStore.getState(),
+          'storytellerName',
+          'storytellerSubtitle',
+          'storytellerEmail'
+        );
+        draft.draftStory = {
+          ...initialStorytellerInfo,
+        };
         draft.draftStory.photo = photo;
         draft.isOpen = true;
         draft.step = Step.INTRO;
@@ -109,7 +118,15 @@ const useStoryDraftStore = create(
 
     saveContent: async () => {
       const draftStory = get().draftStory;
-      const { lngLat, storyType, textContent, photo } = draftStory;
+      const {
+        lngLat,
+        storyType,
+        textContent,
+        photo,
+        storytellerName,
+        storytellerEmail,
+        storytellerSubtitle,
+      } = draftStory;
 
       try {
         set((draft) => {
@@ -126,6 +143,9 @@ const useStoryDraftStore = create(
               storyType,
               textContent,
               photo,
+              storytellerName,
+              storytellerEmail,
+              storytellerSubtitle,
               state: StoryState.DRAFT,
             },
             { recaptchaToken }
@@ -198,6 +218,13 @@ const useStoryDraftStore = create(
         set((draft) => {
           draft.draftStory = updatedStory;
           draft.step = Step.THANK_YOU;
+        });
+
+        // persist storyteller info in local storage
+        useStorytellerInfoStore.setState({
+          storytellerName: draftStory.storytellerName,
+          storytellerSubtitle: draftStory.storytellerSubtitle,
+          storytellerEmail: draftStory.storytellerEmail,
         });
       } finally {
         set((draft) => {
