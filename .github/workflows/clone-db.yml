@@ -10,6 +10,7 @@ jobs:
   cloneDb:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
       - name: Copy data 
         run: ./cloneDb.sh
         env:
