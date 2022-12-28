@@ -19,7 +19,7 @@
   "license": "ISC",
   "devDependencies": {
     "@types/cors": "^2.8.12",
-    "@types/eslint": "^8.4.6",
+    "@types/eslint": "^8.4.10",
     "@types/eslint-plugin-prettier": "^3.1.0",
     "@types/express": "^4.17.14",
     "@types/geojson": "^7946.0.10",
@@ -35,7 +35,7 @@
     "@types/stripe": "^8.0.296",
     "@typescript-eslint/eslint-plugin": "^5.46.1",
     "@typescript-eslint/parser": "^5.46.1",
-    "eslint": "^8.25.0",
+    "eslint": "^8.30.0",
     "eslint-config-jboolean": "^0.1.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.2.1",
