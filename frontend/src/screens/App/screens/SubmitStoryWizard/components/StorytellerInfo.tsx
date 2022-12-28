@@ -36,7 +36,7 @@ export default function StorytellerInfo({
 
       <div className={stylesheet.form}>
         <Labeled
-          labelText="Name"
+          labelText="Name to display"
           renderInput={({ id }) => (
             <TextInput
               id={id}
