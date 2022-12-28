@@ -1,4 +1,6 @@
 import { isNil } from 'lodash';
+import useFeatureFlagsStore from 'screens/App/shared/stores/FeatureFlagsStore';
+import FeatureFlag from 'screens/App/shared/types/FeatureFlag';
 import create from 'zustand';
 import { immer } from 'zustand/middleware/immer';
 
@@ -64,19 +66,34 @@ const useStoryDraftStore = create(
     },
     isSaving: false,
 
-    initialize: (photo: string) =>
+    initialize: (photo: string) => {
       set((draft) => {
         draft.draftStory = {};
         draft.draftStory.photo = photo;
         draft.isOpen = true;
         draft.step = Step.INTRO;
         draft.isSaving = false;
-      }),
+      });
 
-    close: () =>
-      set((draft) => {
-        draft.isOpen = false;
-      }),
+      if (!useFeatureFlagsStore.getState()[FeatureFlag.AUDIO_STORYTELLING]) {
+        // Since there's no audio stories yet, skip the intro and go to the text content step
+        get().beginTextStory();
+      }
+    },
+
+    close: () => {
+      const consentedToClose =
+        get().draftStory.state === StoryState.SUBMITTED ||
+        window.confirm(
+          'Are you sure you want to exit? Your story will not be saved.'
+        );
+
+      if (consentedToClose) {
+        set((draft) => {
+          draft.isOpen = false;
+        });
+      }
+    },
 
     beginTextStory: () =>
       set((draft) => {

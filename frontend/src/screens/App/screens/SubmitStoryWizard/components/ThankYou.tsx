@@ -1,4 +1,5 @@
 import React from 'react';
+import Button from 'shared/components/Button';
 
 export default function ThankYou({
   onCloseClicked,
@@ -12,7 +13,9 @@ export default function ThankYou({
         I love hearing everyone&rsquo;s stories, and I&rsquo;ll publish yours as
         soon as I can.
       </p>
-      <button onClick={onCloseClicked}>Done</button>
+      <Button buttonStyle="primary" onClick={onCloseClicked}>
+        Done
+      </Button>
     </div>
   );
 }
