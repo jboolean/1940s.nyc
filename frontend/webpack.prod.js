@@ -17,7 +17,7 @@ module.exports = merge(common, {
       'process.env.NODE_ENV': JSON.stringify('production'),
       __DEV__: false,
       // Defined in Netlify config
-      __API_BASE__: process.env.API_BASE
+      __API_BASE__: JSON.stringify(process.env.API_BASE)
     }),
     new HtmlWebpackPlugin({
       template: path.join(path.resolve(__dirname, 'src'), 'app.html'),

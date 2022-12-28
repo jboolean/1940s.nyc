@@ -15,7 +15,7 @@ module.exports = merge(common, {
   plugins: [
     new webpack.DefinePlugin({
       __DEV__: true,
-      __API_BASE__: "http://dev.1940s.nyc:3000"
+      __API_BASE__: JSON.stringify("http://dev.1940s.nyc:3000")
     }),
     new HtmlWebpackPlugin({
       template: path.join(path.resolve(__dirname, 'src'), 'app.html'),
