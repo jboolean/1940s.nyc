@@ -67,8 +67,7 @@ class MapPane extends React.Component<Props & RouteComponentProps, State> {
   componentDidMount(): void {
     this.historyUnlisten = this.props.history.listen(() => {
       setTimeout(() => {
-        console.log('Resizing');
-        this.map.resize();
+        if (this.map) this.map.resize();
       });
     });
   }
