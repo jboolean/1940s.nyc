@@ -1,0 +1,38 @@
+name: backend-deploy
+on:
+  workflow_call:
+    inputs:
+      stage:
+        required: true
+        type: string
+    secrets:
+      AWS_ACCESS_KEY_ID:
+        required: true
+      AWS_SECRET_ACCESS_KEY:
+        required: true
+    
+defaults:
+  run:
+    shell: bash
+    working-directory: backend
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+      - run: npm ci
+      - name: Generate routes
+        run: npm run routes
+      - name: Lint
+        run: npm run lint:strict
+      - name: Types
+        run: npm run types
+      - name: Deploy
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID}}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY}}
+          STAGE: ${{ inputs.stage }}
+        run: npm run deploy
