@@ -41,6 +41,7 @@ class MapPane extends React.Component<Props & RouteComponentProps, State> {
   map?: typeof MainMap;
   private idPrefix: string;
   private tipJarTimerHandle: ReturnType<typeof setTimeout> | null = null;
+  historyUnlisten: () => void | null = null;
 
   constructor(props: Props & RouteComponentProps) {
     super(props);
@@ -60,6 +61,16 @@ class MapPane extends React.Component<Props & RouteComponentProps, State> {
 
   componentWillUnmount(): void {
     if (this.tipJarTimerHandle) clearTimeout(this.tipJarTimerHandle);
+    if (this.historyUnlisten) this.historyUnlisten();
+  }
+
+  componentDidMount(): void {
+    this.historyUnlisten = this.props.history.listen(() => {
+      setTimeout(() => {
+        console.log('Resizing');
+        this.map.resize();
+      });
+    });
   }
 
   handleOverlayChange(overlay: OverlayId): void {

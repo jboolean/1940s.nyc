@@ -164,4 +164,4 @@ function withRouterRef<
 export default withRouterRef<Props>(MainMap) as unknown as React.ComponentType<
   Props & React.RefAttributes<MainMap>
 > &
-  Pick<MainMap, 'goTo'>;
+  Pick<MainMap, 'goTo' | 'resize'>;
