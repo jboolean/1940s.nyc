@@ -80,9 +80,8 @@ export class StoriesController extends Controller {
     const recaptchaResult = await validateRecaptchaToken(recaptchaToken, ip);
 
     if (!recaptchaResult.success) {
-      throw new Forbidden(
-        'Recaptcha failed ' + JSON.stringify(recaptchaResult['error-codes'])
-      );
+      console.error('Recaptcha error', recaptchaResult['error-codes']);
+      throw new Forbidden('Recaptcha failed');
     }
 
     story.recaptchaScore = recaptchaResult.score;
