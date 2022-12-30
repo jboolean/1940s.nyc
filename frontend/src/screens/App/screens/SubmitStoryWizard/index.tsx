@@ -11,7 +11,7 @@ import Step from './shared/types/Step';
 
 import useStoryDraftStore, {
   useStoryDraftStoreComputeds,
-} from './StoryDraftStore';
+} from './stores/StoryDraftStore';
 
 const StoryWizardContent = (): JSX.Element | null => {
   const {
