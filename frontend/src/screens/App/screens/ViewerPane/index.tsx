@@ -11,6 +11,9 @@ import Alternates from './components/Alternates';
 import Overlay from './components/Overlay';
 
 import ImageButtons from './components/ImageButtons';
+import Stories from './components/Stories';
+import { useFeatureFlag } from 'screens/App/shared/stores/FeatureFlagsStore';
+import FeatureFlag from 'screens/App/shared/types/FeatureFlag';
 
 export default function ViewerPane({
   className,
@@ -19,6 +22,7 @@ export default function ViewerPane({
 }): JSX.Element {
   const { identifier: photoIdentifier } = useParams<{ identifier?: string }>();
   const history = useHistory();
+  const isStorytellingEnabled = useFeatureFlag(FeatureFlag.STORYTELLING);
 
   return (
     <div className={classnames(stylesheet.container, className)}>
@@ -37,6 +41,12 @@ export default function ViewerPane({
         <div className={stylesheet.alternates}>
           <Alternates originalIdentifier={photoIdentifier} />
         </div>
+
+        {isStorytellingEnabled ? (
+          <div className={stylesheet.stories}>
+            <Stories photoIdentifier={photoIdentifier} />
+          </div>
+        ) : null}
 
         <div className={stylesheet.buttons}>
           <ImageButtons />

@@ -1,5 +1,6 @@
+import memoize from 'lodash/memoize';
 import api from 'shared/utils/api';
-import { Story, StoryDraftRequest } from '../types/Story';
+import { Story, StoryDraftRequest } from '../../../../shared/types/Story';
 
 export async function createStory(
   newStory: StoryDraftRequest,
@@ -24,3 +25,12 @@ export async function updateStory(
   );
   return resp.data;
 }
+
+export const getStoriesForPhoto = memoize(async function getStoriesForPhoto(
+  photoIdentifier: string
+): Promise<Story[]> {
+  const resp = await api.get<Story[]>(
+    `/stories?forPhotoIdentifier=${photoIdentifier}`
+  );
+  return resp.data;
+});

@@ -11,7 +11,7 @@ import {
   StoryDraftRequest,
   StoryState,
   StoryType,
-} from '../shared/types/Story';
+} from 'screens/App/shared/types/Story';
 import { createStory, updateStory } from '../shared/utils/StoryApi';
 import useStorytellerInfoStore from './StorytellerInfoStore';
 
