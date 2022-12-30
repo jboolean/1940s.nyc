@@ -1,4 +1,5 @@
 import map from 'lodash/map';
+import isNumber from 'lodash/isNumber';
 import {
   Body,
   Controller,
@@ -79,7 +80,7 @@ export class StoriesController extends Controller {
     const ip = request.ip;
     const recaptchaResult = await validateRecaptchaToken(recaptchaToken, ip);
 
-    if (!recaptchaResult.success) {
+    if (!recaptchaResult.success || !isNumber(recaptchaResult.score)) {
       console.error('Recaptcha error', recaptchaResult['error-codes']);
       throw new Forbidden('Recaptcha failed');
     }
