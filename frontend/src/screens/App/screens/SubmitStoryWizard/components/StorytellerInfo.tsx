@@ -59,6 +59,7 @@ export default function StorytellerInfo({
                 onStorytellerSubtitleChange(value);
               }}
               placeholder="e.g. Resident, historian, my favorite spot…"
+              maxLength={40}
             />
           )}
         />
