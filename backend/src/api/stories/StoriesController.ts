@@ -1,7 +1,20 @@
 import map from 'lodash/map';
-import { Body, Controller, Get, Path, Post, Put, Query, Route } from 'tsoa';
+import isNumber from 'lodash/isNumber';
+import {
+  Body,
+  Controller,
+  Get,
+  Header,
+  Path,
+  Post,
+  Put,
+  Query,
+  Request,
+  Route,
+} from 'tsoa';
+import Express from 'express';
 
-import { BadRequest, NotFound } from 'http-errors';
+import { BadRequest, NotFound, Forbidden } from 'http-errors';
 import Story from '../../entities/Story';
 import StoryState from '../../enum/StoryState';
 import StoryType from '../../enum/StoryType';
@@ -13,6 +26,7 @@ import {
 } from './StoryApiModel';
 import { toDraftStoryResponse, toPublicStoryResponse } from './storyToApi';
 import getLngLatForIdentifier from '../../repositories/getLngLatForIdentifier';
+import { validateRecaptchaToken } from '../../business/utils/grecaptcha';
 
 function normalizeEmail(email: string): string {
   return email.toLocaleLowerCase();
@@ -50,7 +64,9 @@ function validateSubmittable(story: Story): boolean {
 export class StoriesController extends Controller {
   @Post('/')
   public async createStory(
-    @Body() storyRequest: StoryDraftRequest
+    @Body() storyRequest: StoryDraftRequest,
+    @Header('X-Recaptcha-Token') recaptchaToken: string,
+    @Request() request: Express.Request
   ): Promise<StoryDraftResponse> {
     let story = new Story();
     updateModelFromRequest(story, storyRequest);
@@ -60,6 +76,16 @@ export class StoriesController extends Controller {
     if (!story.lngLat) {
       story.lngLat = await getLngLatForIdentifier(story.photo);
     }
+
+    const ip = request.ip;
+    const recaptchaResult = await validateRecaptchaToken(recaptchaToken, ip);
+
+    if (!recaptchaResult.success || !isNumber(recaptchaResult.score)) {
+      console.error('Recaptcha error', recaptchaResult['error-codes']);
+      throw new Forbidden('Recaptcha failed');
+    }
+
+    story.recaptchaScore = recaptchaResult.score;
 
     story = await StoryRepository().save(story);
 

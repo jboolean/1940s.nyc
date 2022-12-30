@@ -17,6 +17,9 @@ import {
 } from 'express';
 import { ValidateError } from 'tsoa';
 
+// Trust API Gateway
+app.set('trust proxy', 1);
+
 app.use(express.json());
 
 app.use(
