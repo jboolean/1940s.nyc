@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { FeatureCollection, Point } from 'geojson';
 
-const NYC_GEOSEARCH_BASE = 'https://geosearch.planninglabs.nyc/v1';
+const NYC_GEOSEARCH_BASE = 'https://geosearch.planninglabs.nyc/v2';
 
 const geosearch = axios.create({ baseURL: NYC_GEOSEARCH_BASE });
 
