@@ -18,13 +18,15 @@ module.exports = merge(common, {
       __DEV__: false,
       // Defined in Netlify config
       __API_BASE__: JSON.stringify(process.env.API_BASE),
-      __STRIPE_PK__: JSON.stringify(process.env.STRIPE_PK)
+      __STRIPE_PK__: JSON.stringify(process.env.STRIPE_PK),
+      __RECAPTCHA_PK__: JSON.stringify(process.env.RECAPTCHA_PK),
     }),
     new HtmlWebpackPlugin({
       template: path.join(path.resolve(__dirname, 'src'), 'app.html'),
       templateParameters: {
         optimizeContainerId: 'OPT-NVNC4KQ',
         gaId: 'UA-3445091-4',
+        recaptchaSiteKey: process.env.RECAPTCHA_PK,
       },
     }),
   ],

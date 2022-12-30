@@ -1,6 +1,7 @@
 import { isNil } from 'lodash';
 import useFeatureFlagsStore from 'screens/App/shared/stores/FeatureFlagsStore';
 import FeatureFlag from 'screens/App/shared/types/FeatureFlag';
+import { executeRecaptcha } from 'shared/utils/grecaptcha';
 import create from 'zustand';
 import { immer } from 'zustand/middleware/immer';
 
@@ -117,13 +118,18 @@ const useStoryDraftStore = create(
 
         // create if not yet created, otherwise update
         if (isNil(draftStory.id)) {
-          const createdStory = await createStory({
-            lngLat,
-            storyType,
-            textContent,
-            photo,
-            state: StoryState.DRAFT,
-          });
+          const recaptchaToken = await executeRecaptcha('create_story');
+
+          const createdStory = await createStory(
+            {
+              lngLat,
+              storyType,
+              textContent,
+              photo,
+              state: StoryState.DRAFT,
+            },
+            { recaptchaToken }
+          );
 
           set((draft) => {
             draft.draftStory = createdStory;

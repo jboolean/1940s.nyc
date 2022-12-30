@@ -35,6 +35,7 @@ functions:
       DB_PASSWORD: ${ssm:/${self:service}-${sls:stage}-db-password}
       DB_DATABASE: ${ssm:/${self:service}-${sls:stage}-db-database}
       STRIPE_SK: ${ssm:/${self:service}-${sls:stage}-stripe-sk}
+      RECAPTCHA_SK: ${ssm:/${self:service}-${sls:stage}-recaptcha-sk}
   convertImage:
     stages:
       - production
@@ -61,7 +62,13 @@ custom:
   domain:
     production: api.1940s.nyc
     staging: api.staging.1940s.nyc
+    dev: dev.1940s.nyc
+  domainEnabled:
+    production: true
+    staging: true
+    dev: false
   customDomain:
+    enabled: ${self:custom.domainEnabled.${sls:stage}}
     domainName: ${self:custom.domain.${sls:stage}}
     basePath: ''
     stage: ${sls:stage}

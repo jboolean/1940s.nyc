@@ -1,8 +1,13 @@
 import api from 'shared/utils/api';
 import { Story, StoryDraftRequest } from '../types/Story';
 
-export async function createStory(newStory: StoryDraftRequest): Promise<Story> {
-  const resp = await api.post<Story>('/stories', newStory);
+export async function createStory(
+  newStory: StoryDraftRequest,
+  { recaptchaToken }: { recaptchaToken: string }
+): Promise<Story> {
+  const resp = await api.post<Story>('/stories', newStory, {
+    headers: { 'X-Recaptcha-Token': recaptchaToken },
+  });
   return resp.data;
 }
 

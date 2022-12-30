@@ -46,4 +46,7 @@ export default class Story {
 
   @Column()
   textContent?: string;
+
+  @Column()
+  recaptchaScore: number;
 }
