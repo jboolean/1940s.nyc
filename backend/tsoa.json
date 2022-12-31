@@ -4,9 +4,17 @@
   "controllerPathGlobs": ["src/**/*Controller.ts"],
   "spec": {
     "outputDirectory": "tsoa-build",
-    "specVersion": 3
+    "specVersion": 3,
+    "securityDefinitions": {
+      "netlify": {
+        "type": "apiKey",
+        "name": "Authorization",
+        "in": "header"
+      }
+    }
   },
   "routes": {
-    "routesDir": "tsoa-build"
+    "routesDir": "tsoa-build",
+    "authenticationModule": "src/api/auth/authHandler.ts"
   }
 }

@@ -13,6 +13,7 @@ import {
   Query,
   Request,
   Route,
+  Security,
 } from 'tsoa';
 
 import { BadRequest, Forbidden, NotFound } from 'http-errors';
@@ -144,7 +145,7 @@ export class StoriesController extends Controller {
     return map(stories, toPublicStoryResponse);
   }
 
-  // TODO Protect this route because it returns sensitive data
+  @Security('netlify', ['moderator'])
   @Get('/needs-review')
   public async getStoriesNeedingReview(): Promise<AdminStoryResponse[]> {
     const stories = await StoryRepository().findForReview();
@@ -152,6 +153,7 @@ export class StoriesController extends Controller {
     return map(stories, toAdminStoryResponse);
   }
 
+  @Security('netlify', ['moderator'])
   @Patch('/{id}/state')
   public async updateStoryState(
     @Path('id') id: number,
