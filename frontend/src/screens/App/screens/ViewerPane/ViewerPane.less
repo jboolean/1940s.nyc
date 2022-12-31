@@ -120,8 +120,10 @@
     margin-top: -@margin-above;
 
     mask: linear-gradient(180deg, transparent 0%, black @margin-above);
-    background: fade(hsl(0, 0, 20%), 60%);
+    background: fade(hsl(0, 0, 20%), 70%);
 
-    // Tried to use backdrop-filter, but it's not supported in Safari
+    // Tried to use backdrop-filter, but transition is glitchy in Chrome and FF
+    // https://bugs.chromium.org/p/chromium/issues/detail?id=1194050
+    // Maybe revisit this later
   }
 }
