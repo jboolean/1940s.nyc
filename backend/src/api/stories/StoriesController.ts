@@ -21,10 +21,15 @@ import StoryType from '../../enum/StoryType';
 import StoryRepository from '../../repositories/StoryRepository';
 import {
   PublicStoryResponse,
+  StoryApiModel,
   StoryDraftRequest,
   StoryDraftResponse,
 } from './StoryApiModel';
-import { toDraftStoryResponse, toPublicStoryResponse } from './storyToApi';
+import {
+  toDraftStoryResponse,
+  toFullStoryResponse,
+  toPublicStoryResponse,
+} from './storyToApi';
 import getLngLatForIdentifier from '../../repositories/getLngLatForIdentifier';
 import { validateRecaptchaToken } from '../../business/utils/grecaptcha';
 
@@ -136,5 +141,13 @@ export class StoriesController extends Controller {
     const stories = await StoryRepository().findForPhotoIdentifier(identifier);
 
     return map(stories, toPublicStoryResponse);
+  }
+
+  // TODO Protect this route because it returns sensitive data
+  @Get('/needs-review')
+  public async getStoriesNeedingReview(): Promise<StoryApiModel[]> {
+    const stories = await StoryRepository().findForReview();
+
+    return map(stories, toFullStoryResponse);
   }
 }
