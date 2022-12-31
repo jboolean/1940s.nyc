@@ -19,18 +19,22 @@ export async function expressAuthentication(
     }
     const token = authHeader.split(' ')[1];
 
-    const user = await getNetfilyUser(token);
+    try {
+      const user = await getNetfilyUser(token);
 
-    // check that it has the required scopes
-    if (scopes && scopes.length > 0) {
-      const userScopes = (user.app_metadata as NetlifyMetadata)?.roles || [];
-      const hasScopes = scopes.every((scope) => userScopes.includes(scope));
-      if (!hasScopes) {
-        throw new Unauthorized('Insufficient scopes');
+      // check that it has the required scopes
+      if (scopes && scopes.length > 0) {
+        const userScopes = (user.app_metadata as NetlifyMetadata)?.roles || [];
+        const hasScopes = scopes.every((scope) => userScopes.includes(scope));
+        if (!hasScopes) {
+          throw new Unauthorized('Insufficient scopes');
+        }
       }
-    }
 
-    return user;
+      return user;
+    } catch (err) {
+      throw new Unauthorized('Invalid token');
+    }
   }
 
   throw new Unauthorized('Invalid security name');
