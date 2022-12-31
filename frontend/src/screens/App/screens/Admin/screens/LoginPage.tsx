@@ -16,8 +16,11 @@ export default function LoginPage(): JSX.Element {
   React.useEffect(() => {
     if (isAutheticated) {
       history.replace(from);
+    } else {
+      //automatically trigger login modal
+      login();
     }
-  }, [isAutheticated, history, from]);
+  }, [isAutheticated, history, from, login]);
 
   return (
     <div>
