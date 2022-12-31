@@ -82,8 +82,29 @@ export default function StorytellerInfo({
       <p className={stylesheet.finePrint}>
         By using this site you agree to the{' '}
         <a href="/terms.html" target="_blank">
-          Terms & Conditions
+          Terms of Use
         </a>
+      </p>
+
+      {/* This text is legally required by reCAPTCHA because the badge is hidden */}
+      <p className={stylesheet.finePrint}>
+        This site is protected by reCAPTCHA and the Google{' '}
+        <a
+          href="https://policies.google.com/privacy"
+          target="_blank"
+          rel="noreferrer"
+        >
+          Privacy Policy
+        </a>{' '}
+        and{' '}
+        <a
+          href="https://policies.google.com/terms"
+          target="_blank"
+          rel="noreferrer"
+        >
+          Terms of Service
+        </a>{' '}
+        apply.
       </p>
 
       <div className={stylesheet.buttons}>
