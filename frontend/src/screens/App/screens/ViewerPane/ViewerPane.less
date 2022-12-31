@@ -23,9 +23,11 @@
     transform: scale(1.05); // cuts off the borders
   }
 
+  @content-padding: 5.5px;
+
   .overlayContentWrapper {
     display: grid;
-    grid-template-rows: auto 1fr minmax(0, 35%) auto auto;
+    grid-template-rows: auto 1fr fit-content(35%) auto auto;
     grid-template-areas:
       'alternates'
       '.'
@@ -34,7 +36,7 @@
       'credit';
 
     row-gap: 11px;
-    padding: 5.5px 5.5px;
+    padding: @content-padding @content-padding;
     height: 100%;
     box-sizing: border-box;
   }
@@ -65,8 +67,8 @@
     max-width: calc(100% - 77px);
 
     // Flush to left, top edge, it has internal padding
-    margin-left: -5.5px;
-    margin-top: -5.5px;
+    margin-left: -@content-padding;
+    margin-top: -@content-padding;
   }
 
   .stories {
@@ -91,15 +93,20 @@
   }
 
   .floorFade {
-    grid-row: stories-start / -1;
+    z-index: -1;
 
-    width: 100%;
+    grid-row: stories-start / -1;
+    grid-column: 1 / -1;
+
     user-select: none;
 
-    background: linear-gradient(
-      180deg,
-      rgba(0, 0, 0, 0) 0%,
-      rgba(0, 0, 0, 0.3) 100%
-    );
+    @margin-above: 77px;
+
+    margin: -@content-padding -@content-padding;
+    margin-top: -@margin-above;
+
+    mask: linear-gradient(180deg, transparent 0%, black @margin-above);
+    background: fade(black, 20%);
+    backdrop-filter: blur(1px) contrast(0.6);
   }
 }
