@@ -82,7 +82,7 @@ export default function StorytellerInfo({
       <p className={stylesheet.finePrint}>
         By using this site you agree to the{' '}
         <a href="/terms.html" target="_blank">
-          Terms & Conditions
+          Terms of Use
         </a>
       </p>
 
