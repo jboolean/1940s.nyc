@@ -27,32 +27,34 @@ export default function ViewerPane({
   return (
     <div className={classnames(stylesheet.container, className)}>
       <Overlay>
-        <div className={stylesheet.floorFade} />
+        <div className={stylesheet.overlayContentWrapper}>
+          <div className={stylesheet.floorFade} />
 
-        <button
-          className={stylesheet.closeButton}
-          onClick={() =>
-            history.push({ pathname: '..', hash: window.location.hash })
-          }
-        >
-          Close
-        </button>
+          <button
+            className={stylesheet.closeButton}
+            onClick={() =>
+              history.push({ pathname: '..', hash: window.location.hash })
+            }
+          >
+            Close
+          </button>
 
-        <div className={stylesheet.alternates}>
-          <Alternates originalIdentifier={photoIdentifier} />
-        </div>
-
-        {isStorytellingEnabled ? (
-          <div className={stylesheet.stories}>
-            <Stories photoIdentifier={photoIdentifier} />
+          <div className={stylesheet.alternates}>
+            <Alternates originalIdentifier={photoIdentifier} />
           </div>
-        ) : null}
 
-        <div className={stylesheet.buttons}>
-          <ImageButtons />
+          {isStorytellingEnabled ? (
+            <div className={stylesheet.stories}>
+              <Stories photoIdentifier={photoIdentifier} />
+            </div>
+          ) : null}
+
+          <div className={stylesheet.buttons}>
+            <ImageButtons />
+          </div>
+
+          <p className={stylesheet.credit}>Photo © NYC Municipal Archives </p>
         </div>
-
-        <p className={stylesheet.credit}>Photo © NYC Municipal Archives </p>
       </Overlay>
       <ImageSwitcher
         className={stylesheet.image}

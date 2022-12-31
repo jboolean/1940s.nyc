@@ -5,7 +5,6 @@
     left: 0;
     bottom: 0;
     width: 66.6vh;
-    text-align: center;
 
     background-color: black;
 
@@ -22,6 +21,22 @@
     width: 100%;
     height: 100%;
     transform: scale(1.05); // cuts off the borders
+  }
+
+  .overlayContentWrapper {
+    display: grid;
+    grid-template-rows: auto 1fr minmax(0, 35%) auto auto;
+    grid-template-areas:
+      'alternates'
+      '.'
+      'stories'
+      'buttons'
+      'credit';
+
+    row-gap: 11px;
+    padding: 5.5px 5.5px;
+    height: 100%;
+    box-sizing: border-box;
   }
 
   .closeButton {
@@ -45,49 +60,40 @@
   }
 
   .alternates {
-    z-index: 2;
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 77px;
+    grid-area: alternates;
+
+    max-width: calc(100% - 77px);
+
+    // Flush to left, top edge, it has internal padding
+    margin-left: -5.5px;
+    margin-top: -5.5px;
   }
 
   .stories {
-    position: absolute;
-    margin: 5.5px 5.5px;
-    margin-bottom: 11px;
+    grid-area: stories;
 
-    bottom: 33px + 38px;
-
-    max-height: 35%;
+    align-self: end;
+    max-height: 100%;
 
     overflow-y: auto;
   }
 
   .buttons {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    margin: 5.5px 5.5px;
-
-    // space for credit
-    margin-bottom: 33px;
+    grid-area: buttons;
   }
 
   .credit {
-    position: absolute;
-    bottom: 0;
-    margin: 5.5px 5.5px;
-    z-index: 2;
+    grid-area: credit;
+
     color: white;
     font-size: 12px;
+    margin: 0;
   }
 
   .floorFade {
-    position: absolute;
-    bottom: 0;
+    grid-row: stories-start / -1;
+
     width: 100%;
-    height: 154px;
     user-select: none;
 
     background: linear-gradient(
