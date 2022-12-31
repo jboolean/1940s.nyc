@@ -2,6 +2,7 @@ import React from 'react';
 import Button from 'shared/components/Button';
 import Story from 'shared/components/Story';
 import { PHOTO_BASE } from 'shared/utils/apiConstants';
+import classNames from 'classnames';
 
 import useReviewStoriesStore from './stores/ReviewStoriesStore';
 
@@ -22,7 +23,14 @@ function StoryMetadataView({ story }: { story: AdminStory }): JSX.Element {
         </time>
       </div>
       <div>{story.storytellerEmail}</div>
-      <div>{story.recaptchaScore * 100}% Human</div>
+      <div
+        className={classNames(stylesheet.score, {
+          [stylesheet.good]: story.recaptchaScore > 0.5,
+          [stylesheet.bad]: story.recaptchaScore <= 0.5,
+        })}
+      >
+        {story.recaptchaScore * 100}% Human
+      </div>
       {story.lngLat ? (
         <div>
           {story.lngLat.lat}, {story.lngLat.lng}
