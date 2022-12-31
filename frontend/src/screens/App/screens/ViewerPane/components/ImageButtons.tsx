@@ -3,15 +3,12 @@ import React from 'react';
 import { useParams } from 'react-router-dom';
 import { API_BASE } from 'utils/apiConstants';
 
-import { useFeatureFlag } from 'screens/App/shared/stores/FeatureFlagsStore';
-import FeatureFlag from 'screens/App/shared/types/FeatureFlag';
-import { useStoryDraftStore } from '../../SubmitStoryWizard';
 import Button, { ButtonStyledLink } from 'shared/components/Button';
+import { useStoryDraftStore } from '../../SubmitStoryWizard';
 
 export default function ImageButtons(): JSX.Element {
   const { identifier: photoIdentifier } = useParams<{ identifier?: string }>();
   const initializeStoryDraft = useStoryDraftStore((state) => state.initialize);
-  const isStorytellingEnabled = useFeatureFlag(FeatureFlag.STORYTELLING);
 
   return (
     <div>
@@ -24,17 +21,15 @@ export default function ImageButtons(): JSX.Element {
       >
         Order Print
       </ButtonStyledLink>
-      {isStorytellingEnabled ? (
-        <Button
-          buttonTheme="viewer"
-          buttonStyle="secondary"
-          onClick={() => {
-            initializeStoryDraft(photoIdentifier);
-          }}
-        >
-          Share Your Story
-        </Button>
-      ) : null}
+      <Button
+        buttonTheme="viewer"
+        buttonStyle="secondary"
+        onClick={() => {
+          initializeStoryDraft(photoIdentifier);
+        }}
+      >
+        Share Your Story
+      </Button>
     </div>
   );
 }
