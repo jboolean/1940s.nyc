@@ -112,7 +112,8 @@
     margin-top: -@margin-above;
 
     mask: linear-gradient(180deg, transparent 0%, black @margin-above);
-    background: fade(black, 20%);
-    backdrop-filter: blur(1px) contrast(0.6);
+    background: fade(hsl(0, 0, 20%), 60%);
+
+    // Tried to use backdrop-filter, but it's not supported in Safari
   }
 }
