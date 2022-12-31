@@ -6,4 +6,6 @@ declare let __RECAPTCHA_PK__: string;
 
 interface Window {
   dataLayer?: Record<string, unknown>[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  netlifyIdentity: any;
 }
