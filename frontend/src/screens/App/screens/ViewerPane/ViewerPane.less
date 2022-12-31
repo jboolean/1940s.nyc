@@ -39,6 +39,13 @@
     padding: @content-padding @content-padding;
     height: 100%;
     box-sizing: border-box;
+
+    // Ignore pointer events on this wrapper, but not the children
+    pointer-events: none;
+
+    & > * {
+      pointer-events: auto;
+    }
   }
 
   .closeButton {
