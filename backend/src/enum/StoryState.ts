@@ -2,7 +2,7 @@ enum StoryState {
   DRAFT = 'draft',
   SUBMITTED = 'submitted',
   PUBLISHED = 'published',
-  REMOVED = 'removed',
+  REJECTED = 'rejected',
 }
 
 export default StoryState;

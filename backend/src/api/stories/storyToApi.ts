@@ -1,12 +1,12 @@
 import Story from '../../entities/Story';
 import required from '../required';
 import {
+  AdminStoryResponse,
   PublicStoryResponse,
-  StoryApiModel,
   StoryDraftResponse,
 } from './StoryApiModel';
 
-export function toFullStoryResponse(story: Story): StoryApiModel {
+export function toAdminStoryResponse(story: Story): AdminStoryResponse {
   return {
     id: story.id,
     lngLat: story.lngLat ?? undefined,
@@ -21,6 +21,8 @@ export function toFullStoryResponse(story: Story): StoryApiModel {
       'storytellerSubtitle'
     ),
     textContent: story.textContent,
+
+    recaptchaScore: story.recaptchaScore,
   };
 }
 

@@ -1,6 +1,10 @@
 import memoize from 'lodash/memoize';
 import api from 'shared/utils/api';
-import { Story, StoryDraftRequest } from '../../screens/App/shared/types/Story';
+import {
+  AdminStory,
+  Story,
+  StoryDraftRequest,
+} from '../../screens/App/shared/types/Story';
 
 export async function createStory(
   newStory: StoryDraftRequest,
@@ -34,3 +38,18 @@ export const getStoriesForPhoto = memoize(async function getStoriesForPhoto(
   );
   return resp.data;
 });
+
+export async function getStoriesForReview(): Promise<AdminStory[]> {
+  const resp = await api.get<AdminStory[]>('/stories/needs-review');
+  return resp.data;
+}
+
+export async function updateStoryState(
+  storyId: Story['id'],
+  newState: Story['state']
+): Promise<Story> {
+  const resp = await api.patch<AdminStory>(`/stories/${storyId}/state`, {
+    state: newState,
+  });
+  return resp.data;
+}

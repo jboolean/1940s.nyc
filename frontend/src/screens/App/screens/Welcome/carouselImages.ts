@@ -1,3 +1,5 @@
+import { PHOTO_BASE } from 'shared/utils/apiConstants';
+
 export default [
   // Plaza hotel
   {
@@ -67,5 +69,5 @@ export default [
   },
 ].map((image) => ({
   ...image,
-  src: `https://photos.1940s.nyc/jpg/${image.identifier}.jpg`,
+  src: `${PHOTO_BASE}/jpg/${image.identifier}.jpg`,
 }));

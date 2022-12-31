@@ -11,7 +11,7 @@ export enum StoryState {
   DRAFT = 'draft',
   SUBMITTED = 'submitted',
   PUBLISHED = 'published',
-  REMOVED = 'removed',
+  REJECTED = 'rejected',
 }
 
 export interface Story {
@@ -37,4 +37,8 @@ export type StoryDraftRequest = {
   photo: string;
   state: StoryState.DRAFT;
   textContent?: string;
+};
+
+export type AdminStory = Story & {
+  recaptchaScore: number;
 };

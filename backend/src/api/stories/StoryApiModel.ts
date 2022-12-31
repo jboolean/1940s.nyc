@@ -22,6 +22,10 @@ interface StoryApiModel {
   textContent?: string;
 }
 
+type AdminFields = {
+  recaptchaScore: number;
+};
+
 // Can never be set by user
 // type NonUserSettableFields = 'id' | 'createdAt';
 
@@ -53,9 +57,12 @@ type StoryDraftResponse = Optional<StoryApiModel, DraftOptionalFields>;
 
 type PublicStoryResponse = Omit<StoryApiModel, NonPublicFields>;
 
+type AdminStoryResponse = StoryApiModel & AdminFields;
+
 export {
   StoryApiModel,
   StoryDraftRequest,
   StoryDraftResponse,
   PublicStoryResponse,
+  AdminStoryResponse,
 };

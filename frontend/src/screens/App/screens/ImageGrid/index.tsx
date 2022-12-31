@@ -11,6 +11,7 @@ import { PhotoSummary, getOuttakeSummaries } from 'shared/utils/photosApi';
 
 import stylesheet from './ImageGrid.less';
 import { useHistory, useParams, Link } from 'react-router-dom';
+import { PHOTO_BASE } from 'shared/utils/apiConstants';
 
 const TARGET_IMAGE_WIDTH = 420 / 4;
 const ASPECT = 420 / 630;
@@ -106,7 +107,7 @@ function Grid({
                   key={identifier}
                   height={itemHeight}
                   width={`${100 / itemsPerRow}%`}
-                  src={`https://photos.1940s.nyc/420-jpg/${identifier}.jpg`}
+                  src={`${PHOTO_BASE}/420-jpg/${identifier}.jpg`}
                   loading="lazy"
                   className={classnames(stylesheet.image, {
                     [stylesheet.selected]: identifier === selectedIdentifier,
