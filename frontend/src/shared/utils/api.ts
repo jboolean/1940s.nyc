@@ -1,4 +1,19 @@
 import axios from 'axios';
 import { API_BASE } from './apiConstants';
 
-export default axios.create({ baseURL: API_BASE });
+import useAuthStore from 'shared/stores/AuthStore';
+
+const api = axios.create({
+  baseURL: API_BASE,
+});
+
+api.interceptors.request.use((config) => {
+  const { jwt } = useAuthStore.getState();
+  if (jwt) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    config.headers['Authorization'] = `Bearer ${jwt}`;
+  }
+  return config;
+});
+
+export default api;
