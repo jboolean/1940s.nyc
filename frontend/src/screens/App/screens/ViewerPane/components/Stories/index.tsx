@@ -1,5 +1,5 @@
 import React from 'react';
-import { getStoriesForPhoto } from 'screens/App/screens/SubmitStoryWizard/shared/utils/StoryApi';
+import { getStoriesForPhoto } from 'shared/utils/StoryApi';
 import Story from './components/Story';
 import { Story as StoryType } from 'screens/App/shared/types/Story';
 

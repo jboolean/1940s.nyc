@@ -12,7 +12,7 @@ import {
   StoryState,
   StoryType,
 } from 'screens/App/shared/types/Story';
-import { createStory, updateStory } from '../shared/utils/StoryApi';
+import { createStory, updateStory } from '../../../../../shared/utils/StoryApi';
 import useStorytellerInfoStore from './StorytellerInfoStore';
 
 interface State {

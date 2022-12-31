@@ -1,6 +1,6 @@
 import memoize from 'lodash/memoize';
 import api from 'shared/utils/api';
-import { Story, StoryDraftRequest } from '../../../../shared/types/Story';
+import { Story, StoryDraftRequest } from '../../screens/App/shared/types/Story';
 
 export async function createStory(
   newStory: StoryDraftRequest,

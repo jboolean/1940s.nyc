@@ -1,6 +1,28 @@
 import Story from '../../entities/Story';
 import required from '../required';
-import { PublicStoryResponse, StoryDraftResponse } from './StoryApiModel';
+import {
+  PublicStoryResponse,
+  StoryApiModel,
+  StoryDraftResponse,
+} from './StoryApiModel';
+
+export function toFullStoryResponse(story: Story): StoryApiModel {
+  return {
+    id: story.id,
+    lngLat: story.lngLat ?? undefined,
+    photo: story.photo,
+    storyType: story.storyType,
+    state: story.state,
+    createdAt: story.createdAt.toISOString(),
+    storytellerEmail: required(story.storytellerEmail, 'storytellerEmail'),
+    storytellerName: required(story.storytellerName, 'storytellerName'),
+    storytellerSubtitle: required(
+      story.storytellerSubtitle,
+      'storytellerSubtitle'
+    ),
+    textContent: story.textContent,
+  };
+}
 
 export function toDraftStoryResponse(story: Story): StoryDraftResponse {
   return {

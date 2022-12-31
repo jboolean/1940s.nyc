@@ -28,6 +28,13 @@ const StoryRepository = () =>
         )
         .getMany();
     },
+
+    async findForReview(this: Repository<Story>) {
+      return this.createQueryBuilder('story')
+        .where({ state: StoryState.SUBMITTED })
+        .orderBy('story.created_at', 'ASC')
+        .getMany();
+    },
   });
 
 export default StoryRepository;
