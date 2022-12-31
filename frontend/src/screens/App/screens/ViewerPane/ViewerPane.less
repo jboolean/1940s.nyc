@@ -5,7 +5,6 @@
     left: 0;
     bottom: 0;
     width: 66.6vh;
-    text-align: center;
 
     background-color: black;
 
@@ -22,6 +21,31 @@
     width: 100%;
     height: 100%;
     transform: scale(1.05); // cuts off the borders
+  }
+
+  @content-padding: 5.5px;
+
+  .overlayContentWrapper {
+    display: grid;
+    grid-template-rows: auto 1fr fit-content(35%) auto auto;
+    grid-template-areas:
+      'alternates'
+      '.'
+      'stories'
+      'buttons'
+      'credit';
+
+    row-gap: 11px;
+    padding: @content-padding @content-padding;
+    height: 100%;
+    box-sizing: border-box;
+
+    // Ignore pointer events on this wrapper, but not the children
+    pointer-events: none;
+
+    & > * {
+      pointer-events: auto;
+    }
   }
 
   .closeButton {
@@ -45,43 +69,61 @@
   }
 
   .alternates {
-    z-index: 2;
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 77px;
+    grid-area: alternates;
+
+    max-width: calc(100% - 77px);
+
+    // Flush to left, top edge, it has internal padding
+    margin-left: -@content-padding;
+    margin-top: -@content-padding;
+  }
+
+  .stories {
+    grid-area: stories;
+
+    align-self: end;
+    max-height: 100%;
+
+    overflow-y: auto;
+
+    @fadeout-size: 22px;
+    // fade out at bottom
+    mask: linear-gradient(0deg, transparent 0%, black @fadeout-size);
+    // padding-bottom: @fadeout-size;
+    box-sizing: border-box;
   }
 
   .buttons {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    margin: 5.5px 5.5px;
-
-    // space for credit
-    margin-bottom: 33px;
+    grid-area: buttons;
   }
 
   .credit {
-    position: absolute;
-    bottom: 0;
-    margin: 5.5px 5.5px;
-    z-index: 2;
+    grid-area: credit;
+
     color: white;
     font-size: 12px;
+    margin: 0;
   }
 
   .floorFade {
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-    height: 154px;
-    user-select: none;
+    z-index: -1;
 
-    background: linear-gradient(
-      180deg,
-      rgba(0, 0, 0, 0) 0%,
-      rgba(0, 0, 0, 0.3) 100%
-    );
+    grid-row: stories-start / -1;
+    grid-column: 1 / -1;
+
+    user-select: none;
+    pointer-events: none;
+
+    @margin-above: 77px;
+
+    margin: -@content-padding -@content-padding;
+    margin-top: -@margin-above;
+
+    mask: linear-gradient(180deg, transparent 0%, black @margin-above);
+    background: fade(hsl(0, 0, 20%), 70%);
+
+    // Tried to use backdrop-filter, but transition is glitchy in Chrome and FF
+    // https://bugs.chromium.org/p/chromium/issues/detail?id=1194050
+    // Maybe revisit this later
   }
 }
