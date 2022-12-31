@@ -5,6 +5,7 @@ import useAuthStore from 'shared/stores/AuthStore';
 
 export default function LoginPage(): JSX.Element {
   const login = useAuthStore((state) => state.login);
+  const close = useAuthStore((state) => state.close);
   const isAutheticated = useAuthStore((state) => state.isAutheticated);
 
   const location = useLocation<{ from?: string }>();
@@ -20,7 +21,11 @@ export default function LoginPage(): JSX.Element {
       //automatically trigger login modal
       login();
     }
-  }, [isAutheticated, history, from, login]);
+
+    return () => {
+      close();
+    };
+  }, [isAutheticated, history, from, login, close]);
 
   return (
     <div>

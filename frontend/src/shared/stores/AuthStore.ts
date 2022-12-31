@@ -12,6 +12,7 @@ interface State {
 interface Actions {
   login(): void;
   signout(): void;
+  close(): void;
 }
 
 const useAuthStore = create(
@@ -25,6 +26,9 @@ const useAuthStore = create(
     signout: async () => {
       await netlifyIdentity.logout();
     },
+    close: () => {
+      netlifyIdentity.close();
+    },
   }))
 );
 
@@ -32,6 +36,7 @@ netlifyIdentity.on('logout', () => {
   useAuthStore.setState((state: State) => {
     state.isAutheticated = false;
     state.user = null;
+    state.jwt = null;
   });
 });
 netlifyIdentity.on('login', (user) => {
