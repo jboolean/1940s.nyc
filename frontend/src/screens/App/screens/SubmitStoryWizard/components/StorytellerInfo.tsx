@@ -88,7 +88,7 @@ export default function StorytellerInfo({
 
       {/* This text is legally required by reCAPTCHA because the badge is hidden */}
       <p className={stylesheet.finePrint}>
-        This site is protected by reCAPTCHA and the Google
+        This site is protected by reCAPTCHA and the Google{' '}
         <a
           href="https://policies.google.com/privacy"
           target="_blank"
@@ -96,7 +96,7 @@ export default function StorytellerInfo({
         >
           Privacy Policy
         </a>{' '}
-        and
+        and{' '}
         <a
           href="https://policies.google.com/terms"
           target="_blank"
