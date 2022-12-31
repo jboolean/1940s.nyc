@@ -1,32 +1,39 @@
-import map from 'lodash/map';
+import Express from 'express';
 import isNumber from 'lodash/isNumber';
+import map from 'lodash/map';
 import {
   Body,
   Controller,
   Get,
   Header,
+  Patch,
   Path,
   Post,
   Put,
   Query,
   Request,
   Route,
+  Security,
 } from 'tsoa';
-import Express from 'express';
 
-import { BadRequest, NotFound, Forbidden } from 'http-errors';
+import { BadRequest, Forbidden, NotFound } from 'http-errors';
+import { validateRecaptchaToken } from '../../business/utils/grecaptcha';
 import Story from '../../entities/Story';
 import StoryState from '../../enum/StoryState';
 import StoryType from '../../enum/StoryType';
+import getLngLatForIdentifier from '../../repositories/getLngLatForIdentifier';
 import StoryRepository from '../../repositories/StoryRepository';
 import {
+  AdminStoryResponse,
   PublicStoryResponse,
   StoryDraftRequest,
   StoryDraftResponse,
 } from './StoryApiModel';
-import { toDraftStoryResponse, toPublicStoryResponse } from './storyToApi';
-import getLngLatForIdentifier from '../../repositories/getLngLatForIdentifier';
-import { validateRecaptchaToken } from '../../business/utils/grecaptcha';
+import {
+  toAdminStoryResponse,
+  toDraftStoryResponse,
+  toPublicStoryResponse,
+} from './storyToApi';
 
 function normalizeEmail(email: string): string {
   return email.toLocaleLowerCase();
@@ -136,5 +143,42 @@ export class StoriesController extends Controller {
     const stories = await StoryRepository().findForPhotoIdentifier(identifier);
 
     return map(stories, toPublicStoryResponse);
+  }
+
+  @Security('netlify', ['moderator'])
+  @Get('/needs-review')
+  public async getStoriesNeedingReview(): Promise<AdminStoryResponse[]> {
+    const stories = await StoryRepository().findForReview();
+
+    return map(stories, toAdminStoryResponse);
+  }
+
+  @Security('netlify', ['moderator'])
+  @Patch('/{id}/state')
+  public async updateStoryState(
+    @Path('id') id: number,
+    @Body() updates: { state: StoryState }
+  ): Promise<AdminStoryResponse> {
+    let story = await StoryRepository().findOneBy({ id });
+
+    if (!story) {
+      throw new NotFound();
+    }
+
+    // validate state transition
+    if (
+      story.state !== StoryState.SUBMITTED ||
+      ![StoryState.PUBLISHED, StoryState.REJECTED].includes(updates.state)
+    ) {
+      throw new BadRequest(
+        `Not valid state transition: ${story.state}=>${updates.state}`
+      );
+    }
+
+    story.state = updates.state;
+
+    story = await StoryRepository().save(story);
+
+    return toAdminStoryResponse(story);
   }
 }

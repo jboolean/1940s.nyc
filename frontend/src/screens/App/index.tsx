@@ -1,21 +1,22 @@
 import React from 'react';
 
-import { Route, Switch, Redirect, Router } from 'react-router-dom';
+import { Redirect, Route, Router, Switch } from 'react-router-dom';
 import history from 'utils/history';
-import ViewerPane from './screens/ViewerPane';
-import MapPane from './screens/MapPane';
-import Welcome from './screens/Welcome';
-import Shutdown from './screens/Shutdown';
-import ThankYou from './screens/MapPane/components/TipJar/ThankYou';
 import AnnouncementBanner from './screens/AnnouncementBanner';
+import MapPane from './screens/MapPane';
+import ThankYou from './screens/MapPane/components/TipJar/ThankYou';
+import Shutdown from './screens/Shutdown';
+import ViewerPane from './screens/ViewerPane';
+import Welcome from './screens/Welcome';
 
 import stylesheet from './App.less';
 import Outtakes from './screens/ImageGrid';
 
-import 'utils/optimize';
 import { OptimizeExperimentsProvider } from 'shared/utils/OptimizeExperiments';
-import SubmitStoryWizard from './screens/SubmitStoryWizard';
+import 'utils/optimize';
+import AdminRoutes from './screens/Admin/AdminRoutes';
 import FeatureFlags from './screens/FeatureFlags';
+import SubmitStoryWizard from './screens/SubmitStoryWizard';
 
 const IS_SHUTDOWN = false;
 
@@ -85,6 +86,9 @@ export default function App(): JSX.Element {
                 </Route>
                 <Route path="/labs">
                   <FeatureFlags />
+                </Route>
+                <Route path="/admin">
+                  <AdminRoutes />
                 </Route>
                 {!IS_SHUTDOWN && <Redirect to="/map" />}
               </Switch>

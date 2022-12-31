@@ -1,7 +1,7 @@
 import React from 'react';
-import { getStoriesForPhoto } from 'screens/App/screens/SubmitStoryWizard/shared/utils/StoryApi';
-import Story from './components/Story';
+import { getStoriesForPhoto } from 'shared/utils/StoryApi';
 import { Story as StoryType } from 'screens/App/shared/types/Story';
+import Story from 'shared/components/Story';
 
 interface Props {
   photoIdentifier: string;

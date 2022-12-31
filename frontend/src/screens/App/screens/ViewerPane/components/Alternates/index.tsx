@@ -4,6 +4,7 @@ import stylesheet from './Alternates.less';
 import { getAlternatePhotos, PhotoSummary } from 'shared/utils/photosApi';
 import classnames from 'classnames';
 import { CSSTransition } from 'react-transition-group';
+import { PHOTO_BASE } from 'shared/utils/apiConstants';
 
 const COLLECTION_DISPLAY_NAMES: Record<PhotoSummary['collection'], string> = {
   '1940': '40s',
@@ -48,7 +49,7 @@ export default function Alternates({
                 {COLLECTION_DISPLAY_NAMES[collection]}
               </span>
               <img
-                src={`https://photos.1940s.nyc/420-jpg/${identifier}.jpg`}
+                src={`${PHOTO_BASE}/420-jpg/${identifier}.jpg`}
                 className={classnames(stylesheet.thumbnail, {
                   [stylesheet.selected]: identifier === originalIdentifier,
                 })}

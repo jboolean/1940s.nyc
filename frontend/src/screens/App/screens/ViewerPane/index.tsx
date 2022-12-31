@@ -14,6 +14,7 @@ import ImageButtons from './components/ImageButtons';
 import Stories from './components/Stories';
 import { useFeatureFlag } from 'screens/App/shared/stores/FeatureFlagsStore';
 import FeatureFlag from 'screens/App/shared/types/FeatureFlag';
+import { PHOTO_BASE } from 'shared/utils/apiConstants';
 
 export default function ViewerPane({
   className,
@@ -58,7 +59,7 @@ export default function ViewerPane({
       </Overlay>
       <ImageSwitcher
         className={stylesheet.image}
-        src={`https://photos.1940s.nyc/jpg/${photoIdentifier}.jpg`}
+        src={`${PHOTO_BASE}/jpg/${photoIdentifier}.jpg`}
       />
     </div>
   );
