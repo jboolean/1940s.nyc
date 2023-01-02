@@ -28,7 +28,7 @@ export default function ImageButtons(): JSX.Element {
           initializeStoryDraft(photoIdentifier);
         }}
       >
-        Share Your Story
+        Know This Place?
       </Button>
     </div>
   );
