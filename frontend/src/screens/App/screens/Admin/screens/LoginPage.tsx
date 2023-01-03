@@ -19,7 +19,7 @@ export default function LoginPage(): JSX.Element {
       history.replace(from);
     } else {
       //automatically trigger login modal
-      login();
+      login(from);
     }
 
     return () => {
