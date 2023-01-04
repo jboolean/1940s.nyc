@@ -22,12 +22,15 @@ interface Actions {
 
 const useAuthStore = create(
   persist(
-    immer<State & Actions>(() => ({
+    immer<State & Actions>((set) => ({
       isAutheticated: false,
       user: null,
       jwt: null,
-      login: () => {
+      login: (returnToRoute: LocationDescriptor) => {
         netlifyIdentity.open('login');
+        set((state) => {
+          state.returnToRoute = returnToRoute;
+        });
       },
       signout: async () => {
         await netlifyIdentity.logout();
