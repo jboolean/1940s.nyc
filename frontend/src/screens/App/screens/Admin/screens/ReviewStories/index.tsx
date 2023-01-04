@@ -39,7 +39,7 @@ function StoryMetadataView({ story }: { story: AdminStory }): JSX.Element {
       <div>
         Photo:{' '}
         <a
-          href={`/map/photo/${story.photo}#14/${story.lngLat.lat}/${story.lngLat.lng}`}
+          href={`/map/photo/${story.photo}#16/${story.lngLat.lat}/${story.lngLat.lng}`}
           target="_blank"
           rel="noreferrer"
         >
