@@ -3,7 +3,7 @@ import { immer } from 'zustand/middleware/immer';
 import { persist } from 'zustand/middleware';
 
 import netlifyIdentity, { User } from 'netlify-identity-widget';
-import { pick } from 'lodash';
+import pick from 'lodash/pick';
 import history from 'shared/utils/history';
 import { LocationDescriptor } from 'history';
 
@@ -63,6 +63,7 @@ netlifyIdentity.on('login', (user) => {
     // If we have a returnToRoute, navigate to it
     const returnToRoute = useAuthStore.getState().returnToRoute;
     if (returnToRoute) {
+      console.log('Returning to route: ', returnToRoute);
       history.replace(returnToRoute);
       useAuthStore.setState((state) => {
         state.returnToRoute = undefined;
