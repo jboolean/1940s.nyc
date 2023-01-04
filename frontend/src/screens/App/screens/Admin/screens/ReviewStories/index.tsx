@@ -36,6 +36,16 @@ function StoryMetadataView({ story }: { story: AdminStory }): JSX.Element {
           {story.lngLat.lat}, {story.lngLat.lng}
         </div>
       ) : null}
+      <div>
+        Photo:{' '}
+        <a
+          href={`/map/photo/${story.photo}#16/${story.lngLat.lat}/${story.lngLat.lng}`}
+          target="_blank"
+          rel="noreferrer"
+        >
+          {story.photo}
+        </a>
+      </div>
     </div>
   );
 }
