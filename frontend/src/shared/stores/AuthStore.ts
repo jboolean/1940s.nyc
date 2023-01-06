@@ -62,16 +62,6 @@ netlifyIdentity.on('login', (user) => {
       state.user = user;
       state.jwt = jwt;
     });
-
-    // If we have a returnToRoute, navigate to it
-    const returnToRoute = useAuthStore.getState().returnToRoute;
-    if (returnToRoute) {
-      console.log('Returning to route: ', returnToRoute);
-      history.replace(returnToRoute);
-      useAuthStore.setState((state) => {
-        state.returnToRoute = undefined;
-      });
-    }
   }, console.error);
 });
 
