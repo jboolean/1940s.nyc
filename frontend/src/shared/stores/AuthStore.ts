@@ -4,7 +4,6 @@ import { persist } from 'zustand/middleware';
 
 import netlifyIdentity, { User } from 'netlify-identity-widget';
 import pick from 'lodash/pick';
-import history from 'shared/utils/history';
 import { LocationDescriptor } from 'history';
 
 interface State {
