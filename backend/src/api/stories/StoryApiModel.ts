@@ -57,6 +57,8 @@ type StoryDraftRequest = {
 type StoryDraftResponse = Optional<StoryApiModel, DraftOptionalFields>;
 
 type PublicStoryResponse = Omit<StoryApiModel, NonPublicFields> & {
+  // TODO this should NOT be using the db model, we should create an api type for photos
+  // But Photos is not converted to tsoa yet, it's just using untyped express routes
   photoExpanded: Photo;
 };
 
