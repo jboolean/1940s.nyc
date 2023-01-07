@@ -3,14 +3,25 @@ import Announcment from './Announcement';
 
 const ANNOUNCEMENTS_REGISTRY: Announcment[] = [
   {
-    id: 'announcement-1',
-    expiresAt: new Date('2024-01-01'),
-    render: () => <React.Fragment>Announcement 1</React.Fragment>,
+    id: 'storytelling-launch',
+    expiresAt: new Date('2023-03-01'),
+    render: () => (
+      <React.Fragment>
+        <b>New:</b> Click <i>Know This Place?</i> on any photo to contribute
+        your knowledge and stories.
+      </React.Fragment>
+    ),
   },
   {
-    id: 'announcement-2',
-    expiresAt: new Date('2024-01-01'),
-    render: () => <React.Fragment>Announcement 2</React.Fragment>,
+    id: 'call-for-help',
+    expiresAt: new Date('2023-02-01'),
+    render: () => (
+      <React.Fragment>
+        Are you a frontend or fullstack engineer? Seeking a volunteer to help
+        with <i>1940s.nyc</i>.{' '}
+        <a href="mailto:julianboilen+fourtiesnyc@gmail.com">Contact me</a>
+      </React.Fragment>
+    ),
   },
 ];
 
