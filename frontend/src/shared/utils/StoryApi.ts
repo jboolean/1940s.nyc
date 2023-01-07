@@ -39,6 +39,13 @@ export const getStoriesForPhoto = memoize(async function getStoriesForPhoto(
   return resp.data;
 });
 
+export const getAllStories = memoize(async function getAllStories(): Promise<
+  Story[]
+> {
+  const resp = await api.get<Story[]>(`/stories`);
+  return resp.data;
+});
+
 export async function getStoriesForReview(): Promise<AdminStory[]> {
   const resp = await api.get<AdminStory[]>('/stories/needs-review');
   return resp.data;
