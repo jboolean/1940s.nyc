@@ -1,3 +1,4 @@
+import Photo from '../../entities/Photo';
 import LngLat from '../../enum/LngLat';
 import StoryState from '../../enum/StoryState';
 import StoryType from '../../enum/StoryType';
@@ -55,7 +56,9 @@ type StoryDraftRequest = {
 
 type StoryDraftResponse = Optional<StoryApiModel, DraftOptionalFields>;
 
-type PublicStoryResponse = Omit<StoryApiModel, NonPublicFields>;
+type PublicStoryResponse = Omit<StoryApiModel, NonPublicFields> & {
+  photoExpanded: Photo;
+};
 
 type AdminStoryResponse = StoryApiModel & AdminFields;
 

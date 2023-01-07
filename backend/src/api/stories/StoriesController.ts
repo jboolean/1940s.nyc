@@ -44,7 +44,7 @@ function updateModelFromRequest(
   storyRequest: StoryDraftRequest
 ): void {
   story.lngLat = storyRequest.lngLat ?? null;
-  story.photo = storyRequest.photo;
+  story.photoId = storyRequest.photo;
   story.storyType = storyRequest.storyType;
   story.textContent = storyRequest.textContent;
 
@@ -81,7 +81,7 @@ export class StoriesController extends Controller {
 
     // If lat/lng is not provided, try to get it from the photo
     if (!story.lngLat) {
-      story.lngLat = await getLngLatForIdentifier(story.photo);
+      story.lngLat = await getLngLatForIdentifier(story.photoId);
     }
 
     const ip = request.ip;
@@ -138,9 +138,17 @@ export class StoriesController extends Controller {
 
   @Get('/')
   public async getStories(
-    @Query('forPhotoIdentifier') identifier: string
+    @Query('forPhotoIdentifier') identifier?: string
   ): Promise<PublicStoryResponse[]> {
-    const stories = await StoryRepository().findForPhotoIdentifier(identifier);
+    let stories: Story[];
+
+    if (identifier) {
+      stories = await StoryRepository().findPublishedForPhotoIdentifier(
+        identifier
+      );
+    } else {
+      stories = await StoryRepository().findPublished();
+    }
 
     return map(stories, toPublicStoryResponse);
   }
