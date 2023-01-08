@@ -18,8 +18,7 @@ const ANNOUNCEMENTS_REGISTRY: Announcment[] = [
     render: () => (
       <React.Fragment>
         Are you a frontend or fullstack engineer? Seeking a volunteer to help
-        with <i>1940s.nyc</i>.{' '}
-        <a href="mailto:julianboilen+fourtiesnyc@gmail.com">Contact me</a>
+        with <i>1940s.nyc</i>. <a href="mailto:julian@1940s.nyc">Contact me</a>
       </React.Fragment>
     ),
   },
