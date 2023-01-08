@@ -39,7 +39,7 @@
   cursor: pointer;
 
   &:hover {
-    filter: brightness(1.2);
+    // filter: brightness(1.2);
   }
 
   &.selected {
@@ -72,11 +72,15 @@
   object-fit: cover;
   transform: scale(1.05);
 
-  filter: blur(2px) brightness(0.5);
-
-  background-color: black;
+  // A interesting effect to make the image look softly etched, so we can read dark text
+  filter: grayscale(100%) contrast(0.2);
+  mix-blend-mode: hard-light;
 
   user-select: none;
+
+  .storyCard:hover & {
+    filter: grayscale(100%) contrast(0.5);
+  }
 }
 
 .textContent {
@@ -86,6 +90,4 @@
   height: 100%;
 
   z-index: 2;
-
-  color: @creme;
 }
