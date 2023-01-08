@@ -10,7 +10,7 @@ import ViewerPane from './screens/ViewerPane';
 import Welcome from './screens/Welcome';
 
 import stylesheet from './App.less';
-import Outtakes from './screens/ImageGrid';
+import Outtakes from './screens/Outtakes';
 import AllStories from './screens/AllStories';
 
 import { OptimizeExperimentsProvider } from 'shared/utils/OptimizeExperiments';
