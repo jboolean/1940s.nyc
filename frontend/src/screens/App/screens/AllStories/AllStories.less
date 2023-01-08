@@ -1,0 +1,97 @@
+@import '../../../../shared/styles/colors.less';
+@import '../../../../shared/styles/fonts.less';
+
+.container {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background-color: @creme;
+}
+
+.gridWrapper {
+  flex-grow: 1;
+}
+
+.grid {
+  background-color: @green;
+}
+
+.storyItem {
+  height: 100%;
+  box-sizing: border-box;
+  padding: 11px;
+  position: relative;
+}
+
+.storyCard {
+  position: relative;
+
+  background-color: @creme;
+  overflow: hidden;
+  height: 100%;
+  box-sizing: border-box;
+  padding: 11px + 2px;
+
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+  cursor: pointer;
+
+  &:hover {
+    // filter: brightness(1.2);
+  }
+
+  &.selected {
+    padding: 11px;
+
+    border: 2px solid @red;
+  }
+}
+
+.story {
+  overflow: auto;
+  flex-grow: 1;
+}
+
+.storyTitle {
+  font-family: @font-family-serif-heading;
+  border-bottom: 1px solid @font-color-dark;
+
+  padding-bottom: 5.5px;
+  margin-bottom: 11px;
+}
+
+.storyLink {
+  text-decoration: none;
+}
+
+.image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  object-fit: cover;
+  transform: scale(1.05);
+
+  // A interesting effect to make the image look softly etched, so we can read dark text
+  filter: grayscale(100%) contrast(0.2);
+  mix-blend-mode: hard-light;
+
+  user-select: none;
+
+  .storyCard:hover & {
+    filter: grayscale(100%) contrast(0.5);
+  }
+}
+
+.textContent {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  height: 100%;
+
+  z-index: 2;
+}

@@ -29,7 +29,7 @@ module.exports = {
     new CopyPlugin({
       patterns: [{ from: '_redirects' }, {from: 'terms.html'}],
     }),
-    new ESLintPlugin({ fix: true }),
+    new ESLintPlugin({ fix: true, }),
   ],
   module: {
     rules: [

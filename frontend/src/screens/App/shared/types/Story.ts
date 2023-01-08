@@ -1,3 +1,5 @@
+import { Photo } from 'shared/utils/photosApi';
+
 export enum StoryType {
   TEXT = 'text',
 }
@@ -23,6 +25,7 @@ export interface Story {
   storytellerSubtitle: string;
   lngLat?: LngLat;
   photo: string;
+  photoExpanded: Photo;
   state: StoryState;
   textContent?: string;
 }

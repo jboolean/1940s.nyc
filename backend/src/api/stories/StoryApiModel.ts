@@ -1,3 +1,4 @@
+import Photo from '../../entities/Photo';
 import LngLat from '../../enum/LngLat';
 import StoryState from '../../enum/StoryState';
 import StoryType from '../../enum/StoryType';
@@ -55,7 +56,11 @@ type StoryDraftRequest = {
 
 type StoryDraftResponse = Optional<StoryApiModel, DraftOptionalFields>;
 
-type PublicStoryResponse = Omit<StoryApiModel, NonPublicFields>;
+type PublicStoryResponse = Omit<StoryApiModel, NonPublicFields> & {
+  // TODO this should NOT be using the db model, we should create an api type for photos
+  // But Photos is not converted to tsoa yet, it's just using untyped express routes
+  photoExpanded: Photo;
+};
 
 type AdminStoryResponse = StoryApiModel & AdminFields;
 

@@ -2,11 +2,14 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
+  ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import LngLat from '../enum/LngLat';
 import StoryState from '../enum/StoryState';
 import StoryType from '../enum/StoryType';
+import Photo from './Photo';
 
 @Entity('stories')
 export default class Story {
@@ -41,8 +44,12 @@ export default class Story {
   })
   lngLat: LngLat | null;
 
-  @Column()
-  photo: string;
+  @Column({ name: 'photo' })
+  photoId: string;
+
+  @ManyToOne(() => Photo, (photo) => photo.stories)
+  @JoinColumn({ name: 'photo' })
+  photo: Photo;
 
   @Column()
   textContent?: string;

@@ -6,7 +6,10 @@ import StoryState from '../enum/StoryState';
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type -- better type is inferred
 const StoryRepository = () =>
   getRepository(Story).extend({
-    async findForPhotoIdentifier(this: Repository<Story>, identifier: string) {
+    async findPublishedForPhotoIdentifier(
+      this: Repository<Story>,
+      identifier: string
+    ) {
       // Get the lng,lat for this photo, so we can return stories
       // for this photo and stories for other photos in the same location
       const maybeLngLat = await getLngLatForIdentifier(identifier);
@@ -26,6 +29,16 @@ const StoryRepository = () =>
             }
           })
         )
+        .leftJoinAndSelect('story.photo', 'photo')
+        .orderBy('story.created_at', 'DESC')
+        .getMany();
+    },
+
+    async findPublished(this: Repository<Story>) {
+      return this.createQueryBuilder('story')
+        .where({ state: StoryState.PUBLISHED })
+        .orderBy('story.created_at', 'DESC')
+        .leftJoinAndSelect('story.photo', 'photo')
         .getMany();
     },
 
@@ -33,6 +46,7 @@ const StoryRepository = () =>
       return this.createQueryBuilder('story')
         .where({ state: StoryState.SUBMITTED })
         .orderBy('story.created_at', 'ASC')
+        .leftJoinAndSelect('story.photo', 'photo')
         .getMany();
     },
   });

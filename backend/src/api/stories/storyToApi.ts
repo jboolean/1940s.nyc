@@ -10,7 +10,7 @@ export function toAdminStoryResponse(story: Story): AdminStoryResponse {
   return {
     id: story.id,
     lngLat: story.lngLat ?? undefined,
-    photo: story.photo,
+    photo: story.photoId,
     storyType: story.storyType,
     state: story.state,
     createdAt: story.createdAt.toISOString(),
@@ -30,7 +30,7 @@ export function toDraftStoryResponse(story: Story): StoryDraftResponse {
   return {
     id: story.id,
     lngLat: story.lngLat ?? undefined,
-    photo: story.photo,
+    photo: story.photoId,
     storyType: story.storyType,
     state: story.state,
     createdAt: story.createdAt.toISOString(),
@@ -42,10 +42,12 @@ export function toDraftStoryResponse(story: Story): StoryDraftResponse {
 }
 
 export function toPublicStoryResponse(story: Story): PublicStoryResponse {
+  console.log('EXPANDED', story.photo);
   return {
     id: story.id,
     lngLat: story.lngLat ?? undefined,
-    photo: story.photo,
+    photo: story.photoId,
+    photoExpanded: story.photo,
     storyType: story.storyType,
     state: story.state,
     createdAt: story.createdAt.toISOString(),

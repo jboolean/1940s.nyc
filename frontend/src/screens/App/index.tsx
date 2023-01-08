@@ -10,7 +10,8 @@ import ViewerPane from './screens/ViewerPane';
 import Welcome from './screens/Welcome';
 
 import stylesheet from './App.less';
-import Outtakes from './screens/ImageGrid';
+import Outtakes from './screens/Outtakes';
+import AllStories from './screens/AllStories';
 
 import { OptimizeExperimentsProvider } from 'shared/utils/OptimizeExperiments';
 import 'utils/optimize';
@@ -83,6 +84,9 @@ export default function App(): JSX.Element {
                 )}
                 <Route path={['/outtakes/photo/:identifier', '/outtakes']}>
                   <Outtakes className={stylesheet.outtakesContainer} />
+                </Route>
+                <Route path={['/stories/photo/:identifier', '/stories']}>
+                  <AllStories className={stylesheet.outtakesContainer} />
                 </Route>
                 <Route path="/labs">
                   <FeatureFlags />

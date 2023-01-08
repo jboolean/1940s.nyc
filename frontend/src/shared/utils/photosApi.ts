@@ -5,6 +5,12 @@ export interface PhotoSummary {
   collection: '1940' | '1980';
 }
 
+export interface Photo {
+  address?: string;
+  borough?: string;
+  identifier: string;
+}
+
 export async function closest(latLng: {
   lat: number;
   lng: number;
