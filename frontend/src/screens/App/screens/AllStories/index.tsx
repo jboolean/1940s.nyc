@@ -9,8 +9,8 @@ import StoryView from 'shared/components/Story';
 import { getAllStories } from 'shared/utils/StoryApi';
 import stylesheet from './AllStories.less';
 
-const TARGET_IMAGE_WIDTH = 550;
-const ASPECT = 1 / 1;
+const TARGET_WIDTH = 420;
+const ASPECT = 420 / 630;
 
 export default function Outtakes({
   className,
@@ -41,13 +41,19 @@ export default function Outtakes({
       <div className={stylesheet.gridWrapper}>
         <Grid
           items={stories}
-          targetWidth={TARGET_IMAGE_WIDTH}
+          targetWidth={TARGET_WIDTH}
           aspectRatio={ASPECT}
           className={stylesheet.grid}
           renderItem={(story) => {
             return (
               <div className={stylesheet.storyItem}>
                 <div className={stylesheet.storyCard}>
+                  <div className={stylesheet.storyTitle}>
+                    {[
+                      story.photoExpanded.address,
+                      story.photoExpanded.borough,
+                    ].join(', ')}
+                  </div>
                   <StoryView story={story} />
                 </div>
               </div>
