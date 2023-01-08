@@ -31,18 +31,14 @@ export default function Outtakes({
     identifier?: string;
   }>();
 
-  const handleClick = (story: Story): void => {
-    // Open the viewer pane, and move the map to the story's location
-    history.push({
-      pathname: '/stories/photo/' + story.photo,
-      hash: `16/${story.lngLat.lat}/${story.lngLat.lng}`,
-    });
-  };
-
   return (
     <div className={classnames(stylesheet.container, className)}>
       <div className={stylesheet.top}>
         <h1>All Stories</h1>
+        <p>
+          Click a story to see the photo. Add your story by clicking{' '}
+          <i>Know This Place?</i> on any photo.
+        </p>
         <Link
           to={{ pathname: '/map', hash: history.location.hash }}
           className={stylesheet.backToMap}
@@ -60,37 +56,42 @@ export default function Outtakes({
             const identifier = story.photo;
             return (
               <div className={stylesheet.storyItem}>
-                <div
-                  className={classnames(stylesheet.storyCard, {
-                    [stylesheet.selected]: identifier === selectedIdentifier,
-                  })}
-                  onClick={() => {
-                    handleClick(story);
+                <Link
+                  to={{
+                    pathname: '/stories/photo/' + story.photo,
+                    hash: `16/${story.lngLat.lat}/${story.lngLat.lng}`,
                   }}
+                  className={stylesheet.storyLink}
                 >
-                  <img
-                    height={`100%`}
-                    width={`100%`}
-                    src={`${PHOTO_BASE}/420-jpg/${identifier}.jpg`}
-                    loading="lazy"
-                    className={classnames(stylesheet.image)}
-                    onLoad={(e) => {
-                      e.currentTarget.className += ' ' + stylesheet.loaded;
-                    }}
-                  />
+                  <div
+                    className={classnames(stylesheet.storyCard, {
+                      [stylesheet.selected]: identifier === selectedIdentifier,
+                    })}
+                  >
+                    <img
+                      height={`100%`}
+                      width={`100%`}
+                      src={`${PHOTO_BASE}/420-jpg/${identifier}.jpg`}
+                      loading="lazy"
+                      className={classnames(stylesheet.image)}
+                      onLoad={(e) => {
+                        e.currentTarget.className += ' ' + stylesheet.loaded;
+                      }}
+                    />
 
-                  <div className={stylesheet.textContent}>
-                    <div className={stylesheet.storyTitle}>
-                      {[
-                        story.photoExpanded.address,
-                        story.photoExpanded.borough,
-                      ].join(', ')}
-                    </div>
-                    <div className={stylesheet.story}>
-                      <StoryView story={story} />
+                    <div className={stylesheet.textContent}>
+                      <div className={stylesheet.storyTitle}>
+                        {[
+                          story.photoExpanded.address,
+                          story.photoExpanded.borough,
+                        ].join(', ')}
+                      </div>
+                      <div className={stylesheet.story}>
+                        <StoryView story={story} />
+                      </div>
                     </div>
                   </div>
-                </div>
+                </Link>
               </div>
             );
           }}
