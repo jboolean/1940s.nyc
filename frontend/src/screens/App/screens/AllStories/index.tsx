@@ -31,11 +31,22 @@ export default function Outtakes({
     identifier?: string;
   }>();
 
+  const handleClick = (story: Story): void => {
+    // Open the viewer pane, and move the map to the story's location
+    history.push({
+      pathname: '/stories/photo/' + story.photo,
+      hash: `16/${story.lngLat.lat}/${story.lngLat.lng}`,
+    });
+  };
+
   return (
     <div className={classnames(stylesheet.container, className)}>
       <div className={stylesheet.top}>
         <h1>All Stories</h1>
-        <Link to="/map" className={stylesheet.backToMap}>
+        <Link
+          to={{ pathname: '/map', hash: history.location.hash }}
+          className={stylesheet.backToMap}
+        >
           Back to map
         </Link>
       </div>
@@ -54,8 +65,7 @@ export default function Outtakes({
                     [stylesheet.selected]: identifier === selectedIdentifier,
                   })}
                   onClick={() => {
-                    // visibleImageIRef.current = i;
-                    history.push('/stories/photo/' + identifier);
+                    handleClick(story);
                   }}
                 >
                   <img
