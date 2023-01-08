@@ -124,22 +124,13 @@ class MapPane extends React.Component<Props & RouteComponentProps, State> {
           }}
         />
         <div className={stylesheet.links}>
+          <Link to="/stories" className={stylesheet.storiesLink}>
+            Stories
+          </Link>
           <Link to="/outtakes" className={stylesheet.outtakesLink}>
             Outtakes
           </Link>
-          <a
-            href="http://80s.nyc"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={stylesheet.eightiesLink}
-          >
-            1980s{' '}
-            <img
-              src={ExternalIcon}
-              alt="External link"
-              className={stylesheet.externalIcon}
-            />
-          </a>
+
           <button
             type="button"
             className={stylesheet.tipMeButton}
@@ -154,6 +145,19 @@ class MapPane extends React.Component<Props & RouteComponentProps, State> {
           >
             <SuggestedTip /> Tip?
           </button>
+          <a
+            href="http://80s.nyc"
+            target="_blank"
+            rel="noopener noreferrer"
+            className={stylesheet.eightiesLink}
+          >
+            1980s{' '}
+            <img
+              src={ExternalIcon}
+              alt="External link"
+              className={stylesheet.externalIcon}
+            />
+          </a>
         </div>
         <div className={stylesheet.topControls}>
           <Search
