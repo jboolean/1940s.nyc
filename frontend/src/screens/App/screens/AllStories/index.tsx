@@ -49,21 +49,23 @@ export default function Outtakes({
             const identifier = story.photo;
             return (
               <div className={stylesheet.storyItem}>
-                <div className={stylesheet.storyCard}>
+                <div
+                  className={classnames(stylesheet.storyCard, {
+                    [stylesheet.selected]: identifier === selectedIdentifier,
+                  })}
+                  onClick={() => {
+                    // visibleImageIRef.current = i;
+                    history.push('/stories/photo/' + identifier);
+                  }}
+                >
                   <img
                     height={`100%`}
                     width={`100%`}
                     src={`${PHOTO_BASE}/420-jpg/${identifier}.jpg`}
                     loading="lazy"
-                    className={classnames(stylesheet.image, {
-                      [stylesheet.selected]: identifier === selectedIdentifier,
-                    })}
+                    className={classnames(stylesheet.image)}
                     onLoad={(e) => {
                       e.currentTarget.className += ' ' + stylesheet.loaded;
-                    }}
-                    onClick={() => {
-                      // visibleImageIRef.current = i;
-                      history.push('/stories/photo/' + identifier);
                     }}
                   />
 

@@ -32,9 +32,21 @@
   overflow: hidden;
   height: 100%;
   box-sizing: border-box;
-  padding: 11px;
+  padding: 11px + 2px;
 
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+  cursor: pointer;
+
+  &:hover {
+    filter: brightness(1.4);
+  }
+
+  &.selected {
+    padding: 11px;
+
+    border: 2px solid @red;
+  }
 }
 
 .story {
