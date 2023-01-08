@@ -4,7 +4,7 @@ import Announcment from './Announcement';
 const ANNOUNCEMENTS_REGISTRY: Announcment[] = [
   {
     id: 'storytelling-launch',
-    expiresAt: new Date('2023-03-01'),
+    expiresAt: new Date('2023-04-07'),
     render: () => (
       <React.Fragment>
         <b>New:</b> Click <i>Know This Place?</i> on any photo to contribute
