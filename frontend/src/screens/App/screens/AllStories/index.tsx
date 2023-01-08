@@ -2,12 +2,13 @@ import React from 'react';
 
 import classnames from 'classnames';
 
-import { Link } from 'react-router-dom';
+import { Link, useHistory, useParams } from 'react-router-dom';
 import { Story } from 'screens/App/shared/types/Story';
 import Grid from 'shared/components/Grid';
 import StoryView from 'shared/components/Story';
 import { getAllStories } from 'shared/utils/StoryApi';
 import stylesheet from './AllStories.less';
+import { PHOTO_BASE } from 'shared/utils/apiConstants';
 
 const TARGET_WIDTH = 420;
 const ASPECT = 420 / 630;
@@ -25,10 +26,10 @@ export default function Outtakes({
     });
   }, []);
 
-  // const history = useHistory();
-  // const { identifier: selectedIdentifier } = useParams<{
-  //   identifier?: string;
-  // }>();
+  const history = useHistory();
+  const { identifier: selectedIdentifier } = useParams<{
+    identifier?: string;
+  }>();
 
   return (
     <div className={classnames(stylesheet.container, className)}>
@@ -45,16 +46,38 @@ export default function Outtakes({
           aspectRatio={ASPECT}
           className={stylesheet.grid}
           renderItem={(story) => {
+            const identifier = story.photo;
             return (
               <div className={stylesheet.storyItem}>
                 <div className={stylesheet.storyCard}>
-                  <div className={stylesheet.storyTitle}>
-                    {[
-                      story.photoExpanded.address,
-                      story.photoExpanded.borough,
-                    ].join(', ')}
+                  <img
+                    height={`100%`}
+                    width={`100%`}
+                    src={`${PHOTO_BASE}/420-jpg/${identifier}.jpg`}
+                    loading="lazy"
+                    className={classnames(stylesheet.image, {
+                      [stylesheet.selected]: identifier === selectedIdentifier,
+                    })}
+                    onLoad={(e) => {
+                      e.currentTarget.className += ' ' + stylesheet.loaded;
+                    }}
+                    onClick={() => {
+                      // visibleImageIRef.current = i;
+                      history.push('/stories/photo/' + identifier);
+                    }}
+                  />
+
+                  <div className={stylesheet.textContent}>
+                    <div className={stylesheet.storyTitle}>
+                      {[
+                        story.photoExpanded.address,
+                        story.photoExpanded.borough,
+                      ].join(', ')}
+                    </div>
+                    <div className={stylesheet.story}>
+                      <StoryView story={story} />
+                    </div>
                   </div>
-                  <StoryView story={story} />
                 </div>
               </div>
             );

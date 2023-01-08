@@ -26,13 +26,20 @@
 }
 
 .storyCard {
+  position: relative;
+
   background-color: @creme;
-  overflow: auto;
+  overflow: hidden;
   height: 100%;
   box-sizing: border-box;
   padding: 11px;
 
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.story {
+  overflow: auto;
+  flex-grow: 1;
 }
 
 .storyTitle {
@@ -41,4 +48,32 @@
 
   padding-bottom: 5.5px;
   margin-bottom: 11px;
+}
+
+.image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  object-fit: cover;
+  transform: scale(1.05);
+
+  filter: blur(2px) brightness(0.5);
+
+  background-color: black;
+
+  user-select: none;
+}
+
+.textContent {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  height: 100%;
+
+  z-index: 2;
+
+  color: @creme;
 }
