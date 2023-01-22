@@ -4,11 +4,11 @@ import Announcment from './Announcement';
 const ANNOUNCEMENTS_REGISTRY: Announcment[] = [
   {
     id: 'storytelling-launch',
-    expiresAt: new Date('2023-04-07'),
+    expiresAt: new Date('2023-04-21'),
     render: () => (
       <React.Fragment>
         <b>New:</b> Click <i>Know This Place?</i> on any photo to contribute
-        your knowledge and stories.
+        your knowledge and stories. (fixed!)
       </React.Fragment>
     ),
   },
