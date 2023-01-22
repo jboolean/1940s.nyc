@@ -61,7 +61,7 @@ function validateSubmittable(story: Story): boolean {
     story.storytellerName &&
     story.storytellerSubtitle &&
     story.storyType &&
-    story.photo &&
+    story.photoId &&
     story.lngLat &&
     (story.storyType !== StoryType.TEXT || story.textContent)
   );
