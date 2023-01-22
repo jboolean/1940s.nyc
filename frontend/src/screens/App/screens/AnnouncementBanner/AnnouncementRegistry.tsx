@@ -3,7 +3,7 @@ import Announcment from './Announcement';
 
 const ANNOUNCEMENTS_REGISTRY: Announcment[] = [
   {
-    id: 'storytelling-launch',
+    id: 'storytelling-launch-2',
     expiresAt: new Date('2023-04-21'),
     render: () => (
       <React.Fragment>
