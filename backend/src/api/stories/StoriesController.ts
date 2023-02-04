@@ -63,7 +63,7 @@ function validateSubmittable(story: Story): boolean {
     story.storytellerSubtitle &&
     story.storyType &&
     story.photoId &&
-    story.lngLat &&
+    // story.lngLat &&
     (story.storyType !== StoryType.TEXT || story.textContent)
   );
 }
@@ -180,6 +180,8 @@ export class StoriesController extends Controller {
       throw new NotFound();
     }
 
+    const originalState = story.state;
+
     // validate state transition
     if (
       story.state !== StoryState.SUBMITTED ||
@@ -193,6 +195,8 @@ export class StoriesController extends Controller {
     story.state = updates.state;
 
     story = await StoryRepository().save(story);
+
+    await onStateTransition(id, originalState, story.state);
 
     return toAdminStoryResponse(story);
   }

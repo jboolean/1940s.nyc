@@ -18,7 +18,7 @@ const StoryRepository = () =>
         .where({ state: StoryState.PUBLISHED })
         .andWhere(
           new Brackets((qb) => {
-            qb.where({ photo: identifier });
+            qb.where({ photoId: identifier });
 
             if (maybeLngLat) {
               const { lng, lat } = maybeLngLat;

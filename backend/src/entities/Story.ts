@@ -6,6 +6,7 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import PointColumnOptions from '../business/utils/PointColumnOptions';
 import LngLat from '../enum/LngLat';
 import StoryState from '../enum/StoryState';
 import StoryType from '../enum/StoryType';
@@ -34,14 +35,7 @@ export default class Story {
   @Column()
   storytellerSubtitle?: string;
 
-  @Column({
-    type: 'point',
-    transformer: {
-      from: ({ x, y }: { x: number; y: number }) => ({ lng: x, lat: y }),
-      to: (lngLat: LngLat | null) =>
-        lngLat ? `(${lngLat.lng}, ${lngLat.lat})` : null,
-    },
-  })
+  @Column(PointColumnOptions)
   lngLat: LngLat | null;
 
   @Column({ name: 'photo' })

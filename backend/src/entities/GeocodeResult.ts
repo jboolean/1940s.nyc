@@ -1,4 +1,5 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
+import PointColumnOptions from '../business/utils/PointColumnOptions';
 import LngLat from '../enum/LngLat';
 
 import Photo from './Photo';
@@ -15,13 +16,6 @@ export default class GeocodeResult {
   @PrimaryColumn()
   method: string;
 
-  @Column({
-    type: 'point',
-    transformer: {
-      from: (coords: { x: number; y: number } | null) =>
-        coords ? { lng: coords.x, lat: coords.y } : null,
-      to: ({ lng, lat }: LngLat) => `(${lng}, ${lat})`,
-    },
-  })
+  @Column(PointColumnOptions)
   lngLat: LngLat | null;
 }
