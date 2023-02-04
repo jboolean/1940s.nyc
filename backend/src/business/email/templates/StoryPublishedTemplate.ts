@@ -5,12 +5,12 @@ import {
   StoryEmailMetadata,
 } from './StoryUserEmailTemplateData';
 
-class StorySubmittedTemplate extends EmailTemplate<
+class StoryPublishedTemplate extends EmailTemplate<
   StoryEmailTemplateData,
   StoryEmailMetadata
 > {
-  alias = 'story-submitted';
+  alias = 'story-published';
   from = Senders.PERSONAL;
 }
 
-export default new StorySubmittedTemplate();
+export default new StoryPublishedTemplate();
