@@ -36,6 +36,9 @@ functions:
       DB_DATABASE: ${ssm:/${self:service}-${sls:stage}-db-database}
       STRIPE_SK: ${ssm:/${self:service}-${sls:stage}-stripe-sk}
       RECAPTCHA_SK: ${ssm:/${self:service}-${sls:stage}-recaptcha-sk}
+      POSTMARK_TOKEN: ${ssm:/${self:service}-${sls:stage}-postmark-token}
+      FRONTEND_BASE_URL: ${ssm:/${self:service}-${sls:stage}-frontend-base-url}
+      STAGE: ${sls:stage}
   convertImage:
     stages:
       - production

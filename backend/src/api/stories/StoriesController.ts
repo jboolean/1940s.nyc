@@ -17,6 +17,7 @@ import {
 } from 'tsoa';
 
 import { BadRequest, Forbidden, NotFound } from 'http-errors';
+import { onStateTransition } from '../../business/stories/StoriesService';
 import { validateRecaptchaToken } from '../../business/utils/grecaptcha';
 import Story from '../../entities/Story';
 import StoryState from '../../enum/StoryState';
@@ -112,15 +113,17 @@ export class StoriesController extends Controller {
       throw new NotFound();
     }
 
+    const originalState = story.state;
+
     // Immutable unless it's a draft (prevent distruction of published stories until a real, authenticated editing function is implemented)
-    if (story.state !== StoryState.DRAFT) {
+    if (originalState !== StoryState.DRAFT) {
       throw new BadRequest('Cannot be edited');
     }
 
     // validate state transition
     if (![StoryState.SUBMITTED, StoryState.DRAFT].includes(updates.state)) {
       throw new BadRequest(
-        `Not valid state transition: ${story.state}=>${updates.state}`
+        `Not valid state transition: ${originalState}=>${updates.state}`
       );
     }
 
@@ -129,9 +132,13 @@ export class StoriesController extends Controller {
     if (updates.state !== StoryState.DRAFT && !validateSubmittable(story)) {
       throw new BadRequest('Story is not valid for submission');
     }
+
+    // Valid state transition
     story.state = updates.state;
 
     story = await StoryRepository().save(story);
+
+    await onStateTransition(id, originalState, story.state);
 
     return toDraftStoryResponse(story);
   }

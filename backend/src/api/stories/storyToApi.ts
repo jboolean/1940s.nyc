@@ -1,5 +1,5 @@
 import Story from '../../entities/Story';
-import required from '../required';
+import required from '../../business/utils/required';
 import {
   AdminStoryResponse,
   PublicStoryResponse,
