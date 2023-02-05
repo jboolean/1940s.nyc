@@ -50,4 +50,7 @@ export default class Story {
 
   @Column()
   recaptchaScore: number;
+
+  @Column()
+  lastEmailMessageId: string | null;
 }

@@ -12,10 +12,12 @@ abstract class EmailTemplate<
     templateContext,
     metadata,
     to,
+    referenceMessageId,
   }: {
     templateContext: TemplateData;
     metadata: Metadata;
     to: string;
+    referenceMessageId?: string;
   }): TemplatedEmailData {
     return {
       templateAlias: this.alias,
@@ -23,6 +25,7 @@ abstract class EmailTemplate<
       to,
       templateContext,
       metadata,
+      referenceMessageId,
     };
   }
 }

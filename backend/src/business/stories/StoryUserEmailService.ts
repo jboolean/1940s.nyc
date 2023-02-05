@@ -1,6 +1,7 @@
 import { URL, URLSearchParams } from 'url';
 import Photo from '../../entities/Photo';
 import Story from '../../entities/Story';
+import StoryRepository from '../../repositories/StoryRepository';
 import EmailService, { TemplatedEmailData } from '../email/EmailService';
 import StoryPublishedTemplate from '../email/templates/StoryPublishedTemplate';
 import StorySubmittedTemplate from '../email/templates/StorySubmittedTemplate';
@@ -85,9 +86,13 @@ async function sendStoryUserEmail(
     to: required(story.storytellerEmail, 'storytellerEmail'),
     templateContext: forgeStoryTemplateContext(story),
     metadata: forgeStoryMetadata(story),
+    referenceMessageId: story.lastEmailMessageId ?? undefined,
   });
 
-  await EmailService.sendTemplateEmail(email);
+  const { messageId } = await EmailService.sendTemplateEmail(email);
+
+  // Store last message id so we can thread messages
+  await StoryRepository().update(story.id, { lastEmailMessageId: messageId });
 }
 
 export async function sendSubmittedEmail(story: Story): Promise<void> {

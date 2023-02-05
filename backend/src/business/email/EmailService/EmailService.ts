@@ -5,6 +5,7 @@ export type TemplatedEmailData = {
   to: string;
   templateContext: object;
   metadata: Record<string, string>;
+  referenceMessageId?: string;
 };
 
 export type EmailResult = {

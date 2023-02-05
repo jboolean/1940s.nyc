@@ -13,7 +13,14 @@ class PostmarkEmailService implements EmailService {
   }
 
   async sendTemplateEmail(options: TemplatedEmailData): Promise<EmailResult> {
-    const { templateAlias, from, to, templateContext, metadata } = options;
+    const {
+      templateAlias,
+      from,
+      to,
+      templateContext,
+      metadata,
+      referenceMessageId,
+    } = options;
 
     const apiParams: TemplatedMessage = {
       From: from,
@@ -21,6 +28,14 @@ class PostmarkEmailService implements EmailService {
       TemplateAlias: templateAlias,
       TemplateModel: templateContext,
       Metadata: metadata,
+      Headers: referenceMessageId
+        ? [
+            {
+              Name: 'References',
+              Value: options.referenceMessageId || '',
+            },
+          ]
+        : [],
     };
 
     // Refuse to send to real email addresses in dev
