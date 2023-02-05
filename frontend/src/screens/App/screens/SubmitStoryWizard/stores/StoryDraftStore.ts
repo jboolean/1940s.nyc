@@ -115,6 +115,7 @@ const useStoryDraftStore = create(
       const draftStory = get().draftStory;
       const consentedToClose =
         draftStory.state === StoryState.SUBMITTED ||
+        draftStory.state === StoryState.PUBLISHED ||
         (draftStory.storyType === StoryType.TEXT && !draftStory.textContent);
       window.confirm(
         'Are you sure you want to exit? Your story will not be saved.'
