@@ -31,7 +31,6 @@ interface State {
 interface ComputedState {
   isValidToSubmit: boolean;
   isValidToSaveContentDraft: boolean;
-  isAlreadyPublished: boolean;
 }
 
 interface Actions {
@@ -282,7 +281,6 @@ export function useStoryDraftStoreComputeds(): ComputedState {
   return {
     isValidToSubmit: isValidToSubmit(draftStory),
     isValidToSaveContentDraft: isValidToSaveContentDraft(draftStory),
-    isAlreadyPublished: draftStory.state === StoryState.PUBLISHED,
   };
 }
 
