@@ -59,7 +59,7 @@ function updateModelFromRequest(
   story.state = storyRequest.state;
 }
 
-function validateStory(story: Story): boolean {
+function isStoryValid(story: Story): boolean {
   // Validation is lax for stories in these states
   if (
     [StoryState.DRAFT, StoryState.USER_REMOVED, StoryState.REJECTED].includes(
@@ -153,7 +153,7 @@ export class StoriesController extends Controller {
 
     updateModelFromRequest(story, updates);
 
-    if (validateStory(story)) {
+    if (!isStoryValid(story)) {
       throw new BadRequest('Story is not valid for submission');
     }
 
