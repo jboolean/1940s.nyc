@@ -52,7 +52,7 @@ export default class Story {
   recaptchaScore: number;
 
   @Column()
-  lastEmailMessageId: string | null;
+  lastEmailMessageId?: string;
 
   @Column()
   hasEverSubmitted: boolean;
