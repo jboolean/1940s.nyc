@@ -33,3 +33,17 @@ export function verifyStoryToken(
     return false;
   }
 }
+
+export function getStoryFromToken(token: string): Story['id'] | undefined {
+  try {
+    const { sub } = jwt.verify(token, process.env.JWT_SECRET, {
+      algorithms: ['HS256'],
+      issuer: ISSUER,
+    }) as { sub: string };
+
+    return parseInt(sub, 10);
+  } catch (e) {
+    console.error('Error verifying story token', e);
+    return undefined;
+  }
+}

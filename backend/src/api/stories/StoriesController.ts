@@ -18,7 +18,10 @@ import {
 
 import { BadRequest, Forbidden, NotFound } from 'http-errors';
 import { onStateTransition } from '../../business/stories/StoriesService';
-import { verifyStoryToken } from '../../business/stories/StoryTokenService';
+import {
+  getStoryFromToken,
+  verifyStoryToken,
+} from '../../business/stories/StoryTokenService';
 import { validateRecaptchaToken } from '../../business/utils/grecaptcha';
 import Story from '../../entities/Story';
 import StoryState from '../../enum/StoryState';
@@ -162,6 +165,25 @@ export class StoriesController extends Controller {
     await onStateTransition(id, originalState, story.state);
 
     return toDraftStoryResponse(story);
+  }
+
+  @Get('/{id}')
+  public async getStory(
+    @Path('id') id: number,
+    @Header('X-Story-Token') token?: string
+  ): Promise<PublicStoryResponse> {
+    const storyIdAllowedByToken = token ? getStoryFromToken(token) : undefined;
+
+    const story = await StoryRepository().findOnePublicById(
+      id,
+      storyIdAllowedByToken
+    );
+
+    if (!story) {
+      throw new NotFound();
+    }
+
+    return toPublicStoryResponse(story);
   }
 
   @Get('/')
