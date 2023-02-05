@@ -59,7 +59,9 @@ export default function Outtakes({
                 <Link
                   to={{
                     pathname: '/stories/photo/' + story.photo,
-                    hash: `16/${story.lngLat.lat}/${story.lngLat.lng}`,
+                    hash: story.lngLat
+                      ? `16/${story.lngLat.lat}/${story.lngLat.lng}`
+                      : '',
                   }}
                   className={stylesheet.storyLink}
                 >

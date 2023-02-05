@@ -167,23 +167,25 @@ export class StoriesController extends Controller {
     return toDraftStoryResponse(story);
   }
 
-  @Get('/{id}')
-  public async getStory(
-    @Path('id') id: number,
-    @Header('X-Story-Token') token?: string
-  ): Promise<PublicStoryResponse> {
-    const storyIdAllowedByToken = token ? getStoryFromToken(token) : undefined;
+  @Get('/by-token')
+  public async getStoryByToken(
+    @Header('X-Story-Token') token: string
+  ): Promise<StoryDraftResponse> {
+    const storyIdAllowedByToken = getStoryFromToken(token);
 
-    const story = await StoryRepository().findOnePublicById(
-      id,
-      storyIdAllowedByToken
-    );
+    if (!storyIdAllowedByToken) {
+      throw new Forbidden();
+    }
+
+    const story = await StoryRepository().findOneBy({
+      id: storyIdAllowedByToken,
+    });
 
     if (!story) {
       throw new NotFound();
     }
 
-    return toPublicStoryResponse(story);
+    return toDraftStoryResponse(story);
   }
 
   @Get('/')

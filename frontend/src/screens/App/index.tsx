@@ -18,17 +18,21 @@ import 'utils/optimize';
 import AdminRoutes from './screens/Admin/AdminRoutes';
 import FeatureFlags from './screens/FeatureFlags';
 import SubmitStoryWizard from './screens/SubmitStoryWizard';
+import EditStory from './screens/EditStory';
 
 const IS_SHUTDOWN = false;
 
-const thankYouInitial = window.location.search.includes('tipSuccess');
-const noWelcome = window.location.search.includes('noWelcome');
+const searchParams = new URLSearchParams(window.location.search);
 
-if (noWelcome)
-  history.replace({
-    pathname: history.location.pathname,
-    hash: history.location.hash,
-  });
+const thankYouInitial = searchParams.has('tipSuccess');
+const noWelcome = searchParams.has('noWelcome');
+
+if (noWelcome) searchParams.delete('noWelcome');
+history.replace({
+  pathname: history.location.pathname,
+  hash: history.location.hash,
+  search: searchParams.toString(),
+});
 
 function Modals(): JSX.Element {
   const [isThankYouOpen, setThankYouOpen] = React.useState(thankYouInitial);
@@ -84,6 +88,9 @@ export default function App(): JSX.Element {
                 )}
                 <Route path={['/outtakes/photo/:identifier', '/outtakes']}>
                   <Outtakes className={stylesheet.outtakesContainer} />
+                </Route>
+                <Route path="/stories/edit">
+                  <EditStory />
                 </Route>
                 <Route path={['/stories/photo/:identifier', '/stories']}>
                   <AllStories className={stylesheet.outtakesContainer} />

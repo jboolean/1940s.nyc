@@ -33,7 +33,7 @@ function describePhoto(photo: Photo): string {
 
 function forgeStoryEditUrl(story: Story): string {
   const storyEditUrl: URL = new URL(
-    `/stories/${story.id}/edit`,
+    `/stories/edit`,
     process.env.FRONTEND_BASE_URL
   );
 

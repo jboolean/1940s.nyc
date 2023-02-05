@@ -12,6 +12,7 @@ export default function TextContent({
   isSubmitting,
   isValidToSave,
   isAudioStorytellingEnabled,
+  isAlreadyPublished,
 }: {
   textContent: string;
   onTextContentChange: (newTextContent: string) => void;
@@ -19,6 +20,7 @@ export default function TextContent({
   isSubmitting: boolean;
   isValidToSave: boolean;
   isAudioStorytellingEnabled: boolean;
+  isAlreadyPublished: boolean;
 }): JSX.Element {
   const handleTextContentChange: ChangeEventHandler<HTMLTextAreaElement> = (
     event
@@ -51,7 +53,11 @@ export default function TextContent({
           onClick={onSubmit}
           disabled={isSubmitting || !isValidToSave}
         >
-          Save Draft & Continue
+          {isAlreadyPublished ? (
+            <>Unpublish & Save Updated Draft</>
+          ) : (
+            <>Save Draft & Continue</>
+          )}
         </Button>
       </div>
     </div>

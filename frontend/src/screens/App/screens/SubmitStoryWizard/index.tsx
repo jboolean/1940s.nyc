@@ -30,7 +30,7 @@ const StoryWizardContent = (): JSX.Element | null => {
     close,
   } = useStoryDraftStore();
 
-  const { isValidToSaveContentDraft, isValidToSubmit } =
+  const { isValidToSaveContentDraft, isValidToSubmit, isAlreadyPublished } =
     useStoryDraftStoreComputeds();
 
   const isAudioStorytellingEnabled = useFeatureFlag(
@@ -49,6 +49,7 @@ const StoryWizardContent = (): JSX.Element | null => {
           isSubmitting={isSaving}
           isValidToSave={isValidToSaveContentDraft}
           isAudioStorytellingEnabled={isAudioStorytellingEnabled}
+          isAlreadyPublished={isAlreadyPublished}
         />
       );
     case Step.STORYTELLER_INFO:
