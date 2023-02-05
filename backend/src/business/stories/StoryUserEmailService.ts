@@ -3,12 +3,15 @@ import Photo from '../../entities/Photo';
 import Story from '../../entities/Story';
 import StoryRepository from '../../repositories/StoryRepository';
 import EmailService, { TemplatedEmailData } from '../email/EmailService';
+import EmailTemplate from '../email/EmailTemplate';
 import StoryPublishedTemplate from '../email/templates/StoryPublishedTemplate';
+import StorySubmittedAgainTemplate from '../email/templates/StorySubmittedAgainTemplate';
 import StorySubmittedTemplate from '../email/templates/StorySubmittedTemplate';
 import {
   StoryEmailMetadata,
   StoryEmailTemplateData,
 } from '../email/templates/StoryUserEmailTemplateData';
+import StoryUserRemovedTemplate from '../email/templates/StoryUserRemovedTemplate';
 import required from '../utils/required';
 import { createStoryToken } from './StoryTokenService';
 
@@ -76,7 +79,7 @@ function forgeStoryMetadata(story: Story): StoryEmailMetadata {
 
 async function sendStoryUserEmail(
   story: Story,
-  Template: typeof StorySubmittedTemplate
+  Template: EmailTemplate<StoryEmailTemplateData, StoryEmailMetadata>
 ): Promise<void> {
   if (!story.photo) {
     throw new Error('Expected photo to be resolved');
@@ -99,6 +102,14 @@ export async function sendSubmittedEmail(story: Story): Promise<void> {
   return sendStoryUserEmail(story, StorySubmittedTemplate);
 }
 
+export async function sendSubmittedAgainEmail(story: Story): Promise<void> {
+  return sendStoryUserEmail(story, StorySubmittedAgainTemplate);
+}
+
 export async function sendPublishedEmail(story: Story): Promise<void> {
   return sendStoryUserEmail(story, StoryPublishedTemplate);
+}
+
+export async function sendUserRemovedEmail(story: Story): Promise<void> {
+  return sendStoryUserEmail(story, StoryUserRemovedTemplate);
 }

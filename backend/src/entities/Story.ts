@@ -53,4 +53,7 @@ export default class Story {
 
   @Column()
   lastEmailMessageId: string | null;
+
+  @Column()
+  hasEverSubmitted: boolean;
 }

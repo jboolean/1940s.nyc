@@ -55,9 +55,20 @@ function updateModelFromRequest(
     : undefined;
   story.storytellerName = storyRequest.storytellerName;
   story.storytellerSubtitle = storyRequest.storytellerSubtitle;
+
+  story.state = storyRequest.state;
 }
 
-function validateSubmittable(story: Story): boolean {
+function validateStory(story: Story): boolean {
+  // Validation is lax for stories in these states
+  if (
+    [StoryState.DRAFT, StoryState.USER_REMOVED, StoryState.REJECTED].includes(
+      story.state
+    )
+  ) {
+    return true;
+  }
+
   return !!(
     story.storytellerEmail &&
     story.storytellerName &&
@@ -126,8 +137,15 @@ export class StoriesController extends Controller {
       throw new BadRequest('Cannot be edited');
     }
 
-    // Users can only move stories to DRAFT or SUBMITTED. Moderators can move to PUBLISHED.
-    if (![StoryState.SUBMITTED, StoryState.DRAFT].includes(updates.state)) {
+    // Users can only move stories to DRAFT or SUBMITTED or USER_REMOVED.
+    // Moderators use different endpoint to move stories to other states.
+    if (
+      ![
+        StoryState.SUBMITTED,
+        StoryState.DRAFT,
+        StoryState.USER_REMOVED,
+      ].includes(updates.state)
+    ) {
       throw new BadRequest(
         `Not valid state transition: ${originalState}=>${updates.state}`
       );
@@ -135,12 +153,9 @@ export class StoriesController extends Controller {
 
     updateModelFromRequest(story, updates);
 
-    if (updates.state !== StoryState.DRAFT && !validateSubmittable(story)) {
+    if (validateStory(story)) {
       throw new BadRequest('Story is not valid for submission');
     }
-
-    // Valid state transition
-    story.state = updates.state;
 
     story = await StoryRepository().save(story);
 
