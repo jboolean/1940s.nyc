@@ -42,6 +42,10 @@ async function onStoryPublished(storyId: Story['id']): Promise<void> {
   const story = await getStoryOrThrow(storyId, StoryState.PUBLISHED);
 
   try {
+    // If we did not send submitted email before, do it now (will occur during rollout of email feature)
+    if (!story.lastEmailMessageId) {
+      await sendSubmittedEmail(story);
+    }
     await sendPublishedEmail(story);
   } catch (e) {
     console.error('Error sending story submitted email', e);
