@@ -178,13 +178,14 @@ const useStoryDraftStore = create(
           });
         } else {
           // Story must return to a user-updatible state (i.e. not StoryState.PUBLISHED)
-          if (
-            ![StoryState.DRAFT, StoryState.SUBMITTED].includes(draftStory.state)
-          ) {
-            draftStory.state = StoryState.DRAFT;
-          }
+          const newState = ![StoryState.DRAFT, StoryState.SUBMITTED].includes(
+            draftStory.state
+          )
+            ? StoryState.DRAFT
+            : draftStory.state;
+
           const updatedStory = await updateStory(
-            draftStory as StoryDraftRequest,
+            { ...draftStory, state: newState } as StoryDraftRequest,
             storyAuthToken
           );
           set((draft) => {
