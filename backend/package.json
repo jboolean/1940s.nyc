@@ -26,7 +26,7 @@
     "@types/http-errors": "^2.0.1",
     "@types/jsonwebtoken": "^9.0.1",
     "@types/lodash": "^4.14.191",
-    "@types/node": "^10.17.51",
+    "@types/node": "^16.18.12",
     "@types/pg": "^8.6.5",
     "@types/prettier": "^2.7.1",
     "@types/serverless": "^3.12.8",
