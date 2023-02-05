@@ -17,7 +17,10 @@ import {
 } from 'tsoa';
 
 import { BadRequest, Forbidden, NotFound } from 'http-errors';
-import { onStateTransition } from '../../business/stories/StoriesService';
+import {
+  backfillUserStoryEmails,
+  onStateTransition,
+} from '../../business/stories/StoriesService';
 import {
   getStoryFromToken,
   verifyStoryToken,
@@ -244,5 +247,12 @@ export class StoriesController extends Controller {
     await onStateTransition(id, originalState, story.state);
 
     return toAdminStoryResponse(story);
+  }
+
+  // For single use to backfill emails for stories that were submitted before
+  @Security('netlify', ['moderator'])
+  @Post('/backfill-emails')
+  public async backfillEmails(): Promise<void> {
+    await backfillUserStoryEmails();
   }
 }

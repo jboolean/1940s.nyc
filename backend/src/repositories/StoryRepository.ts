@@ -1,7 +1,7 @@
-import { Brackets, getRepository, Repository } from 'typeorm';
-import getLngLatForIdentifier from './getLngLatForIdentifier';
+import { Brackets, getRepository, In, IsNull, Repository } from 'typeorm';
 import Story from '../entities/Story';
 import StoryState from '../enum/StoryState';
+import getLngLatForIdentifier from './getLngLatForIdentifier';
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type -- better type is inferred
 const StoryRepository = () =>
@@ -71,6 +71,17 @@ const StoryRepository = () =>
     async findForReview(this: Repository<Story>) {
       return this.createQueryBuilder('story')
         .where({ state: StoryState.SUBMITTED })
+        .orderBy('story.created_at', 'ASC')
+        .leftJoinAndSelect('story.photo', 'photo')
+        .getMany();
+    },
+
+    async findForEmailBackfill(this: Repository<Story>) {
+      return this.createQueryBuilder('story')
+        .where({
+          state: In([StoryState.SUBMITTED, StoryState.PUBLISHED]),
+          lastEmailMessageId: IsNull(),
+        })
         .orderBy('story.created_at', 'ASC')
         .leftJoinAndSelect('story.photo', 'photo')
         .getMany();

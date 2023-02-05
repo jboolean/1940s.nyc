@@ -83,3 +83,27 @@ export async function onStateTransition(
     await onStoryUserRemoved(storyId);
   }
 }
+
+export async function backfillUserStoryEmails(): Promise<void> {
+  const stories = await StoryRepository().findForEmailBackfill();
+
+  for (const story of stories) {
+    console.log('Backfilling story', story.id);
+    if (story.lastEmailMessageId) {
+      continue;
+    }
+
+    try {
+      await sendSubmittedEmail(story);
+      await StoryRepository().update(story.id, {
+        hasEverSubmitted: true,
+      });
+
+      if (story.state === StoryState.PUBLISHED) {
+        await sendPublishedEmail(story);
+      }
+    } catch (e) {
+      console.error('Could not backfill ', story, e);
+    }
+  }
+}

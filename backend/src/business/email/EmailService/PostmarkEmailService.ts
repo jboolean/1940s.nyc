@@ -1,6 +1,7 @@
 import { ServerClient, TemplatedMessage } from 'postmark';
 import isProduction from '../../utils/isProduction';
 import { EmailResult, EmailService, TemplatedEmailData } from './EmailService';
+import uniqueId from 'lodash/uniqueId';
 
 const POSTMARK_TOKEN = process.env.POSTMARK_TOKEN;
 
@@ -41,7 +42,7 @@ class PostmarkEmailService implements EmailService {
     // Refuse to send to real email addresses in dev
     if (!isProduction() && !to.endsWith('@1940s.nyc')) {
       console.log('[DEV]', 'EmailService.sendTemplateEmail', apiParams);
-      return { messageId: 'fake-message-id' };
+      return { messageId: uniqueId('fake-message-id-') };
     }
 
     const { MessageID: messageId } = await this.client.sendEmailWithTemplate(
