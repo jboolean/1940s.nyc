@@ -18,6 +18,7 @@ import {
 
 import { BadRequest, Forbidden, NotFound } from 'http-errors';
 import { onStateTransition } from '../../business/stories/StoriesService';
+import { verifyStoryToken } from '../../business/stories/StoryTokenService';
 import { validateRecaptchaToken } from '../../business/utils/grecaptcha';
 import Story from '../../entities/Story';
 import StoryState from '../../enum/StoryState';
@@ -105,7 +106,8 @@ export class StoriesController extends Controller {
   @Put('/{id}')
   public async updateStory(
     @Body() updates: StoryDraftRequest,
-    @Path('id') id: number
+    @Path('id') id: number,
+    @Header('X-Story-Token') token?: string
   ): Promise<StoryDraftResponse> {
     let story = await StoryRepository().findOneBy({ id });
 
@@ -115,12 +117,16 @@ export class StoriesController extends Controller {
 
     const originalState = story.state;
 
-    // Immutable unless it's a draft (prevent distruction of published stories until a real, authenticated editing function is implemented)
-    if (originalState !== StoryState.DRAFT) {
+    // Can only mutate drafts or if you have a valid token
+    const canMutate: boolean =
+      originalState === StoryState.DRAFT ||
+      (!!token && verifyStoryToken(token, story.id));
+
+    if (!canMutate) {
       throw new BadRequest('Cannot be edited');
     }
 
-    // validate state transition
+    // Users can only move stories to DRAFT or SUBMITTED. Moderators can move to PUBLISHED.
     if (![StoryState.SUBMITTED, StoryState.DRAFT].includes(updates.state)) {
       throw new BadRequest(
         `Not valid state transition: ${originalState}=>${updates.state}`
