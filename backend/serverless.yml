@@ -29,6 +29,7 @@ functions:
           path: /{proxy+}
           method: ANY
     environment:
+      STAGE: ${sls:stage}
       DB_HOST: ${ssm:/${self:service}-${sls:stage}-db-host}
       DB_PORT: ${ssm:/${self:service}-${sls:stage}-db-port}
       DB_USERNAME: ${ssm:/${self:service}-${sls:stage}-db-username}
@@ -38,7 +39,7 @@ functions:
       RECAPTCHA_SK: ${ssm:/${self:service}-${sls:stage}-recaptcha-sk}
       POSTMARK_TOKEN: ${ssm:/${self:service}-${sls:stage}-postmark-token}
       FRONTEND_BASE_URL: ${ssm:/${self:service}-${sls:stage}-frontend-base-url}
-      STAGE: ${sls:stage}
+      JWT_SECRET: ${ssm:/${self:service}-${sls:stage}-jwt-secret}
   convertImage:
     stages:
       - production

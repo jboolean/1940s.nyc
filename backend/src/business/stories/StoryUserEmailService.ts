@@ -9,6 +9,7 @@ import {
   StoryEmailTemplateData,
 } from '../email/templates/StoryUserEmailTemplateData';
 import required from '../utils/required';
+import { createStoryToken } from './StoryTokenService';
 
 function describePhoto(photo: Photo): string {
   if (photo.address) {
@@ -34,6 +35,7 @@ function forgeStoryEditUrl(story: Story): string {
 
   const storyEditUrlParams: URLSearchParams = new URLSearchParams();
   storyEditUrlParams.append('noWelcome', 'true');
+  storyEditUrlParams.append('token', createStoryToken(story.id));
 
   storyEditUrl.search = storyEditUrlParams.toString();
   return storyEditUrl.toString();
