@@ -29,6 +29,7 @@ const StoryWizardContent = (): JSX.Element | null => {
     submitStorytellerInfo,
     goBackToContentStep,
     close,
+    markUserRemoved,
   } = useStoryDraftStore();
 
   const { isValidToSaveContentDraft, isValidToSubmit } =
@@ -51,6 +52,7 @@ const StoryWizardContent = (): JSX.Element | null => {
           isValidToSave={isValidToSaveContentDraft}
           isAudioStorytellingEnabled={isAudioStorytellingEnabled}
           storyState={draftStory.state ?? StoryState.DRAFT}
+          onUnpublish={markUserRemoved}
         />
       );
     case Step.STORYTELLER_INFO:

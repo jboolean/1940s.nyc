@@ -45,6 +45,7 @@ interface Actions {
   setStorytellerEmail: (newStorytellerEmail: string) => void;
   submitStorytellerInfo: () => void;
   goBackToContentStep: () => void;
+  markUserRemoved: () => void;
 }
 
 const isEmail = (email: string): boolean => {
@@ -111,11 +112,13 @@ const useStoryDraftStore = create(
     },
 
     close: () => {
+      const draftStory = get().draftStory;
       const consentedToClose =
-        get().draftStory.state === StoryState.SUBMITTED ||
-        window.confirm(
-          'Are you sure you want to exit? Your story will not be saved.'
-        );
+        draftStory.state === StoryState.SUBMITTED ||
+        (draftStory.storyType === StoryType.TEXT && !draftStory.textContent);
+      window.confirm(
+        'Are you sure you want to exit? Your story will not be saved.'
+      );
 
       if (consentedToClose) {
         set((draft) => {
@@ -271,6 +274,29 @@ const useStoryDraftStore = create(
         } else {
           throw new Error('No step for story type');
         }
+      });
+    },
+
+    markUserRemoved: async () => {
+      const userConfirmed = window.confirm(
+        'Are you sure you want to remove this story? You can always come back to this link and submit it again.'
+      );
+
+      if (!userConfirmed) {
+        return;
+      }
+
+      const draftStory = get().draftStory;
+      const storyAuthToken = get().storyAuthToken;
+
+      const updatedStory = await updateStory(
+        { ...draftStory, state: StoryState.USER_REMOVED } as Story,
+        storyAuthToken
+      );
+
+      set((draft) => {
+        draft.draftStory = updatedStory;
+        draft.isOpen = false;
       });
     },
   }))

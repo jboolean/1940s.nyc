@@ -22,6 +22,7 @@ export default function TextContent({
   isValidToSave,
   isAudioStorytellingEnabled,
   storyState,
+  onUnpublish,
 }: {
   textContent: string;
   onTextContentChange: (newTextContent: string) => void;
@@ -30,6 +31,7 @@ export default function TextContent({
   isValidToSave: boolean;
   isAudioStorytellingEnabled: boolean;
   storyState: StoryState;
+  onUnpublish: () => void;
 }): JSX.Element {
   const handleTextContentChange: ChangeEventHandler<HTMLTextAreaElement> = (
     event
@@ -57,6 +59,15 @@ export default function TextContent({
         ref={textInputRef}
       />
       <div>
+        {storyState === StoryState.PUBLISHED ? (
+          <Button
+            buttonStyle="secondary"
+            onClick={onUnpublish}
+            disabled={isSubmitting}
+          >
+            Unpublish
+          </Button>
+        ) : null}
         <Button
           buttonStyle="primary"
           onClick={onSubmit}
