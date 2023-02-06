@@ -3,6 +3,8 @@ const webpack = require('webpack');
 const merge = require('webpack-merge');
 const common = require('./webpack.common.js');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const SentryWebpackPlugin = require("@sentry/webpack-plugin");
+
 const path = require('path');
 
 // Webpack configuration
@@ -28,6 +30,20 @@ module.exports = merge(common, {
         gaId: 'UA-3445091-4',
         recaptchaSiteKey: process.env.RECAPTCHA_PK,
       },
+    }),
+    new SentryWebpackPlugin({
+      org: "julian-boilen",
+      project: "fourtiesnyc-frontend",
+
+      // Specify the directory containing build artifacts
+      include: path.resolve(__dirname, 'dist'),
+
+      // Auth tokens can be obtained from https://sentry.io/settings/account/api/auth-tokens/
+      // and needs the `project:releases` and `org:read` scopes
+      authToken: process.env.SENTRY_AUTH_TOKEN,
+
+      // Optionally uncomment the line below to override automatic release name detection
+      // release: process.env.RELEASE,
     }),
   ],
 });
