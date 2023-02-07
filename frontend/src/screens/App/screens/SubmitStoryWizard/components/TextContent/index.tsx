@@ -1,9 +1,18 @@
 import React, { ChangeEventHandler } from 'react';
+import { StoryState } from 'screens/App/shared/types/Story';
 import Button from 'shared/components/Button';
 import TextArea from 'shared/components/TextArea';
 import IntroGraph from '../IntroGraph';
 
 import stylesheet from './TextContent.less';
+
+const nextButtonLabelByStoryState: Record<StoryState, string> = {
+  [StoryState.DRAFT]: 'Save Draft & Continue',
+  [StoryState.PUBLISHED]: 'Unpublish & Save New Draft',
+  [StoryState.SUBMITTED]: 'Update & Continue',
+  [StoryState.REJECTED]: 'Save & Continue',
+  [StoryState.USER_REMOVED]: 'Save New Draft & Continue',
+};
 
 export default function TextContent({
   textContent,
@@ -12,6 +21,8 @@ export default function TextContent({
   isSubmitting,
   isValidToSave,
   isAudioStorytellingEnabled,
+  storyState,
+  onUnpublish,
 }: {
   textContent: string;
   onTextContentChange: (newTextContent: string) => void;
@@ -19,6 +30,8 @@ export default function TextContent({
   isSubmitting: boolean;
   isValidToSave: boolean;
   isAudioStorytellingEnabled: boolean;
+  storyState: StoryState;
+  onUnpublish: () => void;
 }): JSX.Element {
   const handleTextContentChange: ChangeEventHandler<HTMLTextAreaElement> = (
     event
@@ -46,12 +59,21 @@ export default function TextContent({
         ref={textInputRef}
       />
       <div>
+        {storyState === StoryState.PUBLISHED ? (
+          <Button
+            buttonStyle="secondary"
+            onClick={onUnpublish}
+            disabled={isSubmitting}
+          >
+            Unpublish
+          </Button>
+        ) : null}
         <Button
           buttonStyle="primary"
           onClick={onSubmit}
           disabled={isSubmitting || !isValidToSave}
         >
-          Save Draft & Continue
+          {nextButtonLabelByStoryState[storyState]}
         </Button>
       </div>
     </div>

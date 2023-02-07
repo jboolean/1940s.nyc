@@ -14,6 +14,7 @@ export enum StoryState {
   SUBMITTED = 'submitted',
   PUBLISHED = 'published',
   REJECTED = 'rejected',
+  USER_REMOVED = 'user_removed',
 }
 
 export interface Story {

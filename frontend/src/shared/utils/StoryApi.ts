@@ -17,7 +17,8 @@ export async function createStory(
 }
 
 export async function updateStory(
-  updatedStory: StoryDraftRequest | Story
+  updatedStory: StoryDraftRequest | Story,
+  storyAuthToken?: string
 ): Promise<Story> {
   if (!updatedStory.id) {
     throw new Error('Story must already be persisted to update ito');
@@ -25,7 +26,12 @@ export async function updateStory(
 
   const resp = await api.put<Story>(
     `/stories/${updatedStory.id}`,
-    updatedStory
+    updatedStory,
+    {
+      headers: {
+        'X-Story-Token': storyAuthToken,
+      },
+    }
   );
   return resp.data;
 }
@@ -38,6 +44,20 @@ export const getStoriesForPhoto = memoize(async function getStoriesForPhoto(
   );
   return resp.data;
 });
+
+/**
+ * Get the story of the id encoded in the auth token for editing
+ * @param storyAuthToken
+ * @returns
+ */
+export async function getStoryByToken(storyAuthToken: string): Promise<Story> {
+  const resp = await api.get<Story>(`/stories/by-token`, {
+    headers: {
+      'X-Story-Token': storyAuthToken,
+    },
+  });
+  return resp.data;
+}
 
 export const getAllStories = memoize(async function getAllStories(): Promise<
   Story[]

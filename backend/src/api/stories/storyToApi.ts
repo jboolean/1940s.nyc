@@ -1,5 +1,5 @@
 import Story from '../../entities/Story';
-import required from '../required';
+import required from '../../business/utils/required';
 import {
   AdminStoryResponse,
   PublicStoryResponse,
@@ -42,7 +42,6 @@ export function toDraftStoryResponse(story: Story): StoryDraftResponse {
 }
 
 export function toPublicStoryResponse(story: Story): PublicStoryResponse {
-  console.log('EXPANDED', story.photo);
   return {
     id: story.id,
     lngLat: story.lngLat ?? undefined,

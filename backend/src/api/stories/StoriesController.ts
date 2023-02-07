@@ -17,6 +17,14 @@ import {
 } from 'tsoa';
 
 import { BadRequest, Forbidden, NotFound } from 'http-errors';
+import {
+  backfillUserStoryEmails,
+  onStateTransition,
+} from '../../business/stories/StoriesService';
+import {
+  getStoryFromToken,
+  verifyStoryToken,
+} from '../../business/stories/StoryTokenService';
 import { validateRecaptchaToken } from '../../business/utils/grecaptcha';
 import Story from '../../entities/Story';
 import StoryState from '../../enum/StoryState';
@@ -53,16 +61,27 @@ function updateModelFromRequest(
     : undefined;
   story.storytellerName = storyRequest.storytellerName;
   story.storytellerSubtitle = storyRequest.storytellerSubtitle;
+
+  story.state = storyRequest.state;
 }
 
-function validateSubmittable(story: Story): boolean {
+function isStoryValid(story: Story): boolean {
+  // Validation is lax for stories in these states
+  if (
+    [StoryState.DRAFT, StoryState.USER_REMOVED, StoryState.REJECTED].includes(
+      story.state
+    )
+  ) {
+    return true;
+  }
+
   return !!(
     story.storytellerEmail &&
     story.storytellerName &&
     story.storytellerSubtitle &&
     story.storyType &&
     story.photoId &&
-    story.lngLat &&
+    // story.lngLat &&
     (story.storyType !== StoryType.TEXT || story.textContent)
   );
 }
@@ -104,7 +123,8 @@ export class StoriesController extends Controller {
   @Put('/{id}')
   public async updateStory(
     @Body() updates: StoryDraftRequest,
-    @Path('id') id: number
+    @Path('id') id: number,
+    @Header('X-Story-Token') token?: string
   ): Promise<StoryDraftResponse> {
     let story = await StoryRepository().findOneBy({ id });
 
@@ -112,26 +132,61 @@ export class StoriesController extends Controller {
       throw new NotFound();
     }
 
-    // Immutable unless it's a draft (prevent distruction of published stories until a real, authenticated editing function is implemented)
-    if (story.state !== StoryState.DRAFT) {
+    const originalState = story.state;
+
+    // Can only mutate drafts or if you have a valid token
+    const canMutate: boolean =
+      originalState === StoryState.DRAFT ||
+      (!!token && verifyStoryToken(token, story.id));
+
+    if (!canMutate) {
       throw new BadRequest('Cannot be edited');
     }
 
-    // validate state transition
-    if (![StoryState.SUBMITTED, StoryState.DRAFT].includes(updates.state)) {
+    // Users can only move stories to DRAFT or SUBMITTED or USER_REMOVED.
+    // Moderators use different endpoint to move stories to other states.
+    if (
+      ![
+        StoryState.SUBMITTED,
+        StoryState.DRAFT,
+        StoryState.USER_REMOVED,
+      ].includes(updates.state)
+    ) {
       throw new BadRequest(
-        `Not valid state transition: ${story.state}=>${updates.state}`
+        `Not valid state transition: ${originalState}=>${updates.state}`
       );
     }
 
     updateModelFromRequest(story, updates);
 
-    if (updates.state !== StoryState.DRAFT && !validateSubmittable(story)) {
+    if (!isStoryValid(story)) {
       throw new BadRequest('Story is not valid for submission');
     }
-    story.state = updates.state;
 
     story = await StoryRepository().save(story);
+
+    await onStateTransition(id, originalState, story.state);
+
+    return toDraftStoryResponse(story);
+  }
+
+  @Get('/by-token')
+  public async getStoryByToken(
+    @Header('X-Story-Token') token: string
+  ): Promise<StoryDraftResponse> {
+    const storyIdAllowedByToken = getStoryFromToken(token);
+
+    if (!storyIdAllowedByToken) {
+      throw new Forbidden();
+    }
+
+    const story = await StoryRepository().findOneBy({
+      id: storyIdAllowedByToken,
+    });
+
+    if (!story) {
+      throw new NotFound();
+    }
 
     return toDraftStoryResponse(story);
   }
@@ -173,6 +228,8 @@ export class StoriesController extends Controller {
       throw new NotFound();
     }
 
+    const originalState = story.state;
+
     // validate state transition
     if (
       story.state !== StoryState.SUBMITTED ||
@@ -187,6 +244,15 @@ export class StoriesController extends Controller {
 
     story = await StoryRepository().save(story);
 
+    await onStateTransition(id, originalState, story.state);
+
     return toAdminStoryResponse(story);
+  }
+
+  // For single use to backfill emails for stories that were submitted before
+  @Security('netlify', ['moderator'])
+  @Post('/backfill-emails')
+  public async backfillEmails(): Promise<void> {
+    await backfillUserStoryEmails();
   }
 }

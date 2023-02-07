@@ -5,14 +5,18 @@ import { executeRecaptcha } from 'shared/utils/grecaptcha';
 import create from 'zustand';
 import { immer } from 'zustand/middleware/immer';
 
-import Step from '../shared/types/Step';
 import {
   Story,
   StoryDraftRequest,
   StoryState,
   StoryType,
 } from 'screens/App/shared/types/Story';
-import { createStory, updateStory } from '../../../../../shared/utils/StoryApi';
+import {
+  createStory,
+  getStoryByToken,
+  updateStory,
+} from '../../../../../shared/utils/StoryApi';
+import Step from '../shared/types/Step';
 import useStorytellerInfoStore from './StorytellerInfoStore';
 
 interface State {
@@ -21,6 +25,7 @@ interface State {
   isSaving: boolean;
 
   draftStory: Partial<Story>;
+  storyAuthToken?: string;
 }
 
 interface ComputedState {
@@ -30,6 +35,7 @@ interface ComputedState {
 
 interface Actions {
   initialize: (photo: string) => void;
+  rehydrateForEditing: (storyAuthToken: string) => void;
   close: () => void;
   beginTextStory: () => void;
   setTextContent: (newTextContent: string) => void;
@@ -39,6 +45,7 @@ interface Actions {
   setStorytellerEmail: (newStorytellerEmail: string) => void;
   submitStorytellerInfo: () => void;
   goBackToContentStep: () => void;
+  markUserRemoved: () => void;
 }
 
 const isEmail = (email: string): boolean => {
@@ -91,9 +98,25 @@ const useStoryDraftStore = create(
       }
     },
 
+    rehydrateForEditing: async (storyAuthToken: string) => {
+      const story = await getStoryByToken(storyAuthToken);
+
+      set((draft) => {
+        draft.draftStory = story;
+        draft.isOpen = true;
+        draft.step = Step.CONTENT_TEXT;
+        draft.isSaving = false;
+
+        draft.storyAuthToken = storyAuthToken;
+      });
+    },
+
     close: () => {
+      const draftStory = get().draftStory;
       const consentedToClose =
-        get().draftStory.state === StoryState.SUBMITTED ||
+        draftStory.state === StoryState.SUBMITTED ||
+        draftStory.state === StoryState.PUBLISHED ||
+        (draftStory.storyType === StoryType.TEXT && !draftStory.textContent) ||
         window.confirm(
           'Are you sure you want to exit? Your story will not be saved.'
         );
@@ -118,6 +141,7 @@ const useStoryDraftStore = create(
 
     saveContent: async () => {
       const draftStory = get().draftStory;
+      const storyAuthToken = get().storyAuthToken;
       const {
         lngLat,
         storyType,
@@ -156,8 +180,16 @@ const useStoryDraftStore = create(
             draft.step = Step.STORYTELLER_INFO;
           });
         } else {
+          // Story must return to a user-updatible state (i.e. not StoryState.PUBLISHED)
+          const newState = ![StoryState.DRAFT, StoryState.SUBMITTED].includes(
+            draftStory.state
+          )
+            ? StoryState.DRAFT
+            : draftStory.state;
+
           const updatedStory = await updateStory(
-            draftStory as StoryDraftRequest
+            { ...draftStory, state: newState } as StoryDraftRequest,
+            storyAuthToken
           );
           set((draft) => {
             draft.draftStory = updatedStory;
@@ -211,10 +243,13 @@ const useStoryDraftStore = create(
         set((draft) => {
           draft.isSaving = true;
         });
-        const updatedStory = await updateStory({
-          ...draftStory,
-          state: StoryState.SUBMITTED,
-        });
+        const updatedStory = await updateStory(
+          {
+            ...draftStory,
+            state: StoryState.SUBMITTED,
+          },
+          get().storyAuthToken
+        );
         set((draft) => {
           draft.draftStory = updatedStory;
           draft.step = Step.THANK_YOU;
@@ -234,17 +269,35 @@ const useStoryDraftStore = create(
     },
 
     goBackToContentStep: () => {
-      if (get().draftStory.state !== StoryState.DRAFT) {
-        throw new Error(
-          'Cannot go back to content step, as it is already submitted.'
-        );
-      }
       set((draft) => {
         if (draft.draftStory.storyType === StoryType.TEXT) {
           draft.step = Step.CONTENT_TEXT;
         } else {
           throw new Error('No step for story type');
         }
+      });
+    },
+
+    markUserRemoved: async () => {
+      const userConfirmed = window.confirm(
+        'Are you sure you want to remove this story? You can always come back to this link and submit it again.'
+      );
+
+      if (!userConfirmed) {
+        return;
+      }
+
+      const draftStory = get().draftStory;
+      const storyAuthToken = get().storyAuthToken;
+
+      const updatedStory = await updateStory(
+        { ...draftStory, state: StoryState.USER_REMOVED } as Story,
+        storyAuthToken
+      );
+
+      set((draft) => {
+        draft.draftStory = updatedStory;
+        draft.isOpen = false;
       });
     },
   }))

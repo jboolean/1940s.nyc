@@ -1,6 +1,7 @@
 import React from 'react';
 import { useFeatureFlag } from 'screens/App/shared/stores/FeatureFlagsStore';
 import FeatureFlag from 'screens/App/shared/types/FeatureFlag';
+import { StoryState } from 'screens/App/shared/types/Story';
 import FourtiesModal from 'shared/components/Modal';
 
 import Intro from './components/Intro';
@@ -28,6 +29,7 @@ const StoryWizardContent = (): JSX.Element | null => {
     submitStorytellerInfo,
     goBackToContentStep,
     close,
+    markUserRemoved,
   } = useStoryDraftStore();
 
   const { isValidToSaveContentDraft, isValidToSubmit } =
@@ -49,6 +51,8 @@ const StoryWizardContent = (): JSX.Element | null => {
           isSubmitting={isSaving}
           isValidToSave={isValidToSaveContentDraft}
           isAudioStorytellingEnabled={isAudioStorytellingEnabled}
+          storyState={draftStory.state ?? StoryState.DRAFT}
+          onUnpublish={markUserRemoved}
         />
       );
     case Step.STORYTELLER_INFO:
