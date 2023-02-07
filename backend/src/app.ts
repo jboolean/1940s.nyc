@@ -1,6 +1,8 @@
 import cors from 'cors';
 import express from 'express';
 const app = express();
+import * as Sentry from '@sentry/node';
+import * as Tracing from '@sentry/tracing';
 
 import createConnection from './createConnection';
 
@@ -19,6 +21,31 @@ import { ValidateError } from 'tsoa';
 
 // Trust API Gateway
 app.set('trust proxy', 1);
+
+Sentry.init({
+  dsn: 'https://5c9a98d156614bac899b541f69d9b7f3@o4504630310600704.ingest.sentry.io/4504630315974657',
+  integrations: [
+    // enable HTTP calls tracing
+    new Sentry.Integrations.Http({ tracing: true }),
+    // enable Express.js middleware tracing
+    new Tracing.Integrations.Express({ app }),
+  ],
+
+  // Set tracesSampleRate to 1.0 to capture 100%
+  // of transactions for performance monitoring.
+  // We recommend adjusting this value in production
+  tracesSampleRate: 1.0,
+  environment: process.env.STAGE,
+});
+// RequestHandler creates a separate execution context using domains, so that every
+// transaction/span/breadcrumb is attached to its own Hub instance
+app.use(
+  Sentry.Handlers.requestHandler({
+    ip: true,
+  })
+);
+// TracingHandler creates a trace for every incoming request
+app.use(Sentry.Handlers.tracingHandler());
 
 app.use(express.json());
 
@@ -49,6 +76,9 @@ RegisterRoutes(app);
 app.use(function (req, res) {
   throw new NotFound();
 });
+
+// The error handler must be before any other error middleware and after all controllers
+app.use(Sentry.Handlers.errorHandler());
 
 app.use(function errorHandler(
   err: unknown,
