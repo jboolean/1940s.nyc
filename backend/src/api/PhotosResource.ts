@@ -40,7 +40,7 @@ router.get<
     );
 
     if (!lngLatForFromIdentifierResult) {
-      res.status(401).send({ error: 'cannot find by identifier' });
+      res.status(404).send({ error: 'cannot find by identifier' });
       return;
     }
 
@@ -50,7 +50,7 @@ router.get<
   }
 
   if (!lng || !lat) {
-    res.status(401).send({ error: 'lngLat required' });
+    res.status(400).send({ error: 'lngLat required' });
     return;
   }
   const result = await photoRepo.query(
