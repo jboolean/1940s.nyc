@@ -71,7 +71,7 @@ const StoryRepository = () =>
     async findForReview(this: Repository<Story>) {
       return this.createQueryBuilder('story')
         .where({ state: StoryState.SUBMITTED })
-        .orderBy('story.created_at', 'ASC')
+        .orderBy('story.updated_at', 'ASC')
         .leftJoinAndSelect('story.photo', 'photo')
         .getMany();
     },
