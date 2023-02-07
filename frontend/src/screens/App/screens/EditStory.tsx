@@ -25,5 +25,5 @@ export default function EditStory(): JSX.Element {
   if (draftStory && draftStory.photo) {
     return <Redirect to={`/stories/photo/${draftStory.photo}`} />;
   }
-  return <Redirect to="/stories" />;
+  return <></>;
 }
