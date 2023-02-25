@@ -42,7 +42,7 @@ class PostmarkEmailService implements EmailService {
     // Refuse to send to real email addresses in dev
     if (
       !isProduction() &&
-      !to.split(',').some((address) => address.endsWith('@1940s.nyc'))
+      to.split(',').some((address) => !address.endsWith('@1940s.nyc'))
     ) {
       console.log('[DEV]', 'EmailService.sendTemplateEmail', apiParams);
       return { messageId: uniqueId('fake-message-id-') };
