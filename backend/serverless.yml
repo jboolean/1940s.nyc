@@ -14,6 +14,19 @@ provider:
           Action: 
             - s3:*
           Resource: "*"
+  environment:
+    STAGE: ${sls:stage}
+    DB_HOST: ${ssm:/${self:service}-${sls:stage}-db-host}
+    DB_PORT: ${ssm:/${self:service}-${sls:stage}-db-port}
+    DB_USERNAME: ${ssm:/${self:service}-${sls:stage}-db-username}
+    DB_PASSWORD: ${ssm:/${self:service}-${sls:stage}-db-password}
+    DB_DATABASE: ${ssm:/${self:service}-${sls:stage}-db-database}
+    STRIPE_SK: ${ssm:/${self:service}-${sls:stage}-stripe-sk}
+    RECAPTCHA_SK: ${ssm:/${self:service}-${sls:stage}-recaptcha-sk}
+    POSTMARK_TOKEN: ${ssm:/${self:service}-${sls:stage}-postmark-token}
+    FRONTEND_BASE_URL: ${ssm:/${self:service}-${sls:stage}-frontend-base-url}
+    JWT_SECRET: ${ssm:/${self:service}-${sls:stage}-jwt-secret}
+    MODERATORS_TO_EMAIL: ${ssm:/${self:service}-${sls:stage}-moderators-to-email}
 plugins:
   - serverless-plugin-select
   - serverless-offline
@@ -28,18 +41,6 @@ functions:
       - http:
           path: /{proxy+}
           method: ANY
-    environment:
-      STAGE: ${sls:stage}
-      DB_HOST: ${ssm:/${self:service}-${sls:stage}-db-host}
-      DB_PORT: ${ssm:/${self:service}-${sls:stage}-db-port}
-      DB_USERNAME: ${ssm:/${self:service}-${sls:stage}-db-username}
-      DB_PASSWORD: ${ssm:/${self:service}-${sls:stage}-db-password}
-      DB_DATABASE: ${ssm:/${self:service}-${sls:stage}-db-database}
-      STRIPE_SK: ${ssm:/${self:service}-${sls:stage}-stripe-sk}
-      RECAPTCHA_SK: ${ssm:/${self:service}-${sls:stage}-recaptcha-sk}
-      POSTMARK_TOKEN: ${ssm:/${self:service}-${sls:stage}-postmark-token}
-      FRONTEND_BASE_URL: ${ssm:/${self:service}-${sls:stage}-frontend-base-url}
-      JWT_SECRET: ${ssm:/${self:service}-${sls:stage}-jwt-secret}
   convertImage:
     stages:
       - production
@@ -60,7 +61,12 @@ functions:
           event: s3:ObjectRemoved:*
           rules:
             - prefix: originals/
-
+  checkStaleStories:
+    stages:
+      - production
+    handler: cron.checkStaleStories
+    events:
+      - schedule: cron(30 2 * * *)
 custom:
   bucket: fourties-photos
   domain:

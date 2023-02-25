@@ -18,6 +18,7 @@
   "author": "Julian Boilen",
   "license": "ISC",
   "devDependencies": {
+    "@types/aws-lambda": "^8.10.111",
     "@types/cors": "^2.8.12",
     "@types/eslint": "^8.4.6",
     "@types/eslint-plugin-prettier": "^3.1.0",
