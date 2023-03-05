@@ -67,6 +67,12 @@ functions:
     handler: cron.checkStaleStories
     events:
       - schedule: cron(30 11 * * ? *)
+  syncMap:
+    stages:
+      - production
+    handler: cron.syncMap
+    events:
+      - schedule: cron(0 12 * * ? *)
 custom:
   bucket: fourties-photos
   domain:

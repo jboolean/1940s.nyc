@@ -1,56 +1,39 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  OneToMany,
+  OneToOne,
+  PrimaryColumn,
+} from 'typeorm';
+import PointColumnOptions from '../business/utils/PointColumnOptions';
 import LngLat from '../enum/LngLat';
+import Photo from './Photo';
+import Story from './Story';
 
 /**
  * A materialized view summarizing a photo with its best geocode result.
  * Used for quickly generating geojson.
  * Materialized view is refreshed when scraping data.
  */
-@Entity('photos_with_effective_geocode_view')
+@Entity('effective_geocodes_view')
 export default class EffectiveGeocode {
   @PrimaryColumn()
   identifier: string;
 
-  // TODO
-  // @Column()
-  // collection: string;
+  @Column()
+  collection: string;
 
   @Column()
-  date?: string;
-
-  @Column()
-  borough?: string;
-
-  @Column()
-  block?: number;
-
-  @Column()
-  lot?: string;
-
-  @Column()
-  bldgNumberStart?: string;
-
-  @Column()
-  bldgNumberEnd?: string;
-
-  @Column()
-  sideOfStreet?: boolean;
-
-  @Column()
-  streetName?: string;
-
-  @Column()
-  address?: string;
-
-  @PrimaryColumn()
   method: string;
 
-  @Column({
-    type: 'point',
-    transformer: {
-      from: ({ x, y }: { x: number; y: number }) => ({ lng: x, lat: y }),
-      to: ({ lng, lat }: LngLat) => ({ x: lng, y: lat }),
-    },
-  })
+  @Column(PointColumnOptions)
   lngLat: LngLat | null;
+
+  @OneToOne(() => Photo)
+  @JoinColumn({ name: 'identifier' })
+  photo: Photo;
+
+  @OneToMany(() => Story, (story) => story.effectiveGeocode)
+  stories: Story[];
 }

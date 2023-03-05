@@ -1,10 +1,12 @@
 import express from 'express';
 const router = express.Router();
-import { createGeojson } from '../business/GeodataService';
 import http from 'http';
+import GeojsonEncoder from '../business/GeojsonEncoder';
 
 router.get('/geojson.json', async (req, res: http.ServerResponse) => {
-  await createGeojson(res);
+  const encoder = new GeojsonEncoder('geojson');
+
+  (await encoder.createGeojson()).pipe(res);
 });
 
 export default router;
