@@ -5,7 +5,7 @@ package:
 provider:
   name: aws
   runtime: nodejs16.x
-  stage: dev
+  stage: production
   region: us-east-1
   iam:
     role:
@@ -33,7 +33,6 @@ plugins:
   - serverless-offline
   - serverless-plugin-typescript
   - serverless-domain-manager
-  - serverless-plugin-conditional-functions
 
 functions:
   app:
@@ -44,7 +43,8 @@ functions:
           path: /{proxy+}
           method: ANY
   convertImage:
-    enabled: '"${self:provider.stage}" == "production"'
+    stages:
+      - production
     handler: convertImage.handler
     events:
       - s3:
@@ -53,7 +53,8 @@ functions:
           rules:
             - prefix: originals/
   deleteImage:
-    enabled: '"${self:provider.stage}" == "production"'
+    stages:
+      - production
     handler: convertImage.deletionHandler
     events:
       - s3:
@@ -62,12 +63,14 @@ functions:
           rules:
             - prefix: originals/
   checkStaleStories:
-    enabled: '"${self:provider.stage}" == "production"'
+    stages:
+      - production
     handler: cron.checkStaleStories
     events:
       - schedule: cron(30 11 * * ? *)
   syncMap:
-    enabled: '"${self:provider.stage}" == "production"'
+    stages:
+      - production
     handler: cron.syncMap
     events:
       - schedule: cron(0 4 * * ? *)
