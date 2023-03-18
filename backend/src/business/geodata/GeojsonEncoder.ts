@@ -17,6 +17,7 @@ type RawEffectiveGeocode = {
   record_identifier: string;
   record_method: string;
   record_lng_lat: { x: number; y: number };
+  stories_storyteller_subtitle: string;
 };
 
 export default class GeojsonEncoder {
@@ -33,6 +34,13 @@ export default class GeojsonEncoder {
       await getRepository(EffectiveGeocode)
         .createQueryBuilder('record')
         .where({ collection })
+        .leftJoin('record.stories', 'stories')
+        .select([
+          'record.identifier',
+          'record.method',
+          'record.lngLat',
+          'stories.storytellerSubtitle',
+        ])
         .stream()
     )
       .pipe(this.rowToFeatureTransform)
@@ -49,15 +57,21 @@ export default class GeojsonEncoder {
   private rowToFeature = ({
     record_lng_lat: lngLat,
     record_identifier: photoIdentifier,
+    stories_storyteller_subtitle,
   }: RawEffectiveGeocode): Feature => ({
     type: 'Feature',
     geometry: {
       type: 'Point',
       coordinates: [lngLat.x, lngLat.y],
     },
-    properties: {
-      photoIdentifier,
-    },
+    properties: stories_storyteller_subtitle
+      ? {
+          photoIdentifier,
+          storyLabel: stories_storyteller_subtitle,
+        }
+      : {
+          photoIdentifier,
+        },
   });
 
   private get rowToFeatureTransform(): Transform {
@@ -90,8 +104,8 @@ export default class GeojsonEncoder {
       transform(chunk, encoding, callback) {
         if (first && style === 'geojson') {
           this.push(OPEN);
-          first = false;
         }
+        first = false;
         callback(undefined, chunk);
       },
       flush(callback) {
