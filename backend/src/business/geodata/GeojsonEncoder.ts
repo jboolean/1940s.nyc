@@ -32,28 +32,33 @@ export default class GeojsonEncoder {
     collection = '1940'
   ): Promise<NodeJS.ReadableStream> {
     return (
-      await getRepository(EffectiveGeocode)
-        .createQueryBuilder('record')
-        .where({ collection })
-        .leftJoin('record.stories', 'stories', 'stories.state = :state', {
-          state: StoryState.PUBLISHED,
-        })
-        .select([
-          'record.identifier',
-          'record.method',
-          'record.lngLat',
-          'stories.storytellerSubtitle',
-        ])
-        .stream()
-    )
-      .pipe(this.rowToFeatureTransform)
-      .pipe(this.reducePrecisionTransform)
-      .pipe(
-        this.style === 'newline-delimited-geojson'
-          ? JSONStream.stringify(false)
-          : JSONStream.stringify()
+      (
+        await getRepository(EffectiveGeocode)
+          .createQueryBuilder('record')
+          // ensure only one result per photo (even if there are multiple stories)
+          // This lets us use the photo identifier as a unique identifier for the feature.
+          .distinctOn(['record.identifier'])
+          .where({ collection })
+          .leftJoin('record.stories', 'stories', 'stories.state = :state', {
+            state: StoryState.PUBLISHED,
+          })
+          .select([
+            'record.identifier',
+            'record.method',
+            'record.lngLat',
+            'stories.storytellerSubtitle',
+          ])
+          .stream()
       )
-      .pipe(this.openCloseTransform);
+        .pipe(this.rowToFeatureTransform)
+        .pipe(this.reducePrecisionTransform)
+        .pipe(
+          this.style === 'newline-delimited-geojson'
+            ? JSONStream.stringify(false)
+            : JSONStream.stringify()
+        )
+        .pipe(this.openCloseTransform)
+    );
   }
 
   // Typeorm cannot stream real entity instances. It creates weird key names on an object.

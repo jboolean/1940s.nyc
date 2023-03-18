@@ -15,6 +15,9 @@ const PHOTOS_RECIPIE = {
       source: `mapbox://tileset-source/${MAPBOX_USER}/${TILESET_SOURCE_ID}`,
       minzoom: 0,
       maxzoom: 16,
+      features: {
+        id: ['get', 'photoIdentifier'],
+      },
     },
   },
 };
