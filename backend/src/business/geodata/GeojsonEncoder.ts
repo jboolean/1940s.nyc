@@ -1,6 +1,6 @@
 import { Feature } from 'geojson';
 import gp from 'geojson-precision';
-import JSONStream from 'JSONStream';
+import JSONStream from 'jsonstream';
 import { Transform } from 'stream';
 import { getRepository } from 'typeorm';
 import EffectiveGeocode from '../../entities/EffectiveGeocode';
