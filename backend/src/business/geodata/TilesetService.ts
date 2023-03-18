@@ -1,6 +1,6 @@
 import required from '../utils/required';
 import FormData from 'form-data';
-import mapboxApi from '../utils/MapboxApi';
+import mapboxApi from '../utils/mapboxApi';
 import { AxiosError } from 'axios';
 
 const MAPBOX_USER = 'julianboilen';
