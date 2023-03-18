@@ -4,6 +4,7 @@ import JSONStream from 'JSONStream';
 import { Transform } from 'stream';
 import { getRepository } from 'typeorm';
 import EffectiveGeocode from '../../entities/EffectiveGeocode';
+import StoryState from '../../enum/StoryState';
 
 const OPEN = `
 {
@@ -34,7 +35,9 @@ export default class GeojsonEncoder {
       await getRepository(EffectiveGeocode)
         .createQueryBuilder('record')
         .where({ collection })
-        .leftJoin('record.stories', 'stories')
+        .leftJoin('record.stories', 'stories', 'stories.state = :state', {
+          state: StoryState.PUBLISHED,
+        })
         .select([
           'record.identifier',
           'record.method',
