@@ -52,6 +52,7 @@ functions:
           event: s3:ObjectCreated:*
           rules:
             - prefix: originals/
+          existing: true
   deleteImage:
     stages:
       - production
@@ -62,6 +63,7 @@ functions:
           event: s3:ObjectRemoved:*
           rules:
             - prefix: originals/
+          existing: true
   checkStaleStories:
     stages:
       - production
