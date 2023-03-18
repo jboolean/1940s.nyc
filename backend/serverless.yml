@@ -5,7 +5,7 @@ package:
 provider:
   name: aws
   runtime: nodejs16.x
-  stage: production
+  stage: dev
   region: us-east-1
   iam:
     role:
@@ -27,11 +27,13 @@ provider:
     FRONTEND_BASE_URL: ${ssm:/${self:service}-${sls:stage}-frontend-base-url}
     JWT_SECRET: ${ssm:/${self:service}-${sls:stage}-jwt-secret}
     MODERATORS_TO_EMAIL: ${ssm:/${self:service}-${sls:stage}-moderators-to-email}
+    MAPBOX_SK: ${ssm:/${self:service}-${sls:stage}-mapbox-sk}
 plugins:
   - serverless-plugin-select
   - serverless-offline
   - serverless-plugin-typescript
   - serverless-domain-manager
+  - serverless-plugin-conditional-functions
 
 functions:
   app:
@@ -42,8 +44,7 @@ functions:
           path: /{proxy+}
           method: ANY
   convertImage:
-    stages:
-      - production
+    enabled: '"${self:provider.stage}" == "production"'
     handler: convertImage.handler
     events:
       - s3:
@@ -52,8 +53,7 @@ functions:
           rules:
             - prefix: originals/
   deleteImage:
-    stages:
-      - production
+    enabled: '"${self:provider.stage}" == "production"'
     handler: convertImage.deletionHandler
     events:
       - s3:
@@ -62,11 +62,16 @@ functions:
           rules:
             - prefix: originals/
   checkStaleStories:
-    stages:
-      - production
+    enabled: '"${self:provider.stage}" == "production"'
     handler: cron.checkStaleStories
     events:
       - schedule: cron(30 11 * * ? *)
+  syncMap:
+    enabled: '"${self:provider.stage}" == "production"'
+    handler: cron.syncMap
+    events:
+      - schedule: cron(0 4 * * ? *)
+    timeout: 900
 custom:
   bucket: fourties-photos
   domain:

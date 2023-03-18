@@ -11,6 +11,7 @@ import PointColumnOptions from '../business/utils/PointColumnOptions';
 import LngLat from '../enum/LngLat';
 import StoryState from '../enum/StoryState';
 import StoryType from '../enum/StoryType';
+import EffectiveGeocode from './EffectiveGeocode';
 import Photo from './Photo';
 
 @Entity('stories')
@@ -48,6 +49,13 @@ export default class Story {
   @ManyToOne(() => Photo, (photo) => photo.stories)
   @JoinColumn({ name: 'photo' })
   photo: Photo;
+
+  @ManyToOne(
+    () => EffectiveGeocode,
+    (effectiveGeocode) => effectiveGeocode.stories
+  )
+  @JoinColumn({ name: 'photo' })
+  effectiveGeocode: EffectiveGeocode;
 
   @Column()
   textContent?: string;
