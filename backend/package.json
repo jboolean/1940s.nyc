@@ -49,13 +49,13 @@
     "serverless-plugin-conditional-functions": "^1.0.8",
     "serverless-plugin-select": "^2.0.0-rc.1",
     "serverless-plugin-typescript": "^2.1.4",
-    "typescript": "^4.8.4"
+    "typescript": "^4.8.4",
+    "@types/jsonstream": "^0.8.31"
   },
   "dependencies": {
     "@sentry/integrations": "^7.36.0",
     "@sentry/node": "^7.36.0",
     "@sentry/tracing": "^7.36.0",
-    "@types/jsonstream": "^0.8.31",
     "@types/multer": "^1.4.7",
     "aws-sdk": "^2.1277.0",
     "axios": "^1.2.2",
