@@ -3,7 +3,7 @@ import gp from 'geojson-precision';
 import JSONStream from 'JSONStream';
 import { Transform } from 'stream';
 import { getRepository } from 'typeorm';
-import EffectiveGeocode from '../entities/EffectiveGeocode';
+import EffectiveGeocode from '../../entities/EffectiveGeocode';
 
 const OPEN = `
 {
