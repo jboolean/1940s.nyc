@@ -83,7 +83,7 @@ functions:
       - production
     handler: cron.generateStoryTitles
     events:
-      - schedule: cron(0 * * * ? *)
+      - schedule: rate(5 minutes)
     timeout: 900
 custom:
   bucket: fourties-photos
