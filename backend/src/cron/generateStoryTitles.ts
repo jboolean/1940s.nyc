@@ -1,4 +1,4 @@
-import { IsNull } from 'typeorm';
+import { IsNull, Not } from 'typeorm';
 import StoryRepository from '../repositories/StoryRepository';
 import * as AiService from '../business/ai/AiService';
 
@@ -8,7 +8,7 @@ export default async function generateStoryTitles(): Promise<void> {
   const repository = StoryRepository();
   const stories = await repository
     .createQueryBuilder('story')
-    .where({ title: IsNull() })
+    .where({ title: IsNull(), textContent: Not(IsNull()) })
     .limit(LIMIT)
     .getMany();
 
