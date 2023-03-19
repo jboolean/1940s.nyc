@@ -40,6 +40,9 @@ export default class Story {
   @Column()
   storytellerSubtitle?: string;
 
+  @Column()
+  title?: string;
+
   @Column(PointColumnOptions)
   lngLat: LngLat | null;
 

@@ -4,6 +4,7 @@ import createConnection from './src/createConnection';
 
 import checkStaleStoriesImpl from './src/cron/checkStaleStories';
 import syncMapImpl from './src/cron/syncMap';
+import generateStoryTitlesImpl from './src/cron/generateStoryTitles';
 
 import * as Sentry from '@sentry/node';
 import { CaptureConsole as CaptureConsoleIntegration } from '@sentry/integrations';
@@ -39,4 +40,10 @@ export const syncMap = async (): Promise<void> => {
   await setup();
 
   await syncMapImpl();
+};
+
+export const generateStoryTitles = async (): Promise<void> => {
+  await setup();
+
+  await generateStoryTitlesImpl();
 };
