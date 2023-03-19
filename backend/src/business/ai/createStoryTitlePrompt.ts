@@ -19,7 +19,7 @@ Caption: Man sat daily on stoop
 Story: ${storyContent.replaceAll('\n', ' ').trim()}
 Caption:`,
     temperature: 0.1,
-    max_tokens: 8,
+    max_tokens: 11,
     top_p: 1,
     frequency_penalty: 0,
     presence_penalty: 0,
