@@ -11,5 +11,5 @@ export async function suggestStoryTitle(storyContent: string): Promise<string> {
     createStoryTitlePrompt(storyContent)
   );
 
-  return response.data.choices[0].text ?? '';
+  return response.data.choices[0].text?.trim() ?? '';
 }
