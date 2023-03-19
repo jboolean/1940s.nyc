@@ -13,6 +13,9 @@ Caption: My childhood home
 Story: The Tepedino's,  Michael and Angelina. ITALIAN immigrants from the Salerno area of Italy raised 3 children in this home.
 Caption: Italian immigrants raised family
 
+Story: The plaza hotel
+Caption: Plaza Hotel
+
 Story: That's old man Saso sitting on the stoop of 35 Snediker ave. He sat there every day for years.
 Caption: Man sat daily on stoop
 
