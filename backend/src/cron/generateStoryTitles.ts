@@ -12,7 +12,7 @@ export default async function generateStoryTitles(): Promise<void> {
     .limit(LIMIT)
     .getMany();
 
-  stories.map(async (story) => {
+  const promises = stories.map(async (story) => {
     const textContent = story.textContent;
     if (!textContent) return;
 
@@ -28,5 +28,5 @@ export default async function generateStoryTitles(): Promise<void> {
     }
   });
 
-  await Promise.all(stories);
+  await Promise.allSettled(promises);
 }
