@@ -28,6 +28,7 @@ provider:
     JWT_SECRET: ${ssm:/${self:service}-${sls:stage}-jwt-secret}
     MODERATORS_TO_EMAIL: ${ssm:/${self:service}-${sls:stage}-moderators-to-email}
     MAPBOX_SK: ${ssm:/${self:service}-${sls:stage}-mapbox-sk}
+    OPENAI_SK: ${ssm:/${self:service}-${sls:stage}-openai-sk}
 plugins:
   - serverless-plugin-select
   - serverless-offline
@@ -76,6 +77,13 @@ functions:
     handler: cron.syncMap
     events:
       - schedule: cron(0 4 * * ? *)
+    timeout: 900
+  generateStoryTitles:
+    stages:
+      - production
+    handler: cron.generateStoryTitles
+    events:
+      - schedule: cron(0 * * * ? *)
     timeout: 900
 custom:
   bucket: fourties-photos
