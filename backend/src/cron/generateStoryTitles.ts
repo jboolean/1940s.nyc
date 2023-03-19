@@ -2,7 +2,7 @@ import { IsNull, Not } from 'typeorm';
 import StoryRepository from '../repositories/StoryRepository';
 import * as AiService from '../business/ai/AiService';
 
-const LIMIT = 20;
+const LIMIT = 10;
 
 export default async function generateStoryTitles(): Promise<void> {
   const repository = StoryRepository();
