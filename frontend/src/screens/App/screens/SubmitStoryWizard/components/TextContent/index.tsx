@@ -53,7 +53,7 @@ export default function TextContent({
       {isAudioStorytellingEnabled ? null : <IntroGraph />}
       <TextArea
         className={stylesheet.writingArea}
-        placeholder="Share as little or much as you&rsquo;d like about this photo and surrounding area"
+        placeholder="Share as little or much as you&rsquo;d like about this photo, the surrounding area, and your connection to it"
         value={textContent ?? ''}
         onChange={handleTextContentChange}
         ref={textInputRef}
