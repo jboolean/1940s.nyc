@@ -31,17 +31,29 @@ export default class Story {
   @Column()
   state: StoryState;
 
-  @Column()
-  storytellerEmail?: string;
+  @Column({
+    type: String,
+    nullable: true,
+  })
+  storytellerEmail!: string | null;
 
-  @Column()
-  storytellerName?: string;
+  @Column({
+    type: String,
+    nullable: true,
+  })
+  storytellerName!: string | null;
 
-  @Column()
-  storytellerSubtitle?: string;
+  @Column({
+    type: String,
+    nullable: true,
+  })
+  storytellerSubtitle!: string | null;
 
-  @Column()
-  title?: string;
+  @Column({
+    type: String,
+    nullable: true,
+  })
+  title!: string | null;
 
   @Column(PointColumnOptions)
   lngLat: LngLat | null;
@@ -60,8 +72,11 @@ export default class Story {
   @JoinColumn({ name: 'photo' })
   effectiveGeocode: EffectiveGeocode;
 
-  @Column()
-  textContent?: string;
+  @Column({
+    type: 'text',
+    nullable: true,
+  })
+  textContent!: string | null;
 
   @Column()
   recaptchaScore: number;
