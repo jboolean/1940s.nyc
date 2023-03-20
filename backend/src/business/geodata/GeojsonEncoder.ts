@@ -39,10 +39,11 @@ export default class GeojsonEncoder {
           // ensure only one result per photo (even if there are multiple stories)
           // This lets us use the photo identifier as a unique identifier for the feature.
           .distinctOn(['record.identifier'])
-          .where({ collection })
           .leftJoin('record.stories', 'stories', 'stories.state = :state', {
             state: StoryState.PUBLISHED,
           })
+          .where({ collection })
+          .orWhere('stories.id IS NOT NULL')
           .select([
             'record.identifier',
             'record.method',
