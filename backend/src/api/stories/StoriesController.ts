@@ -51,6 +51,15 @@ function updateModelFromRequest(
   story: Story,
   storyRequest: StoryDraftRequest
 ): void {
+  // reset title if text content is changed
+  // it will be regenerated
+  if (
+    storyRequest.textContent &&
+    storyRequest.textContent !== story.textContent
+  ) {
+    story.title = undefined;
+  }
+
   story.lngLat = storyRequest.lngLat ?? null;
   story.photoId = storyRequest.photo;
   story.storyType = storyRequest.storyType;
