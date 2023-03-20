@@ -3,6 +3,7 @@ import StoryState from '../../enum/StoryState';
 import StoryRepository from '../../repositories/StoryRepository';
 import {
   sendPublishedEmail,
+  sendStoryAutoPublishedEmail,
   sendSubmittedAgainEmail,
   sendSubmittedEmail,
   sendUserRemovedEmail,
@@ -94,14 +95,17 @@ export async function backfillUserStoryEmails(): Promise<void> {
     }
 
     try {
-      await sendSubmittedEmail(story);
+      if (story.state === StoryState.SUBMITTED) {
+        await sendSubmittedEmail(story);
+      } else if (story.state === StoryState.PUBLISHED) {
+        await sendStoryAutoPublishedEmail(story);
+      } else {
+        continue;
+      }
+
       await StoryRepository().update(story.id, {
         hasEverSubmitted: true,
       });
-
-      if (story.state === StoryState.PUBLISHED) {
-        await sendPublishedEmail(story);
-      }
     } catch (e) {
       console.error('Could not backfill ', story, e);
     }

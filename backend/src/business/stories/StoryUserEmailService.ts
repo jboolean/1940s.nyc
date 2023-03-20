@@ -4,6 +4,7 @@ import Story from '../../entities/Story';
 import StoryRepository from '../../repositories/StoryRepository';
 import EmailService, { TemplatedEmailData } from '../email/EmailService';
 import EmailTemplate from '../email/EmailTemplate';
+import StoryAutoPublishedTemplate from '../email/templates/StoryAutoPublishedTemplate';
 import StoryPublishedTemplate from '../email/templates/StoryPublishedTemplate';
 import StorySubmittedAgainTemplate from '../email/templates/StorySubmittedAgainTemplate';
 import StorySubmittedTemplate from '../email/templates/StorySubmittedTemplate';
@@ -112,4 +113,8 @@ export async function sendPublishedEmail(story: Story): Promise<void> {
 
 export async function sendUserRemovedEmail(story: Story): Promise<void> {
   return sendStoryUserEmail(story, StoryUserRemovedTemplate);
+}
+
+export async function sendStoryAutoPublishedEmail(story: Story): Promise<void> {
+  return sendStoryUserEmail(story, StoryAutoPublishedTemplate);
 }
