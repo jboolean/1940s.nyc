@@ -20,7 +20,7 @@ export function toAdminStoryResponse(story: Story): AdminStoryResponse {
       story.storytellerSubtitle,
       'storytellerSubtitle'
     ),
-    textContent: story.textContent,
+    textContent: story.textContent ?? undefined,
 
     recaptchaScore: story.recaptchaScore,
   };
@@ -34,10 +34,10 @@ export function toDraftStoryResponse(story: Story): StoryDraftResponse {
     storyType: story.storyType,
     state: story.state,
     createdAt: story.createdAt.toISOString(),
-    storytellerEmail: story.storytellerEmail,
-    storytellerName: story.storytellerName,
-    storytellerSubtitle: story.storytellerSubtitle,
-    textContent: story.textContent,
+    storytellerEmail: story.storytellerEmail ?? undefined,
+    storytellerName: story.storytellerName ?? undefined,
+    storytellerSubtitle: story.storytellerSubtitle ?? undefined,
+    textContent: story.textContent ?? undefined,
   };
 }
 
@@ -55,6 +55,6 @@ export function toPublicStoryResponse(story: Story): PublicStoryResponse {
       story.storytellerSubtitle,
       'storytellerSubtitle'
     ),
-    textContent: story.textContent,
+    textContent: story.textContent ?? undefined,
   };
 }

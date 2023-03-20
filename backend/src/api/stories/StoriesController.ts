@@ -57,19 +57,19 @@ function updateModelFromRequest(
     storyRequest.textContent &&
     storyRequest.textContent !== story.textContent
   ) {
-    story.title = undefined;
+    story.title = null;
   }
 
   story.lngLat = storyRequest.lngLat ?? null;
   story.photoId = storyRequest.photo;
   story.storyType = storyRequest.storyType;
-  story.textContent = storyRequest.textContent;
+  story.textContent = storyRequest.textContent ?? null;
 
   story.storytellerEmail = storyRequest.storytellerEmail
     ? normalizeEmail(storyRequest.storytellerEmail)
-    : undefined;
-  story.storytellerName = storyRequest.storytellerName;
-  story.storytellerSubtitle = storyRequest.storytellerSubtitle;
+    : null;
+  story.storytellerName = storyRequest.storytellerName ?? null;
+  story.storytellerSubtitle = storyRequest.storytellerSubtitle ?? null;
 
   story.state = storyRequest.state;
 }
