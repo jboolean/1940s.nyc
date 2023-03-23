@@ -7,6 +7,8 @@ import FourtiesModal from 'shared/components/Modal';
 import Carousel from './Carousel';
 import carouselImages from './carouselImages';
 
+import classNames from 'classnames';
+
 import stylesheet from './welcome.less';
 
 interface Props {
@@ -47,6 +49,18 @@ export default function Welcome({
             <br />
             Zoom in! Every dot&nbsp;is&nbsp;a&nbsp;photo.
           </p>
+          <div
+            className={classNames(
+              stylesheet.buttonContainer,
+              stylesheet.mobileButton,
+              stylesheet.mobileOnly
+            )}
+            onClick={onRequestClose}
+          >
+            <Button buttonStyle="primary" className={stylesheet.explore}>
+              Start Exploring
+            </Button>
+          </div>
           <hr />
           <p className={stylesheet.finePrint}>
             The photos on this site are property of the NYC Department of
@@ -95,7 +109,13 @@ export default function Welcome({
             </a>
           </p>
         </div>
-        <div className={stylesheet.buttonContainer} onClick={onRequestClose}>
+        <div
+          className={classNames(
+            stylesheet.buttonContainer,
+            stylesheet.desktopOnly
+          )}
+          onClick={onRequestClose}
+        >
           <Button buttonStyle="primary" className={stylesheet.explore}>
             Start Exploring
           </Button>

@@ -73,12 +73,29 @@
 .buttonContainer {
   padding: 1rem;
   text-align: center;
+
+  &.mobileButton {
+    padding: 0;
+    margin: 1rem 0;
+  }
+}
+
+.mobileOnly {
+  display: none;
 }
 
 @media screen and (max-width: @modal-width-max),
   screen and (max-height: @modal-height-max) {
   @visible-text-height: 200px;
   @photo-padding: calc(100vh - @visible-text-height);
+
+  .mobileOnly {
+    display: block;
+  }
+
+  .desktopOnly {
+    display: none;
+  }
 
   .imageContainer {
     height: @photo-padding;
