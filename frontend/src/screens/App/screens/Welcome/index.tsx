@@ -45,7 +45,7 @@ export default function Welcome({
             tagging of these photos. This website places
             them&nbsp;on&nbsp;a&nbsp;map.
             <br />
-            Zoom in! Every dot&nbsp;is&nbsp;a&nbsp;photo.
+            <strong>Zoom in! Every dot&nbsp;is&nbsp;a&nbsp;photo.</strong>
           </p>
           <hr />
           <p className={stylesheet.finePrint}>
