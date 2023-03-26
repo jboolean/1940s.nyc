@@ -24,6 +24,7 @@ provider:
     STRIPE_SK: ${ssm:/${self:service}-${sls:stage}-stripe-sk}
     RECAPTCHA_SK: ${ssm:/${self:service}-${sls:stage}-recaptcha-sk}
     POSTMARK_TOKEN: ${ssm:/${self:service}-${sls:stage}-postmark-token}
+    POSTMARK_SANDBOX_TOKEN: ${ssm:/${self:service}-${sls:stage}-postmark-sandbox-token}
     FRONTEND_BASE_URL: ${ssm:/${self:service}-${sls:stage}-frontend-base-url}
     JWT_SECRET: ${ssm:/${self:service}-${sls:stage}-jwt-secret}
     MODERATORS_TO_EMAIL: ${ssm:/${self:service}-${sls:stage}-moderators-to-email}
@@ -84,6 +85,13 @@ functions:
     handler: cron.generateStoryTitles
     events:
       - schedule: rate(5 minutes)
+    timeout: 900
+  sendEmailCampaigns:
+    stages:
+      - production
+    handler: cron.sendEmailCampaigns
+    events:
+      - schedule: rate(1 minutes)
     timeout: 900
 custom:
   bucket: fourties-photos

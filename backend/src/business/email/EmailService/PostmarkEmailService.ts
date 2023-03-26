@@ -1,19 +1,89 @@
 import { ServerClient, TemplatedMessage } from 'postmark';
 import isProduction from '../../utils/isProduction';
 import { EmailResult, EmailService, TemplatedEmailData } from './EmailService';
-import uniqueId from 'lodash/uniqueId';
+import EmailStreamType from '../templates/EmailStreamType';
+import required from '../../utils/required';
+import { MessageSendingResponse } from 'postmark/dist/client/models';
 
-const POSTMARK_TOKEN = process.env.POSTMARK_TOKEN;
+const POSTMARK_TOKEN = required(process.env.POSTMARK_TOKEN, 'POSTMARK_TOKEN');
+const POSTMARK_SANDBOX_TOKEN = required(
+  process.env.POSTMARK_SANDBOX_TOKEN,
+  'POSTMARK_SANDBOX_TOKEN'
+);
+
+const DEV_ALLOWED_DOMAINS = ['@1940s.nyc', '@bounce-testing.postmarkapp.com'];
+
+const streamIds: Record<EmailStreamType, string> = {
+  [EmailStreamType.TRANSACTIONAL]: 'outbound',
+  [EmailStreamType.BROADCAST]: 'broadcast',
+};
 
 class PostmarkEmailService implements EmailService {
   private client: ServerClient;
+  private sandboxClient: ServerClient;
 
   constructor() {
-    if (!POSTMARK_TOKEN) throw new Error('POSTMARK_TOKEN is not defined');
     this.client = new ServerClient(POSTMARK_TOKEN);
+    this.sandboxClient = new ServerClient(POSTMARK_SANDBOX_TOKEN);
   }
 
-  async sendTemplateEmail(options: TemplatedEmailData): Promise<EmailResult> {
+  private getClient(livemode: boolean): ServerClient {
+    return livemode ? this.client : this.sandboxClient;
+  }
+
+  async sendTemplateEmail(
+    options: TemplatedEmailData,
+    livemode = true
+  ): Promise<EmailResult> {
+    const apiParams = PostmarkEmailService.createApiMessage(options);
+
+    // Refuse to send to real email addresses in dev
+    if (livemode && PostmarkEmailService.shouldForceTestmode([options])) {
+      console.log(
+        'Refusing to send email to real address in dev. Forcing testmode.',
+        {
+          apiParams,
+        }
+      );
+      livemode = false;
+    }
+
+    const client = this.getClient(livemode);
+
+    const resp = await client.sendEmailWithTemplate(apiParams);
+
+    return PostmarkEmailService.mapPostmarkResponse(resp);
+  }
+
+  async sendBulkTemplateEmail(
+    options: TemplatedEmailData[],
+    livemode = true
+  ): Promise<EmailResult[]> {
+    const apiParams = options.map((option) =>
+      PostmarkEmailService.createApiMessage(option)
+    );
+
+    // Refuse to send to real email addresses in dev
+    if (livemode && PostmarkEmailService.shouldForceTestmode(options)) {
+      console.log(
+        'Refusing to send email to real address in dev. Forcing testmode.',
+        {
+          apiParams,
+        }
+      );
+      livemode = false;
+    }
+
+    const client = this.getClient(livemode);
+
+    const resp = await client.sendEmailBatchWithTemplates(apiParams);
+
+    return resp.map((r) => PostmarkEmailService.mapPostmarkResponse(r));
+  }
+
+  private static createApiMessage(
+    options: TemplatedEmailData
+  ): TemplatedMessage {
     const {
       templateAlias,
       from,
@@ -21,6 +91,7 @@ class PostmarkEmailService implements EmailService {
       templateContext,
       metadata,
       referenceMessageId,
+      streamType,
     } = options;
 
     const apiParams: TemplatedMessage = {
@@ -37,22 +108,33 @@ class PostmarkEmailService implements EmailService {
             },
           ]
         : [],
+      MessageStream: streamIds[streamType],
     };
 
-    // Refuse to send to real email addresses in dev
-    if (
+    return apiParams;
+  }
+
+  private static mapPostmarkResponse(
+    response: MessageSendingResponse
+  ): EmailResult {
+    return {
+      messageId: response.MessageID,
+      statusMessage: response.Message,
+      code: response.ErrorCode,
+    };
+  }
+
+  private static shouldForceTestmode(options: TemplatedEmailData[]): boolean {
+    return (
       !isProduction() &&
-      to.split(',').some((address) => !address.endsWith('@1940s.nyc'))
-    ) {
-      console.log('[DEV]', 'EmailService.sendTemplateEmail', apiParams);
-      return { messageId: uniqueId('fake-message-id-') };
-    }
-
-    const { MessageID: messageId } = await this.client.sendEmailWithTemplate(
-      apiParams
+      options
+        .map((option) => option.to.split(','))
+        .flat()
+        .some(
+          (address) =>
+            !DEV_ALLOWED_DOMAINS.some((domain) => address.endsWith(domain))
+        )
     );
-
-    return { messageId };
   }
 }
 

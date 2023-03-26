@@ -1,4 +1,5 @@
 import { TemplatedEmailData } from './EmailService';
+import EmailStreamType from './templates/EmailStreamType';
 import Senders from './templates/Senders';
 
 abstract class EmailTemplate<
@@ -7,6 +8,7 @@ abstract class EmailTemplate<
 > {
   abstract readonly alias: string;
   abstract readonly from: typeof Senders[keyof typeof Senders];
+  abstract readonly streamType: EmailStreamType;
 
   createTemplatedEmail({
     templateContext,
@@ -26,6 +28,7 @@ abstract class EmailTemplate<
       templateContext,
       metadata,
       referenceMessageId,
+      streamType: this.streamType,
     };
   }
 }

@@ -19,6 +19,8 @@ import {
   Response as ExResponse,
 } from 'express';
 import { ValidateError } from 'tsoa';
+import StripeWebhooksResource from './api/StripeWebhooksResource';
+import { IpDeniedError } from 'express-ipfilter';
 
 // Trust API Gateway
 app.set('trust proxy', 1);
@@ -74,6 +76,7 @@ app.use(async (req, res, next) => {
 app.use('/photos', PhotosResource);
 app.use('/tips', TipsResource);
 app.use('/geodata', GeodataResource);
+app.use('/stripe-webhooks', StripeWebhooksResource);
 
 // Tsoa
 RegisterRoutes(app);
@@ -97,6 +100,11 @@ app.use(function errorHandler(
     return res.status(422).json({
       error: 'Validation Failed',
       details: err?.fields,
+    });
+  }
+  if (err instanceof IpDeniedError) {
+    return res.status(403).json({
+      error: err.message,
     });
   }
   if (err instanceof HttpError) {
