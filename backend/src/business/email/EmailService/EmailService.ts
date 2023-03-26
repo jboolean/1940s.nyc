@@ -1,6 +1,9 @@
+import EmailStreamType from '../templates/EmailStreamType';
+
 export type TemplatedEmailData = {
   templateAlias: string;
   from: string;
+  streamType: EmailStreamType;
 
   to: string;
   templateContext: object;

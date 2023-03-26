@@ -1,4 +1,5 @@
 import EmailTemplate from '../EmailTemplate';
+import EmailStreamType from './EmailStreamType';
 import Senders from './Senders';
 import {
   StoryEmailTemplateData,
@@ -11,6 +12,7 @@ class StoryUserRemovedTemplate extends EmailTemplate<
 > {
   alias = 'story-user-removed';
   from = Senders.PERSONAL;
+  streamType = EmailStreamType.TRANSACTIONAL;
 }
 
 export default new StoryUserRemovedTemplate();

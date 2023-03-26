@@ -1,4 +1,5 @@
 import EmailTemplate from '../EmailTemplate';
+import EmailStreamType from './EmailStreamType';
 import Senders from './Senders';
 import {
   StoryEmailTemplateData,
@@ -11,6 +12,7 @@ class StoryPublishedTemplate extends EmailTemplate<
 > {
   alias = 'story-published';
   from = Senders.PERSONAL;
+  streamType = EmailStreamType.TRANSACTIONAL;
 }
 
 export default new StoryPublishedTemplate();

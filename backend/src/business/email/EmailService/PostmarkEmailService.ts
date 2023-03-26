@@ -2,8 +2,14 @@ import { ServerClient, TemplatedMessage } from 'postmark';
 import isProduction from '../../utils/isProduction';
 import { EmailResult, EmailService, TemplatedEmailData } from './EmailService';
 import uniqueId from 'lodash/uniqueId';
+import EmailStreamType from '../templates/EmailStreamType';
 
 const POSTMARK_TOKEN = process.env.POSTMARK_TOKEN;
+
+const streamIds: Record<EmailStreamType, string> = {
+  [EmailStreamType.TRANSACTIONAL]: 'outbound',
+  [EmailStreamType.BROADCAST]: 'broadcast',
+};
 
 class PostmarkEmailService implements EmailService {
   private client: ServerClient;
@@ -21,6 +27,7 @@ class PostmarkEmailService implements EmailService {
       templateContext,
       metadata,
       referenceMessageId,
+      streamType,
     } = options;
 
     const apiParams: TemplatedMessage = {
@@ -37,6 +44,7 @@ class PostmarkEmailService implements EmailService {
             },
           ]
         : [],
+      MessageStream: streamIds[streamType],
     };
 
     // Refuse to send to real email addresses in dev
