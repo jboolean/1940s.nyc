@@ -1,3 +1,4 @@
+import { toLower } from 'lodash';
 import { getConnection, getRepository, LessThan } from 'typeorm';
 import CampaignSend from '../../entities/CampaignSend';
 import MailingListMember from '../../entities/MailingListMember';
@@ -34,11 +35,16 @@ class EmailCampaignService {
     address: string,
     source: string | null
   ): Promise<void> {
-    const member = new MailingListMember();
-    member.address = address.toLowerCase();
-    member.source = source;
-
-    await getRepository(MailingListMember).upsert(member, ['address']);
+    const normalizeEmail = toLower(address);
+    await getRepository(MailingListMember)
+      .createQueryBuilder()
+      .insert()
+      .values({
+        address: normalizeEmail,
+        source: source,
+      })
+      .orIgnore()
+      .execute();
   }
 
   async sendPendingEmails(livemode: boolean): Promise<void> {

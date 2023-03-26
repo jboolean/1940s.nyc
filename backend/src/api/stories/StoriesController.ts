@@ -42,6 +42,7 @@ import {
   toDraftStoryResponse,
   toPublicStoryResponse,
 } from './storyToApi';
+import EmailCampaignService from '../../business/email/EmailCampaignService';
 
 function normalizeEmail(email: string): string {
   return email.toLocaleLowerCase();
@@ -173,6 +174,17 @@ export class StoriesController extends Controller {
     }
 
     story = await StoryRepository().save(story);
+
+    try {
+      if (story.storytellerEmail) {
+        await EmailCampaignService.addToMailingList(
+          story.storytellerEmail,
+          'stories'
+        );
+      }
+    } catch (e) {
+      console.error('Error adding to mailing list', e);
+    }
 
     await onStateTransition(id, originalState, story.state);
 
