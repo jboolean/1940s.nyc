@@ -16,5 +16,8 @@ export type EmailResult = {
 };
 
 export interface EmailService {
-  sendTemplateEmail(options: TemplatedEmailData): Promise<EmailResult>;
+  sendTemplateEmail(
+    options: TemplatedEmailData,
+    livemode?: boolean
+  ): Promise<EmailResult>;
 }
