@@ -14,6 +14,14 @@ const nextButtonLabelByStoryState: Record<StoryState, string> = {
   [StoryState.USER_REMOVED]: 'Save New Draft & Continue',
 };
 
+const unpublishButtonLabelByStoryState: Record<
+  StoryState.PUBLISHED | StoryState.SUBMITTED,
+  string
+> = {
+  [StoryState.PUBLISHED]: 'Unpublish',
+  [StoryState.SUBMITTED]: 'Remove',
+};
+
 export default function TextContent({
   textContent,
   onTextContentChange,
@@ -59,13 +67,14 @@ export default function TextContent({
         ref={textInputRef}
       />
       <div>
-        {storyState === StoryState.PUBLISHED ? (
+        {storyState === StoryState.PUBLISHED ||
+        storyState === StoryState.SUBMITTED ? (
           <Button
             buttonStyle="secondary"
             onClick={onUnpublish}
             disabled={isSubmitting}
           >
-            Unpublish
+            {unpublishButtonLabelByStoryState[storyState]}
           </Button>
         ) : null}
         <Button
