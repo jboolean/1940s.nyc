@@ -54,10 +54,10 @@ class EmailCampaignService {
           .getRepository(CampaignSend)
           .createQueryBuilder('campaign_send')
           .setLock('pessimistic_write')
-          .where('campaign_send.status = :status', {
+          .where({
             status: CampaignSendStatus.PENDING,
             livemode: livemode,
-            sendAt: LessThan(new Date()),
+            sendOn: LessThan(new Date()),
           })
           .limit(BULK_SEND_LIMIT)
           .getMany();
