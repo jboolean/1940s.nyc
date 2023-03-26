@@ -6,7 +6,7 @@ import EmailService from './EmailService';
 import EmailStreamType from './templates/EmailStreamType';
 import Senders from './templates/Senders';
 
-const BULK_SEND_LIMIT = 100;
+const BULK_SEND_LIMIT = 250;
 
 // For sending email marketing newsletters/blast campaigns
 class EmailCampaignService {
