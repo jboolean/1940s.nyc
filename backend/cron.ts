@@ -11,6 +11,7 @@ import { CaptureConsole as CaptureConsoleIntegration } from '@sentry/integration
 
 // Importing @sentry/tracing patches the global hub for tracing to work.
 import '@sentry/tracing';
+import EmailCampaignService from './src/business/email/EmailCampaignService';
 
 async function setup(): Promise<void> {
   await createConnection();
@@ -46,4 +47,11 @@ export const generateStoryTitles = async (): Promise<void> => {
   await setup();
 
   await generateStoryTitlesImpl();
+};
+
+export const sendEmailCampaigns = async (): Promise<void> => {
+  await setup();
+
+  await EmailCampaignService.sendPendingEmails(false);
+  await EmailCampaignService.sendPendingEmails(true);
 };

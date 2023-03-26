@@ -28,6 +28,7 @@ abstract class EmailTemplate<
       templateContext,
       metadata,
       referenceMessageId,
+      streamType: this.streamType,
     };
   }
 }

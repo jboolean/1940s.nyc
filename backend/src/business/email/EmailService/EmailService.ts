@@ -13,6 +13,8 @@ export type TemplatedEmailData = {
 
 export type EmailResult = {
   messageId: string;
+  statusMessage: string;
+  code: number;
 };
 
 export interface EmailService {
@@ -20,4 +22,9 @@ export interface EmailService {
     options: TemplatedEmailData,
     livemode?: boolean
   ): Promise<EmailResult>;
+
+  sendBulkTemplateEmail(
+    options: TemplatedEmailData[],
+    livemode?: boolean
+  ): Promise<EmailResult[]>;
 }

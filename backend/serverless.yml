@@ -86,6 +86,13 @@ functions:
     events:
       - schedule: rate(5 minutes)
     timeout: 900
+  sendEmailCampaigns:
+    stages:
+      - production
+    handler: cron.sendEmailCampaigns
+    events:
+      - schedule: rate(1 minutes)
+    timeout: 900
 custom:
   bucket: fourties-photos
   domain:
