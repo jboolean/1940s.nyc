@@ -1,9 +1,10 @@
 import { Body, Controller, Post, Route, Security } from 'tsoa';
 import EmailCampaignService from '../business/email/EmailCampaignService';
 import { BadRequest } from 'http-errors';
+import { Email } from './CommonApiTypes';
 
 type MailingListRequest = {
-  address: string;
+  address: Email;
   source?: string;
 };
 
