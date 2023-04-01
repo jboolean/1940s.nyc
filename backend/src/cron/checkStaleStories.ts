@@ -3,7 +3,7 @@ import StoryRepository from '../repositories/StoryRepository';
 import EmailService from '../business/email/EmailService';
 import ReviewQueueStaleTemplate from '../business/email/templates/ReviewQueueStaleTemplate';
 
-const STALENESS_THRESHOLD_MS = 1000 * 60 * 60 * 24 * 3; // 7 days
+const STALENESS_THRESHOLD_MS = 1000 * 60 * 60 * 24 * 2;
 
 function forgeReviewStoriesUrl(): string {
   const storyEditUrl: URL = new URL(
