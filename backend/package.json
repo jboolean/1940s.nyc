@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "npm run routes && serverless offline start --stage dev --host dev.1940s.nyc --noPrependStageInUrl",
+    "debug": "export SLS_DEBUG=* && node --inspect ./node_modules/.bin/serverless offline --stage dev --host dev.1940s.nyc --noPrependStageInUrl",
     "routes": "tsoa routes",
     "deploy:dry": "serverless package --stage production",
     "deploy": "npm run install-aws-sharp && npm run lint:strict && serverless deploy --stage $STAGE",
@@ -57,7 +58,7 @@
     "@sentry/tracing": "^7.36.0",
     "@types/multer": "^1.4.7",
     "aws-sdk": "^2.1277.0",
-    "axios": "^1.2.2",
+    "axios": "^1.3.5",
     "cors": "^2.8.5",
     "express": "^4.18.2",
     "express-ipfilter": "^1.3.1",
