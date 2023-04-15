@@ -20,7 +20,7 @@ interface State {
   isOpen: boolean;
   isSubmitting: boolean;
   errorMessage: string | null;
-  openedOn?: Date;
+  openedOn?: number;
 }
 
 const useTipJarStore = create(
@@ -34,7 +34,7 @@ const useTipJarStore = create(
       open: () => {
         set((draft) => {
           draft.isOpen = true;
-          draft.openedOn = new Date();
+          draft.openedOn = new Date().getTime();
         });
       },
       handleSubmit: async () => {
@@ -87,7 +87,7 @@ const useTipJarStore = create(
 // Auto-open tip jar
 setTimeout(() => {
   const { openedOn, open } = useTipJarStore.getState();
-  if (!openedOn || new Date().getTime() - openedOn.getTime() > RE_ENAGE_DELAY) {
+  if (!openedOn || new Date().getTime() - openedOn > RE_ENAGE_DELAY) {
     open();
   }
 }, TIP_JAR_DELAY);
