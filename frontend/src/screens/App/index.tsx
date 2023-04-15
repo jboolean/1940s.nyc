@@ -4,7 +4,7 @@ import { Redirect, Route, Router, Switch } from 'react-router-dom';
 import history from 'utils/history';
 import AnnouncementBanner from './screens/AnnouncementBanner';
 import MapPane from './screens/MapPane';
-import ThankYou from './screens/MapPane/components/TipJar/ThankYou';
+import ThankYou from './screens/TipJar/ThankYou';
 import Shutdown from './screens/Shutdown';
 import ViewerPane from './screens/ViewerPane';
 import Welcome from './screens/Welcome';
@@ -19,6 +19,7 @@ import AdminRoutes from './screens/Admin/AdminRoutes';
 import FeatureFlags from './screens/FeatureFlags';
 import SubmitStoryWizard from './screens/SubmitStoryWizard';
 import EditStory from './screens/EditStory';
+import TipJar from './screens/TipJar';
 
 const IS_SHUTDOWN = false;
 
@@ -60,6 +61,7 @@ function Modals(): JSX.Element {
         }}
       />
       <SubmitStoryWizard />
+      <TipJar />
     </>
   );
 }

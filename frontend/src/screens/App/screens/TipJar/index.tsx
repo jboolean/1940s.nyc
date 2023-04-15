@@ -1,47 +1,30 @@
 import Modal from 'components/Modal';
 import React from 'react';
 import { NumericFormat } from 'react-number-format';
-import redirectToCheckout from './redirectToCheckout';
 
 import Button from 'shared/components/Button';
-import recordEvent from 'shared/utils/recordEvent';
-import stylesheet from './TipJar.less';
-import useAmountPresets from './useAmountPresets';
 import CurrencyInput from 'shared/components/CurrencyInput';
+import stylesheet from './TipJar.less';
+import useTipJarStore from './TipJarStore';
+import useAmountPresets from './useAmountPresets';
 
-export default function TipJar({
-  isOpen,
-  onRequestClose,
-}: Pick<ReactModal.Props, 'isOpen' | 'onRequestClose'>): JSX.Element {
-  const [amountDollars, setAmountDollars] = React.useState<
-    undefined | number
-  >();
-  const [isSubmitting, setIsSubmitting] = React.useState(false);
-  const [errorMessage, setErrorMessage] = React.useState<null | string>(null);
+export { useTipJarStore };
+
+export default function TipJar(): JSX.Element {
+  const {
+    amountDollars,
+    isOpen,
+    isSubmitting,
+    errorMessage,
+    setAmountDollars,
+    handleRequestClose,
+    handleSubmit,
+  } = useTipJarStore();
 
   const amountPresets = useAmountPresets();
 
-  const handleSubmitClick = async (): Promise<void> => {
-    if (Number.isNaN(amountDollars) || amountDollars <= 0) return;
-    setIsSubmitting(true);
-    setErrorMessage(null);
-    recordEvent({
-      category: 'Tip Jar',
-      action: 'Click Checkout',
-      value: amountDollars * 100,
-    });
-    try {
-      // Input is dollars, convert to cents
-      await redirectToCheckout(amountDollars * 100);
-    } catch (error) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
-      setErrorMessage(error?.message || 'Something went wrong');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
   return (
-    <Modal size="small" isOpen={isOpen} onRequestClose={onRequestClose}>
+    <Modal size="small" isOpen={isOpen} onRequestClose={handleRequestClose}>
       <h1>Will you chip in on web hosting costs?</h1>
       <p>
         This site is a labor of love, but it costs real money to host. If you
@@ -82,7 +65,7 @@ export default function TipJar({
         />
         <Button
           buttonStyle="primary"
-          onClick={handleSubmitClick}
+          onClick={handleSubmit}
           disabled={!amountDollars || isSubmitting}
         >
           Leave Tip

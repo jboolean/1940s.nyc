@@ -12,42 +12,52 @@ import stylesheet from './MapPane.less';
 import MainMap from './components/MainMap';
 import Search from './components/Search';
 import Geolocate from './components/Geolocate';
-import TipJar from './components/TipJar';
 import { withRouter, RouteComponentProps } from 'react-router';
 import { Link } from 'react-router-dom';
 
 import recordEvent from 'shared/utils/recordEvent';
 import ExternalIcon from './assets/external.svg?asset';
 import { NumericFormat } from 'react-number-format';
-import useAmountPresets from './components/TipJar/useAmountPresets';
-
-const TIP_JAR_DELAY = 120000;
+import useAmountPresets from '../TipJar/useAmountPresets';
+import { useTipJarStore } from '../TipJar';
 
 function SuggestedTip(): JSX.Element {
   const [lowestAmount] = useAmountPresets();
   return <NumericFormat displayType="text" prefix="$" value={lowestAmount} />;
 }
 
-interface Props {
+interface Props extends TipJarProps {
   className?: string;
 }
 
 interface State {
   overlay: OverlayId | null;
-  isTipJarOpen: boolean;
 }
 
+interface TipJarProps {
+  handleOpenTipJar: () => void;
+}
+function withTipJar<P extends TipJarProps, C extends React.ComponentType<P>>(
+  Component: C & React.ComponentType<P>
+): React.FunctionComponent<Omit<P, keyof TipJarProps>> {
+  function WithTipJar<PassProps extends Omit<P, keyof TipJarProps>>(
+    props: PassProps
+  ): JSX.Element {
+    const { open } = useTipJarStore();
+    // @ts-ignore -- I give up
+    return <Component {...props} handleOpenTipJar={open} />;
+  }
+  return WithTipJar;
+}
 class MapPane extends React.Component<Props & RouteComponentProps, State> {
   map?: typeof MainMap;
   private idPrefix: string;
-  private tipJarTimerHandle: ReturnType<typeof setTimeout> | null = null;
   historyUnlisten: () => void | null = null;
 
   constructor(props: Props & RouteComponentProps) {
     super(props);
     this.state = {
       overlay: 'default-map',
-      isTipJarOpen: false,
     };
     this.idPrefix = uniqueId('MapPane-');
 
@@ -56,11 +66,9 @@ class MapPane extends React.Component<Props & RouteComponentProps, State> {
       this.handleSearchFeatureSelected.bind(this);
     this.handleGeolocated = this.handleGeolocated.bind(this);
     this.openPhoto = this.openPhoto.bind(this);
-    this.setupTipJarPopup();
   }
 
   componentWillUnmount(): void {
-    if (this.tipJarTimerHandle) clearTimeout(this.tipJarTimerHandle);
     if (this.historyUnlisten) this.historyUnlisten();
   }
 
@@ -90,20 +98,6 @@ class MapPane extends React.Component<Props & RouteComponentProps, State> {
     closest(position).then(this.openPhoto, noop);
   }
 
-  setupTipJarPopup(): void {
-    const hasAutoOpenedTipJar =
-      window.localStorage.getItem('hasAutoOpenedTipJar') === 'true';
-    const hasTipped = window.localStorage.getItem('hasTipped') === 'true';
-    if (!this.tipJarTimerHandle) {
-      this.tipJarTimerHandle = setTimeout(() => {
-        if (!hasAutoOpenedTipJar && !hasTipped) {
-          this.setState({ isTipJarOpen: true });
-          window.localStorage.setItem('hasAutoOpenedTipJar', 'true');
-        }
-      }, TIP_JAR_DELAY);
-    }
-  }
-
   openPhoto(identifier: string): void {
     this.props.history.push({
       pathname: '/map/photo/' + identifier,
@@ -112,17 +106,11 @@ class MapPane extends React.Component<Props & RouteComponentProps, State> {
   }
 
   render(): React.ReactNode {
-    const { overlay, isTipJarOpen } = this.state;
+    const { overlay } = this.state;
     const { className } = this.props;
 
     return (
       <div className={classnames(stylesheet.container, className)}>
-        <TipJar
-          isOpen={isTipJarOpen}
-          onRequestClose={() => {
-            this.setState({ isTipJarOpen: false });
-          }}
-        />
         <div className={stylesheet.links}>
           <Link to="/stories" className={stylesheet.storiesLink}>
             Stories
@@ -140,7 +128,7 @@ class MapPane extends React.Component<Props & RouteComponentProps, State> {
                 category: 'Map',
                 action: 'Click Leave Tip',
               });
-              this.setState({ isTipJarOpen: true });
+              this.props.handleOpenTipJar();
             }}
           >
             <SuggestedTip /> Tip?
@@ -211,4 +199,4 @@ class MapPane extends React.Component<Props & RouteComponentProps, State> {
   }
 }
 
-export default withRouter(MapPane);
+export default withTipJar(withRouter(MapPane));
