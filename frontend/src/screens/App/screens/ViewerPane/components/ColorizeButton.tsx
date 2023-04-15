@@ -20,11 +20,13 @@ export default function ColorizeButton({
   const { toggleColorization, isLoading, colorEnabledForIdentifier } =
     useColorizationStore();
 
+  const enabled = colorEnabledForIdentifier === photoIdentifier;
+
   return colorizationEnabled ? (
     <Button
       className={classNames(stylesheet.colorizeButton, {
         [stylesheet.loading]: isLoading,
-        [stylesheet.enabled]: photoIdentifier === colorEnabledForIdentifier,
+        [stylesheet.enabled]: enabled,
       })}
       buttonTheme="viewer"
       buttonStyle="secondary"
@@ -32,6 +34,7 @@ export default function ColorizeButton({
       onClick={() => {
         toggleColorization(photoIdentifier);
       }}
+      aria-pressed={enabled}
     >
       <img
         src={MagicIcon}
