@@ -7,8 +7,9 @@ import stylesheet from './Overlay.less';
 
 // Encapsulates overlay logic for fading children in and out
 export default function Overlay({
+  className,
   children,
-}: React.PropsWithChildren<unknown>): JSX.Element {
+}: React.PropsWithChildren<{ className?: string }>): JSX.Element {
   const [isOverlayVisible, setIsOverlayVisible] = React.useState(false);
   const timeoutRef = React.useRef<number | null>(null);
 
@@ -61,7 +62,7 @@ export default function Overlay({
 
   return (
     <div
-      className={classnames(stylesheet.overlay, {})}
+      className={classnames(stylesheet.overlay, className, {})}
       onPointerOver={handleStartHover}
       onPointerLeave={handleEndHover}
       onPointerDown={handlePointerDown}

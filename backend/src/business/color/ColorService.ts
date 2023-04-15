@@ -4,6 +4,8 @@ import { colorizeImageWithAutoPromptBase64 } from '../utils/paletteApi';
 
 const s3 = new AWS.S3();
 
+// A lot of engineering went into this prompt
+// One word can make a huge difference
 const PROMPT =
   'Outdoor photo of city street with stone buildings and sign, trees, apartment neighborhood. brooklyn newyorkcity. A dramatic contrast in natural color. ';
 
@@ -13,6 +15,8 @@ const PROMPT =
  * @returns
  */
 export async function getColorizedImage(identifier: string): Promise<string> {
+  // I would use the originals, but they are inconsistently named (with and without .jpg)
+  const sourceKey = `jpg/${identifier}.jpg`;
   const destinationKey = `colorized/${identifier}.jpg`;
 
   // Check if image already exists
@@ -30,7 +34,7 @@ export async function getColorizedImage(identifier: string): Promise<string> {
       const s3Response = await s3
         .getObject({
           Bucket: 'fourties-photos',
-          Key: `originals/${identifier}`,
+          Key: sourceKey,
         })
         .promise();
 
