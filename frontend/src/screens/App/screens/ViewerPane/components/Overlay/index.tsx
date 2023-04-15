@@ -17,7 +17,7 @@ export default function Overlay({
   React.useEffect(() => {
     setIsOverlayVisible(true);
     const timeout = window.setTimeout(() => {
-      setIsOverlayVisible(false);
+      // setIsOverlayVisible(false);
     }, 5_000);
 
     timeoutRef.current = timeout;
@@ -57,7 +57,7 @@ export default function Overlay({
     if (e.pointerType !== 'mouse') {
       return;
     }
-    setIsOverlayVisible(false);
+    // setIsOverlayVisible(false);
   };
 
   return (

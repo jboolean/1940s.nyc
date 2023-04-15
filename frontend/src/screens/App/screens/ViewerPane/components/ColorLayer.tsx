@@ -28,32 +28,33 @@ export default function ColorLayer({
   // Sync loading state with store
   React.useEffect(() => {
     if (imageRef.current && enabled && isLoading && imageRef.current.complete) {
-      console.log('syncing loading state');
       handleImageLoaded();
     }
   }, [enabled, handleImageLoaded, imageRef.current?.complete, isLoading]);
 
   return (
-    <CSSTransition
-      appear={true}
-      in={enabled && !isLoading}
-      classNames={{ ...stylesheet }}
-      timeout={{
-        enter: 2000,
-        exit: 1000,
-      }}
-    >
-      <img
-        ref={imageRef}
-        className={classNames(stylesheet.colorLayer, className)}
-        src={colorizedImageSrc}
-        onLoad={() => {
-          console.log('loaded', enabled);
-          if (enabled) {
-            handleImageLoaded();
-          }
+    <>
+      <CSSTransition
+        appear={true}
+        in={enabled && !isLoading}
+        classNames={{ ...stylesheet }}
+        timeout={{
+          enter: 2000,
+          exit: 1000,
         }}
-      />
-    </CSSTransition>
+      >
+        <img
+          ref={imageRef}
+          className={classNames(stylesheet.colorLayer, className)}
+          src={colorizedImageSrc}
+          onLoad={() => {
+            console.log('loaded', enabled);
+            if (enabled) {
+              handleImageLoaded();
+            }
+          }}
+        />
+      </CSSTransition>
+    </>
   );
 }
