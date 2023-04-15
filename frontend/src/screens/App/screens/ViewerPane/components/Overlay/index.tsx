@@ -4,20 +4,26 @@ import { CSSTransition } from 'react-transition-group';
 import classnames from 'classnames';
 
 import stylesheet from './Overlay.less';
+import { useFeatureFlag } from 'screens/App/shared/stores/FeatureFlagsStore';
+import FeatureFlag from 'screens/App/shared/types/FeatureFlag';
 
 // Encapsulates overlay logic for fading children in and out
 export default function Overlay({
   className,
   children,
 }: React.PropsWithChildren<{ className?: string }>): JSX.Element {
-  const [isOverlayVisible, setIsOverlayVisible] = React.useState(false);
+  // This feature flag is useful in development to prevent the overlay from disappearing
+  const alwaysShowOverlay = useFeatureFlag(FeatureFlag.ALWAYS_SHOW_OVERLAY);
+
+  const [isOverlayVisible, setIsOverlayVisible] =
+    React.useState(alwaysShowOverlay);
   const timeoutRef = React.useRef<number | null>(null);
 
   // peek in so people can see this overlay exists
   React.useEffect(() => {
     setIsOverlayVisible(true);
     const timeout = window.setTimeout(() => {
-      // setIsOverlayVisible(false);
+      if (!alwaysShowOverlay) setIsOverlayVisible(false);
     }, 5_000);
 
     timeoutRef.current = timeout;
@@ -57,7 +63,10 @@ export default function Overlay({
     if (e.pointerType !== 'mouse') {
       return;
     }
-    // setIsOverlayVisible(false);
+    if (alwaysShowOverlay) {
+      return;
+    }
+    setIsOverlayVisible(false);
   };
 
   return (
