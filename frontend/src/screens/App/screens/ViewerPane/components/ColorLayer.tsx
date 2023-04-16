@@ -40,7 +40,7 @@ export default function ColorLayer({
         in={enabled && !isLoading}
         classNames={{ ...stylesheet }}
         timeout={{
-          enter: 2000,
+          enter: 1000,
           exit: 1000,
         }}
       >
