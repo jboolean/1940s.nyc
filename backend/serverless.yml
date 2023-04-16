@@ -40,7 +40,7 @@ plugins:
 functions:
   app:
     handler: appHandler.handler
-    timeout: 10
+    timeout: 20
     events: 
       - http:
           path: /{proxy+}
