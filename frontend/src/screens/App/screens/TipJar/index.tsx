@@ -25,17 +25,14 @@ const COPY_BY_VARIANT = {
     body: (
       <>
         <p>
-          Colorization on <i>1940s.nyc</i> uses the best colorization machine
-          learning model available. It costs a bit to process each photo, which
-          adds up.{' '}
+          Colorization on <i>1940s.nyc</i> uses the best machine learning model
+          available. Every photo costs money to process.
         </p>
-
         <p>
           <strong>
-            Would you please chip in a few bucks to cover my costs?
+            Would you please chip in a few bucks to cover these costs?
           </strong>{' '}
-          <br />I can only continue to offer this feature for free with your
-          support.
+          <br />I can only continue to offer this feature with your support.
         </p>
       </>
     ),
