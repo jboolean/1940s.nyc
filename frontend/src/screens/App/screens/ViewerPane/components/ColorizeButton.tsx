@@ -16,7 +16,10 @@ export default function ColorizeButton({
 }: {
   photoIdentifier: string;
 }): JSX.Element {
-  const colorizationEnabled = useFeatureFlag(FeatureFlag.COLORIZATION);
+  // This is a bit of a hack to only show for 40s photos, without making an api call to actually determine the collection
+  const isColorizable = photoIdentifier.startsWith('nynyma');
+  const colorizationEnabled =
+    useFeatureFlag(FeatureFlag.COLORIZATION) && isColorizable;
   const { toggleColorization, isLoading, colorEnabledForIdentifier } =
     useColorizationStore();
 
