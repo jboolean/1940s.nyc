@@ -2,11 +2,19 @@ import create from 'zustand';
 import { mountStoreDevtool } from 'simple-zustand-devtools';
 import { immer } from 'zustand/middleware/immer';
 import { API_BASE } from 'shared/utils/apiConstants';
+import { useTipJarStore } from '../../TipJar';
+
+const TIP_JAR_COUNT_THRESHOLD = 3;
+const TIP_JAR_DELAY = /* 10 seconds */ 1000 * 6;
+const TIP_JAR_REPEAT_EVERY = 5;
 
 interface State {
   colorEnabledForIdentifier: string | null;
   isLoading: boolean;
   colorizedImageSrc: string | null;
+
+  // Track images, so that after so many we can popup the tip jar
+  colorizedImageHistory: Array<string>;
 }
 
 interface Actions {
@@ -24,6 +32,7 @@ const useColorizationStore = create(
     isLoading: false,
     // colorizedImageData: null,
     colorizedImageSrc: null,
+    colorizedImageHistory: [],
 
     toggleColorization: (identifier: string) => {
       const { colorEnabledForIdentifier } = get();
@@ -39,7 +48,24 @@ const useColorizationStore = create(
         draft.colorEnabledForIdentifier = photoIdentifier;
         draft.isLoading = true;
         draft.colorizedImageSrc = `${API_BASE}/colorization/colorized/${photoIdentifier}`;
+
+        if (!get().colorizedImageHistory.includes(photoIdentifier)) {
+          draft.colorizedImageHistory.push(photoIdentifier);
+        }
       });
+
+      // If you have colored 3 images, or every 5 images after that, show the tip jar if they haven't paid
+      const nColored = get().colorizedImageHistory.length;
+      const hasTipped = window.localStorage.getItem('hasTipped') === 'true';
+      if (
+        !hasTipped &&
+        (nColored === TIP_JAR_COUNT_THRESHOLD ||
+          (nColored - TIP_JAR_COUNT_THRESHOLD) % TIP_JAR_REPEAT_EVERY === 0)
+      ) {
+        setTimeout(() => {
+          useTipJarStore.getState().open('colorization');
+        }, TIP_JAR_DELAY);
+      }
     },
     disableColorization: () => {
       set((draft) => {

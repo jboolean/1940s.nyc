@@ -8,8 +8,10 @@ import pick from 'lodash/pick';
 const TIP_JAR_DELAY = /* 2 minutes */ 1000 * 60 * 2;
 const RE_ENAGE_DELAY = /* 3 months */ 1000 * 60 * 60 * 24 * 30 * 3;
 
+type Variant = 'default' | 'colorization';
+
 interface Actions {
-  open(): void;
+  open(variant?: Variant): void;
   handleSubmit(): Promise<void>;
   handleRequestClose(): void;
   setAmountDollars(amountDollars: number): void;
@@ -21,6 +23,7 @@ interface State {
   isSubmitting: boolean;
   errorMessage: string | null;
   openedOn?: number;
+  variant: 'default' | 'colorization';
 }
 
 const useTipJarStore = create(
@@ -30,11 +33,13 @@ const useTipJarStore = create(
       isSubmitting: false,
       amountDollars: undefined,
       errorMessage: null,
+      variant: 'default',
 
-      open: () => {
+      open: (variant: Variant = 'default') => {
         set((draft) => {
           draft.isOpen = true;
           draft.openedOn = new Date().getTime();
+          draft.variant = variant;
         });
       },
       handleSubmit: async () => {
