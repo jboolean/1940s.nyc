@@ -24,6 +24,7 @@ interface Actions {
 
   // Image is loaded from the src attribute, so we need to know when it's done loading
   handleImageLoaded: () => void;
+  handleImageError: () => void;
 }
 
 const useColorizationStore = create(
@@ -77,6 +78,13 @@ const useColorizationStore = create(
     handleImageLoaded: () => {
       set((draft) => {
         draft.isLoading = false;
+      });
+    },
+    handleImageError: () => {
+      set((draft) => {
+        draft.isLoading = false;
+        draft.colorEnabledForIdentifier = null;
+        draft.colorizedImageSrc = null;
       });
     },
   }))

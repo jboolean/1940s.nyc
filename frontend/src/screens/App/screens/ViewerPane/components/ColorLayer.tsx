@@ -19,6 +19,7 @@ export default function ColorLayer({
     colorizedImageSrc,
     handleImageLoaded,
     isLoading,
+    handleImageError,
   } = useColorizationStore();
 
   const imageRef = React.useRef<HTMLImageElement | null>(null);
@@ -52,6 +53,9 @@ export default function ColorLayer({
             if (enabled) {
               handleImageLoaded();
             }
+          }}
+          onError={() => {
+            handleImageError();
           }}
         />
       </CSSTransition>
