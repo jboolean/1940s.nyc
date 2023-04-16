@@ -1,5 +1,6 @@
 import AWS, { AWSError } from 'aws-sdk';
 import { NotFound } from 'http-errors';
+import isProduction from '../utils/isProduction';
 import { colorizeImageWithAutoPromptBase64 } from '../utils/paletteApi';
 
 const s3 = new AWS.S3();
@@ -16,8 +17,10 @@ const PROMPT =
  */
 export async function getColorizedImage(identifier: string): Promise<string> {
   // I would use the originals, but they are inconsistently named (with and without .jpg)
+  const destinationDirectory = isProduction() ? 'colorized' : 'colorized-dev';
   const sourceKey = `jpg/${identifier}.jpg`;
-  const destinationKey = `colorized/${identifier}.jpg`;
+  const destinationKey = `${destinationDirectory}/${identifier}.jpg`;
+  const resolution = isProduction() ? 'sd' : 'watermarked-sd';
 
   // Check if image already exists
   const headObjectResponse = await s3
@@ -44,7 +47,7 @@ export async function getColorizedImage(identifier: string): Promise<string> {
       const { image: colorizedImageBase64 } =
         await colorizeImageWithAutoPromptBase64({
           image: buffer,
-          resolution: 'watermarked-sd',
+          resolution: resolution,
           prompt: PROMPT,
           raw_captions: true,
           auto_color: true,
@@ -56,7 +59,7 @@ export async function getColorizedImage(identifier: string): Promise<string> {
       await s3
         .putObject({
           Bucket: 'fourties-photos',
-          Key: `colorized/${identifier}.jpg`,
+          Key: destinationKey,
           Body: colorizedImage,
           ContentType: 'image/jpeg',
         })
@@ -72,5 +75,5 @@ export async function getColorizedImage(identifier: string): Promise<string> {
     }
   }
 
-  return `https://photos.1940s.nyc/colorized/${identifier}.jpg`;
+  return `https://photos.1940s.nyc/${destinationKey}`;
 }
