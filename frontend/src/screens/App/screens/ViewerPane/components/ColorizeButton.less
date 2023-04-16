@@ -1,13 +1,15 @@
 @import '../../../../../shared/styles/colors.less';
 
 @enabled-color: @blue;
+@background-width: 200%;
+@animation-time: 1.5s;
 
 .colorizeButton {
-  animation: loading 10s linear infinite paused;
+  animation: loading @animation-time linear infinite paused;
 
   @keyframes loading {
     0% {
-      background-position-x: 600%;
+      background-position-x: @background-width;
     }
     100% {
       background-position-x: 0%;
@@ -27,10 +29,14 @@
       @green ((2/3) * 100%),
       @blue ((3/3) * 100%)
     )
-    100% 0% / 600% 100%;
+    100% 0% / @background-width 100%;
 
   &.loading {
     animation-play-state: running;
+  }
+
+  &:disabled {
+    opacity: 1 !important;
   }
 }
 
