@@ -6,7 +6,7 @@ import { useTipJarStore } from '../../TipJar';
 
 const TIP_JAR_COUNT_THRESHOLD = 3;
 const TIP_JAR_DELAY = /* 10 seconds */ 1000 * 6;
-const TIP_JAR_REPEAT_EVERY = 5;
+const TIP_JAR_REPEAT_EVERY = 4;
 
 interface State {
   colorEnabledForIdentifier: string | null;
