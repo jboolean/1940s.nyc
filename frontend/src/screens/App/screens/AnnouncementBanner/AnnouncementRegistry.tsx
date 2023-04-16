@@ -32,7 +32,8 @@ if (useFeatureFlagStore.getState()[FeatureFlag.COLORIZATION]) {
     expiresAt: new Date('2023-07-01'),
     render: () => (
       <React.Fragment>
-        <b>🌈 New:</b> Click <i>Colorize</i> on any photo to see it in color.
+        <b>🌈 New:</b> Bring photos to life with the AI-powered <i>Colorize</i>{' '}
+        button
       </React.Fragment>
     ),
   });
