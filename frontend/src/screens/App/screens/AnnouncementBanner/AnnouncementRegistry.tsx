@@ -1,4 +1,6 @@
 import React from 'react';
+import useFeatureFlagStore from 'screens/App/shared/stores/FeatureFlagsStore';
+import FeatureFlag from 'screens/App/shared/types/FeatureFlag';
 import Announcment from './Announcement';
 
 const ANNOUNCEMENTS_REGISTRY: Announcment[] = [
@@ -23,5 +25,17 @@ const ANNOUNCEMENTS_REGISTRY: Announcment[] = [
     ),
   },
 ];
+
+if (useFeatureFlagStore.getState()[FeatureFlag.COLORIZATION]) {
+  ANNOUNCEMENTS_REGISTRY.push({
+    id: 'colorization',
+    expiresAt: new Date('2023-07-01'),
+    render: () => (
+      <React.Fragment>
+        <b>🌈 New:</b> Click <i>Colorize</i> on any photo to see it in color.
+      </React.Fragment>
+    ),
+  });
+}
 
 export default ANNOUNCEMENTS_REGISTRY;
