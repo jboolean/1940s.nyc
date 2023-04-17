@@ -31,7 +31,7 @@ export default function Overlay({
     return (): void => {
       clearTimeout(timeout);
     };
-  }, []);
+  }, [alwaysShowOverlay]);
 
   const cancelPeekTimeout = (): void => {
     if (timeoutRef.current) {
