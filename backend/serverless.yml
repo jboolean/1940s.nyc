@@ -30,16 +30,17 @@ provider:
     MODERATORS_TO_EMAIL: ${ssm:/${self:service}-${sls:stage}-moderators-to-email}
     MAPBOX_SK: ${ssm:/${self:service}-${sls:stage}-mapbox-sk}
     OPENAI_SK: ${ssm:/${self:service}-${sls:stage}-openai-sk}
+    PALETTE_API_KEY: ${ssm:/${self:service}-${sls:stage}-palette-api-key}
 plugins:
   - serverless-plugin-select
-  - serverless-offline
   - serverless-plugin-typescript
   - serverless-domain-manager
+  - serverless-offline
 
 functions:
   app:
     handler: appHandler.handler
-    timeout: 10
+    timeout: 20
     events: 
       - http:
           path: /{proxy+}

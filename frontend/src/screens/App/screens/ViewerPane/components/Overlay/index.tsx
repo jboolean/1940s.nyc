@@ -4,19 +4,26 @@ import { CSSTransition } from 'react-transition-group';
 import classnames from 'classnames';
 
 import stylesheet from './Overlay.less';
+import { useFeatureFlag } from 'screens/App/shared/stores/FeatureFlagsStore';
+import FeatureFlag from 'screens/App/shared/types/FeatureFlag';
 
 // Encapsulates overlay logic for fading children in and out
 export default function Overlay({
+  className,
   children,
-}: React.PropsWithChildren<unknown>): JSX.Element {
-  const [isOverlayVisible, setIsOverlayVisible] = React.useState(false);
+}: React.PropsWithChildren<{ className?: string }>): JSX.Element {
+  // This feature flag is useful in development to prevent the overlay from disappearing
+  const alwaysShowOverlay = useFeatureFlag(FeatureFlag.ALWAYS_SHOW_OVERLAY);
+
+  const [isOverlayVisible, setIsOverlayVisible] =
+    React.useState(alwaysShowOverlay);
   const timeoutRef = React.useRef<number | null>(null);
 
   // peek in so people can see this overlay exists
   React.useEffect(() => {
     setIsOverlayVisible(true);
     const timeout = window.setTimeout(() => {
-      setIsOverlayVisible(false);
+      if (!alwaysShowOverlay) setIsOverlayVisible(false);
     }, 5_000);
 
     timeoutRef.current = timeout;
@@ -24,7 +31,7 @@ export default function Overlay({
     return (): void => {
       clearTimeout(timeout);
     };
-  }, []);
+  }, [alwaysShowOverlay]);
 
   const cancelPeekTimeout = (): void => {
     if (timeoutRef.current) {
@@ -56,12 +63,15 @@ export default function Overlay({
     if (e.pointerType !== 'mouse') {
       return;
     }
+    if (alwaysShowOverlay) {
+      return;
+    }
     setIsOverlayVisible(false);
   };
 
   return (
     <div
-      className={classnames(stylesheet.overlay, {})}
+      className={classnames(stylesheet.overlay, className, {})}
       onPointerOver={handleStartHover}
       onPointerLeave={handleEndHover}
       onPointerDown={handlePointerDown}

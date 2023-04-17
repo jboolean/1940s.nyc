@@ -15,12 +15,29 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
   }
 
-  .image {
+  .colorLayer {
+    z-index: 1;
+    position: absolute;
+
+    user-select: none;
+    pointer-events: none;
+
+    // We get low res color images and "upscole" them here by only using the color information
+    // and blending in the lightness of the full image
+    mix-blend-mode: color;
+  }
+
+  .image,
+  .colorLayer {
     object-fit: contain;
     object-position: center center;
     width: 100%;
     height: 100%;
     transform: scale(1.05); // cuts off the borders
+  }
+
+  .overlay {
+    z-index: 2;
   }
 
   @content-padding: 5.5px;

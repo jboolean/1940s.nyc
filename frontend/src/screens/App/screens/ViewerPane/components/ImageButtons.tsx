@@ -5,6 +5,7 @@ import { API_BASE } from 'utils/apiConstants';
 
 import Button, { ButtonStyledLink } from 'shared/components/Button';
 import { useStoryDraftStore } from '../../SubmitStoryWizard';
+import ColorizeButton from './ColorizeButton';
 
 export default function ImageButtons(): JSX.Element {
   const { identifier: photoIdentifier } = useParams<{ identifier?: string }>();
@@ -21,6 +22,7 @@ export default function ImageButtons(): JSX.Element {
       >
         Order Print
       </ButtonStyledLink>
+      <ColorizeButton photoIdentifier={photoIdentifier} />
       <Button
         buttonTheme="viewer"
         buttonStyle="secondary"

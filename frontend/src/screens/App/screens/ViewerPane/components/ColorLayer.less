@@ -1,0 +1,40 @@
+@import '../../../../../shared/styles/colors.less';
+
+:local {
+  .unfaded {
+    opacity: 1;
+  }
+
+  .faded {
+    opacity: 0;
+  }
+
+  .colorLayer {
+    // default state
+    .faded();
+  }
+
+  .enter,
+  .appear {
+    .faded();
+  }
+  .enterActive,
+  .appearActive {
+    transition: opacity 1s ease-in;
+    .unfaded();
+  }
+  .enterDone,
+  .appearDone {
+    .unfaded();
+  }
+  .exit {
+    .unfaded();
+  }
+  .exitActive {
+    .faded();
+    transition: opacity 1s ease-out;
+  }
+  .exitDone {
+    .faded();
+  }
+}

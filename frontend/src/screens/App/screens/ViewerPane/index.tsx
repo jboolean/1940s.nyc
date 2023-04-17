@@ -13,6 +13,7 @@ import Overlay from './components/Overlay';
 import { PHOTO_BASE } from 'shared/utils/apiConstants';
 import ImageButtons from './components/ImageButtons';
 import Stories from './components/Stories';
+import ColorLayer from './components/ColorLayer';
 
 export default function ViewerPane({
   className,
@@ -24,7 +25,7 @@ export default function ViewerPane({
 
   return (
     <div className={classnames(stylesheet.container, className)}>
-      <Overlay>
+      <Overlay className={stylesheet.overlay}>
         <div className={stylesheet.overlayContentWrapper}>
           <div className={stylesheet.floorFade} />
 
@@ -52,6 +53,10 @@ export default function ViewerPane({
           <p className={stylesheet.credit}>Photo © NYC Municipal Archives </p>
         </div>
       </Overlay>
+      <ColorLayer
+        className={stylesheet.colorLayer}
+        photoIdentifier={photoIdentifier}
+      />
       <ImageSwitcher
         className={stylesheet.image}
         src={`${PHOTO_BASE}/jpg/${photoIdentifier}.jpg`}
