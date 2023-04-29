@@ -4,14 +4,18 @@ import * as express from 'express';
 export const USER_TOKEN_COOKIE = 'user-token';
 
 export async function getUserFromRequestOrCreateAndSetCookie(
-  req: express.Request & { user?: { id: number } },
-  res: express.Response
+  req: express.Request & { user?: { id: number } }
 ): Promise<number> {
   let token: string | undefined;
   let userId: number | undefined;
   if (req.user) {
     userId = req.user.id;
     token = UserService.createUserToken(userId);
+  }
+
+  const res = req.res;
+  if (!res) {
+    throw new Error('No response object');
   }
 
   if (!token || !userId) {

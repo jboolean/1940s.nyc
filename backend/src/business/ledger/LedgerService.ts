@@ -57,7 +57,7 @@ export class UsageCapError extends TooManyRequests {
  * @param wrapped
  * @returns result of wrapped function
  */
-export default async function withMeteredUsage<R>(
+export async function withMeteredUsage<R>(
   userId: number,
   photoIdentifier: string,
   wrapped: () => Promise<R>
@@ -90,4 +90,39 @@ export default async function withMeteredUsage<R>(
     // if this throws, the transaction will be rolled back
     return await wrapped();
   });
+}
+
+const CENTS_PER_CREDIT = 6;
+
+/**
+ * This exists because there is not a formal pay-for-credits flow in the app, but
+ * I want to reduce rate-limiting on users who contribute.
+ *
+ * So, in response to a payment, we grant credits to the user at a hardcoded rate.
+ *
+ * This is not advertised in the app, but hopefully reduces rate-limiting for users who contribute.
+ * (it would be annoying if you donate and then still get rate-limited)
+ * @param userId
+ * @param amountCents
+ * @param paymentIntentId
+ */
+export async function grantCreditsForPayment(
+  userId: number,
+  amountCents: number,
+  paymentIntentId: string
+): Promise<void> {
+  const ledgerRepository = getConnection().getRepository(LedgerEntry);
+
+  const amount = Math.floor(amountCents / CENTS_PER_CREDIT);
+
+  // Create a new ledger entry
+  const entry = new LedgerEntry();
+  entry.userId = userId;
+  entry.amount = amount;
+  entry.type = LedgerEntryType.CREDIT;
+  entry.metadata = {
+    paymentIntentId,
+    amountCents,
+  };
+  await ledgerRepository.save(entry);
 }

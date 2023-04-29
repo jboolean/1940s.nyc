@@ -1,6 +1,8 @@
 /* eslint-disable camelcase */
+import * as express from 'express';
 import { InternalServerError } from 'http-errors';
-import { Body, Post, Route, Security } from 'tsoa';
+import { Body, Post, Request, Route, Security } from 'tsoa';
+import { getUserFromRequestOrCreateAndSetCookie } from './auth/userAuthUtils';
 import stripe from './stripe';
 
 type TipSessionRequest = {
@@ -14,9 +16,12 @@ export class TipsController {
   @Security('user-token')
   @Post('/session')
   public async createTipSession(
-    @Body() body: TipSessionRequest
+    @Body() body: TipSessionRequest,
+    @Request() req: express.Request
   ): Promise<{ sessionId: string }> {
     const { amount, successUrl, cancelUrl } = body;
+    const userId = await getUserFromRequestOrCreateAndSetCookie(req);
+
     try {
       const session = await stripe.checkout.sessions.create({
         cancel_url: cancelUrl,
@@ -34,6 +39,9 @@ export class TipsController {
             quantity: 1,
           },
         ],
+        metadata: {
+          userId,
+        },
       });
 
       return { sessionId: session.id };

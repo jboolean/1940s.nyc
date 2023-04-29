@@ -10,9 +10,17 @@ import LedgerEntryType from '../enum/LedgerEntryType';
  * An entry in the usage ledger to support
  * limiting by frequency or by total usage
  */
-interface LedgerEntryMetadata {
+
+interface PhotoUsageMetadata {
   photoIdentifier: string;
 }
+
+interface CreditMetadata {
+  paymentIntentId: string;
+  amountCents: number;
+}
+
+type LedgerEntryMetadata = PhotoUsageMetadata | CreditMetadata;
 
 @Entity('ledger')
 export default class LedgerEntry {

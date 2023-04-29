@@ -1,6 +1,6 @@
 import AWS, { AWSError } from 'aws-sdk';
 import { NotFound } from 'http-errors';
-import withMeteredUsage from '../ledger/LedgerService';
+import { withMeteredUsage } from '../ledger/LedgerService';
 import isProduction from '../utils/isProduction';
 import { colorizeImageWithAutoPromptBase64 } from '../utils/paletteApi';
 

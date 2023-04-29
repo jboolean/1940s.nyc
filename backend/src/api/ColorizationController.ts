@@ -16,7 +16,7 @@ export class ColorizationController extends Controller {
       throw new Error('No response object');
     }
 
-    const userId = await getUserFromRequestOrCreateAndSetCookie(req, res);
+    const userId = await getUserFromRequestOrCreateAndSetCookie(req);
 
     const url = await ColorService.getColorizedImage(identifier, userId);
     res.redirect(301, url);
