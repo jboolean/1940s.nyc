@@ -1,6 +1,7 @@
 import React, { ImgHTMLAttributes } from 'react';
 
 import { CSSTransition } from 'react-transition-group';
+import recordEvent from 'shared/utils/recordEvent';
 
 import Require from 'utils/Require';
 
@@ -48,6 +49,11 @@ export default class ImageSwitcher extends React.Component<Props, State> {
           preloadImage(this.props.src, this.handleNewImgLoad);
         }
       );
+
+      recordEvent({
+        category: 'Image Viewer',
+        action: 'Image Changed',
+      });
     }
   }
 
