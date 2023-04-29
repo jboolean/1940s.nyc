@@ -10,11 +10,10 @@ const MAX_LOOKBACK_USAGES = 20;
 
 const SINGLE_PHOTO_USAGE_AMOUNT_POSITIVE = 1;
 
-async function hasEnoughBalance(
+async function getBalance(
   ledgerRepository: Repository<LedgerEntry>,
-  userId: number,
-  amountToConsume: number
-): Promise<boolean> {
+  userId: number
+): Promise<number> {
   const { balance } = (await ledgerRepository
     .createQueryBuilder('entry')
     .select('SUM(entry.amount)', 'balance')
@@ -22,6 +21,16 @@ async function hasEnoughBalance(
       userId,
     })
     .getRawOne<{ balance: number }>()) ?? { balance: 0 };
+
+  return balance;
+}
+
+async function hasEnoughBalance(
+  ledgerRepository: Repository<LedgerEntry>,
+  userId: number,
+  amountToConsume: number
+): Promise<boolean> {
+  const balance = await getBalance(ledgerRepository, userId);
 
   return balance >= amountToConsume;
 }
@@ -92,7 +101,7 @@ export async function withMeteredUsage<R>(
   });
 }
 
-const CENTS_PER_CREDIT = 6;
+const CENTS_PER_CREDIT = 10;
 
 /**
  * This exists because there is not a formal pay-for-credits flow in the app, but
@@ -113,12 +122,20 @@ export async function grantCreditsForPayment(
 ): Promise<void> {
   const ledgerRepository = getConnection().getRepository(LedgerEntry);
 
-  const amount = Math.floor(amountCents / CENTS_PER_CREDIT);
+  const balance = await getBalance(ledgerRepository, userId);
+
+  // Credits are granted at a fixed rate
+  // Plus an amnesty for negative balances
+
+  const creditsFromPayment = Math.floor(amountCents / CENTS_PER_CREDIT);
+  const amnesty = balance < 0 ? -balance : 0;
+
+  const creditsToGrant = creditsFromPayment + amnesty;
 
   // Create a new ledger entry
   const entry = new LedgerEntry();
   entry.userId = userId;
-  entry.amount = amount;
+  entry.amount = creditsToGrant;
   entry.type = LedgerEntryType.CREDIT;
   entry.metadata = {
     paymentIntentId,
