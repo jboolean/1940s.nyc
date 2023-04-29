@@ -19,13 +19,14 @@ import AdminRoutes from './screens/Admin/AdminRoutes';
 import FeatureFlags from './screens/FeatureFlags';
 import SubmitStoryWizard from './screens/SubmitStoryWizard';
 import EditStory from './screens/EditStory';
-import TipJar from './screens/TipJar';
+import TipJar, { useTipJarStore } from './screens/TipJar';
 
 const IS_SHUTDOWN = false;
 
 const searchParams = new URLSearchParams(window.location.search);
 
 const thankYouInitial = searchParams.has('tipSuccess');
+const openTipJarOnLoad = searchParams.has('openTipJar');
 const noWelcome = searchParams.has('noWelcome');
 
 if (noWelcome) searchParams.delete('noWelcome');
@@ -38,8 +39,16 @@ history.replace({
 function Modals(): JSX.Element {
   const [isThankYouOpen, setThankYouOpen] = React.useState(thankYouInitial);
   const [isWelcomeOpen, setWelcomeOpen] = React.useState(
-    !isThankYouOpen && !noWelcome
+    !isThankYouOpen && !openTipJarOnLoad && !noWelcome
   );
+
+  const openTipJar = useTipJarStore((state) => state.open);
+
+  React.useEffect(() => {
+    if (openTipJarOnLoad) {
+      openTipJar();
+    }
+  }, [openTipJar]);
 
   return (
     <>
