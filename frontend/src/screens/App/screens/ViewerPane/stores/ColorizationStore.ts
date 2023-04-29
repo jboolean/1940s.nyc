@@ -91,6 +91,7 @@ const useColorizationStore = create(
         'The image could not be colorized. ' +
           'You may have reached the limit on the number of photos that can be colorized per 24-hour period. ' +
           'This limit exists to keep costs in check. ' +
+          'Leaving a tip will increase the limit in this browser. ' +
           'Thank you for understanding, and I hope you come back to explore more tomorrow. \n\n' +
           '  - Julian (julian@1940s.nyc)'
       );
