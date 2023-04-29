@@ -10,6 +10,7 @@ import MagicIcon from './assets/magic.svg?asset';
 import classNames from 'classnames';
 
 import stylesheet from './ColorizeButton.less';
+import { useExperimentVariants } from 'shared/utils/OptimizeExperiments';
 
 export default function ColorizeButton({
   photoIdentifier,
@@ -18,8 +19,13 @@ export default function ColorizeButton({
 }): JSX.Element {
   // This is a bit of a hack to only show for 40s photos, without making an api call to actually determine the collection
   const isColorizable = photoIdentifier.startsWith('nynyma');
+  const isColorizationFlagEnabled = useFeatureFlag(FeatureFlag.COLORIZATION);
+  const isColorizationExperimentEnabled =
+    useExperimentVariants('nqDw4XFlQaCY57aVMxJReA')?.[0] == 1;
   const colorizationEnabled =
-    useFeatureFlag(FeatureFlag.COLORIZATION) && isColorizable;
+    isColorizable &&
+    (isColorizationFlagEnabled || isColorizationExperimentEnabled);
+
   const { toggleColorization, isLoading, colorEnabledForIdentifier } =
     useColorizationStore();
 
