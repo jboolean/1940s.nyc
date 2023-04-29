@@ -47,7 +47,7 @@ export async function expressAuthentication(
       throw new Unauthorized('Invalid token');
     }
 
-    // User for public endpoints where usage is trackedo
+    // User for public endpoints where usage is tracked
   } else if (securityName === 'user-token') {
     const userToken = (req.cookies as Cookies)[USER_TOKEN_COOKIE];
     if (!userToken) {
