@@ -3,6 +3,7 @@ import { mountStoreDevtool } from 'simple-zustand-devtools';
 import { immer } from 'zustand/middleware/immer';
 import { API_BASE } from 'shared/utils/apiConstants';
 import { useTipJarStore } from '../../TipJar';
+import recordEvent from 'shared/utils/recordEvent';
 
 const TIP_JAR_COUNT_THRESHOLD = 3;
 const TIP_JAR_DELAY = /* 10 seconds */ 1000 * 6;
@@ -53,6 +54,11 @@ const useColorizationStore = create(
         if (!get().colorizedImageHistory.includes(photoIdentifier)) {
           draft.colorizedImageHistory.push(photoIdentifier);
         }
+
+        recordEvent({
+          category: 'Colorization',
+          action: 'Click Colorize',
+        });
       });
 
       // If you have colored 3 images, or every 5 images after that, show the tip jar if they haven't paid
