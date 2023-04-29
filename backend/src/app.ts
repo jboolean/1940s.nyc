@@ -4,6 +4,7 @@ const app = express();
 import * as Sentry from '@sentry/node';
 import * as Tracing from '@sentry/tracing';
 import { CaptureConsole as CaptureConsoleIntegration } from '@sentry/integrations';
+import cookieParser from 'cookie-parser';
 
 import createConnection from './createConnection';
 
@@ -56,6 +57,7 @@ app.use(
 app.use(Sentry.Handlers.tracingHandler());
 
 app.use(express.json());
+app.use(cookieParser());
 
 app.use(
   cors({

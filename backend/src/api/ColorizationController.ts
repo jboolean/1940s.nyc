@@ -1,9 +1,11 @@
-import { Controller, Get, Path, Request, Route } from 'tsoa';
-import * as ColorService from '../business/color/ColorService';
 import * as express from 'express';
+import { Controller, Get, Path, Request, Route, Security } from 'tsoa';
+import * as ColorService from '../business/color/ColorService';
+import { getUserFromRequestOrCreateAndSetCookie } from './auth/userAuthUtils';
 
 @Route('colorization')
 export class ColorizationController extends Controller {
+  @Security('user-token')
   @Get('/colorized/{identifier}')
   public async getColorizedImage(
     @Path('identifier') identifier: string,
@@ -14,7 +16,9 @@ export class ColorizationController extends Controller {
       throw new Error('No response object');
     }
 
-    const url = await ColorService.getColorizedImage(identifier);
+    const userId = await getUserFromRequestOrCreateAndSetCookie(req, res);
+
+    const url = await ColorService.getColorizedImage(identifier, userId);
     res.redirect(301, url);
   }
 }
