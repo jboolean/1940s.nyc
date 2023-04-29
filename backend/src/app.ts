@@ -12,7 +12,6 @@ import { NotFound, HttpError } from 'http-errors';
 import { RegisterRoutes } from '../tsoa-build/routes';
 import GeodataResource from './api/GeodataResource';
 import PhotosResource from './api/PhotosResource';
-import TipsResource from './api/TipsResource';
 
 import {
   NextFunction,
@@ -76,7 +75,6 @@ app.use(async (req, res, next) => {
 });
 
 app.use('/photos', PhotosResource);
-app.use('/tips', TipsResource);
 app.use('/geodata', GeodataResource);
 app.use('/stripe-webhooks', StripeWebhooksResource);
 
