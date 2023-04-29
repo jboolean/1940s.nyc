@@ -66,6 +66,7 @@ app.use(
       'https://1940s.nyc',
       /--1940s-nyc\.netlify\.app$/,
     ],
+    credentials: true,
   })
 );
 
