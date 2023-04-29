@@ -3,6 +3,7 @@ import ipfilter from 'express-ipfilter';
 
 import Stripe from 'stripe';
 import EmailCampaignService from '../business/email/EmailCampaignService';
+import * as LedgerService from '../business/ledger/LedgerService';
 const router = express.Router();
 
 const STRIPE_IPS = [
@@ -33,6 +34,25 @@ router.post<'/', unknown, unknown, Stripe.Event, unknown>(
         if (email) {
           await EmailCampaignService.addToMailingList(email, 'stripe');
         }
+        break;
+      }
+      case 'checkout.session.completed': {
+        const session = event.data.object as Stripe.Checkout.Session;
+        const userId = session.metadata?.userId
+          ? parseInt(session.metadata.userId, 10)
+          : undefined;
+        const amountCents = session.amount_subtotal;
+        const paymentIntent = session.payment_intent;
+        if (userId && amountCents && typeof paymentIntent === 'string') {
+          await LedgerService.grantCreditsForPayment(
+            userId,
+            amountCents,
+            paymentIntent
+          );
+        } else {
+          console.warn('Stripe webhook missing required data', event);
+        }
+        break;
       }
     }
     res.status(200).send();

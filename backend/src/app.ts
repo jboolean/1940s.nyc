@@ -4,6 +4,7 @@ const app = express();
 import * as Sentry from '@sentry/node';
 import * as Tracing from '@sentry/tracing';
 import { CaptureConsole as CaptureConsoleIntegration } from '@sentry/integrations';
+import cookieParser from 'cookie-parser';
 
 import createConnection from './createConnection';
 
@@ -11,7 +12,6 @@ import { NotFound, HttpError } from 'http-errors';
 import { RegisterRoutes } from '../tsoa-build/routes';
 import GeodataResource from './api/GeodataResource';
 import PhotosResource from './api/PhotosResource';
-import TipsResource from './api/TipsResource';
 
 import {
   NextFunction,
@@ -56,6 +56,7 @@ app.use(
 app.use(Sentry.Handlers.tracingHandler());
 
 app.use(express.json());
+app.use(cookieParser());
 
 app.use(
   cors({
@@ -74,7 +75,6 @@ app.use(async (req, res, next) => {
 });
 
 app.use('/photos', PhotosResource);
-app.use('/tips', TipsResource);
 app.use('/geodata', GeodataResource);
 app.use('/stripe-webhooks', StripeWebhooksResource);
 
