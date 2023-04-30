@@ -85,7 +85,8 @@ export function OptimizeExperimentsProvider({
         [experimentId]: variants,
       });
     });
-  }, [assignmentsByExperimentId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- run once
+  }, []);
 
   return (
     <ExperimentAssignmentsContext.Provider value={assignmentsByExperimentId}>
