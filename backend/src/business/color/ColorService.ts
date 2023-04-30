@@ -13,8 +13,8 @@ const PROMPT =
 
 async function createColorVersion(
   sourceKey: string,
-  useTestingResolution: boolean,
-  destinationKey: string
+  destinationKey: string,
+  useTestingResolution: boolean
 ): Promise<void> {
   const resolution = useTestingResolution ? 'watermarked-sd' : 'sd';
 
@@ -70,9 +70,8 @@ export async function getColorizedImage(
   identifier: string,
   userId: number
 ): Promise<string> {
-  // I would use the originals, but they are inconsistently named (with and without .jpg)
-  const destinationDirectory = isProduction() ? 'colorized' : 'colorized-dev';
   const sourceKey = `jpg/${identifier}.jpg`;
+  const destinationDirectory = isProduction() ? 'colorized' : 'colorized-dev';
   const destinationKey = `${destinationDirectory}/${identifier}.jpg`;
 
   // Check if image already exists
@@ -86,7 +85,7 @@ export async function getColorizedImage(
 
   if (!headObjectResponse) {
     await withMeteredUsage(userId, identifier, async () => {
-      await createColorVersion(sourceKey, !isProduction(), destinationKey);
+      await createColorVersion(sourceKey, destinationKey, !isProduction());
     });
   }
 
