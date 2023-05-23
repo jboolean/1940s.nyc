@@ -90,7 +90,7 @@ export default function Welcome({
             </a>{' '}
             •{' '}
             <a
-              href="https://www1.nyc.gov/site/records/about/terms-and-conditions.page"
+              href="https://www.nyc.gov/site/records/historical-records/terms-and-conditions.page"
               target="_blank"
               rel="noopener noreferrer"
             >
