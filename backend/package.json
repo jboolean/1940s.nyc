@@ -51,7 +51,7 @@
     "serverless-offline": "^11.2.1",
     "serverless-plugin-select": "^2.0.0-rc.1",
     "serverless-plugin-typescript": "^2.1.4",
-    "typescript": "^4.8.4"
+    "typescript": "^5.1.3"
   },
   "dependencies": {
     "@sentry/integrations": "^7.36.0",
