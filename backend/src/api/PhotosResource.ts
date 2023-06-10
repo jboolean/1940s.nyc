@@ -16,6 +16,13 @@ import ErrorResponse from './ErrorResponse';
 const PHOTO_PURCHASE_FORM_URL =
   'https://dorisorders.nyc.gov/dorisorders/ui/order-reproductions';
 
+// I don't know whether DORIS has analytics, but if they do this will allow them to see my referrals
+const UTM_TAGS_FOR_DORIS = {
+  utm_source: 'fourtiesnyc',
+  utm_campaign: 'order-print',
+  utm_medium: 'referral',
+};
+
 // Get photos by matching lng,lat
 router.get<
   '/',
@@ -144,7 +151,9 @@ router.get('/:identifier/buy-prints', async (req, res) => {
   };
 
   const formUrl =
-    PHOTO_PURCHASE_FORM_URL + '?' + querystring.stringify(formParams);
+    PHOTO_PURCHASE_FORM_URL +
+    '?' +
+    querystring.stringify({ ...formParams, ...UTM_TAGS_FOR_DORIS });
   res.redirect(formUrl);
 });
 
