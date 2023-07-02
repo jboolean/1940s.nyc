@@ -43,10 +43,7 @@ import {
   toPublicStoryResponse,
 } from './storyToApi';
 import EmailCampaignService from '../../business/email/EmailCampaignService';
-
-function normalizeEmail(email: string): string {
-  return email.toLocaleLowerCase();
-}
+import normalizeEmail from '../../business/utils/normalizeEmail';
 
 function updateModelFromRequest(
   story: Story,

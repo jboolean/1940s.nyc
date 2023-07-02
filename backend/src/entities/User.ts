@@ -24,4 +24,14 @@ export default class User {
     name: 'ip_address',
   })
   ipAddress: string;
+
+  @Column({
+    type: String,
+    nullable: true,
+  })
+  email!: string | null;
+
+  get isAnonymous(): boolean {
+    return !this.email;
+  }
 }

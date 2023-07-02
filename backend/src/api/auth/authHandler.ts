@@ -1,9 +1,9 @@
 import * as Express from 'express';
-import getNetfilyUser from '../../business/utils/getNetlifyUser';
-import { Unauthorized } from 'http-errors';
 import { UserData } from 'gotrue-js';
+import { Unauthorized } from 'http-errors';
 import * as UserService from '../../business/users/UserService';
-import { USER_TOKEN_COOKIE } from './userAuthUtils';
+import getNetfilyUser from '../../business/utils/getNetlifyUser';
+import { getAuthCookie } from './authCookieUtils';
 
 interface NetlifyMetadata {
   roles: string[];
@@ -11,10 +11,6 @@ interface NetlifyMetadata {
 
 interface EndUser {
   id: number;
-}
-
-interface Cookies {
-  [USER_TOKEN_COOKIE]?: string;
 }
 
 export async function expressAuthentication(
@@ -49,7 +45,7 @@ export async function expressAuthentication(
 
     // User for public endpoints where usage is tracked
   } else if (securityName === 'user-token') {
-    const userToken = (req.cookies as Cookies)[USER_TOKEN_COOKIE];
+    const userToken = getAuthCookie(req);
     if (!userToken) {
       // Allow unauthenticated users, we should create a new user in the request handler
       return null;
