@@ -34,7 +34,7 @@ function createUserTokenForMagicLink(userId: number): string {
   });
 }
 
-export function getUserFromToken(token: string): number | undefined {
+export function getUserIdFromToken(token: string): number | undefined {
   try {
     const { sub } = jwt.verify(token, JWT_SECRET, {
       algorithms: ['HS256'],
@@ -50,6 +50,30 @@ export function getUserFromToken(token: string): number | undefined {
     console.error('Error verifying user token', e);
     return undefined;
   }
+}
+
+export function getUser(userId: number): Promise<User | null> {
+  const userRepository = getRepository(User);
+  return userRepository.findOneBy({ id: userId });
+}
+
+/**
+ * Attach the Stripe customer ID to the user.
+ * Also set the email if the user was anonymous.
+ * @param userId
+ * @param stripeCustomerId
+ * @param email
+ */
+export async function attachStripeCustomer(
+  userId: number,
+  stripeCustomerId: string,
+  email?: string
+): Promise<void> {
+  const userRepository = getRepository(User);
+  const user = await userRepository.findOneByOrFail({ id: userId });
+  user.stripeCustomerId = stripeCustomerId;
+  if (email && user.isAnonymous) user.email = email;
+  await userRepository.save(user);
 }
 
 export async function createUser(

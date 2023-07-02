@@ -50,7 +50,7 @@ export async function expressAuthentication(
       // Allow unauthenticated users, we should create a new user in the request handler
       return null;
     }
-    const userId = UserService.getUserFromToken(userToken);
+    const userId = UserService.getUserIdFromToken(userToken);
     if (!userId) {
       return null;
     }

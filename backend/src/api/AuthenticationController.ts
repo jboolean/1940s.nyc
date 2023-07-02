@@ -77,7 +77,7 @@ export class AuthenticationController extends Controller {
       throw new BadRequest('No token provided');
     }
 
-    const userId = UserService.getUserFromToken(magicToken);
+    const userId = UserService.getUserIdFromToken(magicToken);
 
     if (!userId) {
       throw new Unauthorized('The link contains in invalid or expired token');

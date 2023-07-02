@@ -4,6 +4,8 @@ import ipfilter from 'express-ipfilter';
 import Stripe from 'stripe';
 import EmailCampaignService from '../business/email/EmailCampaignService';
 import * as LedgerService from '../business/ledger/LedgerService';
+import * as UserService from '../business/users/UserService';
+import isProduction from '../business/utils/isProduction';
 const router = express.Router();
 
 const STRIPE_IPS = [
@@ -20,6 +22,10 @@ const STRIPE_IPS = [
   '54.187.205.235',
   '54.187.216.72',
 ];
+
+if (!isProduction()) {
+  STRIPE_IPS.push('127.0.0.1');
+}
 
 router.use('/', ipfilter.IpFilter(STRIPE_IPS, { mode: 'allow' }));
 
@@ -41,6 +47,8 @@ router.post<'/', unknown, unknown, Stripe.Event, unknown>(
         const userId = session.metadata?.userId
           ? parseInt(session.metadata.userId, 10)
           : undefined;
+
+        // Grant some credits from their payment, see comment on LedgerService
         const amountCents = session.amount_subtotal;
         const paymentIntent = session.payment_intent;
         if (userId && amountCents && typeof paymentIntent === 'string') {
@@ -50,7 +58,26 @@ router.post<'/', unknown, unknown, Stripe.Event, unknown>(
             paymentIntent
           );
         } else {
-          console.warn('Stripe webhook missing required data', event);
+          console.warn(
+            'Stripe webhook missing required data to update ledger',
+            event
+          );
+        }
+
+        // Attach the customer to the user and also set an email if the user was anonymous
+        const customer = session.customer;
+        const email = session.customer_details?.email;
+        if (userId && typeof customer === 'string') {
+          await UserService.attachStripeCustomer(
+            userId,
+            customer,
+            email ?? undefined
+          );
+        } else {
+          console.warn(
+            'Stripe webhook missing required data to update user',
+            event
+          );
         }
         break;
       }
