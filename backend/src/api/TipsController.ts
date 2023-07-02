@@ -56,10 +56,7 @@ export class TipsController {
         customer_email: hasExistingCustomer
           ? undefined
           : user?.email ?? undefined,
-        payment_intent_data: {
-          // Keeps payment method on file for easier use later
-          setup_future_usage: 'on_session',
-        },
+        payment_intent_data: {},
       });
 
       return { sessionId: session.id };
