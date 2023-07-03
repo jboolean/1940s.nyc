@@ -1,8 +1,7 @@
 enum LoginOutcome {
   AlreadyAuthenticated = 'already_authenticated',
-  SentLinkToNewAccount = 'sent_link_to_new_account',
+  UpdatedEmailOnAuthenticatedAccount = 'updated_email_on_authenticated_account',
   SentLinkToExistingAccount = 'sent_link_to_existing_account',
-  NamedAnonymousAccount = 'named_anonymous_account',
 }
 
 export default LoginOutcome;

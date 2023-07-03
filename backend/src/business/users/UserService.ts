@@ -178,22 +178,9 @@ export async function processLoginRequest(
     );
     return LoginOutcome.SentLinkToExistingAccount;
   } else {
-    if (currentUser.isAnonymous) {
-      currentUser.email = normalizeEmail(requestedEmail);
-      await userRepository.save(currentUser);
-      return LoginOutcome.NamedAnonymousAccount;
-    } else {
-      // We can't attach the email to the current account because it has a different email
-      const newUserCreds = await createUser(ipAddress, requestedEmail);
-
-      await sendMagicLink(
-        requestedEmail,
-        newUserCreds.userId,
-        apiBase,
-        returnToPath
-      );
-
-      return LoginOutcome.SentLinkToNewAccount;
-    }
+    // Either account is anonymous or the current user is changing their email
+    currentUser.email = normalizeEmail(requestedEmail);
+    await userRepository.save(currentUser);
+    return LoginOutcome.UpdatedEmailOnAuthenticatedAccount;
   }
 }
