@@ -1,6 +1,6 @@
+import { TooManyRequests } from 'http-errors';
 import { getConnection, MoreThan, Repository } from 'typeorm';
 import LedgerEntry from '../../entities/LedgerEntry';
-import { TooManyRequests } from 'http-errors';
 import LedgerEntryType from '../../enum/LedgerEntryType';
 
 const RATE_LIMIT_LOOKBACK = 24 * 60 * 60 * 1000; // 24 hours
@@ -10,10 +10,13 @@ const MAX_LOOKBACK_USAGES = 3;
 
 const SINGLE_PHOTO_USAGE_AMOUNT_POSITIVE = 1;
 
-async function getBalance(
-  ledgerRepository: Repository<LedgerEntry>,
-  userId: number
+export async function getBalance(
+  userId: number,
+  ledgerRepository?: Repository<LedgerEntry>
 ): Promise<number> {
+  if (!ledgerRepository) {
+    ledgerRepository = getConnection().getRepository(LedgerEntry);
+  }
   const { balance } = (await ledgerRepository
     .createQueryBuilder('entry')
     .select('SUM(entry.amount)', 'balance')
@@ -26,18 +29,21 @@ async function getBalance(
 }
 
 async function hasEnoughBalance(
-  ledgerRepository: Repository<LedgerEntry>,
   userId: number,
-  amountToConsume: number
+  amountToConsume: number,
+  ledgerRepository?: Repository<LedgerEntry>
 ): Promise<boolean> {
-  const balance = await getBalance(ledgerRepository, userId);
+  if (!ledgerRepository) {
+    ledgerRepository = getConnection().getRepository(LedgerEntry);
+  }
+  const balance = await getBalance(userId, ledgerRepository);
 
   return balance >= amountToConsume;
 }
 
 async function isRateLimitExceeded(
-  ledgerRepository: Repository<LedgerEntry>,
-  userId: number
+  userId: number,
+  ledgerRepository: Repository<LedgerEntry>
 ): Promise<boolean> {
   const { recentUsageSum } = (await ledgerRepository
     .createQueryBuilder('entry')
@@ -77,11 +83,11 @@ export async function withMeteredUsage<R>(
 
     // Must have not exceeded the rate limit (regardless of balance) or have lifetime balance
     const isAllowed =
-      !(await isRateLimitExceeded(ledgerRepository, userId)) ||
+      !(await isRateLimitExceeded(userId, ledgerRepository)) ||
       (await hasEnoughBalance(
-        ledgerRepository,
         userId,
-        SINGLE_PHOTO_USAGE_AMOUNT_POSITIVE
+        SINGLE_PHOTO_USAGE_AMOUNT_POSITIVE,
+        ledgerRepository
       ));
 
     if (!isAllowed) {
@@ -122,7 +128,7 @@ export async function grantCreditsForPayment(
 ): Promise<void> {
   const ledgerRepository = getConnection().getRepository(LedgerEntry);
 
-  const balance = await getBalance(ledgerRepository, userId);
+  const balance = await getBalance(userId, ledgerRepository);
 
   // Credits are granted at a fixed rate
   // Plus an amnesty for negative balances

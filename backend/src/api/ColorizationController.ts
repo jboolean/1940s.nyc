@@ -47,6 +47,16 @@ export class ColorizationController extends Controller {
   }
 
   @Security('user-token')
+  @Get('/billing/balance')
+  public async getBalance(
+    @Request() req: express.Request
+  ): Promise<{ creditBalance: number }> {
+    const userId = await getUserFromRequestOrCreateAndSetCookie(req);
+    const balance = await ColorService.getBalance(userId);
+    return { creditBalance: balance };
+  }
+
+  @Security('user-token')
   @Post('/billing/buy-credits/sessions')
   public async createBuyCreditsSession(
     @Body() body: BuyCreditsSessionRequest,

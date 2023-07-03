@@ -1,6 +1,6 @@
 import AWS, { AWSError } from 'aws-sdk';
 import { NotFound } from 'http-errors';
-import { withMeteredUsage } from '../ledger/LedgerService';
+import * as LedgerService from '../ledger/LedgerService';
 import isProduction from '../utils/isProduction';
 import { colorizeImageWithAutoPromptBase64 } from '../utils/paletteApi';
 
@@ -84,10 +84,14 @@ export async function getColorizedImage(
     .catch(() => null);
 
   if (!headObjectResponse) {
-    await withMeteredUsage(userId, identifier, async () => {
+    await LedgerService.withMeteredUsage(userId, identifier, async () => {
       await createColorVersion(sourceKey, destinationKey, !isProduction());
     });
   }
 
   return `https://photos.1940s.nyc/${destinationKey}`;
+}
+
+export function getBalance(userId: number): Promise<number> {
+  return LedgerService.getBalance(userId);
 }
