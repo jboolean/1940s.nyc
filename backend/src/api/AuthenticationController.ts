@@ -11,6 +11,7 @@ import {
   Security,
 } from 'tsoa';
 import * as UserService from '../business/users/UserService';
+import required from '../business/utils/required';
 import LoginOutcome from '../enum/LoginOutcome';
 import { setAuthCookie } from './auth/authCookieUtils';
 import { getUserFromRequestOrCreateAndSetCookie } from './auth/userAuthUtils';
@@ -21,7 +22,7 @@ type LoginRequest = {
   requestedEmail: Email;
 
   // If login involes a link, the frontend path to return to after login
-  returnToPath: string;
+  returnToPath?: string;
 };
 
 type LoginResponse = {
@@ -39,7 +40,7 @@ export class AuthenticationController extends Controller {
     const userId = await getUserFromRequestOrCreateAndSetCookie(req);
     const { requestedEmail, returnToPath } = loginRequest;
     const ipAddress = req.ip;
-    const apiBase = `${req.protocol}://${req.hostname}`;
+    const apiBase = `${req.protocol}://${required(req.get('host'), 'host')}`;
     const result = await UserService.processLoginRequest(
       requestedEmail,
       userId,
@@ -86,6 +87,10 @@ export class AuthenticationController extends Controller {
     const permenantToken = UserService.createUserToken(userId);
 
     setAuthCookie(permenantToken, res);
+
+    console.log('Logged in with magic link', {
+      userId,
+    });
 
     const redirectUrl: URL = new URL(
       returnToPath || '/',

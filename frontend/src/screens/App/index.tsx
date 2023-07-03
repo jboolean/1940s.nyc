@@ -20,6 +20,7 @@ import FeatureFlags from './screens/FeatureFlags';
 import SubmitStoryWizard from './screens/SubmitStoryWizard';
 import EditStory from './screens/EditStory';
 import TipJar, { useTipJarStore } from './screens/TipJar';
+import CreditPurchaseModal from './screens/CreditPurchaseModal';
 
 const IS_SHUTDOWN = false;
 
@@ -70,6 +71,7 @@ function Modals(): JSX.Element {
         }}
       />
       <SubmitStoryWizard />
+      <CreditPurchaseModal />
       <TipJar />
     </>
   );

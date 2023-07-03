@@ -1,5 +1,6 @@
 import express from 'express';
 import ipfilter from 'express-ipfilter';
+import stripe from './stripe';
 
 import Stripe from 'stripe';
 import EmailCampaignService from '../business/email/EmailCampaignService';
@@ -7,6 +8,10 @@ import * as LedgerService from '../business/ledger/LedgerService';
 import * as UserService from '../business/users/UserService';
 import isProduction from '../business/utils/isProduction';
 const router = express.Router();
+
+type ProductMetadata = {
+  'product-type'?: 'color-credit';
+};
 
 const STRIPE_IPS = [
   '3.18.12.63',
@@ -44,24 +49,70 @@ router.post<'/', unknown, unknown, Stripe.Event, unknown>(
       }
       case 'checkout.session.completed': {
         const session = event.data.object as Stripe.Checkout.Session;
+        // Retrieve the session to expand the line items
+        const expandedSession = await stripe.checkout.sessions.retrieve(
+          session.id,
+          {
+            expand: ['line_items', 'line_items.data.price.product'],
+          }
+        );
+        const paymentIntentId =
+          typeof session.payment_intent === 'string'
+            ? session.payment_intent
+            : null;
+        const subtotalAmountCents = session.amount_subtotal;
+
         const userId = session.metadata?.userId
           ? parseInt(session.metadata.userId, 10)
           : undefined;
 
-        // Grant some credits from their payment, see comment on LedgerService
-        const amountCents = session.amount_subtotal;
-        const paymentIntent = session.payment_intent;
-        if (userId && amountCents && typeof paymentIntent === 'string') {
-          await LedgerService.grantCreditsForPayment(
+        // See if they purchased credits
+        const creditsLineItem = expandedSession.line_items?.data.find(
+          (lineItem) =>
+            (
+              (lineItem.price?.product as Stripe.Product)
+                .metadata as ProductMetadata
+            )['product-type'] === 'color-credit'
+        );
+
+        // fulfill credit purchase
+        if (creditsLineItem) {
+          const quantity = creditsLineItem.quantity;
+          if (typeof userId !== 'number') {
+            throw new Error('userId is missing from purchase of credits');
+          }
+          if (typeof quantity !== 'number') {
+            throw new Error('quantity is missing from purchase of credits');
+          }
+          console.log('Fulfilling purchase of credits', {
+            customer: session.customer,
             userId,
-            amountCents,
-            paymentIntent
+            quantity,
+          });
+          await LedgerService.grantCredits(
+            userId,
+            quantity,
+            paymentIntentId,
+            subtotalAmountCents || 0
           );
         } else {
-          console.warn(
-            'Stripe webhook missing required data to update ledger',
-            event
-          );
+          // Grant some credits from their non-credit payment, see comment on LedgerService
+          if (
+            userId &&
+            subtotalAmountCents &&
+            typeof paymentIntentId === 'string'
+          ) {
+            await LedgerService.grantCreditsForTip(
+              userId,
+              subtotalAmountCents,
+              paymentIntentId
+            );
+          } else {
+            console.warn(
+              'Stripe webhook missing required data to update ledger',
+              event
+            );
+          }
         }
 
         // Attach the customer to the user and also set an email if the user was anonymous

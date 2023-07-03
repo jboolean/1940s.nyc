@@ -14,6 +14,7 @@ import * as UserService from '../business/users/UserService';
 import isProduction from '../business/utils/isProduction';
 import { getUserFromRequestOrCreateAndSetCookie } from './auth/userAuthUtils';
 import stripe from './stripe';
+import { BadRequest } from 'http-errors';
 
 type BuyCreditsSessionRequest = {
   quantity: number;
@@ -66,6 +67,13 @@ export class ColorizationController extends Controller {
     const userId = await getUserFromRequestOrCreateAndSetCookie(req);
 
     const user = await UserService.getUser(userId);
+
+    // purchasing is only allowed on named accounts, otherwise credits could be lost
+    if (!user || user.isAnonymous) {
+      throw new BadRequest(
+        'You must be logged into an account with an email address to buy credits'
+      );
+    }
 
     const stripeCustomerId: string | undefined =
       user?.stripeCustomerId ?? undefined;

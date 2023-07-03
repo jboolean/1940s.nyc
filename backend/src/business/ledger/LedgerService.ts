@@ -106,6 +106,36 @@ export async function withMeteredUsage<R>(
     return await wrapped();
   });
 }
+export async function grantCredits(
+  userId: number,
+  quantity: number,
+  paymentIntentId: string | null,
+  amountCents: number,
+  giveAmnesty = true
+): Promise<void> {
+  const ledgerRepository = getConnection().getRepository(LedgerEntry);
+
+  const balance = await getBalance(userId, ledgerRepository);
+  const amnesty = balance < 0 ? -balance : 0;
+
+  let creditsToGrant = quantity;
+
+  // They may have gone negative from free daily usage, so we give them amnesty
+  if (giveAmnesty) {
+    creditsToGrant += amnesty;
+  }
+
+  // Create a new ledger entry
+  const entry = new LedgerEntry();
+  entry.userId = userId;
+  entry.amount = creditsToGrant;
+  entry.type = LedgerEntryType.CREDIT;
+  entry.metadata = {
+    paymentIntentId,
+    amountCents,
+  };
+  await ledgerRepository.save(entry);
+}
 
 const CENTS_PER_CREDIT = 10;
 
@@ -121,31 +151,21 @@ const CENTS_PER_CREDIT = 10;
  * @param amountCents
  * @param paymentIntentId
  */
-export async function grantCreditsForPayment(
+export async function grantCreditsForTip(
   userId: number,
   amountCents: number,
   paymentIntentId: string
 ): Promise<void> {
-  const ledgerRepository = getConnection().getRepository(LedgerEntry);
-
-  const balance = await getBalance(userId, ledgerRepository);
-
   // Credits are granted at a fixed rate
   // Plus an amnesty for negative balances
 
   const creditsFromPayment = Math.floor(amountCents / CENTS_PER_CREDIT);
-  const amnesty = balance < 0 ? -balance : 0;
 
-  const creditsToGrant = creditsFromPayment + amnesty;
-
-  // Create a new ledger entry
-  const entry = new LedgerEntry();
-  entry.userId = userId;
-  entry.amount = creditsToGrant;
-  entry.type = LedgerEntryType.CREDIT;
-  entry.metadata = {
+  await grantCredits(
+    userId,
+    creditsFromPayment,
     paymentIntentId,
     amountCents,
-  };
-  await ledgerRepository.save(entry);
+    true
+  );
 }

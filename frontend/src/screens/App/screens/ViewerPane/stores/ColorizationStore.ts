@@ -1,20 +1,16 @@
-import create from 'zustand';
-import { mountStoreDevtool } from 'simple-zustand-devtools';
-import { immer } from 'zustand/middleware/immer';
-import { API_BASE } from 'shared/utils/apiConstants';
-import { useTipJarStore } from '../../TipJar';
 import recordEvent from 'shared/utils/recordEvent';
+import { mountStoreDevtool } from 'simple-zustand-devtools';
+import create from 'zustand';
+import { immer } from 'zustand/middleware/immer';
+import { openCreditPurchaseModal } from '../../CreditPurchaseModal';
 
-const TIP_JAR_COUNT_THRESHOLD = 3;
-const TIP_JAR_DELAY = /* 10 seconds */ 1000 * 6;
-const TIP_JAR_REPEAT_EVERY = 4;
+import * as ColorApi from 'utils/ColorApi';
 
 interface State {
   colorEnabledForIdentifier: string | null;
   isLoading: boolean;
   colorizedImageSrc: string | null;
 
-  // Track images, so that after so many we can popup the tip jar
   colorizedImageHistory: Array<string>;
 }
 
@@ -49,30 +45,14 @@ const useColorizationStore = create(
       set((draft) => {
         draft.colorEnabledForIdentifier = photoIdentifier;
         draft.isLoading = true;
-        draft.colorizedImageSrc = `${API_BASE}/colorization/colorized/${photoIdentifier}`;
-
-        if (!get().colorizedImageHistory.includes(photoIdentifier)) {
-          draft.colorizedImageHistory.push(photoIdentifier);
-        }
+        draft.colorizedImageSrc =
+          ColorApi.getColorizedImageUrl(photoIdentifier);
 
         recordEvent({
           category: 'Colorization',
           action: 'Click Colorize',
         });
       });
-
-      // If you have colored 3 images, or every 5 images after that, show the tip jar if they haven't paid
-      const nColored = get().colorizedImageHistory.length;
-      const hasTipped = window.localStorage.getItem('hasTipped') === 'true';
-      if (
-        !hasTipped &&
-        (nColored === TIP_JAR_COUNT_THRESHOLD ||
-          (nColored - TIP_JAR_COUNT_THRESHOLD) % TIP_JAR_REPEAT_EVERY === 0)
-      ) {
-        setTimeout(() => {
-          useTipJarStore.getState().open('colorization');
-        }, TIP_JAR_DELAY);
-      }
     },
     disableColorization: () => {
       set((draft) => {
@@ -86,19 +66,30 @@ const useColorizationStore = create(
         draft.isLoading = false;
       });
     },
-    handleImageError: () => {
+
+    // This is a total hack
+    // There was a CORS issue making the image request from javascript, so we use an img tag, which works
+    // But error codes or messages cannot be returned from an img tag, so we can only check the balance and guess if the error was due to lack of balance
+    handleImageError: async () => {
       set((draft) => {
         draft.isLoading = false;
         draft.colorEnabledForIdentifier = null;
         draft.colorizedImageSrc = null;
       });
 
+      const balance = await ColorApi.getBalance();
+      const hasBalance = balance > 0;
+
+      if (!hasBalance) {
+        openCreditPurchaseModal();
+        return;
+      }
+
+      console.error('Error loading colorized image, but balance is positive');
+
       alert(
-        'The image could not be colorized. ' +
-          'You may have reached the limit on the number of photos that can be colorized for the first time per 24-hour period. ' +
-          'This limit exists to keep costs in check. ' +
-          'Leaving a tip will increase the limit in this browser. ' +
-          'Thank you for understanding, and I hope you come back to explore more tomorrow. \n\n' +
+        'The image could not be colorized, even though you have a credit balance. ' +
+          'Please contact me if the issue persists.' +
           '  - Julian (julian@1940s.nyc)'
       );
     },

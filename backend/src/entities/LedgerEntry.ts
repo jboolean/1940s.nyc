@@ -16,7 +16,7 @@ interface PhotoUsageMetadata {
 }
 
 interface CreditMetadata {
-  paymentIntentId: string;
+  paymentIntentId: string | null;
   amountCents: number;
 }
 
