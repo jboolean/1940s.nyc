@@ -137,9 +137,8 @@ async function sendMagicLink(
  * This determines what to do, which ultimately drives the UI.
  * Either:
  *  - We're already logged in, or
- *  - An account doesn't exist yet, and the current account is anonymous, in which attach the email to it, or
- *  - An account doesn't exist, but we can't name the current account because it has a different email, in which case we create a new account and send a magic link, or
- *  - The account exists, so we send a magic link to log in
+ *  - The account exists, so we send a magic link to log in, or
+ *  - We update the email on the current account
  * @param requestedEmail
  * @param authenticatedUserId
  */
