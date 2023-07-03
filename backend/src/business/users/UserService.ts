@@ -151,14 +151,9 @@ export async function processLoginRequest(
 ): Promise<LoginOutcome> {
   const userRepository = getRepository(User);
 
-  const currentUser = await userRepository.findOneBy({
+  const currentUser = await userRepository.findOneByOrFail({
     id: authenticatedUserId,
   });
-
-  if (!currentUser) {
-    // This should have been a real user id
-    throw new Error('Cannot find authenticated user');
-  }
 
   if (currentUser.email === requestedEmail) {
     // We're already logged in
