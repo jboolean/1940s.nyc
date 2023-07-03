@@ -1,6 +1,7 @@
 import { randomUUID } from 'crypto';
 import jwt from 'jsonwebtoken';
 import { getRepository } from 'typeorm';
+import stripe from '../../api/stripe';
 import User from '../../entities/User';
 import LoginOutcome from '../../enum/LoginOutcome';
 import EmailService from '../email/EmailService';
@@ -181,6 +182,17 @@ export async function processLoginRequest(
     // Either account is anonymous or the current user is changing their email
     currentUser.email = normalizeEmail(requestedEmail);
     await userRepository.save(currentUser);
+
+    if (currentUser.stripeCustomerId) {
+      try {
+        await stripe.customers.update(currentUser.stripeCustomerId, {
+          email: currentUser.email,
+        });
+      } catch (e) {
+        console.error('Error updating Stripe customer', e);
+      }
+    }
+
     return LoginOutcome.UpdatedEmailOnAuthenticatedAccount;
   }
 }
