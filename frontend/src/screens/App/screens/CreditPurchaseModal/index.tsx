@@ -42,7 +42,7 @@ export default function CreditPurchaseModal(): JSX.Element {
       isCloseButtonVisible={true}
     >
       <div>
-        <h1>It costs a dime to ride!</h1>
+        <h1>It takes a dime to ride!</h1>
 
         <div>
           <p>
