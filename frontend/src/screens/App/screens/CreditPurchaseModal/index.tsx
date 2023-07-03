@@ -42,7 +42,7 @@ export default function CreditPurchaseModal(): JSX.Element {
       isCloseButtonVisible={true}
     >
       <div>
-        <h1>It takes a dime to ride!</h1>
+        <h1>It costs a dime to ride!</h1>
 
         <div>
           <p>
@@ -61,11 +61,6 @@ export default function CreditPurchaseModal(): JSX.Element {
           <p>
             Already purchased tokens? Your email address will be used to
             retrieve them.
-          </p>
-
-          <p>
-            Write me at <a href="mailto:julian@1940s.nyc">julian@1940s.nyc</a>{' '}
-            if you have questions.
           </p>
         </div>
 
@@ -127,6 +122,11 @@ export default function CreditPurchaseModal(): JSX.Element {
           ))}
         </div>
       </div>
+
+      <p>
+        Write me at <a href="mailto:julian@1940s.nyc">julian@1940s.nyc</a> if
+        you have questions.
+      </p>
 
       <div>
         <Button
