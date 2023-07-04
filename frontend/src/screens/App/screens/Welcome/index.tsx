@@ -4,7 +4,7 @@ import FeatureFlag from 'screens/App/shared/types/FeatureFlag';
 import Button from 'shared/components/Button';
 
 import FourtiesModal from 'shared/components/Modal';
-import Carousel from './Carousel';
+import Carousel from '../../../../shared/components/Carousel';
 import carouselImages from './carouselImages';
 
 import classNames from 'classnames';
