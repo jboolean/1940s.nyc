@@ -23,7 +23,7 @@ type BuyCreditsSessionRequest = {
 };
 
 const COLOR_CREDIT_PRICE_ID = isProduction()
-  ? 'price_TODO' // TODO
+  ? 'price_1NQ8p5FCLBtNZLVl95u5tXZh'
   : 'price_1NPpdrFCLBtNZLVlpl2852ha';
 
 const MIN_QUANTITY = 20;
