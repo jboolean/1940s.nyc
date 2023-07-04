@@ -3,8 +3,7 @@ import { useFeatureFlag } from 'screens/App/shared/stores/FeatureFlagsStore';
 import FeatureFlag from 'screens/App/shared/types/FeatureFlag';
 import Button from 'shared/components/Button';
 
-import FourtiesModal from 'shared/components/Modal';
-import Carousel from '../../../../shared/components/Carousel';
+import PhotoAsideModal from '../PhotoAsideModal';
 import carouselImages from './carouselImages';
 
 import classNames from 'classnames';
@@ -23,7 +22,7 @@ export default function Welcome({
   const isWelcomeDisabled = useFeatureFlag(FeatureFlag.DISABLE_WELCOME_MODAL);
 
   return (
-    <FourtiesModal
+    <PhotoAsideModal
       isOpen={isOpen && !isWelcomeDisabled}
       className={stylesheet.welcomeModal}
       onRequestClose={onRequestClose}
@@ -31,12 +30,12 @@ export default function Welcome({
       shouldCloseOnEsc
       size="large"
       isCloseButtonVisible={false}
+      carouselProps={{
+        images: carouselImages,
+        className: stylesheet.image,
+      }}
     >
-      <div className={stylesheet.imageContainer}>
-        <Carousel className={stylesheet.image} images={carouselImages} />
-      </div>
-
-      <div className={stylesheet.textContainer}>
+      <div className={stylesheet.right}>
         <div className={stylesheet.text}>
           <h1>Street View of 1940s&nbsp;New&nbsp;York</h1>
           <p>
@@ -121,6 +120,6 @@ export default function Welcome({
           </Button>
         </div>
       </div>
-    </FourtiesModal>
+    </PhotoAsideModal>
   );
 }

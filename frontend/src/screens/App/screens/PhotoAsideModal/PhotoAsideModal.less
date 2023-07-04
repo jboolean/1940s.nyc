@@ -1,0 +1,64 @@
+@import '../../../../shared/styles/colors.less';
+@import '../../../../shared/styles/viewport.less';
+
+.photoAsideModal {
+  display: flex;
+  padding: 0;
+}
+
+.rightOuter {
+  height: 100%;
+  position: relative;
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
+.rightInner {
+  padding: 1.5rem 1rem;
+  padding-bottom: 0;
+}
+
+.imageContainer {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  flex-basis: 35rem * 0.666;
+  flex-shrink: 0;
+}
+
+.image {
+  position: absolute;
+  left: 0;
+
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+  transform: scale(1.1);
+}
+
+@media screen and (max-width: @modal-width-max),
+  screen and (max-height: @modal-height-max) {
+  @visible-text-height: 200px;
+  @photo-padding: calc(100vh - @visible-text-height);
+
+  .imageContainer {
+    height: @photo-padding;
+  }
+
+  .rightOuter {
+    display: block;
+    position: absolute;
+    top: 0;
+
+    padding-top: @photo-padding;
+    height: 100%;
+    box-sizing: border-box;
+    overflow-y: scroll;
+  }
+
+  .rightInner {
+    background: @creme;
+    text-align: left;
+    height: auto;
+  }
+}
