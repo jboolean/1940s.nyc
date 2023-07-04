@@ -1,8 +1,14 @@
 import * as UserService from '../../business/users/UserService';
 import * as express from 'express';
+import { setAuthCookie } from './authCookieUtils';
 
 export const USER_TOKEN_COOKIE = 'user-token';
 
+/**
+ * This works on a request with @Security('user-token') and will either return the user id from the request or create a new user and set a cookie on the response.
+ * @param req express.Request
+ * @returns
+ */
 export async function getUserFromRequestOrCreateAndSetCookie(
   req: express.Request & { user?: { id: number } }
 ): Promise<number> {
@@ -25,12 +31,7 @@ export async function getUserFromRequestOrCreateAndSetCookie(
   }
 
   // We always set the cookie because some browsers now cap the cookie expiration date
-  res.cookie(USER_TOKEN_COOKIE, token, {
-    httpOnly: true,
-    // do not expire
-    expires: new Date(253402300000000),
-    sameSite: 'strict',
-  });
+  setAuthCookie(token, res);
 
   req.user = { id: userId };
   return userId;

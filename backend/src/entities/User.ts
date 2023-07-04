@@ -24,4 +24,22 @@ export default class User {
     name: 'ip_address',
   })
   ipAddress: string;
+
+  @Column({
+    type: String,
+    nullable: true,
+    name: 'email',
+  })
+  email!: string | null;
+
+  @Column({
+    type: String,
+    nullable: true,
+    name: 'stripe_customer',
+  })
+  stripeCustomerId!: string | null;
+
+  get isAnonymous(): boolean {
+    return !this.email;
+  }
 }

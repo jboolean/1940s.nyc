@@ -8,6 +8,11 @@ import ReactModal from 'react-modal';
 import classnames from 'classnames';
 import stylesheet from './modal.less';
 
+export type FourtiesModalProps = React.PropsWithChildren<ReactModal.Props> & {
+  size: 'large' | 'small' | 'x-large';
+  isCloseButtonVisible?: boolean;
+};
+
 export default function FourtiesModal({
   className,
   size,
@@ -17,10 +22,7 @@ export default function FourtiesModal({
   onAfterOpen = noop,
   children,
   ...props
-}: React.PropsWithChildren<ReactModal.Props> & {
-  size: 'large' | 'small';
-  isCloseButtonVisible?: boolean;
-}): JSX.Element {
+}: FourtiesModalProps): JSX.Element {
   return (
     <ReactModal
       className={classnames(stylesheet.modal, stylesheet[size], className)}

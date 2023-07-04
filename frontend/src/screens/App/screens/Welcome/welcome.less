@@ -1,30 +1,7 @@
 @import '../../../../shared/styles/colors.less';
 @import '../../../../shared/styles/viewport.less';
 
-.welcomeModal {
-  display: flex;
-  padding: 0;
-}
-
-.imageContainer {
-  position: relative;
-  height: 100%;
-  overflow: hidden;
-  flex-basis: 35rem * 0.666;
-  flex-shrink: 0;
-}
-
-.image {
-  position: absolute;
-  left: 0;
-
-  height: 100%;
-  width: 100%;
-  object-fit: cover;
-  transform: scale(1.1);
-}
-
-.textContainer {
+.right {
   display: flex;
   flex-direction: column;
 
@@ -35,9 +12,7 @@
 }
 
 .text {
-  padding: 1rem;
-  padding-top: 1.5rem;
-  padding-bottom: 0;
+  height: 100%;
   flex-grow: 1;
 
   overflow-y: auto;
@@ -86,30 +61,12 @@
 
 @media screen and (max-width: @modal-width-max),
   screen and (max-height: @modal-height-max) {
-  @visible-text-height: 200px;
-  @photo-padding: calc(100vh - @visible-text-height);
-
   .mobileOnly {
     display: block;
   }
 
   .desktopOnly {
     display: none;
-  }
-
-  .imageContainer {
-    height: @photo-padding;
-  }
-
-  .textContainer {
-    display: block;
-    position: absolute;
-    top: 0;
-
-    padding-top: @photo-padding;
-    height: 100%;
-    box-sizing: border-box;
-    overflow-y: scroll;
   }
 
   .text,

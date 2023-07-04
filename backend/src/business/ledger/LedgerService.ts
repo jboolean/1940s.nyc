@@ -1,43 +1,49 @@
+import { TooManyRequests } from 'http-errors';
 import { getConnection, MoreThan, Repository } from 'typeorm';
 import LedgerEntry from '../../entities/LedgerEntry';
-import { TooManyRequests } from 'http-errors';
 import LedgerEntryType from '../../enum/LedgerEntryType';
 
 const RATE_LIMIT_LOOKBACK = 24 * 60 * 60 * 1000; // 24 hours
 
 // We allow this much usage in the lookback window
-const MAX_LOOKBACK_USAGES = 20;
+const MAX_LOOKBACK_USAGES = 3;
 
 const SINGLE_PHOTO_USAGE_AMOUNT_POSITIVE = 1;
 
-async function getBalance(
-  ledgerRepository: Repository<LedgerEntry>,
-  userId: number
+export async function getBalance(
+  userId: number,
+  ledgerRepository?: Repository<LedgerEntry>
 ): Promise<number> {
+  if (!ledgerRepository) {
+    ledgerRepository = getConnection().getRepository(LedgerEntry);
+  }
   const { balance } = (await ledgerRepository
     .createQueryBuilder('entry')
-    .select('SUM(entry.amount)', 'balance')
+    .select('COALESCE(SUM(entry.amount), 0)', 'balance')
     .where({
       userId,
     })
     .getRawOne<{ balance: number }>()) ?? { balance: 0 };
 
-  return balance;
+  return Number(balance);
 }
 
 async function hasEnoughBalance(
-  ledgerRepository: Repository<LedgerEntry>,
   userId: number,
-  amountToConsume: number
+  amountToConsume: number,
+  ledgerRepository?: Repository<LedgerEntry>
 ): Promise<boolean> {
-  const balance = await getBalance(ledgerRepository, userId);
+  if (!ledgerRepository) {
+    ledgerRepository = getConnection().getRepository(LedgerEntry);
+  }
+  const balance = await getBalance(userId, ledgerRepository);
 
   return balance >= amountToConsume;
 }
 
 async function isRateLimitExceeded(
-  ledgerRepository: Repository<LedgerEntry>,
-  userId: number
+  userId: number,
+  ledgerRepository: Repository<LedgerEntry>
 ): Promise<boolean> {
   const { recentUsageSum } = (await ledgerRepository
     .createQueryBuilder('entry')
@@ -77,11 +83,11 @@ export async function withMeteredUsage<R>(
 
     // Must have not exceeded the rate limit (regardless of balance) or have lifetime balance
     const isAllowed =
-      !(await isRateLimitExceeded(ledgerRepository, userId)) ||
+      !(await isRateLimitExceeded(userId, ledgerRepository)) ||
       (await hasEnoughBalance(
-        ledgerRepository,
         userId,
-        SINGLE_PHOTO_USAGE_AMOUNT_POSITIVE
+        SINGLE_PHOTO_USAGE_AMOUNT_POSITIVE,
+        ledgerRepository
       ));
 
     if (!isAllowed) {
@@ -100,6 +106,36 @@ export async function withMeteredUsage<R>(
     return await wrapped();
   });
 }
+export async function grantCredits(
+  userId: number,
+  quantity: number,
+  paymentIntentId: string | null,
+  amountCents: number,
+  giveAmnesty = true
+): Promise<void> {
+  const ledgerRepository = getConnection().getRepository(LedgerEntry);
+
+  const balance = await getBalance(userId, ledgerRepository);
+  const amnesty = balance < 0 ? -balance : 0;
+
+  let creditsToGrant = quantity;
+
+  // They may have gone negative from free daily usage, so we give them amnesty
+  if (giveAmnesty) {
+    creditsToGrant += amnesty;
+  }
+
+  // Create a new ledger entry
+  const entry = new LedgerEntry();
+  entry.userId = userId;
+  entry.amount = creditsToGrant;
+  entry.type = LedgerEntryType.CREDIT;
+  entry.metadata = {
+    paymentIntentId,
+    amountCents,
+  };
+  await ledgerRepository.save(entry);
+}
 
 const CENTS_PER_CREDIT = 10;
 
@@ -115,31 +151,21 @@ const CENTS_PER_CREDIT = 10;
  * @param amountCents
  * @param paymentIntentId
  */
-export async function grantCreditsForPayment(
+export async function grantCreditsForTip(
   userId: number,
   amountCents: number,
   paymentIntentId: string
 ): Promise<void> {
-  const ledgerRepository = getConnection().getRepository(LedgerEntry);
-
-  const balance = await getBalance(ledgerRepository, userId);
-
   // Credits are granted at a fixed rate
   // Plus an amnesty for negative balances
 
   const creditsFromPayment = Math.floor(amountCents / CENTS_PER_CREDIT);
-  const amnesty = balance < 0 ? -balance : 0;
 
-  const creditsToGrant = creditsFromPayment + amnesty;
-
-  // Create a new ledger entry
-  const entry = new LedgerEntry();
-  entry.userId = userId;
-  entry.amount = creditsToGrant;
-  entry.type = LedgerEntryType.CREDIT;
-  entry.metadata = {
+  await grantCredits(
+    userId,
+    creditsFromPayment,
     paymentIntentId,
     amountCents,
-  };
-  await ledgerRepository.save(entry);
+    true
+  );
 }

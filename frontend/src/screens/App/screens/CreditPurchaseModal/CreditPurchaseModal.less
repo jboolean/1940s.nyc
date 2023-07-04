@@ -1,0 +1,56 @@
+@import '../../../../shared/styles/viewport.less';
+
+.creditPurchaseModal {
+  text-align: left;
+
+  h1 {
+    text-align: center;
+  }
+}
+
+.finePrint {
+  font-size: 12px;
+}
+
+.emailRow {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+
+  .email {
+    flex-grow: 1;
+    margin-right: 1rem;
+  }
+
+  .submitButton {
+    flex-grow: 0;
+    margin-right: 0;
+  }
+}
+
+.magicLinkMessage {
+  font-weight: bold;
+}
+
+.quantityOptions {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  margin-bottom: 2rem;
+}
+
+.buttonRow {
+  margin-bottom: 1rem;
+}
+
+@media screen and (max-width: @modal-width-max),
+  screen and (max-height: @modal-height-max) {
+  .creditPurchaseModal h1 {
+    text-align: left;
+  }
+
+  .quantityOptions {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,19 +1,23 @@
 import uniqueId from 'lodash/uniqueId';
 import React from 'react';
+import classNames from 'classnames';
 
 import stylesheet from './labeled.less';
 
 export default function Labeled({
   labelText,
   renderInput,
+  className,
 }: {
   labelText: string;
   renderInput: ({ id }: { id: string }) => JSX.Element;
+  className?: string;
 }): JSX.Element {
-  const id = uniqueId('labeled-input-');
+  const idRef = React.useRef<string>(uniqueId('labeled-input-'));
+  const id = idRef.current;
 
   return (
-    <div className={stylesheet.container}>
+    <div className={classNames(stylesheet.container, className)}>
       <label htmlFor={id} className={stylesheet.label}>
         {labelText}
       </label>
