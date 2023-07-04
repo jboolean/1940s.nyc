@@ -11,7 +11,7 @@ interface State {
   isLoading: boolean;
   colorizedImageSrc: string | null;
 
-  colorizedImageHistory: Array<string>;
+  balance: number | null;
 }
 
 interface Actions {
@@ -22,15 +22,16 @@ interface Actions {
   // Image is loaded from the src attribute, so we need to know when it's done loading
   handleImageLoaded: () => void;
   handleImageError: () => void;
+
+  refreshBalance: () => Promise<number>;
 }
 
 const useColorizationStore = create(
   immer<State & Actions>((set, get) => ({
     colorEnabledForIdentifier: null,
     isLoading: false,
-    // colorizedImageData: null,
     colorizedImageSrc: null,
-    colorizedImageHistory: [],
+    balance: null,
 
     toggleColorization: (identifier: string) => {
       const { colorEnabledForIdentifier } = get();
@@ -65,6 +66,7 @@ const useColorizationStore = create(
       set((draft) => {
         draft.isLoading = false;
       });
+      void get().refreshBalance();
     },
 
     // This is a total hack
@@ -77,7 +79,7 @@ const useColorizationStore = create(
         draft.colorizedImageSrc = null;
       });
 
-      const balance = await ColorApi.getBalance();
+      const balance = await get().refreshBalance();
       const hasBalance = balance > 0;
 
       if (!hasBalance) {
@@ -92,6 +94,14 @@ const useColorizationStore = create(
           'Please contact me if the issue persists.' +
           '  - Julian (julian@1940s.nyc)'
       );
+    },
+
+    refreshBalance: async () => {
+      const balance = await ColorApi.getBalance();
+      set((draft) => {
+        draft.balance = balance;
+      });
+      return balance;
     },
   }))
 );

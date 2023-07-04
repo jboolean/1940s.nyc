@@ -26,7 +26,7 @@ export default function ColorizeButton({
     isColorizable &&
     (isColorizationFlagEnabled || isColorizationExperimentEnabled);
 
-  const { toggleColorization, isLoading, colorEnabledForIdentifier } =
+  const { toggleColorization, isLoading, colorEnabledForIdentifier, balance } =
     useColorizationStore();
 
   const enabled = colorEnabledForIdentifier === photoIdentifier;
@@ -51,6 +51,9 @@ export default function ColorizeButton({
         className={stylesheet.magicIcon}
       />
       Colorize
+      {balance !== null && balance >= 0 ? (
+        <span className={stylesheet.balance}>[{balance}]</span>
+      ) : null}
     </Button>
   ) : null;
 }
