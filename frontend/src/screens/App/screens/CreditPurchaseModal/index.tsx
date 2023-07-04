@@ -13,8 +13,6 @@ import carouselImages from './carouselImages';
 
 import stylesheet from './CreditPurchaseModal.less';
 
-const PRICE = 0.1;
-
 export default function CreditPurchaseModal(): JSX.Element {
   const {
     close: onRequestClose,
@@ -30,6 +28,7 @@ export default function CreditPurchaseModal(): JSX.Element {
     quantityOptions,
     selectedQuantity,
     setQuantity,
+    unitPrice,
   } = useCreditPurchaseModalStore();
 
   return (
@@ -116,22 +115,23 @@ export default function CreditPurchaseModal(): JSX.Element {
             [stylesheet.disabled]: !isLoginValidated,
           })}
         >
-          {quantityOptions.map((quantity) => (
-            <Button
-              buttonStyle="secondary"
-              key={quantity}
-              onClick={() => setQuantity(quantity)}
-              isActive={selectedQuantity === quantity && isLoginValidated}
-              disabled={!isLoginValidated}
-            >
-              <NumericFormat
-                displayType="text"
-                prefix="$"
-                value={quantity * PRICE}
-              />
-              &mdash;{quantity} photos
-            </Button>
-          ))}
+          {unitPrice !== null &&
+            quantityOptions.map((quantity) => (
+              <Button
+                buttonStyle="secondary"
+                key={quantity}
+                onClick={() => setQuantity(quantity)}
+                isActive={selectedQuantity === quantity && isLoginValidated}
+                disabled={!isLoginValidated}
+              >
+                <NumericFormat
+                  displayType="text"
+                  prefix="$"
+                  value={quantity * (unitPrice / 100)}
+                />
+                &mdash;{quantity} photos
+              </Button>
+            ))}
         </div>
       </div>
 

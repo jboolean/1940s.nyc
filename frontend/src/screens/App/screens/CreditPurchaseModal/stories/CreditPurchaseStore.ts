@@ -1,4 +1,4 @@
-import { redirectToCheckout } from 'shared/utils/ColorApi';
+import { getPriceAmount, redirectToCheckout } from 'shared/utils/ColorApi';
 import create from 'zustand';
 import { immer } from 'zustand/middleware/immer';
 import { getMe, LoginOutcome, processLoginRequest } from '../utils/CreditsApi';
@@ -14,6 +14,7 @@ interface State {
   errorMessage: string | null;
   isCheckingOut: boolean;
   isFollowMagicLinkMessageVisible: boolean;
+  unitPrice: number | null;
 }
 
 interface Actions {
@@ -35,6 +36,7 @@ const useCreditPurchaseModalStore = create(
     errorMessage: null,
     isCheckingOut: false,
     isFollowMagicLinkMessageVisible: false,
+    unitPrice: null,
     open: () => {
       set((draft) => {
         draft.isOpen = true;
@@ -48,6 +50,20 @@ const useCreditPurchaseModalStore = create(
         })
         .catch((err) => {
           console.warn('Error fetching me', err);
+        });
+
+      getPriceAmount()
+        .then((price) => {
+          set((draft) => {
+            draft.unitPrice = price;
+          });
+        })
+        .catch((err) => {
+          set((draft) => {
+            console.error('Error fetching price', err);
+            draft.errorMessage =
+              'Something went wrong getting pricing information. Please try again later.';
+          });
         });
     },
 

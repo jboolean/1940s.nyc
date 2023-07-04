@@ -34,3 +34,9 @@ export async function getBalance(): Promise<number> {
 export function getColorizedImageUrl(identifier: string): string {
   return `${api.defaults.baseURL}/colorization/colorized/${identifier}`;
 }
+
+export function getPriceAmount(): Promise<number> {
+  return api
+    .get<{ unitAmount: number }>('/colorization/billing/price')
+    .then((resp) => resp.data.unitAmount);
+}

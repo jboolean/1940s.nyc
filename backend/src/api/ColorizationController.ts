@@ -15,6 +15,7 @@ import isProduction from '../business/utils/isProduction';
 import { getUserFromRequestOrCreateAndSetCookie } from './auth/userAuthUtils';
 import stripe from './stripe';
 import { BadRequest } from 'http-errors';
+import required from '../business/utils/required';
 
 type BuyCreditsSessionRequest = {
   quantity: number;
@@ -45,6 +46,13 @@ export class ColorizationController extends Controller {
 
     const url = await ColorService.getColorizedImage(identifier, userId);
     res.redirect(301, url);
+  }
+
+  @Get('/billing/price')
+  public async getPrice(): Promise<{ unitAmount: number }> {
+    const price = await stripe.prices.retrieve(COLOR_CREDIT_PRICE_ID);
+    const unitAmount = required(price.unit_amount, 'price.unit_amount');
+    return { unitAmount };
   }
 
   @Security('user-token')
