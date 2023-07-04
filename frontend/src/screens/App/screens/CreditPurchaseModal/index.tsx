@@ -170,4 +170,8 @@ export function openCreditPurchaseModal(): void {
 }
 
 // For testing
-if (__DEV__) openCreditPurchaseModal();
+if (__DEV__) {
+  setTimeout(() => {
+    openCreditPurchaseModal();
+  }, 0);
+}

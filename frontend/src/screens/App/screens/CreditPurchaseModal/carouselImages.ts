@@ -7,17 +7,40 @@ export default [
     objectPosition: 'center 75%',
     alt: 'Plaza hotel',
   },
+  // Girl
+  {
+    identifier: 'nynyma_rec0040_1_E-1262_02',
+    objectPosition: 'center 75%',
+    alt: 'Little girl on the street in front of black car and brick buildings',
+  },
+  // Alley with sunlight
+  {
+    identifier: 'nynyma_rec0040_1_00069_0039b',
+    objectPosition: 'center bottom',
+    alt: 'Alleyway in the Financial District, with scattered sunlight',
+  },
+  // Green lawn
+  {
+    identifier: 'nynyma_rec0040_2_03256_0018',
+    objectPosition: 'right 25%',
+    alt: 'Man holding sign in front of house with conical roof',
+  },
+  // Kids
+  {
+    identifier: 'nynyma_rec0040_3_01892_0027',
+    objectPosition: 'center 70%',
+  },
+  // Mom and boy at fence
+  {
+    identifier: 'nynyma_rec0040_4_T-5761A_19',
+    objectPosition: 'left 80%',
+    alt: 'Woman and boy at fence',
+  },
   // Fulton mall
   {
     identifier: 'nynyma_rec0040_3_00150_0006',
     objectPosition: '50% 70%',
     alt: 'Fulton mall',
-  },
-  // Stoop kids
-  {
-    identifier: 'nynyma_rec0040_3_00083_0020',
-    objectPosition: '60% 60%',
-    alt: 'Children on stoop',
   },
   // Black boy
   {
@@ -30,42 +53,6 @@ export default [
     identifier: 'nynyma_rec0040_1_01559_0018',
     objectPosition: '50% 60%',
     alt: 'Brownstones',
-  },
-  // Theater
-  {
-    identifier: 'nynyma_rec0040_1_I-2490_34',
-    objectPosition: '75% 75%',
-    alt: 'Woman walking by theater',
-  },
-  // Words fair
-  {
-    identifier: 'nynyma_rec0040_1_00998_0063',
-    objectPosition: '70% 50%',
-    alt: 'Times Square',
-  },
-  // Grand st
-  {
-    identifier: 'nynyma_rec0040_1_00239_0020',
-    objectPosition: '42.857% bottom',
-    alt: 'Man bowing at grant st',
-  },
-  // Group of men
-  {
-    identifier: 'nynyma_rec0040_1_00554_0001',
-    objectPosition: '16.627% 57.023%',
-    alt: 'group of men in the distance',
-  },
-  // Penn. R.R. Sta.
-  {
-    identifier: 'nynyma_rec0040_1_01280_0001',
-    objectPosition: '55.000% 61.786%',
-    alt: 'Pennsylvania Rail Road Station',
-  },
-  // Tax man
-  {
-    identifier: 'nynyma_rec0040_1_F-1690_37',
-    objectPosition: '60% 40%',
-    alt: 'Tax man',
   },
 ].map((image) => ({
   ...image,
