@@ -19,7 +19,7 @@ export async function getBalance(
   }
   const { balance } = (await ledgerRepository
     .createQueryBuilder('entry')
-    .select('SUM(entry.amount)', 'balance')
+    .select('COALESCE(SUM(entry.amount), 0)', 'balance')
     .where({
       userId,
     })
