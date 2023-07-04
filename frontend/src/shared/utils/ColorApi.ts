@@ -2,7 +2,6 @@ import api from 'utils/api';
 import getStripe from 'utils/getStripe';
 
 export async function redirectToCheckout(quantity: number): Promise<void> {
-  // TODO Create a success modal
   const successUrl = `${window.location.protocol}//${window.location.host}${window.location.pathname}?noWelcome=&creditPurchaseSuccess=${window.location.hash}`;
   const cancelUrl = `${window.location.protocol}//${window.location.host}${window.location.pathname}?noWelcome=${window.location.hash}`;
 
