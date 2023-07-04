@@ -9,7 +9,7 @@ import classnames from 'classnames';
 import stylesheet from './modal.less';
 
 export type FourtiesModalProps = React.PropsWithChildren<ReactModal.Props> & {
-  size: 'large' | 'small';
+  size: 'large' | 'small' | 'x-large';
   isCloseButtonVisible?: boolean;
 };
 

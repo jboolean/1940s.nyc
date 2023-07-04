@@ -20,7 +20,11 @@ export default function PhotoAsideModal({
     <FourtiesModal
       size="large"
       {...props}
-      className={classNames(stylesheet.photoAsideModal, className)}
+      className={classNames(
+        stylesheet.photoAsideModal,
+        className,
+        stylesheet[props.size]
+      )}
     >
       <div className={stylesheet.imageContainer}>
         <Carousel

@@ -38,7 +38,7 @@ export default function CreditPurchaseModal(): JSX.Element {
       onRequestClose={onRequestClose}
       shouldCloseOnEsc
       shouldCloseOnOverlayClick
-      size="large"
+      size="x-large"
       isCloseButtonVisible={true}
       className={stylesheet.creditPurchaseModal}
       carouselProps={{
@@ -121,7 +121,7 @@ export default function CreditPurchaseModal(): JSX.Element {
               buttonStyle="secondary"
               key={quantity}
               onClick={() => setQuantity(quantity)}
-              isActive={selectedQuantity === quantity}
+              isActive={selectedQuantity === quantity && isLoginValidated}
               disabled={!isLoginValidated}
             >
               <NumericFormat

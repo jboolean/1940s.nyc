@@ -40,6 +40,15 @@
     min-height: @modal-height;
     overflow-y: auto;
   }
+
+  &.x-large {
+    @modal-width: 75rem;
+    @modal-height: 45rem;
+
+    top: calc(50% - (@modal-height / 2));
+    width: @modal-width;
+    height: @modal-height;
+  }
 }
 
 .bodyOpen {
@@ -103,7 +112,8 @@
 @media screen and (max-width: @modal-width-max),
   screen and (max-height: @modal-height-max) {
   .modal.small,
-  .modal.large {
+  .modal.large,
+  .modal.x-large {
     display: block;
     position: relative;
     transform: none;
