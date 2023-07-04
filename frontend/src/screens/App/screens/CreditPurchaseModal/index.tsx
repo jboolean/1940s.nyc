@@ -151,7 +151,7 @@ export default function CreditPurchaseModal(): JSX.Element {
         .
       </p>
 
-      <div>
+      <div className={stylesheet.buttonRow}>
         <Button
           buttonStyle={isLoginValidated ? 'primary' : 'secondary'}
           onClick={() => handleCheckout()}
