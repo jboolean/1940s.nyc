@@ -53,9 +53,9 @@ export function getUserIdFromToken(token: string): number | undefined {
   }
 }
 
-export function getUser(userId: number): Promise<User | null> {
+export function getUser(userId: number): Promise<User> {
   const userRepository = getRepository(User);
-  return userRepository.findOneBy({ id: userId });
+  return userRepository.findOneByOrFail({ id: userId });
 }
 
 /**

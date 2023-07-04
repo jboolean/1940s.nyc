@@ -29,8 +29,20 @@ type LoginResponse = {
   outcome: LoginOutcome;
 };
 
+type UserResponse = {
+  email: string | null;
+};
+
 @Route('authentication')
 export class AuthenticationController extends Controller {
+  @Security('user-token')
+  @Get('/me')
+  public async getMe(@Request() req: express.Request): Promise<UserResponse> {
+    const userId = await getUserFromRequestOrCreateAndSetCookie(req);
+    const user = await UserService.getUser(userId);
+    return { email: user.email };
+  }
+
   @Security('user-token')
   @Post('/request-login')
   public async requestLogin(

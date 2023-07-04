@@ -1,7 +1,7 @@
 import { redirectToCheckout } from 'shared/utils/ColorApi';
 import create from 'zustand';
 import { immer } from 'zustand/middleware/immer';
-import { LoginOutcome, processLoginRequest } from '../utils/CreditsApi';
+import { getMe, LoginOutcome, processLoginRequest } from '../utils/CreditsApi';
 
 const PRESET_QUANTITIES = [20, 50, 100, 200];
 
@@ -39,6 +39,16 @@ const useCreditPurchaseModalStore = create(
       set((draft) => {
         draft.isOpen = true;
       });
+
+      getMe()
+        .then((me) => {
+          set((draft) => {
+            draft.emailAddress = me.email || '';
+          });
+        })
+        .catch((err) => {
+          console.warn('Error fetching me', err);
+        });
     },
 
     close: () => {

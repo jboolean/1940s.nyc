@@ -19,3 +19,8 @@ export async function processLoginRequest(
   );
   return resp.data.outcome;
 }
+
+export async function getMe(): Promise<{ email: string | null }> {
+  const resp = await api.get<{ email: string | null }>('/authentication/me');
+  return resp.data;
+}
