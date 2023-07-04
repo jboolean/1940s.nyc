@@ -4,6 +4,7 @@ import Button from 'shared/components/Button';
 import Labeled from 'shared/components/Labeled';
 import FourtiesModal from 'shared/components/Modal';
 import TextInput from 'shared/components/TextInput';
+import classNames from 'classnames';
 
 import useCreditPurchaseModalStore from './stories/CreditPurchaseStore';
 
@@ -62,7 +63,7 @@ export default function CreditPurchaseModal(): JSX.Element {
             <p className={stylesheet.finePrint}>
               A color token is used each time you click “Colorize” on a photo
               that has never been colorized before. If you or anyone else has
-              colored this photo before, it&rsquo;s free.
+              colored the photo before, it&rsquo;s free.
               <br />
               Already purchased tokens? Your email address will be used to
               retrieve them.
@@ -104,7 +105,11 @@ export default function CreditPurchaseModal(): JSX.Element {
         </div>
 
         <div>
-          <div className={stylesheet.quantityOptions}>
+          <div
+            className={classNames(stylesheet.quantityOptions, {
+              [stylesheet.disabled]: !isLoginValidated,
+            })}
+          >
             {quantityOptions.map((quantity) => (
               <Button
                 buttonStyle="secondary"
@@ -121,33 +126,20 @@ export default function CreditPurchaseModal(): JSX.Element {
                 &mdash;{quantity} photos
               </Button>
             ))}
-            {/*quantityOptions.map((quantity) => (
-              <Labeled
-                key={quantity}
-                labelText={`${quantity} photos—${formatPrice(
-                  quantity * PRICE
-                )}`}
-                renderInput={({ id }) => (
-                  <input
-                    id={id}
-                    type="radio"
-                    name="quantity"
-                    value={quantity}
-                    checked={selectedQuantity === quantity}
-                    onChange={({ target: { value } }) => {
-                      setQuantity(Number(value));
-                    }}
-                    disabled={!isLoginValidated}
-                  />
-                )}
-              />
-                  )) */}
           </div>
         </div>
 
         <p className={stylesheet.finePrint}>
           Write me at <a href="mailto:julian@1940s.nyc">julian@1940s.nyc</a> if
-          you have questions.
+          you have questions. Color by{' '}
+          <a
+            href="http://palette.fm?utm_source=fourtiesnyc"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Palette
+          </a>
+          .
         </p>
 
         <div>
