@@ -70,31 +70,40 @@ export default function CreditPurchaseModal(): JSX.Element {
             </p>
           </div>
 
-          <div className={stylesheet.emailRow}>
+          <form
+            className={stylesheet.emailRow}
+            onSubmit={(e) => {
+              e.preventDefault();
+              onSubmitLogin();
+            }}
+          >
             <Labeled
               labelText="Your email address"
               className={stylesheet.email}
               renderInput={({ id }) => (
                 <TextInput
                   id={id}
-                  type="text"
+                  type="email"
                   value={emailAddress}
+                  autoComplete="email"
+                  required
                   onChange={({ target: { value } }) => {
                     onEmailAddressChange(value);
                   }}
+                  disabled={isLoginValidated}
                 />
               )}
             />
 
             <Button
+              type="submit"
               buttonStyle="primary"
-              onClick={onSubmitLogin}
               disabled={isLoginValidated || !emailAddress}
               className={stylesheet.submitButton}
             >
               Continue
             </Button>
-          </div>
+          </form>
 
           {isFollowMagicLinkMessageVisible && (
             <p className={stylesheet.magicLinkMessage}>
@@ -130,8 +139,11 @@ export default function CreditPurchaseModal(): JSX.Element {
         </div>
 
         <p className={stylesheet.finePrint}>
-          Write me at <a href="mailto:julian@1940s.nyc">julian@1940s.nyc</a> if
-          you have questions. Color by{' '}
+          Write me at{' '}
+          <a href="mailto:julian@1940s.nyc" target="_blank  " rel="noreferrer">
+            julian@1940s.nyc
+          </a>{' '}
+          if you have questions. Color by{' '}
           <a
             href="http://palette.fm?utm_source=fourtiesnyc"
             target="_blank"
