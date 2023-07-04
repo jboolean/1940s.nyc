@@ -25,7 +25,7 @@ export async function getBalance(
     })
     .getRawOne<{ balance: number }>()) ?? { balance: 0 };
 
-  return balance;
+  return Number(balance);
 }
 
 async function hasEnoughBalance(
