@@ -1,3 +1,13 @@
+@import '../../../../shared/styles/viewport.less';
+
+.creditPurchaseModal {
+  text-align: left;
+
+  h1 {
+    text-align: center;
+  }
+}
+
 .finePrint {
   font-size: 12px;
 }
@@ -25,9 +35,22 @@
 }
 
 .quantityOptions {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
   margin-bottom: 2rem;
 
   &.disabled {
     opacity: 0.5;
+  }
+}
+
+@media screen and (max-width: @modal-width-max),
+  screen and (max-height: @modal-height-max) {
+  .creditPurchaseModal h1 {
+    text-align: left;
+  }
+
+  .quantityOptions {
+    grid-template-columns: 1fr;
   }
 }
