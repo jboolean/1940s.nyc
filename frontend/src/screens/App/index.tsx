@@ -4,29 +4,32 @@ import { Redirect, Route, Router, Switch } from 'react-router-dom';
 import history from 'utils/history';
 import AnnouncementBanner from './screens/AnnouncementBanner';
 import MapPane from './screens/MapPane';
-import ThankYou from './screens/TipJar/ThankYou';
 import Shutdown from './screens/Shutdown';
+import ThankYou from './screens/TipJar/ThankYou';
 import ViewerPane from './screens/ViewerPane';
 import Welcome from './screens/Welcome';
 
 import stylesheet from './App.less';
-import Outtakes from './screens/Outtakes';
 import AllStories from './screens/AllStories';
+import Outtakes from './screens/Outtakes';
 
 import { OptimizeExperimentsProvider } from 'shared/utils/OptimizeExperiments';
 import 'utils/optimize';
 import AdminRoutes from './screens/Admin/AdminRoutes';
+import CreditPurchaseModal, {
+  CreditPurchaseSuccessMessage,
+} from './screens/CreditPurchaseModal';
+import EditStory from './screens/EditStory';
 import FeatureFlags from './screens/FeatureFlags';
 import SubmitStoryWizard from './screens/SubmitStoryWizard';
-import EditStory from './screens/EditStory';
 import TipJar, { useTipJarStore } from './screens/TipJar';
-import CreditPurchaseModal from './screens/CreditPurchaseModal';
 
 const IS_SHUTDOWN = false;
 
 const searchParams = new URLSearchParams(window.location.search);
 
 const thankYouInitial = searchParams.has('tipSuccess');
+const creditSuccessInitial = searchParams.has('creditPurchaseSuccess');
 const openTipJarOnLoad = searchParams.has('openTipJar');
 const noWelcome = searchParams.has('noWelcome');
 
@@ -39,6 +42,8 @@ history.replace({
 
 function Modals(): JSX.Element {
   const [isThankYouOpen, setThankYouOpen] = React.useState(thankYouInitial);
+  const [isCreditPurchaseSuccessOpen, setCreditPurchaseSuccessOpen] =
+    React.useState(creditSuccessInitial);
   const [isWelcomeOpen, setWelcomeOpen] = React.useState(
     !isThankYouOpen && !openTipJarOnLoad && !noWelcome
   );
@@ -72,6 +77,12 @@ function Modals(): JSX.Element {
       />
       <SubmitStoryWizard />
       <CreditPurchaseModal />
+      <CreditPurchaseSuccessMessage
+        isOpen={isCreditPurchaseSuccessOpen}
+        onRequestClose={() => {
+          setCreditPurchaseSuccessOpen(false);
+        }}
+      />
       <TipJar />
     </>
   );

@@ -169,9 +169,4 @@ export function openCreditPurchaseModal(): void {
   useCreditPurchaseModalStore.getState().open();
 }
 
-// For testing
-if (__DEV__) {
-  setTimeout(() => {
-    openCreditPurchaseModal();
-  }, 0);
-}
+export { default as CreditPurchaseSuccessMessage } from './SuccessMessage';
