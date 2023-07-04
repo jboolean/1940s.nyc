@@ -46,23 +46,23 @@ export default function CreditPurchaseModal(): JSX.Element {
       }}
     >
       <div>
-        <h1>It takes a dime to ride!</h1>
+        <h1>Ride for just a dime!</h1>
 
         <div>
           <p>
-            The first three photos per day are free, but because I&rsquo;m using
-            the best AI colorization model available it costs a few cents after
-            that to keep exploring in color. Please purchase color tokens to
-            continue.
+            Enjoy three free colorized photos per day using the best AI
+            colorization model available. After that, a small fee is required to
+            cover the costs of the model. Purchase tokens to keep exploring in
+            color.
           </p>
 
           <p className={stylesheet.finePrint}>
-            A color token is used each time you click “Colorize” on a photo that
-            has never been colorized before. If you or anyone else has colored
-            the photo before, it&rsquo;s free.
+            A color token is consumed each time you click <i>Colorize</i> on a
+            photo that hasn&rsquo;t been colorized before. If the photo has been
+            colored by you or someone else, it&rsquo;s free.
             <br />
-            Already purchased tokens? Your email address will be used to
-            retrieve them.
+            Already bought tokens? Your email address will be used to retrieve
+            them.
           </p>
         </div>
 
