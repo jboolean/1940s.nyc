@@ -169,4 +169,6 @@ export function openCreditPurchaseModal(): void {
   useCreditPurchaseModalStore.getState().open();
 }
 
+openCreditPurchaseModal();
+
 export { default as CreditPurchaseSuccessMessage } from './SuccessMessage';
