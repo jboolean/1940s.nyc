@@ -45,6 +45,7 @@
   .overlayContentWrapper {
     display: grid;
     grid-template-rows: auto 1fr fit-content(35%) auto auto;
+    grid-template-columns: 100%;
     grid-template-areas:
       'alternates'
       '.'
@@ -88,7 +89,7 @@
   .alternates {
     grid-area: alternates;
 
-    max-width: calc(100% - 77px);
+    max-width: calc(100% - 40px);
 
     // Flush to left, top edge, it has internal padding
     margin-left: -@content-padding;
