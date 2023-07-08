@@ -139,6 +139,10 @@ class MapPane extends React.Component<Props & RouteComponentProps, State> {
             rel="noopener noreferrer"
             className={stylesheet.eightiesLink}
             onClick={() => {
+              recordEvent({
+                category: 'Map',
+                action: 'Clicks 80s.nyc',
+              });
               alert('You you leaving 1940s.nyc for an unaffiliated site.');
             }}
           >
