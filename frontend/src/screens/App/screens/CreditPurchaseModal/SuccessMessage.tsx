@@ -9,7 +9,10 @@ export default function ThankYou({
 }: Pick<ReactModal.Props, 'isOpen' | 'onRequestClose'>): JSX.Element {
   const history = useHistory();
 
-  const queryParams = new URLSearchParams(window.location.search);
+  const queryParamsRef = React.useRef(
+    new URLSearchParams(window.location.search)
+  );
+  const queryParams = queryParamsRef.current;
 
   React.useEffect(() => {
     // Remove query from url
@@ -19,14 +22,18 @@ export default function ThankYou({
     });
   }, [history]);
 
-  recordEvent({
-    action: 'Completes Credit Purchase',
-    category: 'Colorization',
-    value:
-      parseInt(queryParams.get('quantity'), 10) *
-      parseInt(queryParams.get('unitPrice'), 10),
-    nonInteraction: true,
-  });
+  React.useEffect(() => {
+    if (!isOpen) return;
+
+    recordEvent({
+      action: 'Completes Credit Purchase',
+      category: 'Colorization',
+      value:
+        parseInt(queryParams.get('quantity'), 10) *
+        parseInt(queryParams.get('unitPrice'), 10),
+      nonInteraction: true,
+    });
+  }, [isOpen, queryParams]);
 
   return (
     <Modal size="small" isOpen={isOpen} onRequestClose={onRequestClose}>
