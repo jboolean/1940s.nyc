@@ -1,4 +1,5 @@
 import { getPriceAmount, redirectToCheckout } from 'shared/utils/ColorApi';
+import recordEvent from 'shared/utils/recordEvent';
 import create from 'zustand';
 import { immer } from 'zustand/middleware/immer';
 import { getMe, LoginOutcome, processLoginRequest } from '../utils/CreditsApi';
@@ -65,6 +66,11 @@ const useCreditPurchaseModalStore = create(
               'Something went wrong getting pricing information. Please try again later.';
           });
         });
+
+      recordEvent({
+        category: 'Colorization',
+        action: 'Open credit purchase modal',
+      });
     },
 
     close: () => {
@@ -122,7 +128,7 @@ const useCreditPurchaseModalStore = create(
           draft.errorMessage = null;
         });
 
-        await redirectToCheckout(get().selectedQuantity);
+        await redirectToCheckout(get().selectedQuantity, get().unitPrice);
       } catch (error) {
         set((draft) => {
           // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
