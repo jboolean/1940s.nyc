@@ -1,6 +1,4 @@
 import React from 'react';
-import useFeatureFlagStore from 'screens/App/shared/stores/FeatureFlagsStore';
-import FeatureFlag from 'screens/App/shared/types/FeatureFlag';
 import Announcment from './Announcement';
 
 const ANNOUNCEMENTS_REGISTRY: Announcment[] = [
