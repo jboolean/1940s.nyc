@@ -1,8 +1,11 @@
 import api from 'utils/api';
 import getStripe from 'utils/getStripe';
 
-export async function redirectToCheckout(quantity: number): Promise<void> {
-  const successUrl = `${window.location.protocol}//${window.location.host}${window.location.pathname}?noWelcome=&creditPurchaseSuccess=${window.location.hash}`;
+export async function redirectToCheckout(
+  quantity: number,
+  unitPriceForAnalytics: number
+): Promise<void> {
+  const successUrl = `${window.location.protocol}//${window.location.host}${window.location.pathname}?noWelcome=&creditPurchaseSuccess=&quantity=${quantity}&unitPrice=${unitPriceForAnalytics}${window.location.hash}`;
   const cancelUrl = `${window.location.protocol}//${window.location.host}${window.location.pathname}?noWelcome=${window.location.hash}`;
 
   const stripe = await getStripe();
