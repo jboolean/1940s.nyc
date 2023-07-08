@@ -21,7 +21,7 @@ export default function ImageButtons(): JSX.Element {
         buttonStyle="secondary"
         href={`${API_BASE}/photos/${photoIdentifier}/buy-prints`}
         target="_blank"
-        onClick={(e) => {
+        onClick={() => {
           recordEvent({
             category: 'Image Viewer',
             action: 'Clicks Order Print',
