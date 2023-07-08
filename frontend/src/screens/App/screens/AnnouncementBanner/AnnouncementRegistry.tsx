@@ -24,10 +24,7 @@ const ANNOUNCEMENTS_REGISTRY: Announcment[] = [
       </React.Fragment>
     ),
   },
-];
-
-if (useFeatureFlagStore.getState()[FeatureFlag.COLORIZATION]) {
-  ANNOUNCEMENTS_REGISTRY.push({
+  {
     id: 'colorization',
     expiresAt: new Date('2023-10-04'),
     render: () => (
@@ -36,7 +33,7 @@ if (useFeatureFlagStore.getState()[FeatureFlag.COLORIZATION]) {
         button
       </React.Fragment>
     ),
-  });
-}
+  },
+];
 
 export default ANNOUNCEMENTS_REGISTRY;
