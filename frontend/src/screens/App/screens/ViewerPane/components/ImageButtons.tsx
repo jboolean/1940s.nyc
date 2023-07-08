@@ -8,6 +8,9 @@ import { useStoryDraftStore } from '../../SubmitStoryWizard';
 import ColorizeButton from './ColorizeButton';
 import recordEvent from 'shared/utils/recordEvent';
 
+const ORDER_PRINT_EXTERNAL_LINK_MESSAGE =
+  'You are leaving 1940s.nyc for the Department of Records and Information Services (DORIS), with which 1940s.nyc is not affilliated. 1940s.nyc cannot help with orders placed through DORIS. ' +
+  'Copies are from the original negatives will not include colorization from 1940s.nyc. ';
 export default function ImageButtons(): JSX.Element {
   const { identifier: photoIdentifier } = useParams<{ identifier?: string }>();
   const initializeStoryDraft = useStoryDraftStore((state) => state.initialize);
@@ -23,6 +26,8 @@ export default function ImageButtons(): JSX.Element {
             category: 'Image Viewer',
             action: 'Clicks Order Print',
           });
+          alert(ORDER_PRINT_EXTERNAL_LINK_MESSAGE);
+          return true;
         }}
       >
         Order Print
