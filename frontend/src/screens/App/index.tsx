@@ -58,16 +58,18 @@ function Modals(): JSX.Element {
 
   return (
     <>
-      {IS_SHUTDOWN ? (
-        <Shutdown isOpen={true} />
-      ) : (
-        <Welcome
-          isOpen={isWelcomeOpen}
-          onRequestClose={() => {
-            setWelcomeOpen(false);
-          }}
-        />
-      )}
+      <Route path={['/map', '/stories']}>
+        {IS_SHUTDOWN ? (
+          <Shutdown isOpen={true} />
+        ) : (
+          <Welcome
+            isOpen={isWelcomeOpen}
+            onRequestClose={() => {
+              setWelcomeOpen(false);
+            }}
+          />
+        )}
+      </Route>
 
       <ThankYou
         isOpen={isThankYouOpen}
