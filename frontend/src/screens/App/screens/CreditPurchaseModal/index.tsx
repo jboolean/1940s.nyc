@@ -46,9 +46,7 @@ export default function CreditPurchaseModal(): JSX.Element {
       }}
     >
       <div>
-        <h1>
-          One dime, please<em>!</em>
-        </h1>
+        <h1>One dime, please</h1>
 
         <div>
           <p>
