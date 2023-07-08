@@ -1,6 +1,4 @@
 import React from 'react';
-import useFeatureFlagStore from 'screens/App/shared/stores/FeatureFlagsStore';
-import FeatureFlag from 'screens/App/shared/types/FeatureFlag';
 import Announcment from './Announcement';
 
 const ANNOUNCEMENTS_REGISTRY: Announcment[] = [
@@ -24,10 +22,7 @@ const ANNOUNCEMENTS_REGISTRY: Announcment[] = [
       </React.Fragment>
     ),
   },
-];
-
-if (useFeatureFlagStore.getState()[FeatureFlag.COLORIZATION]) {
-  ANNOUNCEMENTS_REGISTRY.push({
+  {
     id: 'colorization',
     expiresAt: new Date('2023-10-04'),
     render: () => (
@@ -36,7 +31,7 @@ if (useFeatureFlagStore.getState()[FeatureFlag.COLORIZATION]) {
         button
       </React.Fragment>
     ),
-  });
-}
+  },
+];
 
 export default ANNOUNCEMENTS_REGISTRY;
