@@ -28,6 +28,7 @@ const COLOR_CREDIT_PRICE_ID = isProduction()
   : 'price_1NPpdrFCLBtNZLVlpl2852ha';
 
 const MIN_QUANTITY = 20;
+const MAX_QUANTITY = 2000;
 
 @Route('colorization')
 export class ColorizationController extends Controller {
@@ -99,6 +100,7 @@ export class ColorizationController extends Controller {
             adjustable_quantity: {
               enabled: true,
               minimum: MIN_QUANTITY,
+              maximum: MAX_QUANTITY,
             },
           },
         ],
