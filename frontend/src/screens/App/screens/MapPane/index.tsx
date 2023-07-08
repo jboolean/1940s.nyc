@@ -138,6 +138,9 @@ class MapPane extends React.Component<Props & RouteComponentProps, State> {
             target="_blank"
             rel="noopener noreferrer"
             className={stylesheet.eightiesLink}
+            onClick={() => {
+              alert('You you leaving 1940s.nyc for an unaffiliated site.');
+            }}
           >
             1980s{' '}
             <img
