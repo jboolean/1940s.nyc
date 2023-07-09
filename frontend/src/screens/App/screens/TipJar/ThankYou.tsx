@@ -17,7 +17,7 @@ export default function ThankYou({
     recordEvent({
       action: 'Completes Tip',
       category: 'Tip Jar',
-      value: Number(tipAmount) * 0.01,
+      value: Math.round(Number(tipAmount) * 0.01),
       nonInteraction: true,
     });
     window.localStorage.setItem('hasTipped', 'true');

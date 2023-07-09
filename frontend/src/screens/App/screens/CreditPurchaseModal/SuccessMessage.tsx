@@ -28,10 +28,11 @@ export default function ThankYou({
     recordEvent({
       action: 'Completes Credit Purchase',
       category: 'Colorization',
-      value:
+      value: Math.round(
         parseInt(queryParams.get('quantity'), 10) *
-        parseInt(queryParams.get('unitPrice'), 10) *
-        0.01,
+          parseInt(queryParams.get('unitPrice'), 10) *
+          0.01
+      ),
       nonInteraction: true,
     });
   }, [isOpen, queryParams]);
