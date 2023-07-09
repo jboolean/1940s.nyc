@@ -30,7 +30,8 @@ export default function ThankYou({
       category: 'Colorization',
       value:
         parseInt(queryParams.get('quantity'), 10) *
-        parseInt(queryParams.get('unitPrice'), 10),
+        parseInt(queryParams.get('unitPrice'), 10) *
+        0.01,
       nonInteraction: true,
     });
   }, [isOpen, queryParams]);
