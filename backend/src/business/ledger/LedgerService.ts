@@ -6,7 +6,7 @@ import LedgerEntryType from '../../enum/LedgerEntryType';
 const RATE_LIMIT_LOOKBACK = 24 * 60 * 60 * 1000; // 24 hours
 
 // We allow this much usage in the lookback window
-const MAX_LOOKBACK_USAGES = 3;
+const MAX_LOOKBACK_USAGES = 2;
 
 const SINGLE_PHOTO_USAGE_AMOUNT_POSITIVE = 1;
 

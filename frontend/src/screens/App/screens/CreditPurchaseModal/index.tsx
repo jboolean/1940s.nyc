@@ -50,7 +50,7 @@ export default function CreditPurchaseModal(): JSX.Element {
 
         <div>
           <p>
-            Enjoy three free colorized photos per day using the best AI
+            Enjoy two free colorized photos per day using the best AI
             colorization model available. After that, a small fee (equal to a
             1948 subway ride) is required to cover the costs of the model.
             Purchase tokens to keep exploring in color and support the site.
