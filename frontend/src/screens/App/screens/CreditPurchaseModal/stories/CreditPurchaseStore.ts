@@ -4,7 +4,7 @@ import create from 'zustand';
 import { immer } from 'zustand/middleware/immer';
 import { getMe, LoginOutcome, processLoginRequest } from '../utils/CreditsApi';
 
-const PRESET_QUANTITIES = [20, 50, 100, 200];
+const PRESET_QUANTITIES = [50, 100, 200];
 
 interface State {
   isOpen: boolean;
