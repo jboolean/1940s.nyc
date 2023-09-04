@@ -14,6 +14,7 @@ import * as UserService from '../business/users/UserService';
 import isProduction from '../business/utils/isProduction';
 import { getUserFromRequestOrCreateAndSetCookie } from './auth/userAuthUtils';
 import stripe from './stripe';
+import Stripe from 'stripe';
 import { BadRequest } from 'http-errors';
 import required from '../business/utils/required';
 
@@ -23,9 +24,9 @@ type BuyCreditsSessionRequest = {
   cancelUrl: string;
 };
 
-const COLOR_CREDIT_PRICE_ID = isProduction()
-  ? 'price_1NQ8p5FCLBtNZLVl95u5tXZh'
-  : 'price_1NPpdrFCLBtNZLVlpl2852ha';
+const COLOR_CREDIT_PRODUCT_ID = isProduction()
+  ? 'prod_OCXuxXcQOP3N4j'
+  : 'prod_OCE62CeqBcpuxW';
 
 const MIN_QUANTITY = 20;
 const MAX_QUANTITY = 2000;
@@ -51,7 +52,13 @@ export class ColorizationController extends Controller {
 
   @Get('/billing/price')
   public async getPrice(): Promise<{ unitAmount: number }> {
-    const price = await stripe.prices.retrieve(COLOR_CREDIT_PRICE_ID);
+    const product = await stripe.products.retrieve(COLOR_CREDIT_PRODUCT_ID, {
+      expand: ['default_price'],
+    });
+    const price = required(
+      product.default_price,
+      'product.default_price'
+    ) as Stripe.Price;
     const unitAmount = required(price.unit_amount, 'price.unit_amount');
     return { unitAmount };
   }
@@ -88,6 +95,8 @@ export class ColorizationController extends Controller {
       user?.stripeCustomerId ?? undefined;
     const hasExistingCustomer = !!stripeCustomerId;
 
+    const product = await stripe.products.retrieve(COLOR_CREDIT_PRODUCT_ID);
+
     try {
       const session = await stripe.checkout.sessions.create({
         cancel_url: cancelUrl,
@@ -95,7 +104,7 @@ export class ColorizationController extends Controller {
         success_url: successUrl,
         line_items: [
           {
-            price: COLOR_CREDIT_PRICE_ID,
+            price: product.default_price as string,
             quantity,
             adjustable_quantity: {
               enabled: true,
