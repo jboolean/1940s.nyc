@@ -6,7 +6,7 @@ import LedgerEntryType from '../../enum/LedgerEntryType';
 const RATE_LIMIT_LOOKBACK = 24 * 60 * 60 * 1000; // 24 hours
 
 // We allow this much usage in the lookback window
-const MAX_LOOKBACK_USAGES = 2;
+const MAX_LOOKBACK_USAGES = 1;
 
 const SINGLE_PHOTO_USAGE_AMOUNT_POSITIVE = 1;
 
@@ -137,7 +137,8 @@ export async function grantCredits(
   await ledgerRepository.save(entry);
 }
 
-const CENTS_PER_CREDIT = 10;
+const CENTS_PER_CREDIT = 20;
+const MAX_CREDITS_FOR_TIP = 15;
 
 /**
  * This exists because there is not a formal pay-for-credits flow in the app, but
@@ -159,7 +160,10 @@ export async function grantCreditsForTip(
   // Credits are granted at a fixed rate
   // Plus an amnesty for negative balances
 
-  const creditsFromPayment = Math.floor(amountCents / CENTS_PER_CREDIT);
+  const creditsFromPayment = Math.min(
+    Math.floor(amountCents / CENTS_PER_CREDIT),
+    MAX_CREDITS_FOR_TIP
+  );
 
   await grantCredits(
     userId,
