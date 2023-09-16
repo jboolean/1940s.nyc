@@ -22,6 +22,7 @@ interface StoryApiModel {
 type AdminFields = {
   recaptchaScore: number;
   title?: string;
+  emailBounced: boolean;
 };
 
 // Can never be set by user

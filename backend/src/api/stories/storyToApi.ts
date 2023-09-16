@@ -24,6 +24,7 @@ export function toAdminStoryResponse(story: Story): AdminStoryResponse {
     title: story.title ?? undefined,
 
     recaptchaScore: story.recaptchaScore,
+    emailBounced: !!story.bounce,
   };
 }
 

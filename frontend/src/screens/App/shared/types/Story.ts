@@ -46,4 +46,5 @@ export type StoryDraftRequest = {
 export type AdminStory = Story & {
   recaptchaScore: number;
   title?: string;
+  emailBounced: boolean;
 };

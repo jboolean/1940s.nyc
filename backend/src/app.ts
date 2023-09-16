@@ -20,6 +20,7 @@ import {
 } from 'express';
 import { ValidateError } from 'tsoa';
 import StripeWebhooksResource from './api/StripeWebhooksResource';
+import PostmarkWebhooksResource from './api/PostmarkWebhooksResource';
 import { IpDeniedError } from 'express-ipfilter';
 
 // Trust API Gateway
@@ -78,6 +79,7 @@ app.use(async (req, res, next) => {
 app.use('/photos', PhotosResource);
 app.use('/geodata', GeodataResource);
 app.use('/stripe-webhooks', StripeWebhooksResource);
+app.use('/postmark-webhooks', PostmarkWebhooksResource);
 
 // Tsoa
 RegisterRoutes(app);
