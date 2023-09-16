@@ -44,6 +44,8 @@ import {
 } from './storyToApi';
 import EmailCampaignService from '../../business/email/EmailCampaignService';
 import normalizeEmail from '../../business/utils/normalizeEmail';
+import { UserData as NetlifyUserData } from 'gotrue-js';
+import required from '../../business/utils/required';
 
 function updateModelFromRequest(
   story: Story,
@@ -238,7 +240,8 @@ export class StoriesController extends Controller {
   @Patch('/{id}/state')
   public async updateStoryState(
     @Path('id') id: number,
-    @Body() updates: { state: StoryState }
+    @Body() updates: { state: StoryState },
+    @Request() req: Express.Request & { user?: NetlifyUserData }
   ): Promise<AdminStoryResponse> {
     let story = await StoryRepository().findOneBy({ id });
 
@@ -259,6 +262,7 @@ export class StoriesController extends Controller {
     }
 
     story.state = updates.state;
+    story.lastReviewer = required(req.user, 'user').email;
 
     story = await StoryRepository().save(story);
 
