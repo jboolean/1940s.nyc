@@ -1,3 +1,4 @@
+import { Models } from 'postmark';
 import {
   Column,
   CreateDateColumn,
@@ -93,4 +94,10 @@ export default class Story {
     name: 'last_reviewer',
   })
   lastReviewer!: string | null;
+
+  @Column({
+    type: 'jsonb',
+    nullable: true,
+  })
+  bounce: Models.Bounce | null;
 }

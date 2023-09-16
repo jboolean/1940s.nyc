@@ -31,6 +31,12 @@ function StoryMetadataView({ story }: { story: AdminStory }): JSX.Element {
       >
         {story.recaptchaScore * 100}% Human
       </div>
+      {story.emailBounced ? (
+        <div className={classNames(stylesheet.score, stylesheet.bad)}>
+          Email bounced
+        </div>
+      ) : null}
+
       {story.lngLat ? (
         <div>
           {story.lngLat.lat}, {story.lngLat.lng}
