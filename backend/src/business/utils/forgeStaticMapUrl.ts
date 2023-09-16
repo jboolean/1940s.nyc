@@ -21,7 +21,7 @@ export default function forgeStaticMapUrl(
   const mapImageUrl: URL = new URL(
     `/styles/v1/${MAPBOX_USER}/${MAP_STYLE_ID}/static/${lng},${lat},${zoomLevel}/${width}x${height}${
       retina ? '@2x' : ''
-    }}`,
+    }`,
     'https://api.mapbox.com'
   );
 
