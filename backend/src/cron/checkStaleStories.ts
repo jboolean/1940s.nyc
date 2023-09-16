@@ -14,6 +14,15 @@ function forgeReviewStoriesUrl(): string {
   return storyEditUrl.toString();
 }
 
+async function getReviewerStats(): Promise<
+  { reviewer: string; count: number }[]
+> {
+  const stats = (await StoryRepository().query(
+    `select last_reviewer as reviewer, count(*) as count from stories where last_reviewer is not null group by last_reviewer order by count(*) desc;`
+  )) as Promise<{ reviewer: string; count: number }[]>;
+  return stats;
+}
+
 export default async function checkStaleStories(): Promise<void> {
   const hasStaleStories =
     (await StoryRepository()
@@ -34,10 +43,13 @@ export default async function checkStaleStories(): Promise<void> {
 
   const reviewStoriesUrl = forgeReviewStoriesUrl();
 
+  const stats = await getReviewerStats();
+
   const email = ReviewQueueStaleTemplate.createTemplatedEmail({
     templateContext: {
       reviewStoriesUrl,
       storiesCount,
+      stats,
     },
     metadata: {},
     to: process.env.MODERATORS_TO_EMAIL ?? '',
