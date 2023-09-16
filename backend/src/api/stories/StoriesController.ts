@@ -262,6 +262,7 @@ export class StoriesController extends Controller {
     }
 
     story.state = updates.state;
+    console.log(req.user);
     story.lastReviewer = required(req.user, 'user').email;
 
     story = await StoryRepository().save(story);
