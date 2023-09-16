@@ -87,6 +87,10 @@ export default class Story {
   @Column()
   hasEverSubmitted: boolean;
 
-  @Column()
+  @Column({
+    type: String,
+    nullable: true,
+    name: 'last_reviewer',
+  })
   lastReviewer!: string | null;
 }
