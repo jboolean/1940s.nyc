@@ -20,7 +20,6 @@ async function getReviewerStats(): Promise<
   const stats = (await StoryRepository().query(
     `select last_reviewer as reviewer, count(*) as count from stories where last_reviewer is not null group by last_reviewer order by count(*) desc;`
   )) as Promise<{ reviewer: string; count: number }[]>;
-  console.log(stats);
   return stats;
 }
 
