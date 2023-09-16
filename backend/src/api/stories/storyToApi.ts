@@ -21,6 +21,7 @@ export function toAdminStoryResponse(story: Story): AdminStoryResponse {
       'storytellerSubtitle'
     ),
     textContent: story.textContent ?? undefined,
+    title: story.title ?? undefined,
 
     recaptchaScore: story.recaptchaScore,
   };
