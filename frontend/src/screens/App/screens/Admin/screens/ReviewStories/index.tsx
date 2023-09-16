@@ -46,6 +46,7 @@ function StoryMetadataView({ story }: { story: AdminStory }): JSX.Element {
           {story.photo}
         </a>
       </div>
+      <div>Title: {story.title}</div>
     </div>
   );
 }
