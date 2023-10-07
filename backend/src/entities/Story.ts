@@ -79,7 +79,9 @@ export default class Story {
   })
   textContent!: string | null;
 
-  @Column()
+  @Column({
+    type: 'numeric',
+  })
   recaptchaScore: number;
 
   @Column()
