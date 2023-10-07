@@ -1,4 +1,4 @@
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import React from 'react';
 import Modal from 'react-modal';
 import * as Sentry from '@sentry/react';
@@ -31,4 +31,6 @@ netlifyIdentity.init({});
 
 Modal.setAppElement(containerEl);
 
-ReactDOM.render(React.createElement(App), containerEl);
+const root = createRoot(containerEl);
+
+root.render(React.createElement(App));

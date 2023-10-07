@@ -3,18 +3,20 @@ const merge = require('webpack-merge');
 const common = require('./webpack.common.js');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const path = require('path');
+const ReactRefreshPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
+
 
 const RECAPTCHA_SITE_KEY_DEV = '6LeEBLwjAAAAAOrrSxVM9Oac2rlC0uRGkmvx2m0p'
 
 // Webpack configuration
 module.exports = merge(common, {
   mode: 'development',
-  entry: ['react-hot-loader/patch'],
   devtool: 'inline-source-map',
   optimization: {
     moduleIds: 'named',
   },
   plugins: [
+    new ReactRefreshPlugin(),
     new webpack.DefinePlugin({
       __DEV__: true,
       __API_BASE__: JSON.stringify("http://dev.1940s.nyc:3000"),
@@ -34,5 +36,6 @@ module.exports = merge(common, {
   devServer: {
     historyApiFallback: true,
     host: 'dev.1940s.nyc',
+    hot: true
   },
 });

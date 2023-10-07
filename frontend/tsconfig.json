@@ -22,7 +22,7 @@
         "esModuleInterop": true,
         "resolveJsonModule": true,
         "strictNullChecks": false,
-        "strictBindCallApply": true
+        "strictBindCallApply": true,
     },
     "include": [
         "src"
