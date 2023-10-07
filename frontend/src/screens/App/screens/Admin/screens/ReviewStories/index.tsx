@@ -23,14 +23,16 @@ function StoryMetadataView({ story }: { story: AdminStory }): JSX.Element {
         </time>
       </div>
       <div>{story.storytellerEmail}</div>
-      <div
-        className={classNames(stylesheet.score, {
-          [stylesheet.good]: story.recaptchaScore > 0.5,
-          [stylesheet.bad]: story.recaptchaScore <= 0.5,
-        })}
-      >
-        {story.recaptchaScore * 100}% Human
-      </div>
+      {story.recaptchaScore < 0.7 ? (
+        <div
+          className={classNames(stylesheet.score, {
+            [stylesheet.good]: story.recaptchaScore > 0.5,
+            [stylesheet.bad]: story.recaptchaScore <= 0.5,
+          })}
+        >
+          {story.recaptchaScore * 100}% Human
+        </div>
+      ) : null}
       {story.emailBounced ? (
         <div className={classNames(stylesheet.score, stylesheet.bad)}>
           Email bounced
