@@ -1,5 +1,6 @@
 import recordEvent from 'shared/utils/recordEvent';
-import { mountStoreDevtool } from 'simple-zustand-devtools';
+// This library is broken. Re-enable if fixed. https://github.com/beerose/simple-zustand-devtools/issues/31
+// import { mountStoreDevtool } from 'simple-zustand-devtools';
 import create from 'zustand';
 import { immer } from 'zustand/middleware/immer';
 import { openCreditPurchaseModal } from '../../CreditPurchaseModal';
@@ -106,8 +107,8 @@ const useColorizationStore = create(
   }))
 );
 
-if (__DEV__) {
-  mountStoreDevtool('ColorizationStore', useColorizationStore);
-}
+// if (__DEV__) {
+//   mountStoreDevtool('ColorizationStore', useColorizationStore);
+// }
 
 export default useColorizationStore;
