@@ -49,7 +49,7 @@ const useCreditPurchaseModalStore = create(
             draft.emailAddress = me.email || '';
           });
         })
-        .catch((err) => {
+        .catch((err: unknown) => {
           console.warn('Error fetching me', err);
         });
 
@@ -59,7 +59,7 @@ const useCreditPurchaseModalStore = create(
             draft.unitPrice = price;
           });
         })
-        .catch((err) => {
+        .catch((err: unknown) => {
           set((draft) => {
             console.error('Error fetching price', err);
             draft.errorMessage =
