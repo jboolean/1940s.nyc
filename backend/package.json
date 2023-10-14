@@ -50,7 +50,7 @@
     "serverless-lambda-edge-pre-existing-cloudfront": "^1.2.0",
     "serverless-offline": "^13.2.0",
     "serverless-plugin-select": "^2.0.0-rc.1",
-    "serverless-plugin-typescript": "^2.1.4",
+    "serverless-plugin-typescript": "^2.1.5",
     "typescript": "^5.2.2"
   },
   "dependencies": {
