@@ -1,15 +1,15 @@
-import { Configuration, OpenAIApi } from 'openai';
+import OpenAI from 'openai';
 import createStoryTitlePrompt from './createStoryTitlePrompt';
-const configuration = new Configuration({
+
+const openai = new OpenAI({
   organization: 'org-TEbKEsj2LQsKAmHZRs1MoHHh',
   apiKey: process.env.OPENAI_SK,
 });
-const openai = new OpenAIApi(configuration);
 
 export async function suggestStoryTitle(storyContent: string): Promise<string> {
-  const response = await openai.createCompletion(
+  const response = await openai.completions.create(
     createStoryTitlePrompt(storyContent)
   );
 
-  return response.data.choices[0].text?.trim() ?? '';
+  return response.choices[0].text?.trim() ?? '';
 }

@@ -1,8 +1,8 @@
-import { CreateCompletionRequest } from 'openai';
+import OpenAI from 'openai';
 
 export default function createStoryTitlePrompt(
   storyContent: string
-): CreateCompletionRequest {
+): OpenAI.CompletionCreateParamsNonStreaming {
   return {
     model: 'text-davinci-003',
     prompt: `Create a very short caption for each story
