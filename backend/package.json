@@ -19,7 +19,7 @@
   "author": "Julian Boilen",
   "license": "ISC",
   "devDependencies": {
-    "@types/aws-lambda": "^8.10.111",
+    "@types/aws-lambda": "^8.10.125",
     "@types/cookie-parser": "^1.4.3",
     "@types/cors": "^2.8.12",
     "@types/eslint": "^8.44.3",
