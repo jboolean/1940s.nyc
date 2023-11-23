@@ -44,7 +44,12 @@ export default function Alternates({
       >
         <div className={classnames(stylesheet.filmstrip)}>
           {alternatePhotos.map(({ identifier, collection }) => (
-            <Link to={identifier} key={identifier} className={stylesheet.link}>
+            <Link
+              to={identifier}
+              key={identifier}
+              className={stylesheet.link}
+              aria-label={`Alternate photo of this location from ${COLLECTION_DISPLAY_NAMES[collection]} collection`}
+            >
               <span className={stylesheet.collectionTag}>
                 {COLLECTION_DISPLAY_NAMES[collection]}
               </span>

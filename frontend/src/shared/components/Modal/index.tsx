@@ -41,6 +41,7 @@ export default function FourtiesModal({
             className={stylesheet.closeButton}
             onClick={props.onRequestClose}
             title="Close"
+            aria-label="Close dialog"
           />
         </>
       )}
