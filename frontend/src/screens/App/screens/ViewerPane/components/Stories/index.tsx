@@ -21,7 +21,7 @@ export default function Stories({ photoIdentifier }: Props): JSX.Element {
   }, [photoIdentifier]);
 
   return (
-    <div>
+    <div title="Stories">
       {stories.map((story) => (
         <Story key={story.id} story={story} />
       ))}

@@ -62,6 +62,7 @@ export default function TextContent({
       <TextArea
         className={stylesheet.writingArea}
         placeholder="Share as little or much as you&rsquo;d like about this photo, the surrounding area, and your connection to it"
+        aria-label='"Story content'
         value={textContent ?? ''}
         onChange={handleTextContentChange}
         ref={textInputRef}
