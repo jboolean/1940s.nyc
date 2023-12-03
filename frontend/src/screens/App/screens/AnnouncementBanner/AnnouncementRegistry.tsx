@@ -32,6 +32,15 @@ const ANNOUNCEMENTS_REGISTRY: Announcment[] = [
       </React.Fragment>
     ),
   },
+  {
+    id: 'color-outage-2023-12-03',
+    expiresAt: new Date('2023-12-06'),
+    render: () => (
+      <React.Fragment>
+        The Colorization feature is experiencing an outage
+      </React.Fragment>
+    ),
+  },
 ];
 
 export default ANNOUNCEMENTS_REGISTRY;
