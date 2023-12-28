@@ -1,0 +1,24 @@
+@import '../../../shared/styles/colors.less';
+@import '../../../shared/styles/viewport.less';
+
+fieldset.fieldset {
+  margin-top: 1em;
+  background-color: @creme;
+  border: none;
+
+  &:disabled {
+    filter: contrast(0.75);
+    cursor: not-allowed;
+  }
+
+  legend.legend {
+    font-weight: bold;
+    color: @creme;
+    background-color: @font-color-dark;
+    padding: 0.25em 0.5em;
+  }
+
+  @media screen and (max-width: @modal-width-max) {
+    border: 1px solid @font-color-dark;
+  }
+}

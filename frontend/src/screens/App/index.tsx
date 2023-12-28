@@ -23,6 +23,7 @@ import EditStory from './screens/EditStory';
 import FeatureFlags from './screens/FeatureFlags';
 import SubmitStoryWizard from './screens/SubmitStoryWizard';
 import TipJar, { useTipJarStore } from './screens/TipJar';
+import Corrections from './screens/Corrections';
 
 const IS_SHUTDOWN = false;
 
@@ -78,6 +79,7 @@ function Modals(): JSX.Element {
         }}
       />
       <SubmitStoryWizard />
+      <Corrections />
       <CreditPurchaseModal />
       <CreditPurchaseSuccessMessage
         isOpen={isCreditPurchaseSuccessOpen}

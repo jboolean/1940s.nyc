@@ -19,6 +19,7 @@ interface Actions {
   close(): void;
 }
 
+// Auth store is for admin login only
 const useAuthStore = create(
   persist(
     immer<State & Actions>((set) => ({

@@ -1,14 +1,32 @@
 import api from './api';
 
+type Collection = '1940' | '1980';
 export interface PhotoSummary {
   identifier: string;
-  collection: '1940' | '1980';
+  collection: Collection;
+}
+
+interface GeocodeResult {
+  method: string;
+  lngLat: { lng: number; lat: number } | null;
 }
 
 export interface Photo {
   address?: string;
   borough?: string;
   identifier: string;
+
+  // Extended data for the corrections interface
+  collection: Collection;
+  block?: number;
+  lot?: string;
+
+  geocodeResults: GeocodeResult[];
+}
+
+export async function getPhoto(identifier: string): Promise<Photo | null> {
+  const resp = await api.get<Photo[]>(`/photos/${identifier}`);
+  return resp.data[0] ?? null;
 }
 
 export async function closest(latLng: {
