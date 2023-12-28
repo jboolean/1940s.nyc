@@ -22,8 +22,8 @@ export default function PhotoMetadata({
       ? Number(photo.lot)
       : photo.lot;
   return (
-    <div className={stylesheet.metadataContainer}>
-      <h2>Photo information</h2>
+    <details className={stylesheet.metadataContainer}>
+      <summary>Photo information</summary>
       <dl>
         <dt>Identifier</dt>
         <dd>{photo.identifier}</dd>
@@ -70,6 +70,6 @@ export default function PhotoMetadata({
           </dl>
         </dd>
       </dl>
-    </div>
+    </details>
   );
 }
