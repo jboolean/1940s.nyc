@@ -1,8 +1,8 @@
 @import '../../../../../shared/styles/fonts.less';
 @import '../../../../../shared/styles/colors.less';
+@import '../../../../../shared/styles/viewport.less';
 
 .metadataContainer {
-  margin-right: 0.5rem;
   background-color: @creme;
   padding: 0.5rem;
   box-sizing: border-box;
@@ -24,5 +24,9 @@
 
   dd {
     text-align: right;
+  }
+
+  @media screen and (max-width: @modal-width-max) {
+    border: 1px solid @font-color-dark;
   }
 }
