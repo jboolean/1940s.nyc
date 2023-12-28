@@ -1,11 +1,14 @@
 import React from 'react';
 
+import classNames from 'classnames';
+import isEmpty from 'lodash/isEmpty';
 import map from 'lodash/map';
 import uniqueId from 'lodash/uniqueId';
-import isEmpty from 'lodash/isEmpty';
 
 import useLoginStore from 'shared/stores/LoginStore';
-import useCorrectionsStore from './stores/CorrectionsStore';
+import useCorrectionsStore, {
+  useStoryDraftStoreComputeds,
+} from './stores/CorrectionsStore';
 
 import Button from 'shared/components/Button';
 import FieldSet from 'shared/components/FieldSet';
@@ -15,11 +18,22 @@ import TextInput from 'shared/components/TextInput';
 import PhotoMetadata from './components/PhotoMetadata';
 
 import { PHOTO_BASE } from 'shared/utils/apiConstants';
+import CoordinateInput from './components/CoordinateInput';
+import LocationPickerModal from './components/LocationPickerModal';
 import stylesheet from './Corrections.less';
 
 const CorrectionsDialogContent = (): JSX.Element | null => {
-  const { photo, alternatesSelections, toggleAlternateSelection } =
-    useCorrectionsStore();
+  const {
+    photo,
+    alternatesSelections,
+    toggleAlternateSelection,
+    openMap,
+    correctedLng,
+    correctedLat,
+    setCorrectedLngLat,
+  } = useCorrectionsStore();
+  const { defaultLng, defaultLat } = useStoryDraftStoreComputeds();
+
   const { isLoginValidated } = useLoginStore();
 
   const handleAlternateSelectionChange = (identifier: string): void => {
@@ -73,32 +87,40 @@ const CorrectionsDialogContent = (): JSX.Element | null => {
             <p>Fix where the dot for this photo appears on the map.</p>
 
             <div className={stylesheet.coordinateInputRow}>
-              <TextInput
-                type="number"
+              <CoordinateInput
                 name="lat"
-                aria-label="Latitude"
-                max={90}
-                min={-90}
-                size={11}
-                step={0.000001}
+                label="Latitude"
+                placeholder={defaultLat}
+                value={correctedLat}
+                onValueChange={(newValue) =>
+                  setCorrectedLngLat(correctedLng ?? null, newValue)
+                }
+                rangeMin={-90}
+                rangeMax={90}
+                className={stylesheet.correctionInput}
               />
               <span style={{ verticalAlign: 'bottom' }}>, </span>
-              <TextInput
-                type="number"
+              <CoordinateInput
                 name="lng"
-                aria-label="Longitude"
-                max={180}
-                min={-180}
-                size={11}
-                step={0.000001}
+                label="Longitude"
+                placeholder={defaultLng}
+                value={correctedLng}
+                onValueChange={(newValue) =>
+                  setCorrectedLngLat(newValue ?? null, correctedLat)
+                }
+                rangeMin={-180}
+                rangeMax={180}
+                className={stylesheet.correctionInput}
               />
               <Button
-                buttonStyle="secondary"
+                buttonStyle="primary"
                 buttonTheme="modal"
                 className={stylesheet.openMapButton}
+                onClick={openMap}
               >
                 Select on map
               </Button>
+              <LocationPickerModal />
             </div>
 
             <fieldset className={stylesheet.alternates}>
@@ -131,6 +153,7 @@ const CorrectionsDialogContent = (): JSX.Element | null => {
                             src={`${PHOTO_BASE}/420-jpg/${identifier}.jpg`}
                             className={stylesheet.thumbnail}
                             title={identifier}
+                            draggable={false}
                           />
                         </label>
                       </React.Fragment>
@@ -158,7 +181,10 @@ const CorrectionsDialogContent = (): JSX.Element | null => {
                 type="text"
                 name="address"
                 aria-label="Address"
-                className={stylesheet.addressInput}
+                className={classNames(
+                  stylesheet.correctionInput,
+                  stylesheet.addressInput
+                )}
               />
             </div>
           </FieldSet>

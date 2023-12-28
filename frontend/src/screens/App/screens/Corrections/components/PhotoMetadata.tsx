@@ -42,7 +42,7 @@ export default function PhotoMetadata({
             {photo.geocodeResults
               .map(({ method, lngLat }) => {
                 return (
-                  <>
+                  <React.Fragment key={method}>
                     <dt key={method}>
                       {method in GEOCODE_METHOD_DISPLAY_NAMES
                         ? GEOCODE_METHOD_DISPLAY_NAMES[
@@ -63,7 +63,7 @@ export default function PhotoMetadata({
                         <i>No result</i>
                       )}
                     </dd>
-                  </>
+                  </React.Fragment>
                 );
               })
               .reverse()}

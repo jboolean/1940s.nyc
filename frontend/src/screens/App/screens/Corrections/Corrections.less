@@ -10,6 +10,7 @@
 .modalBody {
   flex-grow: 1;
   overflow-y: auto;
+  text-align: initial;
 }
 
 .requiredAstrisk {
@@ -34,6 +35,15 @@
     margin: 0 0.5rem;
     padding: 0 0.5rem;
     align-self: stretch;
+  }
+}
+
+.correctionInput {
+  color: @blue;
+  font-weight: bold;
+  &::placeholder {
+    color: @font-color-dark;
+    font-weight: normal;
   }
 }
 
