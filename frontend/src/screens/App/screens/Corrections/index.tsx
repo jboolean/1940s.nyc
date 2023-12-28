@@ -100,7 +100,6 @@ const CorrectionsDialogContent = (): JSX.Element | null => {
                 }
                 rangeMin={-90}
                 rangeMax={90}
-                className={stylesheet.correctionInput}
               />
               <span style={{ verticalAlign: 'bottom' }}>, </span>
               <CoordinateInput
@@ -113,7 +112,6 @@ const CorrectionsDialogContent = (): JSX.Element | null => {
                 }
                 rangeMin={-180}
                 rangeMax={180}
-                className={stylesheet.correctionInput}
               />
               <Button
                 buttonStyle="primary"
@@ -184,10 +182,7 @@ const CorrectionsDialogContent = (): JSX.Element | null => {
                 type="text"
                 name="address"
                 aria-label="Address"
-                className={classNames(
-                  stylesheet.correctionInput,
-                  stylesheet.addressInput
-                )}
+                className={classNames(stylesheet.addressInput)}
                 placeholder={defaultAddress}
                 value={correctedAddress}
                 onChange={(event) =>
