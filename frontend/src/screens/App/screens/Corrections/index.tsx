@@ -7,7 +7,7 @@ import uniqueId from 'lodash/uniqueId';
 
 import useLoginStore from 'shared/stores/LoginStore';
 import useCorrectionsStore, {
-  useStoryDraftStoreComputeds,
+  useCorrectionsStoreComputeds,
 } from './stores/CorrectionsStore';
 
 import Button from 'shared/components/Button';
@@ -31,8 +31,11 @@ const CorrectionsDialogContent = (): JSX.Element | null => {
     correctedLng,
     correctedLat,
     setCorrectedLngLat,
+    correctedAddress,
+    setCorrectedAddress,
   } = useCorrectionsStore();
-  const { defaultLng, defaultLat } = useStoryDraftStoreComputeds();
+  const { defaultLng, defaultLat, defaultAddress, canSubmit } =
+    useCorrectionsStoreComputeds();
 
   const { isLoginValidated } = useLoginStore();
 
@@ -185,6 +188,11 @@ const CorrectionsDialogContent = (): JSX.Element | null => {
                   stylesheet.correctionInput,
                   stylesheet.addressInput
                 )}
+                placeholder={defaultAddress}
+                value={correctedAddress}
+                onChange={(event) =>
+                  setCorrectedAddress(event.target.value || null)
+                }
               />
             </div>
           </FieldSet>
@@ -199,7 +207,7 @@ const CorrectionsDialogContent = (): JSX.Element | null => {
         <Button
           type="submit"
           buttonStyle="primary"
-          disabled={!isLoginValidated}
+          disabled={!(isLoginValidated && canSubmit)}
           className={stylesheet.submitButton}
         >
           Submit correction

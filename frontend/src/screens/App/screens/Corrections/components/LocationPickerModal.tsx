@@ -3,7 +3,7 @@ import React from 'react';
 import round from 'lodash/round';
 
 import useCorrectionsStore, {
-  useStoryDraftStoreComputeds,
+  useCorrectionsStoreComputeds,
 } from '../stores/CorrectionsStore';
 
 import FourtiesModal from 'shared/components/Modal';
@@ -38,7 +38,7 @@ export default function LocationPickerModal(): JSX.Element {
       setCorrectedLngLat,
     })
   );
-  const { defaultLng, defaultLat } = useStoryDraftStoreComputeds();
+  const { defaultLng, defaultLat } = useCorrectionsStoreComputeds();
 
   const renderMap = (): void => {
     const startingPosition = [

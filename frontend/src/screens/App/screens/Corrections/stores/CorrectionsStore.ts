@@ -17,11 +17,14 @@ interface State {
   isMapOpen: boolean;
   correctedLng: number | null;
   correctedLat: number | null;
+  correctedAddress: string | null;
 }
 
 interface ComputedState {
   defaultLng: number;
   defaultLat: number;
+  defaultAddress: string | null;
+  canSubmit: boolean;
 }
 
 interface Actions {
@@ -31,9 +34,10 @@ interface Actions {
   openMap: () => void;
   closeMap: () => void;
   setCorrectedLngLat: (lng: number, lat: number) => void;
+  setCorrectedAddress: (address: string | null) => void;
 }
 
-const useStoryDraftStore = create(
+const useCorrectionsStore = create(
   immer<State & Actions>((set, get) => ({
     isOpen: false,
     photoId: null,
@@ -42,6 +46,7 @@ const useStoryDraftStore = create(
     isMapOpen: false,
     correctedLng: null,
     correctedLat: null,
+    correctedAddress: null,
 
     initialize: (photo: string) => {
       set((draft) => {
@@ -52,6 +57,7 @@ const useStoryDraftStore = create(
         draft.isMapOpen = false;
         draft.correctedLng = null;
         draft.correctedLat = null;
+        draft.correctedAddress = null;
       });
 
       useLoginStore.getState().initialize();
@@ -110,18 +116,28 @@ const useStoryDraftStore = create(
         draft.correctedLat = lat;
       });
     },
+    setCorrectedAddress: (address: string | null) => {
+      set((draft) => {
+        draft.correctedAddress = address;
+      });
+    },
   }))
 );
 
-export function useStoryDraftStoreComputeds(): ComputedState {
-  const { photo } = useStoryDraftStore();
+export function useCorrectionsStoreComputeds(): ComputedState {
+  const { photo, correctedAddress, correctedLat, correctedLng } =
+    useCorrectionsStore();
   const defaultGeocode = photo?.geocodeResults?.find(
     (result) => !!result.lngLat
   );
   return {
     defaultLng: defaultGeocode?.lngLat.lng ?? DEFAULT_LNG_LAT[0],
     defaultLat: defaultGeocode?.lngLat.lat ?? DEFAULT_LNG_LAT[1],
+    defaultAddress: photo?.address ?? null,
+    canSubmit:
+      correctedAddress !== null ||
+      (correctedLat !== null && correctedLng !== null),
   };
 }
 
-export default useStoryDraftStore;
+export default useCorrectionsStore;
