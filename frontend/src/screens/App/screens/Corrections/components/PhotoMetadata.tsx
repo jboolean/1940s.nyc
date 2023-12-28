@@ -39,34 +39,32 @@ export default function PhotoMetadata({
         <dt>Placement attempts</dt>
         <dd>
           <dl>
-            {photo.geocodeResults
-              .map(({ method, lngLat }) => {
-                return (
-                  <React.Fragment key={method}>
-                    <dt key={method}>
-                      {method in GEOCODE_METHOD_DISPLAY_NAMES
-                        ? GEOCODE_METHOD_DISPLAY_NAMES[
-                            method as keyof typeof GEOCODE_METHOD_DISPLAY_NAMES
-                          ]
-                        : method}
-                    </dt>
-                    <dd>
-                      {lngLat ? (
-                        <a
-                          href={`https://www.openstreetmap.org/#map=17/${lngLat.lat}/${lngLat.lng}`}
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          📍 {lngLat.lat}, {lngLat.lng}
-                        </a>
-                      ) : (
-                        <i>No result</i>
-                      )}
-                    </dd>
-                  </React.Fragment>
-                );
-              })
-              .reverse()}
+            {photo.geocodeResults.map(({ method, lngLat }) => {
+              return (
+                <React.Fragment key={method}>
+                  <dt key={method}>
+                    {method in GEOCODE_METHOD_DISPLAY_NAMES
+                      ? GEOCODE_METHOD_DISPLAY_NAMES[
+                          method as keyof typeof GEOCODE_METHOD_DISPLAY_NAMES
+                        ]
+                      : method}
+                  </dt>
+                  <dd>
+                    {lngLat ? (
+                      <a
+                        href={`https://www.openstreetmap.org/#map=17/${lngLat.lat}/${lngLat.lng}`}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        📍 {lngLat.lat}, {lngLat.lng}
+                      </a>
+                    ) : (
+                      <i>No result</i>
+                    )}
+                  </dd>
+                </React.Fragment>
+              );
+            })}
           </dl>
         </dd>
       </dl>
