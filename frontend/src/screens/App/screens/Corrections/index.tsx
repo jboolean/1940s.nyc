@@ -124,17 +124,16 @@ const CorrectionsDialogContent = (): JSX.Element | null => {
               <LocationPickerModal />
             </div>
 
-            <fieldset className={stylesheet.alternates}>
-              <legend>
-                Also move these other photos at the same location?
-              </legend>
-              <p>
-                If they are not moved together they will be dissociated. 80s
-                photos left without a 40s photo at the same location are hidden
-                from the site.
-              </p>
-
-              {!isEmpty(alternatesSelections) ? (
+            {!isEmpty(alternatesSelections) ? (
+              <fieldset className={stylesheet.alternates}>
+                <legend>
+                  Also move these other photos at the same location?
+                </legend>
+                <p>
+                  If they are not moved together they will be dissociated. 80s
+                  photos left without a 40s photo at the same location are
+                  hidden from the site.
+                </p>
                 <div>
                   <div className={stylesheet.alternatesCheckboxes}>
                     {map(alternatesSelections, (selected, identifier) => (
@@ -151,6 +150,7 @@ const CorrectionsDialogContent = (): JSX.Element | null => {
                         />
                         <label htmlFor={`${idPrefix}-${identifier}`}>
                           <img
+                            alt={identifier}
                             src={`${PHOTO_BASE}/420-jpg/${identifier}.jpg`}
                             className={stylesheet.thumbnail}
                             title={identifier}
@@ -161,12 +161,12 @@ const CorrectionsDialogContent = (): JSX.Element | null => {
                     ))}
                   </div>
                 </div>
-              ) : (
-                <p>
-                  <i>No other photos at this location.</i>
-                </p>
-              )}
-            </fieldset>
+              </fieldset>
+            ) : (
+              <p>
+                <i>No other photos at this location.</i>
+              </p>
+            )}
           </FieldSet>
 
           <FieldSet
