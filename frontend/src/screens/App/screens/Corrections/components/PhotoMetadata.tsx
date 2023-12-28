@@ -57,7 +57,7 @@ export default function PhotoMetadata({
                           target="_blank"
                           rel="noreferrer"
                         >
-                          📍 {lngLat.lng}, {lngLat.lat}
+                          📍 {lngLat.lat}, {lngLat.lng}
                         </a>
                       ) : (
                         <i>No result</i>
