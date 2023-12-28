@@ -1,27 +1,26 @@
+import { CaptureConsole as CaptureConsoleIntegration } from '@sentry/integrations';
+import * as Sentry from '@sentry/node';
+import * as Tracing from '@sentry/tracing';
+import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express from 'express';
 const app = express();
-import * as Sentry from '@sentry/node';
-import * as Tracing from '@sentry/tracing';
-import { CaptureConsole as CaptureConsoleIntegration } from '@sentry/integrations';
-import cookieParser from 'cookie-parser';
 
 import createConnection from './createConnection';
 
-import { NotFound, HttpError } from 'http-errors';
+import { HttpError, NotFound } from 'http-errors';
 import { RegisterRoutes } from '../tsoa-build/routes';
 import GeodataResource from './api/GeodataResource';
-import PhotosResource from './api/PhotosResource';
 
 import {
   NextFunction,
   Request as ExRequest,
   Response as ExResponse,
 } from 'express';
-import { ValidateError } from 'tsoa';
-import StripeWebhooksResource from './api/StripeWebhooksResource';
-import PostmarkWebhooksResource from './api/PostmarkWebhooksResource';
 import { IpDeniedError } from 'express-ipfilter';
+import { ValidateError } from 'tsoa';
+import PostmarkWebhooksResource from './api/PostmarkWebhooksResource';
+import StripeWebhooksResource from './api/StripeWebhooksResource';
 
 // Trust API Gateway
 app.set('trust proxy', 1);
@@ -76,7 +75,6 @@ app.use(async (req, res, next) => {
   next();
 });
 
-app.use('/photos', PhotosResource);
 app.use('/geodata', GeodataResource);
 app.use('/stripe-webhooks', StripeWebhooksResource);
 app.use('/postmark-webhooks', PostmarkWebhooksResource);

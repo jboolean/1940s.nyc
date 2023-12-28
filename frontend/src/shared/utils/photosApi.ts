@@ -25,8 +25,8 @@ export interface Photo {
 }
 
 export async function getPhoto(identifier: string): Promise<Photo | null> {
-  const resp = await api.get<Photo[]>(`/photos/${identifier}`);
-  return resp.data[0] ?? null;
+  const resp = await api.get<Photo>(`/photos/${identifier}`);
+  return resp.data ?? null;
 }
 
 export async function closest(latLng: {
