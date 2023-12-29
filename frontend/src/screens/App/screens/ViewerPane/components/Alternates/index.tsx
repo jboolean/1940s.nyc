@@ -1,12 +1,12 @@
+import classnames from 'classnames';
 import React from 'react';
 import { Link } from 'react-router-dom';
-import stylesheet from './Alternates.less';
-import { getAlternatePhotos, PhotoSummary } from 'shared/utils/photosApi';
-import classnames from 'classnames';
 import { CSSTransition } from 'react-transition-group';
 import { PHOTO_BASE } from 'shared/utils/apiConstants';
+import { getAlternatePhotos, Photo } from 'shared/utils/photosApi';
+import stylesheet from './Alternates.less';
 
-const COLLECTION_DISPLAY_NAMES: Record<PhotoSummary['collection'], string> = {
+const COLLECTION_DISPLAY_NAMES: Record<Photo['collection'], string> = {
   '1940': '40s',
   '1980': '80s',
 };
@@ -18,9 +18,7 @@ export default function Alternates({
   className?: string;
   originalIdentifier: string;
 }): JSX.Element | null {
-  const [alternatePhotos, setAlternatePhotos] = React.useState<PhotoSummary[]>(
-    []
-  );
+  const [alternatePhotos, setAlternatePhotos] = React.useState<Photo[]>([]);
 
   React.useEffect(() => {
     // setAlternatePhotos([]);

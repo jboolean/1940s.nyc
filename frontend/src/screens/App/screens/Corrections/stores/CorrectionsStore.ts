@@ -127,9 +127,7 @@ const useCorrectionsStore = create(
 export function useCorrectionsStoreComputeds(): ComputedState {
   const { photo, correctedAddress, correctedLat, correctedLng } =
     useCorrectionsStore();
-  const defaultGeocode = photo?.geocodeResults?.find(
-    (result) => !!result.lngLat
-  );
+  const defaultGeocode = photo?.effectiveGeocode;
   return {
     defaultLng: defaultGeocode?.lngLat.lng ?? DEFAULT_LNG_LAT[0],
     defaultLat: defaultGeocode?.lngLat.lat ?? DEFAULT_LNG_LAT[1],

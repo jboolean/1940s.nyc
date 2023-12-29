@@ -11,6 +11,8 @@ const GEOCODE_METHOD_DISPLAY_NAMES = {
   pluto: 'Primary Land Use Tax Lot Output (PLUTO)',
 };
 
+const EMPTY = '—';
+
 export default function PhotoMetadata({
   photo,
 }: {
@@ -29,43 +31,21 @@ export default function PhotoMetadata({
         <dd>{photo.identifier}</dd>
 
         <dt>Address</dt>
-        <dd>{photo.address ?? '—'}</dd>
+        <dd>{photo.address ?? EMPTY}</dd>
 
         <dt>Borough / Block / Lot</dt>
         <dd>
-          {photo.borough ?? '—'} / {photo.block ?? '—'} / {lot ?? '—'}
+          {photo.borough ?? EMPTY} / {photo.block ?? EMPTY} / {lot ?? EMPTY}
         </dd>
 
-        <dt>Placement attempts</dt>
+        <dt>Placed using</dt>
         <dd>
-          <dl>
-            {photo.geocodeResults.map(({ method, lngLat }) => {
-              return (
-                <React.Fragment key={method}>
-                  <dt key={method}>
-                    {method in GEOCODE_METHOD_DISPLAY_NAMES
-                      ? GEOCODE_METHOD_DISPLAY_NAMES[
-                          method as keyof typeof GEOCODE_METHOD_DISPLAY_NAMES
-                        ]
-                      : method}
-                  </dt>
-                  <dd>
-                    {lngLat ? (
-                      <a
-                        href={`https://www.openstreetmap.org/#map=17/${lngLat.lat}/${lngLat.lng}`}
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        📍 {lngLat.lat}, {lngLat.lng}
-                      </a>
-                    ) : (
-                      <i>No result</i>
-                    )}
-                  </dd>
-                </React.Fragment>
-              );
-            })}
-          </dl>
+          {GEOCODE_METHOD_DISPLAY_NAMES[
+            photo.effectiveGeocode
+              ?.method as keyof typeof GEOCODE_METHOD_DISPLAY_NAMES
+          ] ||
+            photo.effectiveGeocode?.method ||
+            EMPTY}
         </dd>
       </dl>
     </details>

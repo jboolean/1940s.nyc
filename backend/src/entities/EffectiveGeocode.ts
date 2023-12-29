@@ -7,6 +7,7 @@ import {
   PrimaryColumn,
 } from 'typeorm';
 import PointColumnOptions from '../business/utils/PointColumnOptions';
+import GeocodeMethod from '../enum/GeocodeMethod';
 import LngLat from '../enum/LngLat';
 import Photo from './Photo';
 import Story from './Story';
@@ -25,12 +26,12 @@ export default class EffectiveGeocode {
   collection: string;
 
   @Column()
-  method: string;
+  method: GeocodeMethod;
 
   @Column(PointColumnOptions)
   lngLat: LngLat | null;
 
-  @OneToOne(() => Photo)
+  @OneToOne(() => Photo, (photo) => photo.effectiveGeocode)
   @JoinColumn({ name: 'identifier' })
   photo: Photo;
 

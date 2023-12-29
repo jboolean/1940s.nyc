@@ -1,5 +1,6 @@
 import * as express from 'express';
 import { BadRequest, NotFound } from 'http-errors';
+import querystring from 'querystring';
 import {
   Controller,
   Get,
@@ -9,12 +10,12 @@ import {
   Route,
   SuccessResponse,
 } from 'tsoa';
-
-import querystring from 'querystring';
-
 import { getRepository, In } from 'typeorm';
-import Photo from '../entities/Photo';
-import getLngLatForIdentifier from '../repositories/getLngLatForIdentifier';
+import Photo from '../../entities/Photo';
+import Collection from '../../enum/Collection';
+import getLngLatForIdentifier from '../../repositories/getLngLatForIdentifier';
+import { PhotoApiModel } from './PhotoApiModel';
+import photoToApi from './photoToApi';
 
 const PHOTO_PURCHASE_FORM_URL =
   'https://dorisorders.nyc.gov/dorisorders/ui/order-reproductions';
@@ -35,7 +36,7 @@ export class PhotosController extends Controller {
     @Query() lng?: string | number,
     @Query() lat?: string | number,
     @Query() withSameLngLatByIdentifier?: string
-  ): Promise<Photo[]> {
+  ): Promise<PhotoApiModel[]> {
     const photoRepo = getRepository(Photo);
 
     if (withSameLngLatByIdentifier) {
@@ -44,7 +45,9 @@ export class PhotosController extends Controller {
       );
 
       if (!lngLatForFromIdentifierResult) {
-        throw new NotFound('cannot find by identifier');
+        // If the identifier doesn't exist, return an empty array
+        // Previously this errored, but this is easier to handle and cache.
+        return [];
       }
 
       // Use lng, lat from this photo instead of lng, lat parameters
@@ -66,11 +69,9 @@ export class PhotosController extends Controller {
     const photos = await photoRepo.find({
       where: { identifier: In(ids) },
       order: { collection: 'ASC' },
-      relations: ['geocodeResults'],
-      loadEagerRelations: true,
     });
 
-    return photos;
+    return photos.map(photoToApi);
   }
 
   @Get('/closest')
@@ -78,7 +79,7 @@ export class PhotosController extends Controller {
     @Query() lng: string | number,
     @Query() lat: string | number,
     @Query() collection?: '1940' | '1980'
-  ): Promise<Photo> {
+  ): Promise<PhotoApiModel> {
     const photoRepo = getRepository(Photo);
 
     const result = (await photoRepo.query(
@@ -94,40 +95,40 @@ export class PhotosController extends Controller {
       identifier: result[0].identifier,
     });
 
-    return photo;
+    return photoToApi(photo);
   }
 
   @Get('/outtake-summaries')
   public async getOuttakeSummaries(
-    @Query() collection?: '1940' | '1980'
+    @Query() collection: Collection = Collection.FOURTIES
   ): Promise<{ identifier: string }[]> {
     const photoRepo = getRepository(Photo);
 
     const photos = await photoRepo.find({
-      where: { isOuttake: true, collection: collection ?? '1940' },
+      where: { isOuttake: true, collection: collection },
       select: ['identifier'],
       order: {
         identifier: 'ASC',
       },
     });
-    return photos;
+    return photos.map(({ identifier }) => ({ identifier }));
   }
 
   @Get('/{identifier}')
-  public async getByIdentifier(@Path() identifier: string): Promise<Photo> {
+  public async getByIdentifier(
+    @Path() identifier: string
+  ): Promise<PhotoApiModel> {
     const photoRepo = getRepository(Photo);
 
     const photo = await photoRepo.findOne({
       where: { identifier },
-      relations: ['geocodeResults'],
-      loadEagerRelations: true,
     });
 
     if (!photo) {
       throw new NotFound('photo not found');
     }
 
-    return photo;
+    return photoToApi(photo);
   }
 
   @Get('/{identifier}/buy-prints')
@@ -139,7 +140,7 @@ export class PhotosController extends Controller {
     const photoRepo = getRepository(Photo);
 
     const photo = await photoRepo.findOneBy({
-      identifier: req.params.identifier,
+      identifier: identifier,
     });
 
     if (!photo) {
