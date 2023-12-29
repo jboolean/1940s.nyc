@@ -14,6 +14,8 @@ const MAPBOX_STYLE = __DEV__
   ? 'mapbox://styles/julianboilen/ck5jrzrs11r1p1imia7qzjkm1/draft'
   : 'mapbox://styles/julianboilen/ck5jrzrs11r1p1imia7qzjkm1';
 
+const DEFAULT_LNG_LAT = [-73.99397, 40.7093] as const;
+
 export default function LocationPickerModal(): JSX.Element {
   const mapContainer = React.useRef<HTMLDivElement>(null);
   const map = React.useRef<mapboxgl.Map | null>(null);
@@ -38,12 +40,12 @@ export default function LocationPickerModal(): JSX.Element {
       setCorrectedLngLat,
     })
   );
-  const { defaultLng, defaultLat } = useCorrectionsStoreComputeds();
+  const { previousLng, previousLat } = useCorrectionsStoreComputeds();
 
   const renderMap = (): void => {
     const startingPosition = [
-      correctedLng ?? defaultLng,
-      correctedLat ?? defaultLat,
+      correctedLng ?? previousLng ?? DEFAULT_LNG_LAT[0],
+      correctedLat ?? previousLat ?? DEFAULT_LNG_LAT[1],
     ] as [number, number];
     map.current = new mapboxgl.Map({
       container: mapContainer.current,

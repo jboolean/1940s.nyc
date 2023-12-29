@@ -34,8 +34,12 @@ const CorrectionsDialogContent = (): JSX.Element | null => {
     correctedAddress,
     setCorrectedAddress,
   } = useCorrectionsStore();
-  const { defaultLng, defaultLat, defaultAddress, canSubmit } =
-    useCorrectionsStoreComputeds();
+  const {
+    previousLng: defaultLng,
+    previousLat: defaultLat,
+    previousAddress: defaultAddress,
+    canSubmit,
+  } = useCorrectionsStoreComputeds();
 
   const { isLoginValidated } = useLoginStore();
 

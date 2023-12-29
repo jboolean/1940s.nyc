@@ -3,11 +3,6 @@ import { immer } from 'zustand/middleware/immer';
 
 import useLoginStore from 'shared/stores/LoginStore';
 import { getAlternatePhotos, getPhoto, Photo } from 'shared/utils/photosApi';
-
-type LngLat = [number, number];
-
-const DEFAULT_LNG_LAT: LngLat = [-73.99397, 40.7093];
-
 interface State {
   isOpen: boolean;
   photoId: string | null;
@@ -21,9 +16,9 @@ interface State {
 }
 
 interface ComputedState {
-  defaultLng: number;
-  defaultLat: number;
-  defaultAddress: string | null;
+  previousLng: number | null;
+  previousLat: number | null;
+  previousAddress: string | null;
   canSubmit: boolean;
 }
 
@@ -129,9 +124,9 @@ export function useCorrectionsStoreComputeds(): ComputedState {
     useCorrectionsStore();
   const defaultGeocode = photo?.effectiveGeocode;
   return {
-    defaultLng: defaultGeocode?.lngLat.lng ?? DEFAULT_LNG_LAT[0],
-    defaultLat: defaultGeocode?.lngLat.lat ?? DEFAULT_LNG_LAT[1],
-    defaultAddress: photo?.address ?? null,
+    previousLng: defaultGeocode?.lngLat.lng ?? null,
+    previousLat: defaultGeocode?.lngLat.lat ?? null,
+    previousAddress: photo?.address ?? null,
     canSubmit:
       correctedAddress !== null ||
       (correctedLat !== null && correctedLng !== null),

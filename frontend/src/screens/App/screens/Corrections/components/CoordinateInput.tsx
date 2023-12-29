@@ -6,7 +6,7 @@ import TextInput from 'shared/components/TextInput';
 interface CoordinateInputProps {
   name: string;
   label: string;
-  placeholder: number;
+  placeholder?: number;
   value: number;
   onValueChange: (newValue: number) => void;
   rangeMin: number;
@@ -30,7 +30,9 @@ const CoordinateInput: React.FC<CoordinateInputProps> = ({
       name={name}
       aria-label={label}
       size={11}
-      placeholder={'' + placeholder}
+      placeholder={
+        typeof placeholder === 'number' ? placeholder.toString() : placeholder
+      }
       value={value}
       onValueChange={({ floatValue }) => {
         onValueChange(floatValue);
