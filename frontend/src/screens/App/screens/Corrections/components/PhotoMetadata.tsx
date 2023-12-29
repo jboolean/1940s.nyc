@@ -16,38 +16,40 @@ const EMPTY = '—';
 export default function PhotoMetadata({
   photo,
 }: {
-  photo: Photo;
+  photo?: Photo;
 }): JSX.Element {
   // Lot numbers are strings, but can almost always be parsed as numbers and displayed better.
-  const lot =
-    !!photo.lot && !isNaN(Number(photo.lot ?? ''))
-      ? Number(photo.lot)
-      : photo.lot;
+
   return (
     <details className={stylesheet.metadataContainer}>
       <summary>Photo information</summary>
-      <dl>
-        <dt>Identifier</dt>
-        <dd>{photo.identifier}</dd>
+      {photo ? (
+        <dl>
+          <dt>Identifier</dt>
+          <dd>{photo.identifier}</dd>
 
-        <dt>Address</dt>
-        <dd>{photo.address ?? EMPTY}</dd>
+          <dt>Address</dt>
+          <dd>{photo.address ?? EMPTY}</dd>
 
-        <dt>Borough / Block / Lot</dt>
-        <dd>
-          {photo.borough ?? EMPTY} / {photo.block ?? EMPTY} / {lot ?? EMPTY}
-        </dd>
+          <dt>Borough / Block / Lot</dt>
+          <dd>
+            {photo.borough ?? EMPTY} / {photo.block ?? EMPTY} /{' '}
+            {!!photo.lot && !isNaN(Number(photo.lot ?? ''))
+              ? Number(photo.lot)
+              : photo.lot ?? EMPTY}
+          </dd>
 
-        <dt>Placed using</dt>
-        <dd>
-          {GEOCODE_METHOD_DISPLAY_NAMES[
-            photo.effectiveGeocode
-              ?.method as keyof typeof GEOCODE_METHOD_DISPLAY_NAMES
-          ] ||
-            photo.effectiveGeocode?.method ||
-            EMPTY}
-        </dd>
-      </dl>
+          <dt>Placed using</dt>
+          <dd>
+            {GEOCODE_METHOD_DISPLAY_NAMES[
+              photo.effectiveGeocode
+                ?.method as keyof typeof GEOCODE_METHOD_DISPLAY_NAMES
+            ] ||
+              photo.effectiveGeocode?.method ||
+              EMPTY}
+          </dd>
+        </dl>
+      ) : null}
     </details>
   );
 }

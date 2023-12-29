@@ -68,7 +68,7 @@ const CorrectionsDialogContent = (): JSX.Element | null => {
           .
         </p>
 
-        {photo ? <PhotoMetadata photo={photo} /> : null}
+        <PhotoMetadata photo={photo} />
 
         <FieldSet className={stylesheet.fieldset} disabled={isLoginValidated}>
           <FieldSet.Legend>
