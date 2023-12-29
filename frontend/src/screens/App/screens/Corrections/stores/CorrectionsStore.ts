@@ -3,6 +3,7 @@ import { immer } from 'zustand/middleware/immer';
 
 import useLoginStore from 'shared/stores/LoginStore';
 import { getAlternatePhotos, getPhoto, Photo } from 'shared/utils/photosApi';
+import { createGeocodeCorrection } from '../shared/utils/correctionsApi';
 interface State {
   isOpen: boolean;
   photoId: string | null;
@@ -30,6 +31,7 @@ interface Actions {
   closeMap: () => void;
   setCorrectedLngLat: (lng: number, lat: number) => void;
   setCorrectedAddress: (address: string | null) => void;
+  submit: () => void;
 }
 
 const useCorrectionsStore = create(
@@ -115,6 +117,31 @@ const useCorrectionsStore = create(
       set((draft) => {
         draft.correctedAddress = address;
       });
+    },
+
+    submit: async () => {
+      const { photoId, correctedLng, correctedLat, close } = get();
+      if (!photoId) return;
+
+      // get selected alternates
+      const alternates = Object.entries(get().alternatesSelections)
+        .filter(([, isSelected]) => isSelected)
+        .map(([identifier]) => identifier);
+
+      if (
+        typeof correctedLng === 'number' &&
+        typeof correctedLat === 'number'
+      ) {
+        await createGeocodeCorrection(
+          [photoId, ...alternates],
+          correctedLat,
+          correctedLng
+        );
+      }
+
+      // TODO add address correction
+
+      close();
     },
   }))
 );

@@ -33,6 +33,7 @@ const CorrectionsDialogContent = (): JSX.Element | null => {
     setCorrectedLngLat,
     correctedAddress,
     setCorrectedAddress,
+    submit,
   } = useCorrectionsStore();
   const {
     previousLng: defaultLng,
@@ -208,6 +209,7 @@ const CorrectionsDialogContent = (): JSX.Element | null => {
           buttonStyle="primary"
           disabled={!(isLoginValidated && canSubmit)}
           className={stylesheet.submitButton}
+          onClick={submit}
         >
           Submit correction
         </Button>

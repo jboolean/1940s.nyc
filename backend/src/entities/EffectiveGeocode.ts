@@ -16,6 +16,9 @@ import Story from './Story';
  * A materialized view summarizing a photo with its best geocode result.
  * Used for quickly generating geojson.
  * Materialized view is refreshed when scraping data.
+ *
+ * TODO someday bring the view definition into the codebase by defining using typeorm migrations.
+ * It existed before there was a backend.
  */
 @Entity('effective_geocodes_view')
 export default class EffectiveGeocode {
