@@ -9,6 +9,7 @@ const GEOCODE_METHOD_DISPLAY_NAMES = {
   gmapsPlacesAutocomplete: 'Google Maps Place Autocomplete',
   mapbox: 'Mapbox',
   pluto: 'Primary Land Use Tax Lot Output (PLUTO)',
+  user: 'User-submitted',
 };
 
 const EMPTY = '—';
