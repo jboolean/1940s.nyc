@@ -42,4 +42,10 @@ export default class User {
   get isAnonymous(): boolean {
     return !this.email;
   }
+
+  @Column()
+  isEmailVerified: boolean;
+
+  @Column()
+  isBanned: boolean;
 }

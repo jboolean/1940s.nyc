@@ -77,6 +77,11 @@ export async function attachStripeCustomer(
   await userRepository.save(user);
 }
 
+export async function markEmailVerified(userId: number): Promise<void> {
+  const userRepository = getRepository(User);
+  await userRepository.update(userId, { isEmailVerified: true });
+}
+
 export async function createUser(
   ipAddress: string,
   email?: string
@@ -175,6 +180,7 @@ export async function processLoginRequest(
   } else {
     // Either account is anonymous or the current user is changing their email
     currentUser.email = normalizeEmail(requestedEmail);
+    currentUser.isEmailVerified = false;
     await userRepository.save(currentUser);
 
     if (currentUser.stripeCustomerId) {

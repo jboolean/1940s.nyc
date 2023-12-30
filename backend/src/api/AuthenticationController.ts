@@ -76,11 +76,11 @@ export class AuthenticationController extends Controller {
    * @param returnToPath The path to attach to the frontend base URL and redirect to after login
    */
   @Get('/login-with-magic-link')
-  public loginWithMagicLink(
+  public async loginWithMagicLink(
     @Query('token') magicToken: string,
     @Request() req: express.Request,
     @Query('returnToPath') returnToPath?: string
-  ): void {
+  ): Promise<void> {
     const res = req.res;
     if (!res) {
       throw new Error('No response object');
@@ -95,6 +95,8 @@ export class AuthenticationController extends Controller {
     if (!userId) {
       throw new Unauthorized('The link contains in invalid or expired token');
     }
+
+    await UserService.markEmailVerified(userId);
 
     const permenantToken = UserService.createUserToken(userId);
 
