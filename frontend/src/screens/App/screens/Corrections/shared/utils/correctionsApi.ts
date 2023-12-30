@@ -13,3 +13,13 @@ export async function createGeocodeCorrection(
     },
   });
 }
+
+export async function createAddressCorrection(
+  photoIdentifiers: string[],
+  address: string
+): Promise<void> {
+  await api.post(`/corrections/address`, {
+    photos: photoIdentifiers,
+    address,
+  });
+}

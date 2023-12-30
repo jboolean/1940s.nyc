@@ -3,7 +3,10 @@ import { immer } from 'zustand/middleware/immer';
 
 import useLoginStore from 'shared/stores/LoginStore';
 import { getAlternatePhotos, getPhoto, Photo } from 'shared/utils/photosApi';
-import { createGeocodeCorrection } from '../shared/utils/correctionsApi';
+import {
+  createAddressCorrection,
+  createGeocodeCorrection,
+} from '../shared/utils/correctionsApi';
 interface State {
   isOpen: boolean;
   photoId: string | null;
@@ -120,7 +123,8 @@ const useCorrectionsStore = create(
     },
 
     submit: async () => {
-      const { photoId, correctedLng, correctedLat, close } = get();
+      const { photoId, correctedLng, correctedLat, close, correctedAddress } =
+        get();
       if (!photoId) return;
 
       // get selected alternates
@@ -139,7 +143,10 @@ const useCorrectionsStore = create(
         );
       }
 
-      // TODO add address correction
+      if (correctedAddress !== null) {
+        // Address correction is only for the selected photo
+        await createAddressCorrection([photoId], correctedAddress);
+      }
 
       close();
     },
