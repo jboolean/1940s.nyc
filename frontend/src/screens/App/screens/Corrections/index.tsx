@@ -89,8 +89,9 @@ const CorrectionsDialogContent = (): JSX.Element | null => {
               correctionType === 'geocode' ? (
                 <>
                   Are these photos of the same place? If they are not moved
-                  together they will be dissociated. 80s photos left without a
-                  40s photo at the same location are hidden from the site.
+                  together they will be dissociated. <br />
+                  80s photos left without a 40s photo at the same location are
+                  hidden from the site.
                 </>
               ) : (
                 <>
