@@ -6,7 +6,6 @@ import useCorrectionsStore, {
 } from './stores/CorrectionsStore';
 
 import Button from 'shared/components/Button';
-import FieldSet from 'shared/components/FieldSet';
 import LoginForm from 'shared/components/LoginForm';
 import FourtiesModal from 'shared/components/Modal';
 import CorrectAddress from './components/CorrectAddress';
@@ -14,9 +13,12 @@ import CorrectGeocode from './components/CorrectGeocode';
 import PhotoMetadata from './components/PhotoMetadata';
 
 import stylesheet from './Corrections.less';
+import FieldSet from 'shared/components/FieldSet';
+import SelectAlternates from './components/SelectAlternates';
 
 const CorrectionsDialogContent = (): JSX.Element | null => {
-  const { photo, submit } = useCorrectionsStore();
+  const { photo, submit, correctionType, setCorrectionType } =
+    useCorrectionsStore();
   const { canSubmit } = useCorrectionsStoreComputeds();
 
   const { isLoginValidated } = useLoginStore();
@@ -53,16 +55,56 @@ const CorrectionsDialogContent = (): JSX.Element | null => {
               <span className={stylesheet.requiredAstrisk}> *</span>
             )}
           </FieldSet.Legend>
-
           <LoginForm />
         </FieldSet>
-        <div className={stylesheet.correctionsGroup}>
-          <CorrectGeocode />
-          <CorrectAddress />
-        </div>
+
+        <FieldSet>
+          <FieldSet.Legend>What would you like to correct?</FieldSet.Legend>
+          <Button
+            type="button"
+            buttonStyle="secondary"
+            isActive={correctionType === 'geocode'}
+            onClick={() => setCorrectionType('geocode')}
+            disabled={!isLoginValidated}
+          >
+            Map position
+          </Button>
+          <Button
+            type="button"
+            buttonStyle="secondary"
+            isActive={correctionType === 'address'}
+            onClick={() => setCorrectionType('address')}
+            disabled={!isLoginValidated}
+          >
+            Address
+          </Button>
+        </FieldSet>
+
+        {correctionType === 'geocode' ? <CorrectGeocode /> : null}
+        {correctionType === 'address' ? <CorrectAddress /> : null}
+
+        {correctionType !== null ? (
+          <SelectAlternates
+            description={
+              correctionType === 'geocode' ? (
+                <>
+                  Are these photos of the same place? If they are not moved
+                  together they will be dissociated. 80s photos left without a
+                  40s photo at the same location are hidden from the site.
+                </>
+              ) : (
+                <>
+                  Are these photos of the same place? Select photos to update
+                  the address for all of them.
+                </>
+              )
+            }
+          />
+        ) : null}
 
         <p>
-          The map is updated nightly. Map corrections will be visible tomorrow.
+          Corrections are not immediate. They are processed nightly and will be
+          visible tomorrow.
         </p>
       </div>
 

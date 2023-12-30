@@ -9,6 +9,7 @@ import {
 } from '../shared/utils/correctionsApi';
 interface State {
   isOpen: boolean;
+  correctionType: 'geocode' | 'address' | null;
   photoId: string | null;
   photo: Photo | null;
   alternatesSelections: Record<string, boolean>;
@@ -35,6 +36,7 @@ interface Actions {
   setCorrectedLngLat: (lng: number, lat: number) => void;
   setCorrectedAddress: (address: string | null) => void;
   submit: () => void;
+  setCorrectionType: (type: State['correctionType']) => void;
 }
 
 const useCorrectionsStore = create(
@@ -47,6 +49,7 @@ const useCorrectionsStore = create(
     correctedLng: null,
     correctedLat: null,
     correctedAddress: null,
+    correctionType: null,
 
     initialize: (photo: string) => {
       set((draft) => {
@@ -111,7 +114,6 @@ const useCorrectionsStore = create(
     },
     setCorrectedLngLat: (lng: number | null, lat: number | null) => {
       set((draft) => {
-        // round to 6 decimal places
         draft.correctedLng = lng;
         draft.correctedLat = lat;
       });
@@ -123,8 +125,14 @@ const useCorrectionsStore = create(
     },
 
     submit: async () => {
-      const { photoId, correctedLng, correctedLat, close, correctedAddress } =
-        get();
+      const {
+        photoId,
+        correctedLng,
+        correctedLat,
+        close,
+        correctedAddress,
+        correctionType,
+      } = get();
       if (!photoId) return;
 
       // get selected alternates
@@ -132,38 +140,49 @@ const useCorrectionsStore = create(
         .filter(([, isSelected]) => isSelected)
         .map(([identifier]) => identifier);
 
+      const photos = [photoId, ...alternates];
+
       if (
+        correctionType === 'geocode' &&
         typeof correctedLng === 'number' &&
         typeof correctedLat === 'number'
       ) {
-        await createGeocodeCorrection(
-          [photoId, ...alternates],
-          correctedLat,
-          correctedLng
-        );
+        await createGeocodeCorrection(photos, correctedLat, correctedLng);
       }
 
-      if (correctedAddress !== null) {
-        // Address correction is only for the selected photo
-        await createAddressCorrection([photoId], correctedAddress);
+      if (correctionType === 'address' && correctedAddress !== null) {
+        await createAddressCorrection(photos, correctedAddress);
       }
 
       close();
+    },
+
+    setCorrectionType: (type) => {
+      set((draft) => {
+        draft.correctionType = type;
+      });
     },
   }))
 );
 
 export function useCorrectionsStoreComputeds(): ComputedState {
-  const { photo, correctedAddress, correctedLat, correctedLng } =
-    useCorrectionsStore();
+  const {
+    photo,
+    correctedAddress,
+    correctedLat,
+    correctedLng,
+    correctionType,
+  } = useCorrectionsStore();
   const defaultGeocode = photo?.effectiveGeocode;
   return {
     previousLng: defaultGeocode?.lngLat.lng ?? null,
     previousLat: defaultGeocode?.lngLat.lat ?? null,
     previousAddress: photo?.address ?? null,
     canSubmit:
-      correctedAddress !== null ||
-      (correctedLat !== null && correctedLng !== null),
+      (correctionType === 'geocode' &&
+        correctedLat !== null &&
+        correctedLng !== null) ||
+      (correctionType === 'address' && correctedAddress !== null),
   };
 }
 

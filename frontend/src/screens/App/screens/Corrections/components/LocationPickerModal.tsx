@@ -101,6 +101,7 @@ export default function LocationPickerModal(): JSX.Element {
     >
       <div className={stylesheet.content}>
         <h2>Move the map to position the pin</h2>
+        <div>Close this dialog when complete</div>
         <div ref={mapContainer} className={stylesheet.map} />
       </div>
     </FourtiesModal>
