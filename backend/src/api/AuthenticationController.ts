@@ -23,6 +23,11 @@ type LoginRequest = {
 
   // If login involes a link, the frontend path to return to after login
   returnToPath?: string;
+
+  // If true, sends an email even if user is already logged in, if email is not verified
+  // Use before sensitive actions
+  // Remember to check isEmailVerified before performing sensitive actions
+  requireVerifiedEmail?: boolean;
 };
 
 type LoginResponse = {
@@ -50,7 +55,7 @@ export class AuthenticationController extends Controller {
     @Request() req: express.Request
   ): Promise<LoginResponse> {
     const userId = await getUserFromRequestOrCreateAndSetCookie(req);
-    const { requestedEmail, returnToPath } = loginRequest;
+    const { requestedEmail, returnToPath, requireVerifiedEmail } = loginRequest;
     const ipAddress = req.ip;
     const apiBase = `${req.protocol}://${required(req.get('host'), 'host')}`;
     const result = await UserService.processLoginRequest(
@@ -58,7 +63,8 @@ export class AuthenticationController extends Controller {
       userId,
       ipAddress,
       apiBase,
-      returnToPath
+      returnToPath,
+      requireVerifiedEmail
     );
 
     console.log('Login requested', {
