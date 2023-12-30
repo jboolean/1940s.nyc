@@ -7,6 +7,7 @@ import {
   JoinColumn,
 } from 'typeorm';
 import Collection from '../enum/Collection';
+import EffectiveAddress from './EffectiveAddress';
 import EffectiveGeocode from './EffectiveGeocode';
 import GeocodeResult from './GeocodeResult';
 import Story from './Story';
@@ -57,6 +58,12 @@ export default class Photo {
   })
   @JoinColumn({ name: 'identifier' })
   effectiveGeocode?: EffectiveGeocode;
+
+  @OneToOne(() => EffectiveAddress, {
+    eager: true,
+  })
+  @JoinColumn({ name: 'identifier' })
+  effectiveAddress: EffectiveAddress;
 
   @OneToMany(() => Story, (story) => story.photo)
   stories: Story[];

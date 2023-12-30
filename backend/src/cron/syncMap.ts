@@ -1,9 +1,15 @@
 import { getRepository } from 'typeorm';
 import GeojsonEncoder from '../business/geodata/GeojsonEncoder';
 import * as TilesetService from '../business/geodata/TilesetService';
+import EffectiveAddress from '../entities/EffectiveAddress';
 import EffectiveGeocode from '../entities/EffectiveGeocode';
 
 export default async function syncMap(): Promise<void> {
+  console.log('Refreshing effective addresses...');
+  await getRepository(EffectiveAddress).query(
+    'REFRESH MATERIALIZED VIEW effective_addresses_view WITH DATA'
+  );
+
   console.log('Refreshing effective geocodes...');
   await getRepository(EffectiveGeocode).query(
     'REFRESH MATERIALIZED VIEW effective_geocodes_view WITH DATA'

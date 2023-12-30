@@ -6,7 +6,7 @@ export default function photoToApi(photo: Photo): PhotoApiModel {
   return {
     identifier: photo.identifier,
     collection: photo.collection,
-    address: photo.address,
+    address: photo.effectiveAddress.address ?? undefined,
     borough: photo.borough,
     block: photo.block,
     lot: photo.lot,
