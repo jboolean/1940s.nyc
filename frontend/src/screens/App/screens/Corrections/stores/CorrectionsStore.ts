@@ -9,6 +9,7 @@ import {
 } from '../shared/utils/correctionsApi';
 interface State {
   isOpen: boolean;
+  isConfirmationOpen: boolean;
   correctionType: 'geocode' | 'address' | null;
   photoId: string | null;
   photo: Photo | null;
@@ -42,6 +43,7 @@ interface Actions {
 const useCorrectionsStore = create(
   immer<State & Actions>((set, get) => ({
     isOpen: false,
+    isConfirmationOpen: false,
     photoId: null,
     photo: null,
     alternatesSelections: {},
@@ -61,6 +63,7 @@ const useCorrectionsStore = create(
         draft.correctedLng = null;
         draft.correctedLat = null;
         draft.correctedAddress = null;
+        draft.correctionType = null;
       });
 
       useLoginStore.getState().initialize();
@@ -92,6 +95,7 @@ const useCorrectionsStore = create(
     close: () => {
       set((draft) => {
         draft.isOpen = false;
+        draft.isConfirmationOpen = false;
       });
     },
 
@@ -129,7 +133,6 @@ const useCorrectionsStore = create(
         photoId,
         correctedLng,
         correctedLat,
-        close,
         correctedAddress,
         correctionType,
       } = get();
@@ -154,7 +157,10 @@ const useCorrectionsStore = create(
         await createAddressCorrection(photos, correctedAddress);
       }
 
-      close();
+      set((draft) => {
+        draft.isOpen = false;
+        draft.isConfirmationOpen = true;
+      });
     },
 
     setCorrectionType: (type) => {

@@ -125,20 +125,36 @@ const CorrectionsDialogContent = (): JSX.Element | null => {
 };
 
 export default function Corrections(): JSX.Element {
-  const isOpen = useCorrectionsStore((state) => state.isOpen);
+  const { isOpen, isConfirmationOpen } = useCorrectionsStore(
+    ({ isOpen, isConfirmationOpen }) => ({
+      isOpen,
+      isConfirmationOpen,
+    })
+  );
   const onRequestClose = useCorrectionsStore((state) => state.close);
 
   return (
-    <FourtiesModal
-      isOpen={isOpen}
-      onRequestClose={onRequestClose}
-      shouldCloseOnOverlayClick={false}
-      shouldCloseOnEsc={false}
-      size="x-large"
-      isCloseButtonVisible={true}
-    >
-      <CorrectionsDialogContent />
-    </FourtiesModal>
+    <>
+      <FourtiesModal
+        isOpen={isOpen}
+        onRequestClose={onRequestClose}
+        shouldCloseOnOverlayClick={false}
+        shouldCloseOnEsc={false}
+        size="x-large"
+        isCloseButtonVisible={true}
+      >
+        <CorrectionsDialogContent />
+      </FourtiesModal>
+      <FourtiesModal
+        isOpen={isConfirmationOpen}
+        onRequestClose={onRequestClose}
+        size="small"
+        isCloseButtonVisible={true}
+      >
+        <h1>Thank you!</h1>
+        <p>Your correction has been submitted.</p>
+      </FourtiesModal>
+    </>
   );
 }
 
