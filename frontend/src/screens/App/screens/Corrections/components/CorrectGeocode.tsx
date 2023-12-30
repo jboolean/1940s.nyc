@@ -12,6 +12,7 @@ import CoordinateInput from './CoordinateInput';
 import LocationPickerModal from './LocationPickerModal';
 
 import stylesheet from './CorrectGeocode.less';
+import Labeled from 'shared/components/Labeled';
 
 export default function CorrectGeocode(): JSX.Element {
   const { openMap, correctedLng, correctedLat, setCorrectedLngLat } =
@@ -22,33 +23,43 @@ export default function CorrectGeocode(): JSX.Element {
 
   return (
     <FieldSet disabled={!isLoginValidated}>
-      <FieldSet.Legend>Correct map placement</FieldSet.Legend>
+      <FieldSet.Legend>Correct map position</FieldSet.Legend>
 
       <p>Fix where the dot for this photo appears on the map.</p>
 
       <div className={stylesheet.coordinateInputRow}>
-        <CoordinateInput
-          name="lat"
-          label="Latitude"
-          placeholder={defaultLat}
-          value={correctedLat}
-          onValueChange={(newValue) =>
-            setCorrectedLngLat(correctedLng ?? null, newValue)
-          }
-          rangeMin={-90}
-          rangeMax={90}
+        <Labeled
+          labelText="Latitude"
+          renderInput={({ id }) => (
+            <CoordinateInput
+              id={id}
+              name="lat"
+              placeholder={defaultLat}
+              value={correctedLat}
+              onValueChange={(newValue) =>
+                setCorrectedLngLat(correctedLng ?? null, newValue)
+              }
+              rangeMin={-90}
+              rangeMax={90}
+            />
+          )}
         />
         <span style={{ verticalAlign: 'bottom' }}>, </span>
-        <CoordinateInput
-          name="lng"
-          label="Longitude"
-          placeholder={defaultLng}
-          value={correctedLng}
-          onValueChange={(newValue) =>
-            setCorrectedLngLat(newValue ?? null, correctedLat)
-          }
-          rangeMin={-180}
-          rangeMax={180}
+        <Labeled
+          labelText="Longitude"
+          renderInput={({ id }) => (
+            <CoordinateInput
+              id={id}
+              name="lng"
+              placeholder={defaultLng}
+              value={correctedLng}
+              onValueChange={(newValue) =>
+                setCorrectedLngLat(newValue ?? null, correctedLat)
+              }
+              rangeMin={-180}
+              rangeMax={180}
+            />
+          )}
         />
         <Button
           buttonStyle="primary"

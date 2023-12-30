@@ -4,8 +4,8 @@ import { NumericFormat } from 'react-number-format';
 import TextInput from 'shared/components/TextInput';
 
 interface CoordinateInputProps {
+  id?: string;
   name: string;
-  label: string;
   placeholder?: number;
   value: number;
   onValueChange: (newValue: number) => void;
@@ -15,8 +15,8 @@ interface CoordinateInputProps {
 }
 
 const CoordinateInput: React.FC<CoordinateInputProps> = ({
+  id,
   name,
-  label,
   placeholder,
   value,
   onValueChange,
@@ -26,9 +26,9 @@ const CoordinateInput: React.FC<CoordinateInputProps> = ({
 }) => {
   return (
     <NumericFormat
+      id={id}
       customInput={TextInput}
       name={name}
-      aria-label={label}
       size={11}
       placeholder={
         typeof placeholder === 'number' ? placeholder.toString() : placeholder
