@@ -28,9 +28,9 @@ async function getUserIdFromRequestForCorrection(
   const user = await UserService.getUser(userId);
 
   // corrections can only be created by logged in users with an email address
-  if (!user || user.isAnonymous) {
+  if (!user || user.isAnonymous || !user.isEmailVerified) {
     throw new Forbidden(
-      'You must be logged into an account with an email address to create corrections'
+      'You must be logged into an account with a verified email address to create corrections'
     );
   }
 

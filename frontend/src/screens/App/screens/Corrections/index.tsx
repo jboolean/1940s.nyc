@@ -55,7 +55,7 @@ const CorrectionsDialogContent = (): JSX.Element | null => {
               <span className={stylesheet.requiredAstrisk}> *</span>
             )}
           </FieldSet.Legend>
-          <LoginForm />
+          <LoginForm requireVerifiedEmail />
         </FieldSet>
 
         <FieldSet>
