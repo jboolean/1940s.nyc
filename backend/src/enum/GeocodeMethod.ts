@@ -4,6 +4,9 @@ enum GeocodeMethod {
   GOOGLE_MAPS_PLACES_AUTOCOMPLETE = 'gmapsPlacesAutocomplete',
   MAPBOX = 'mapbox',
   PLUTO = 'pluto',
+
+  // From corrections
+  USER = 'user',
 }
 
 export default GeocodeMethod;
