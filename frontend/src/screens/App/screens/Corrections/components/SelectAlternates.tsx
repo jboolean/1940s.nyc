@@ -2,15 +2,15 @@ import React from 'react';
 
 import isEmpty from 'lodash/isEmpty';
 import map from 'lodash/map';
-import uniqueId from 'lodash/uniqueId';
 
 import useLoginStore from 'shared/stores/LoginStore';
 import useCorrectionsStore from '../stores/CorrectionsStore';
 
 import { PHOTO_BASE } from 'shared/utils/apiConstants';
 
-import stylesheet from './SelectAlternates.less';
 import FieldSet from 'shared/components/FieldSet';
+import useElementId from 'shared/utils/useElementId';
+import stylesheet from './SelectAlternates.less';
 
 export default function SelectAlternates({
   description,
@@ -21,7 +21,7 @@ export default function SelectAlternates({
     useCorrectionsStore();
   const { isLoginValidated } = useLoginStore();
 
-  const idPrefix = uniqueId('corrections-');
+  const idPrefix = useElementId('corrections-');
 
   const handleAlternateSelectionChange = (identifier: string): void => {
     toggleAlternateSelection(identifier);
