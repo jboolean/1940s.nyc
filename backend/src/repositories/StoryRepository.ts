@@ -30,6 +30,8 @@ const StoryRepository = () =>
           })
         )
         .leftJoinAndSelect('story.photo', 'photo')
+        .leftJoinAndSelect('photo.effectiveAddress', 'effectiveAddress')
+        .leftJoinAndSelect('photo.effectiveGeocode', 'effectiveGeocode')
         .orderBy('story.created_at', 'DESC')
         .getMany();
     },
@@ -39,6 +41,8 @@ const StoryRepository = () =>
         .where({ state: StoryState.PUBLISHED })
         .orderBy('story.created_at', 'DESC')
         .leftJoinAndSelect('story.photo', 'photo')
+        .leftJoinAndSelect('photo.effectiveAddress', 'effectiveAddress')
+        .leftJoinAndSelect('photo.effectiveGeocode', 'effectiveGeocode')
         .getMany();
     },
 
@@ -65,6 +69,8 @@ const StoryRepository = () =>
           })
         )
         .leftJoinAndSelect('story.photo', 'photo')
+        .leftJoinAndSelect('photo.effectiveAddress', 'effectiveAddress')
+        .leftJoinAndSelect('photo.effectiveGeocode', 'effectiveGeocode')
         .getOne();
     },
 
@@ -73,6 +79,8 @@ const StoryRepository = () =>
         .where({ state: StoryState.SUBMITTED })
         .orderBy('story.updated_at', 'ASC')
         .leftJoinAndSelect('story.photo', 'photo')
+        .leftJoinAndSelect('photo.effectiveAddress', 'effectiveAddress')
+        .leftJoinAndSelect('photo.effectiveGeocode', 'effectiveGeocode')
         .getMany();
     },
 
@@ -84,6 +92,8 @@ const StoryRepository = () =>
         })
         .orderBy('story.created_at', 'ASC')
         .leftJoinAndSelect('story.photo', 'photo')
+        .leftJoinAndSelect('photo.effectiveAddress', 'effectiveAddress')
+        .leftJoinAndSelect('photo.effectiveGeocode', 'effectiveGeocode')
         .getMany();
     },
   });
