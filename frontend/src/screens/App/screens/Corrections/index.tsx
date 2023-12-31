@@ -152,7 +152,10 @@ export default function Corrections(): JSX.Element {
         isCloseButtonVisible={true}
       >
         <h1>Thank you!</h1>
-        <p>Your correction has been submitted.</p>
+        <p>
+          Your correction has been submitted. Corrections are processed nightly
+          and will be visible tomorrow.
+        </p>
       </FourtiesModal>
     </>
   );
