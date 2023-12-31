@@ -1,0 +1,32 @@
+@import '../../../../../shared/styles/fonts.less';
+@import '../../../../../shared/styles/colors.less';
+@import '../../../../../shared/styles/viewport.less';
+
+.metadataContainer {
+  background-color: @creme;
+  padding: 0.5rem;
+  box-sizing: border-box;
+
+  summary {
+    font-family: inherit;
+    font-size: 1em;
+  }
+
+  dl {
+    clear: both;
+  }
+
+  dt {
+    float: left;
+    clear: left;
+    text-align: left;
+  }
+
+  dd {
+    text-align: right;
+  }
+
+  @media screen and (max-width: @modal-width-max) {
+    border: 1px solid @font-color-dark;
+  }
+}

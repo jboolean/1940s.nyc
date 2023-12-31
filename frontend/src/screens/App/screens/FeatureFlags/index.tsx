@@ -16,7 +16,7 @@ export default function FeatureFlags(): JSX.Element {
   return (
     <div>
       <h1>Labs</h1>
-      <h2>Features under development</h2>
+      <h2>Features under development and debug options</h2>
       <ul>
         {Object.values(FeatureFlag).map((featureFlag) => (
           <li key={featureFlag}>

@@ -2,14 +2,12 @@ import { getPriceAmount, redirectToCheckout } from 'shared/utils/ColorApi';
 import recordEvent from 'shared/utils/recordEvent';
 import create from 'zustand';
 import { immer } from 'zustand/middleware/immer';
-import { getMe, LoginOutcome, processLoginRequest } from '../utils/CreditsApi';
+import useLoginStore from '../../../../../shared/stores/LoginStore';
 
 const PRESET_QUANTITIES = [50, 100, 200];
 
 interface State {
   isOpen: boolean;
-  emailAddress: string;
-  isLoginValidated: boolean;
   selectedQuantity: number;
   quantityOptions: number[];
   errorMessage: string | null;
@@ -21,8 +19,6 @@ interface State {
 interface Actions {
   open: () => void;
   close: () => void;
-  onEmailAddressChange: (emailAddress: string) => void;
-  onSubmitLogin: () => void;
   setQuantity: (quantity: number) => void;
   handleCheckout: () => void;
 }
@@ -30,8 +26,6 @@ interface Actions {
 const useCreditPurchaseModalStore = create(
   immer<State & Actions>((set, get) => ({
     isOpen: false,
-    emailAddress: '',
-    isLoginValidated: false,
     quantityOptions: PRESET_QUANTITIES,
     selectedQuantity: PRESET_QUANTITIES[1],
     errorMessage: null,
@@ -43,15 +37,7 @@ const useCreditPurchaseModalStore = create(
         draft.isOpen = true;
       });
 
-      getMe()
-        .then((me) => {
-          set((draft) => {
-            draft.emailAddress = me.email || '';
-          });
-        })
-        .catch((err: unknown) => {
-          console.warn('Error fetching me', err);
-        });
+      useLoginStore.getState().initialize();
 
       getPriceAmount()
         .then((price) => {
@@ -77,42 +63,6 @@ const useCreditPurchaseModalStore = create(
       set((draft) => {
         draft.isOpen = false;
       });
-    },
-
-    onEmailAddressChange: (emailAddress: string) => {
-      set((draft) => {
-        draft.emailAddress = emailAddress;
-        draft.isFollowMagicLinkMessageVisible = false;
-        draft.isLoginValidated = false;
-      });
-    },
-
-    onSubmitLogin: async () => {
-      const searchParams = new URLSearchParams(window.location.search);
-      searchParams.set('noWelcome', 'true');
-      const returnToPath =
-        window.location.pathname +
-        '?' +
-        searchParams.toString() +
-        window.location.hash;
-      const outcome = await processLoginRequest(
-        get().emailAddress,
-        returnToPath
-      );
-      if (
-        outcome === LoginOutcome.AlreadyAuthenticated ||
-        outcome === LoginOutcome.UpdatedEmailOnAuthenticatedAccount
-      ) {
-        set((draft) => {
-          // We stay logged into the current account and can proceed
-          draft.isLoginValidated = true;
-        });
-      } else if (outcome === LoginOutcome.SentLinkToExistingAccount) {
-        set((draft) => {
-          // The user must follow the link to log into another account
-          draft.isFollowMagicLinkMessageVisible = true;
-        });
-      }
     },
 
     setQuantity: (quantity: number) => {

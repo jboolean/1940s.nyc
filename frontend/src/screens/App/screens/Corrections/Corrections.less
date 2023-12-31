@@ -1,0 +1,29 @@
+@import '../../../../shared/styles/fonts.less';
+@import '../../../../shared/styles/colors.less';
+@import '../../../../shared/styles/viewport.less';
+@import '../../../../shared/styles/utils.less';
+
+.modalContent {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.modalBody {
+  flex-grow: 1;
+  overflow-y: auto;
+  text-align: initial;
+}
+
+.requiredAstrisk {
+  color: @red;
+}
+
+.correctionsGroup {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-gap: 1rem;
+
+  @media screen and (max-width: @modal-width-max) {
+    grid-template-columns: 1fr;
+  }
+}

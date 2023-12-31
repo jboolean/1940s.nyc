@@ -77,6 +77,11 @@ export async function attachStripeCustomer(
   await userRepository.save(user);
 }
 
+export async function markEmailVerified(userId: number): Promise<void> {
+  const userRepository = getRepository(User);
+  await userRepository.update(userId, { isEmailVerified: true });
+}
+
 export async function createUser(
   ipAddress: string,
   email?: string
@@ -147,7 +152,8 @@ export async function processLoginRequest(
   authenticatedUserId: number,
   ipAddress: string,
   apiBase: string,
-  returnToPath?: string
+  returnToPath?: string,
+  requireVerifiedEmail = false
 ): Promise<LoginOutcome> {
   const userRepository = getRepository(User);
 
@@ -157,6 +163,19 @@ export async function processLoginRequest(
 
   if (currentUser.email === requestedEmail) {
     // We're already logged in
+
+    if (requireVerifiedEmail && !currentUser.isEmailVerified) {
+      // If we require a verified email, and the current user's email is not verified,
+      // send a new magic link
+      await sendMagicLink(
+        required(currentUser.email, 'email'),
+        currentUser.id,
+        apiBase,
+        returnToPath
+      );
+      return LoginOutcome.SentLinkToVerifyEmail;
+    }
+
     return LoginOutcome.AlreadyAuthenticated;
   }
 
@@ -165,6 +184,7 @@ export async function processLoginRequest(
   });
 
   if (userByEmail) {
+    // Sent link to switch to existing account
     await sendMagicLink(
       required(userByEmail.email, 'email'),
       userByEmail.id,
@@ -174,7 +194,9 @@ export async function processLoginRequest(
     return LoginOutcome.SentLinkToExistingAccount;
   } else {
     // Either account is anonymous or the current user is changing their email
+    // Stays logged in, but updates account info
     currentUser.email = normalizeEmail(requestedEmail);
+    currentUser.isEmailVerified = false;
     await userRepository.save(currentUser);
 
     if (currentUser.stripeCustomerId) {
@@ -185,6 +207,17 @@ export async function processLoginRequest(
       } catch (e) {
         console.error('Error updating Stripe customer', e);
       }
+    }
+
+    if (requireVerifiedEmail) {
+      // We require a verified email, and this user's email has just changed.
+      await sendMagicLink(
+        required(currentUser.email, 'email'),
+        currentUser.id,
+        apiBase,
+        returnToPath
+      );
+      return LoginOutcome.SentLinkToVerifyEmail;
     }
 
     return LoginOutcome.UpdatedEmailOnAuthenticatedAccount;

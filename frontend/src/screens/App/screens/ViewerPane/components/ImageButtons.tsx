@@ -3,10 +3,13 @@ import React from 'react';
 import { useParams } from 'react-router-dom';
 import { API_BASE } from 'utils/apiConstants';
 
+import { useFeatureFlag } from 'screens/App/shared/stores/FeatureFlagsStore';
+import FeatureFlag from 'screens/App/shared/types/FeatureFlag';
 import Button, { ButtonStyledLink } from 'shared/components/Button';
+import recordEvent from 'shared/utils/recordEvent';
+import { useCorrectionsStore } from '../../Corrections';
 import { useStoryDraftStore } from '../../SubmitStoryWizard';
 import ColorizeButton from './ColorizeButton';
-import recordEvent from 'shared/utils/recordEvent';
 
 const ORDER_PRINT_EXTERNAL_LINK_MESSAGE =
   'You are leaving 1940s.nyc for the Department of Records and Information Services (DORIS), with which 1940s.nyc is not affilliated. 1940s.nyc cannot help with orders placed through DORIS. ' +
@@ -14,6 +17,11 @@ const ORDER_PRINT_EXTERNAL_LINK_MESSAGE =
 export default function ImageButtons(): JSX.Element {
   const { identifier: photoIdentifier } = useParams<{ identifier?: string }>();
   const initializeStoryDraft = useStoryDraftStore((state) => state.initialize);
+  const initializeCorrections = useCorrectionsStore(
+    (state) => state.initialize
+  );
+  const isFixVisible = useFeatureFlag(FeatureFlag.CORRECTIONS);
+
   return (
     <div>
       <ButtonStyledLink
@@ -42,6 +50,17 @@ export default function ImageButtons(): JSX.Element {
       >
         Know This Place?
       </Button>
+      {isFixVisible ? (
+        <Button
+          buttonTheme="viewer"
+          buttonStyle="secondary"
+          onClick={() => {
+            initializeCorrections(photoIdentifier);
+          }}
+        >
+          Fix
+        </Button>
+      ) : null}
     </div>
   );
 }

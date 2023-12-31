@@ -1,7 +1,7 @@
-import uniqueId from 'lodash/uniqueId';
-import React from 'react';
 import classNames from 'classnames';
+import React from 'react';
 
+import useElementId from 'shared/utils/useElementId';
 import stylesheet from './labeled.less';
 
 export default function Labeled({
@@ -13,8 +13,7 @@ export default function Labeled({
   renderInput: ({ id }: { id: string }) => JSX.Element;
   className?: string;
 }): JSX.Element {
-  const idRef = React.useRef<string>(uniqueId('labeled-input-'));
-  const id = idRef.current;
+  const id = useElementId('labled-input-');
 
   return (
     <div className={classNames(stylesheet.container, className)}>

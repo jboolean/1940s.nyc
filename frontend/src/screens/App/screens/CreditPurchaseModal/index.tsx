@@ -2,34 +2,31 @@ import React from 'react';
 
 import classNames from 'classnames';
 import Button from 'shared/components/Button';
-import Labeled from 'shared/components/Labeled';
-import TextInput from 'shared/components/TextInput';
 
-import useCreditPurchaseModalStore from './stories/CreditPurchaseStore';
+import useCreditPurchaseModalStore from './stores/CreditPurchaseStore';
 
 import { NumericFormat } from 'react-number-format';
 import PhotoAsideModal from '../PhotoAsideModal';
 import carouselImages from './carouselImages';
 
+import useLoginStore from '../../../../shared/stores/LoginStore';
 import stylesheet from './CreditPurchaseModal.less';
+import LoginForm from 'shared/components/LoginForm';
 
 export default function CreditPurchaseModal(): JSX.Element {
   const {
     close: onRequestClose,
-    emailAddress,
     errorMessage,
     handleCheckout: handleCheckout,
     isCheckingOut,
-    isFollowMagicLinkMessageVisible,
-    isLoginValidated,
     isOpen,
-    onEmailAddressChange,
-    onSubmitLogin,
     quantityOptions,
     selectedQuantity,
     setQuantity,
     unitPrice,
   } = useCreditPurchaseModalStore();
+
+  const { isLoginValidated } = useLoginStore();
 
   return (
     <PhotoAsideModal
@@ -66,47 +63,7 @@ export default function CreditPurchaseModal(): JSX.Element {
           </p>
         </div>
 
-        <form
-          className={stylesheet.emailRow}
-          onSubmit={(e) => {
-            e.preventDefault();
-            onSubmitLogin();
-          }}
-        >
-          <Labeled
-            labelText="Your email address"
-            className={stylesheet.email}
-            renderInput={({ id }) => (
-              <TextInput
-                id={id}
-                type="email"
-                value={emailAddress}
-                autoComplete="email"
-                required
-                onChange={({ target: { value } }) => {
-                  onEmailAddressChange(value);
-                }}
-                disabled={isLoginValidated}
-              />
-            )}
-          />
-
-          <Button
-            type="submit"
-            buttonStyle="primary"
-            disabled={isLoginValidated || !emailAddress}
-            className={stylesheet.submitButton}
-          >
-            Continue
-          </Button>
-        </form>
-
-        {isFollowMagicLinkMessageVisible && (
-          <p className={stylesheet.magicLinkMessage}>
-            You already have an account. Please click the link emailed to{' '}
-            <i>{emailAddress}</i> to log in.
-          </p>
-        )}
+        <LoginForm />
       </div>
 
       <div>

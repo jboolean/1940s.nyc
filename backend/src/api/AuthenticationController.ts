@@ -23,6 +23,11 @@ type LoginRequest = {
 
   // If login involes a link, the frontend path to return to after login
   returnToPath?: string;
+
+  // If true, sends an email even if user is already logged in, if email is not verified
+  // Use before sensitive actions
+  // Remember to check isEmailVerified before performing sensitive actions
+  requireVerifiedEmail?: boolean;
 };
 
 type LoginResponse = {
@@ -50,7 +55,7 @@ export class AuthenticationController extends Controller {
     @Request() req: express.Request
   ): Promise<LoginResponse> {
     const userId = await getUserFromRequestOrCreateAndSetCookie(req);
-    const { requestedEmail, returnToPath } = loginRequest;
+    const { requestedEmail, returnToPath, requireVerifiedEmail } = loginRequest;
     const ipAddress = req.ip;
     const apiBase = `${req.protocol}://${required(req.get('host'), 'host')}`;
     const result = await UserService.processLoginRequest(
@@ -58,7 +63,8 @@ export class AuthenticationController extends Controller {
       userId,
       ipAddress,
       apiBase,
-      returnToPath
+      returnToPath,
+      requireVerifiedEmail
     );
 
     console.log('Login requested', {
@@ -76,11 +82,11 @@ export class AuthenticationController extends Controller {
    * @param returnToPath The path to attach to the frontend base URL and redirect to after login
    */
   @Get('/login-with-magic-link')
-  public loginWithMagicLink(
+  public async loginWithMagicLink(
     @Query('token') magicToken: string,
     @Request() req: express.Request,
     @Query('returnToPath') returnToPath?: string
-  ): void {
+  ): Promise<void> {
     const res = req.res;
     if (!res) {
       throw new Error('No response object');
@@ -95,6 +101,8 @@ export class AuthenticationController extends Controller {
     if (!userId) {
       throw new Unauthorized('The link contains in invalid or expired token');
     }
+
+    await UserService.markEmailVerified(userId);
 
     const permenantToken = UserService.createUserToken(userId);
 

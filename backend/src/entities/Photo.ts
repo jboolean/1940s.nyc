@@ -1,4 +1,14 @@
-import { Entity, Column, PrimaryColumn, OneToMany } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryColumn,
+  OneToMany,
+  OneToOne,
+  JoinColumn,
+} from 'typeorm';
+import Collection from '../enum/Collection';
+import EffectiveAddress from './EffectiveAddress';
+import EffectiveGeocode from './EffectiveGeocode';
 import GeocodeResult from './GeocodeResult';
 import Story from './Story';
 
@@ -8,7 +18,7 @@ export default class Photo {
   identifier: string;
 
   @Column()
-  collection: string;
+  collection: Collection;
 
   @Column()
   date?: string;
@@ -42,6 +52,18 @@ export default class Photo {
 
   @OneToMany(() => GeocodeResult, (geocode) => geocode.photo)
   geocodeResults: GeocodeResult[];
+
+  @OneToOne(() => EffectiveGeocode, {
+    eager: true,
+  })
+  @JoinColumn({ name: 'identifier' })
+  effectiveGeocode?: EffectiveGeocode;
+
+  @OneToOne(() => EffectiveAddress, {
+    eager: true,
+  })
+  @JoinColumn({ name: 'identifier' })
+  effectiveAddress: EffectiveAddress;
 
   @OneToMany(() => Story, (story) => story.photo)
   stories: Story[];
