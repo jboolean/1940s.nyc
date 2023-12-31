@@ -17,6 +17,10 @@ import required from '../utils/required';
 import { createStoryToken } from './StoryTokenService';
 
 function describePhoto(photo: Photo): string {
+  if (photo.effectiveAddress?.address) {
+    return photo.effectiveAddress.address;
+  }
+
   if (photo.address) {
     return photo.address;
   }

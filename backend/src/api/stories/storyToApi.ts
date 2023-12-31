@@ -5,6 +5,7 @@ import {
   PublicStoryResponse,
   StoryDraftResponse,
 } from './StoryApiModel';
+import photoToApi from '../photos/photoToApi';
 
 export function toAdminStoryResponse(story: Story): AdminStoryResponse {
   return {
@@ -48,7 +49,7 @@ export function toPublicStoryResponse(story: Story): PublicStoryResponse {
     id: story.id,
     lngLat: story.lngLat ?? undefined,
     photo: story.photoId,
-    photoExpanded: story.photo,
+    photoExpanded: photoToApi(story.photo),
     storyType: story.storyType,
     state: story.state,
     createdAt: story.createdAt.toISOString(),
