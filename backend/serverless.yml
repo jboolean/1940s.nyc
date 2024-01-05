@@ -78,7 +78,7 @@ functions:
       - production
     handler: cron.syncMap
     events:
-      - schedule: cron(0 4 * * ? *)
+      - schedule: cron(0 12 * * ? *)
     timeout: 900
   generateStoryTitles:
     stages:
