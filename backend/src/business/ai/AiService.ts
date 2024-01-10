@@ -7,9 +7,9 @@ const openai = new OpenAI({
 });
 
 export async function suggestStoryTitle(storyContent: string): Promise<string> {
-  const response = await openai.completions.create(
+  const response = await openai.chat.completions.create(
     createStoryTitlePrompt(storyContent)
   );
 
-  return response.choices[0].text?.trim() ?? '';
+  return response.choices[0].message.content?.trim() ?? '';
 }
