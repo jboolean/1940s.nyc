@@ -25,9 +25,13 @@ type ColorizeImageWithAutoPromptBase64Request = {
 };
 
 const paletteApi = axios.create({
-  baseURL: 'https://apis.palette.fm/1a0ffbmqnpuf3uzj',
+  baseURL: 'https://colorize-photo1.p.rapidapi.com/',
   headers: {
-    'X-BLOBR-KEY': required(process.env.PALETTE_API_KEY, 'PALETTE_API_KEY'),
+    'X-RapidAPI-Key': required(
+      process.env.RAPIDAPI_API_KEY,
+      'RAPIDAPI_API_KEY'
+    ),
+    'X-RapidAPI-Host': 'colorize-photo1.p.rapidapi.com',
     'Content-Type': 'multipart/form-data',
   },
 });
