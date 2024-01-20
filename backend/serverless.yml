@@ -30,7 +30,7 @@ provider:
     MODERATORS_TO_EMAIL: ${ssm:/${self:service}-${sls:stage}-moderators-to-email}
     MAPBOX_SK: ${ssm:/${self:service}-${sls:stage}-mapbox-sk}
     OPENAI_SK: ${ssm:/${self:service}-${sls:stage}-openai-sk}
-    PALETTE_API_KEY: ${ssm:/${self:service}-${sls:stage}-palette-api-key}
+    RAPIDAPI_API_KEY: ${ssm:/${self:service}-${sls:stage}-rapidapi-api-key}
 plugins:
   - serverless-plugin-select
   - serverless-plugin-typescript
