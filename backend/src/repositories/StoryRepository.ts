@@ -1,20 +1,24 @@
 import { Brackets, getRepository, In, IsNull, Repository } from 'typeorm';
+import Paginated from '../business/pagination/Paginated';
+import PaginationInput from '../business/pagination/PaginationInput';
 import Story from '../entities/Story';
 import StoryState from '../enum/StoryState';
 import getLngLatForIdentifier from './getLngLatForIdentifier';
+import { getPaginated } from './paginationUtils';
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type -- better type is inferred
 const StoryRepository = () =>
   getRepository(Story).extend({
     async findPublishedForPhotoIdentifier(
       this: Repository<Story>,
-      identifier: string
+      identifier: string,
+      pagination: PaginationInput
     ) {
       // Get the lng,lat for this photo, so we can return stories
       // for this photo and stories for other photos in the same location
       const maybeLngLat = await getLngLatForIdentifier(identifier);
 
-      return this.createQueryBuilder('story')
+      const qb = this.createQueryBuilder('story')
         .where({ state: StoryState.PUBLISHED })
         .andWhere(
           new Brackets((qb) => {
@@ -31,19 +35,37 @@ const StoryRepository = () =>
         )
         .leftJoinAndSelect('story.photo', 'photo')
         .leftJoinAndSelect('photo.effectiveAddress', 'effectiveAddress')
-        .leftJoinAndSelect('photo.effectiveGeocode', 'effectiveGeocode')
-        .orderBy('story.created_at', 'DESC')
-        .getMany();
+        .leftJoinAndSelect('photo.effectiveGeocode', 'effectiveGeocode');
+      return getPaginated(
+        qb,
+        {
+          key: 'createdAt',
+          sortDirection: 'DESC',
+          getKeyValue: (story) => story.createdAt,
+        },
+        pagination
+      );
     },
 
-    async findPublished(this: Repository<Story>) {
-      return this.createQueryBuilder('story')
+    async findPublished(
+      this: Repository<Story>,
+      pagination: PaginationInput
+    ): Promise<Paginated<Story>> {
+      const qb = this.createQueryBuilder('story')
         .where({ state: StoryState.PUBLISHED })
-        .orderBy('story.created_at', 'DESC')
         .leftJoinAndSelect('story.photo', 'photo')
         .leftJoinAndSelect('photo.effectiveAddress', 'effectiveAddress')
-        .leftJoinAndSelect('photo.effectiveGeocode', 'effectiveGeocode')
-        .getMany();
+        .leftJoinAndSelect('photo.effectiveGeocode', 'effectiveGeocode');
+
+      return getPaginated(
+        qb,
+        {
+          key: 'createdAt',
+          sortDirection: 'DESC',
+          getKeyValue: (story) => story.createdAt,
+        },
+        pagination
+      );
     },
 
     /**
