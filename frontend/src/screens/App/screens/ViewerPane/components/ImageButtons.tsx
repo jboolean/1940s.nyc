@@ -3,8 +3,6 @@ import React from 'react';
 import { useParams } from 'react-router-dom';
 import { API_BASE } from 'utils/apiConstants';
 
-import { useFeatureFlag } from 'screens/App/shared/stores/FeatureFlagsStore';
-import FeatureFlag from 'screens/App/shared/types/FeatureFlag';
 import Button, { ButtonStyledLink } from 'shared/components/Button';
 import recordEvent from 'shared/utils/recordEvent';
 import { useCorrectionsStore } from '../../Corrections';
@@ -20,7 +18,6 @@ export default function ImageButtons(): JSX.Element {
   const initializeCorrections = useCorrectionsStore(
     (state) => state.initialize
   );
-  const isFixVisible = useFeatureFlag(FeatureFlag.CORRECTIONS);
 
   return (
     <div>
@@ -50,17 +47,15 @@ export default function ImageButtons(): JSX.Element {
       >
         Know This Place?
       </Button>
-      {isFixVisible ? (
-        <Button
-          buttonTheme="viewer"
-          buttonStyle="secondary"
-          onClick={() => {
-            initializeCorrections(photoIdentifier);
-          }}
-        >
-          Fix
-        </Button>
-      ) : null}
+      <Button
+        buttonTheme="viewer"
+        buttonStyle="secondary"
+        onClick={() => {
+          initializeCorrections(photoIdentifier);
+        }}
+      >
+        Fix
+      </Button>
     </div>
   );
 }
