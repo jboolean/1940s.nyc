@@ -46,7 +46,6 @@ export default function Outtakes({
       if (!storiesPage) return;
       if (!storiesPage.hasNextPage) return;
       if (isLoading.current) {
-        console.warn('Already loading next page');
         return;
       }
 

@@ -61,7 +61,7 @@ export async function getStoryByToken(storyAuthToken: string): Promise<Story> {
 }
 
 export const getAllStories = async function getAllStories(
-  pageSize = 20,
+  pageSize = 100,
   pageToken?: string
 ): Promise<Paginated<Story>> {
   const resp = await api.get<Paginated<Story>>(`/stories`, {
