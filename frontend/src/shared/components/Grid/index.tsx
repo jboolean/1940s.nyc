@@ -74,7 +74,7 @@ function Grid<T>({
   );
 
   const rowCount = Math.ceil(totalItems / itemsPerRow);
-  const isRowLoaded = (index: number) => {
+  const isRowLoaded = (index: number): boolean => {
     const firstItemI = index * itemsPerRow;
     const lastItemI = Math.min(firstItemI + itemsPerRow - 1, totalItems - 1);
     return lastItemI < items.length;

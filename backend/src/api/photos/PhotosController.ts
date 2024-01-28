@@ -11,9 +11,12 @@ import {
   SuccessResponse,
 } from 'tsoa';
 import { getRepository, In } from 'typeorm';
+import Paginated from '../../business/pagination/Paginated';
+import mapPaginated from '../../business/utils/mapPaginated';
 import Photo from '../../entities/Photo';
 import Collection from '../../enum/Collection';
 import getLngLatForIdentifier from '../../repositories/getLngLatForIdentifier';
+import { getPaginated } from '../../repositories/paginationUtils';
 import { PhotoApiModel } from './PhotoApiModel';
 import photoToApi from './photoToApi';
 
@@ -100,18 +103,36 @@ export class PhotosController extends Controller {
 
   @Get('/outtake-summaries')
   public async getOuttakeSummaries(
-    @Query() collection: Collection = Collection.FOURTIES
-  ): Promise<{ identifier: string }[]> {
+    @Query() collection: Collection = Collection.FOURTIES,
+
+    // pagination
+    @Query('pageToken') pageToken?: string,
+    @Query('pageSize') pageSize = 100
+  ): Promise<Paginated<{ identifier: string }>> {
     const photoRepo = getRepository(Photo);
 
-    const photos = await photoRepo.find({
-      where: { isOuttake: true, collection: collection },
-      select: ['identifier'],
-      order: {
-        identifier: 'ASC',
+    const qb = photoRepo
+      .createQueryBuilder('photo')
+      .select(['photo.identifier'])
+      .where({ isOuttake: true, collection: collection });
+
+    const page = await getPaginated(
+      qb,
+      {
+        key: 'identifier',
+        sortDirection: 'ASC',
+        getSerializedToken: (photo) => photo.identifier,
+        deserializeToken: (token) => token,
       },
-    });
-    return photos.map(({ identifier }) => ({ identifier }));
+      {
+        pageToken,
+        pageSize,
+      }
+    );
+
+    return mapPaginated(page, ({ identifier }: Pick<Photo, 'identifier'>) => ({
+      identifier,
+    }));
   }
 
   @Get('/{identifier}')

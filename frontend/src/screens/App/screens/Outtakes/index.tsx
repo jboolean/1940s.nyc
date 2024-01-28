@@ -6,6 +6,7 @@ import { getOuttakeSummaries, PhotoSummary } from 'shared/utils/photosApi';
 
 import { Link, useHistory, useParams } from 'react-router-dom';
 import Grid from 'shared/components/Grid';
+import Paginated from 'shared/types/Paginated';
 import { PHOTO_BASE } from 'shared/utils/apiConstants';
 import stylesheet from './Outtakes.less';
 
@@ -17,15 +18,61 @@ export default function Outtakes({
 }: {
   className?: string;
 }): JSX.Element {
+  const nextToken = React.useRef<string>(undefined);
+  const [photoSummariesPage, setPhotoSummariesPage] =
+    React.useState<Paginated<PhotoSummary> | null>(null);
   const [photoSummaries, setPhotoSummaries] = React.useState<PhotoSummary[]>(
     []
   );
+  const isLoading = React.useRef(false);
 
-  React.useEffect(() => {
-    void getOuttakeSummaries().then((data) => {
-      setPhotoSummaries(data);
-    });
-  }, []);
+  const handleNewPage = React.useCallback(
+    (newPage: Paginated<PhotoSummary>): void => {
+      nextToken.current = newPage.nextToken;
+      setPhotoSummariesPage(newPage);
+      setPhotoSummaries([...photoSummaries, ...newPage.items]);
+    },
+    [photoSummaries]
+  );
+
+  React.useEffect(
+    () => {
+      isLoading.current = true;
+      void getOuttakeSummaries(500)
+        .then(handleNewPage)
+        .finally(() => {
+          isLoading.current = false;
+        });
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  );
+
+  const loadNextPage = React.useCallback(
+    async (pageSize: number) => {
+      if (!photoSummariesPage) return;
+      if (!photoSummariesPage.hasNextPage) return;
+      if (isLoading.current) {
+        return;
+      }
+
+      isLoading.current = true;
+
+      return getOuttakeSummaries(Math.max(pageSize, 1), nextToken.current)
+        .then((data) => handleNewPage(data))
+        .finally(() => {
+          isLoading.current = false;
+        });
+    },
+    [photoSummariesPage, handleNewPage]
+  );
+
+  const handleLoadMoreItems = React.useCallback(
+    (untilIndex: number) => {
+      return loadNextPage(untilIndex - photoSummaries.length + 1);
+    },
+    [photoSummaries, loadNextPage]
+  );
 
   const history = useHistory();
   const { identifier: selectedIdentifier } = useParams<{
@@ -46,9 +93,10 @@ export default function Outtakes({
           targetWidth={TARGET_IMAGE_WIDTH}
           aspectRatio={ASPECT}
           className={stylesheet.grid}
-          totalItems={photoSummaries.length}
-          loadMoreItems={() => Promise.resolve()}
+          totalItems={photoSummariesPage?.total ?? 0}
+          loadMoreItems={handleLoadMoreItems}
           renderItem={(photoSummary) => {
+            if (!photoSummary) return null;
             const { identifier } = photoSummary;
             return (
               <img

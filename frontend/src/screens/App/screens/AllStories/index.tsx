@@ -26,20 +26,28 @@ export default function Outtakes({
   const [stories, setStories] = React.useState<Story[]>([]);
   const isLoading = React.useRef(false);
 
-  const handleNewPage = (newPage: Paginated<Story>) => {
-    nextToken.current = newPage.nextToken;
-    setStoriesPage(newPage);
-    setStories([...stories, ...newPage.items]);
-  };
+  const handleNewPage = React.useCallback(
+    (newPage: Paginated<Story>) => {
+      nextToken.current = newPage.nextToken;
+      setStoriesPage(newPage);
+      setStories([...stories, ...newPage.items]);
+    },
+    [stories]
+  );
 
-  React.useEffect(() => {
-    isLoading.current = true;
-    void getAllStories()
-      .then(handleNewPage)
-      .finally(() => {
-        isLoading.current = false;
-      });
-  }, []);
+  React.useEffect(
+    () => {
+      isLoading.current = true;
+      void getAllStories()
+        .then(handleNewPage)
+        .finally(() => {
+          isLoading.current = false;
+        });
+    },
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  );
 
   const loadNextPage = React.useCallback(
     async (pageSize = 20) => {
@@ -57,12 +65,12 @@ export default function Outtakes({
           isLoading.current = false;
         });
     },
-    [storiesPage]
+    [storiesPage, handleNewPage]
   );
 
   const handleLoadMoreItems = React.useCallback(
-    async (untilIndex: number) => {
-      loadNextPage(untilIndex - stories.length + 1);
+    (untilIndex: number) => {
+      return loadNextPage(untilIndex - stories.length + 1);
     },
     [stories, loadNextPage]
   );

@@ -26,7 +26,6 @@ export async function getPaginated<E extends ObjectLiteral>(
   let filterOp: FindOperator<unknown> = Not(IsNull());
   if (nextToken) {
     const tokenDeserialized = deserializeToken(nextToken);
-    console.log('tokenDeserialized', nextToken, tokenDeserialized);
     filterOp =
       sortDirection === 'ASC'
         ? MoreThan(tokenDeserialized)
