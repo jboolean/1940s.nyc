@@ -41,7 +41,8 @@ const StoryRepository = () =>
         {
           key: 'createdAt',
           sortDirection: 'DESC',
-          getKeyValue: (story) => story.createdAt,
+          getSerializedToken: (story) => story.createdAt.toISOString(),
+          deserializeToken: (token) => Date.parse(token),
         },
         pagination
       );
@@ -62,7 +63,8 @@ const StoryRepository = () =>
         {
           key: 'createdAt',
           sortDirection: 'DESC',
-          getKeyValue: (story) => story.createdAt,
+          getSerializedToken: (story) => story.createdAt.toISOString(),
+          deserializeToken: (token) => new Date(token),
         },
         pagination
       );

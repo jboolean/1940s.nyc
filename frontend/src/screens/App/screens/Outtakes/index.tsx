@@ -46,6 +46,8 @@ export default function Outtakes({
           targetWidth={TARGET_IMAGE_WIDTH}
           aspectRatio={ASPECT}
           className={stylesheet.grid}
+          totalItems={photoSummaries.length}
+          loadMoreItems={() => Promise.resolve()}
           renderItem={(photoSummary) => {
             const { identifier } = photoSummary;
             return (

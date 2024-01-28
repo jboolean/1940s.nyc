@@ -1,4 +1,5 @@
 import memoize from 'lodash/memoize';
+import Paginated from 'shared/types/Paginated';
 import api from 'shared/utils/api';
 import {
   AdminStory,
@@ -38,8 +39,8 @@ export async function updateStory(
 
 export const getStoriesForPhoto = memoize(async function getStoriesForPhoto(
   photoIdentifier: string
-): Promise<Story[]> {
-  const resp = await api.get<Story[]>(
+): Promise<Paginated<Story>> {
+  const resp = await api.get<Paginated<Story>>(
     `/stories?forPhotoIdentifier=${photoIdentifier}`
   );
   return resp.data;
@@ -59,12 +60,18 @@ export async function getStoryByToken(storyAuthToken: string): Promise<Story> {
   return resp.data;
 }
 
-export const getAllStories = memoize(async function getAllStories(): Promise<
-  Story[]
-> {
-  const resp = await api.get<Story[]>(`/stories`);
+export const getAllStories = async function getAllStories(
+  pageSize = 20,
+  pageToken?: string
+): Promise<Paginated<Story>> {
+  const resp = await api.get<Paginated<Story>>(`/stories`, {
+    params: {
+      pageToken,
+      pageSize,
+    },
+  });
   return resp.data;
-});
+};
 
 export async function getStoriesForReview(): Promise<AdminStory[]> {
   const resp = await api.get<AdminStory[]>('/stories/needs-review');

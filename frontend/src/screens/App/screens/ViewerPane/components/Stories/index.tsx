@@ -1,7 +1,7 @@
 import React from 'react';
-import { getStoriesForPhoto } from 'shared/utils/StoryApi';
 import { Story as StoryType } from 'screens/App/shared/types/Story';
 import Story from 'shared/components/Story';
+import { getStoriesForPhoto } from 'shared/utils/StoryApi';
 
 interface Props {
   photoIdentifier: string;
@@ -13,7 +13,8 @@ export default function Stories({ photoIdentifier }: Props): JSX.Element {
   React.useEffect(() => {
     getStoriesForPhoto(photoIdentifier)
       .then((stories) => {
-        setStories(stories);
+        // TODO handle pagination
+        setStories(stories.items);
       })
       .catch((err) => {
         console.error(err);

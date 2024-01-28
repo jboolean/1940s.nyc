@@ -1,3 +1,4 @@
+import last from 'lodash/last';
 import {
   FindOperator,
   IsNull,
@@ -10,15 +11,22 @@ import {
 import Paginated from '../business/pagination/Paginated';
 import PaginationInput from '../business/pagination/PaginationInput';
 import PaginationOptions from '../business/pagination/PaginationOptions';
+import required from '../business/utils/required';
 
 export async function getPaginated<E extends ObjectLiteral>(
   qb: SelectQueryBuilder<E>,
-  { key, sortDirection, getKeyValue }: PaginationOptions<E>,
+  {
+    key,
+    sortDirection,
+    getSerializedToken,
+    deserializeToken,
+  }: PaginationOptions<E>,
   { pageToken: nextToken, pageSize }: PaginationInput
 ): Promise<Paginated<E>> {
   let filterOp: FindOperator<unknown> = Not(IsNull());
   if (nextToken) {
-    const tokenDeserialized = JSON.parse(nextToken) as unknown;
+    const tokenDeserialized = deserializeToken(nextToken);
+    console.log('tokenDeserialized', nextToken, tokenDeserialized);
     filterOp =
       sortDirection === 'ASC'
         ? MoreThan(tokenDeserialized)
@@ -39,13 +47,15 @@ export async function getPaginated<E extends ObjectLiteral>(
     .take(pageSize + 1)
     .getMany();
 
+  const items = results.slice(0, pageSize);
   const hasNextPage = results.length > pageSize;
+  const nextNextToken = hasNextPage
+    ? getSerializedToken(required(last(items), 'last'))
+    : undefined;
   return {
-    items: results.slice(0, pageSize),
+    items,
     total: count,
     hasNextPage,
-    nextToken: hasNextPage
-      ? JSON.stringify(getKeyValue(results[pageSize - 1]))
-      : undefined,
+    nextToken: nextNextToken,
   };
 }
