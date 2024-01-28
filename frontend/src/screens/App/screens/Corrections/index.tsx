@@ -107,6 +107,13 @@ const CorrectionsDialogContent = (): JSX.Element | null => {
           Corrections are not immediate. They are processed nightly and will be
           visible tomorrow.
         </p>
+        <p className={stylesheet.smallPrint}>
+          This is a new feature. Send feedback to{' '}
+          <a href="mailto:julian@1940s.nyc" target="_blank" rel="noreferrer">
+            julian@1940s.nyc
+          </a>
+          .
+        </p>
       </div>
 
       <div>
