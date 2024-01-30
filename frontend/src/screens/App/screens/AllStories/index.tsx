@@ -59,7 +59,7 @@ export default function Outtakes({
 
       isLoading.current = true;
 
-      return getAllStories(Math.max(pageSize, 1), nextToken.current)
+      return getAllStories(Math.max(pageSize, 100), nextToken.current)
         .then((data) => handleNewPage(data))
         .finally(() => {
           isLoading.current = false;
