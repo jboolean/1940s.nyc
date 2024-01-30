@@ -16,7 +16,10 @@ import {
   Security,
 } from 'tsoa';
 
+import { UserData as NetlifyUserData } from 'gotrue-js';
 import { BadRequest, Forbidden, NotFound } from 'http-errors';
+import EmailCampaignService from '../../business/email/EmailCampaignService';
+import Paginated from '../../business/pagination/Paginated';
 import {
   backfillUserStoryEmails,
   onStateTransition,
@@ -26,6 +29,9 @@ import {
   verifyStoryToken,
 } from '../../business/stories/StoryTokenService';
 import { validateRecaptchaToken } from '../../business/utils/grecaptcha';
+import mapPaginated from '../../business/utils/mapPaginated';
+import normalizeEmail from '../../business/utils/normalizeEmail';
+import required from '../../business/utils/required';
 import Story from '../../entities/Story';
 import StoryState from '../../enum/StoryState';
 import StoryType from '../../enum/StoryType';
@@ -42,10 +48,6 @@ import {
   toDraftStoryResponse,
   toPublicStoryResponse,
 } from './storyToApi';
-import EmailCampaignService from '../../business/email/EmailCampaignService';
-import normalizeEmail from '../../business/utils/normalizeEmail';
-import { UserData as NetlifyUserData } from 'gotrue-js';
-import required from '../../business/utils/required';
 
 function updateModelFromRequest(
   story: Story,
@@ -213,19 +215,29 @@ export class StoriesController extends Controller {
 
   @Get('/')
   public async getStories(
-    @Query('forPhotoIdentifier') identifier?: string
-  ): Promise<PublicStoryResponse[]> {
-    let stories: Story[];
+    @Query('forPhotoIdentifier') identifier?: string,
+
+    // pagination
+    @Query('pageToken') pageToken?: string,
+    @Query('pageSize') pageSize = 100
+  ): Promise<Paginated<PublicStoryResponse>> {
+    let stories: Paginated<Story>;
+
+    const paginationInput = {
+      pageToken,
+      pageSize,
+    };
 
     if (identifier) {
       stories = await StoryRepository().findPublishedForPhotoIdentifier(
-        identifier
+        identifier,
+        paginationInput
       );
     } else {
-      stories = await StoryRepository().findPublished();
+      stories = await StoryRepository().findPublished(paginationInput);
     }
 
-    return map(stories, toPublicStoryResponse);
+    return mapPaginated(stories, toPublicStoryResponse);
   }
 
   @Security('netlify', ['moderator'])

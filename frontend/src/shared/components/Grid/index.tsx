@@ -5,6 +5,7 @@ import throttle from 'lodash/throttle';
 import { FixedSizeList as List } from 'react-window';
 
 import AutoSizer, { Size } from 'react-virtualized-auto-sizer';
+import InfiniteLoader from 'react-window-infinite-loader';
 
 const calculateItemsPerRow = (
   targetWidth: number,
@@ -25,7 +26,9 @@ type GridProps<T> = {
   targetWidth: number;
   aspectRatio: number;
   items: T[];
+  totalItems: number;
   renderItem: (item: T) => JSX.Element;
+  loadMoreItems: (upTo: number) => Promise<void>;
 };
 
 type PrivateProps = {
@@ -35,6 +38,7 @@ type PrivateProps = {
 
 function Grid<T>({
   items,
+  totalItems,
   renderItem,
   className,
   targetWidth,
@@ -45,6 +49,8 @@ function Grid<T>({
 
   visibleItemIRef: visibleImageIRef,
   listRef,
+
+  loadMoreItems,
 }: GridProps<T> & Size & PrivateProps): JSX.Element {
   const itemsPerRow = calculateItemsPerRow(targetWidth, containerWidth);
   const itemHeight = (1 / aspectRatio) * (containerWidth / itemsPerRow);
@@ -67,52 +73,81 @@ function Grid<T>({
     { leading: false }
   );
 
+  const rowCount = Math.ceil(totalItems / itemsPerRow);
+  const isRowLoaded = (index: number): boolean => {
+    const firstItemI = index * itemsPerRow;
+    const lastItemI = Math.min(firstItemI + itemsPerRow - 1, totalItems - 1);
+    return lastItemI < items.length;
+  };
+
+  const handleLoadMoreItems = React.useCallback(
+    async (_startIndex: number, stopIndex: number) => {
+      const firstItemI = stopIndex * itemsPerRow;
+      const lastItemI = Math.min(firstItemI + itemsPerRow - 1, totalItems - 1);
+      await loadMoreItems(lastItemI);
+    },
+    [itemsPerRow, loadMoreItems, totalItems]
+  );
+
   return (
-    <List
-      ref={listRef}
-      className={className}
-      width={containerWidth}
-      height={containerHeight}
-      itemSize={itemHeight}
-      itemCount={Math.ceil(items.length / itemsPerRow)}
-      useIsScrolling
-      onItemsRendered={({ visibleStartIndex }) => {
-        const imageI = visibleStartIndex * itemsPerRow;
-        if (containerWidth === 0) {
-          return;
-        }
-        // We'll scroll back to here
-        // Record on a delay to allow time for reflow
-        updateVisibleImageI(imageI);
-      }}
+    <InfiniteLoader
+      isItemLoaded={isRowLoaded}
+      itemCount={rowCount}
+      loadMoreItems={handleLoadMoreItems}
     >
-      {({ index: rowIndex, style }) => {
-        const firstItemI = rowIndex * itemsPerRow;
-        return (
-          <div style={style}>
-            {range(
-              firstItemI,
-              Math.min(firstItemI + itemsPerRow, items.length)
-            ).map((i) => {
-              const item = items[i];
-              return (
-                <div
-                  style={{
-                    width: `${100 / itemsPerRow}%`,
-                    height: '100%',
-                    display: 'inline-block',
-                    position: 'relative',
-                  }}
-                  key={i}
-                >
-                  {renderItem(item)}
-                </div>
-              );
-            })}
-          </div>
-        );
-      }}
-    </List>
+      {({ onItemsRendered, ref }) => (
+        <List
+          ref={(el) => {
+            ref(el);
+            listRef.current = el;
+          }}
+          className={className}
+          width={containerWidth}
+          height={containerHeight}
+          itemSize={itemHeight}
+          itemCount={rowCount}
+          useIsScrolling
+          onItemsRendered={(props) => {
+            const { visibleStartIndex } = props;
+            const imageI = visibleStartIndex * itemsPerRow;
+            if (containerWidth === 0) {
+              return;
+            }
+            // We'll scroll back to here
+            // Record on a delay to allow time for reflow
+            updateVisibleImageI(imageI);
+            onItemsRendered(props);
+          }}
+        >
+          {({ index: rowIndex, style }) => {
+            const firstItemI = rowIndex * itemsPerRow;
+            return (
+              <div style={style}>
+                {range(
+                  firstItemI,
+                  Math.min(firstItemI + itemsPerRow, items.length)
+                ).map((i) => {
+                  const item = items[i];
+                  return (
+                    <div
+                      style={{
+                        width: `${100 / itemsPerRow}%`,
+                        height: '100%',
+                        display: 'inline-block',
+                        position: 'relative',
+                      }}
+                      key={i}
+                    >
+                      {renderItem(item)}
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          }}
+        </List>
+      )}
+    </InfiniteLoader>
   );
 }
 

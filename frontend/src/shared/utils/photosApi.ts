@@ -1,3 +1,4 @@
+import Paginated from 'shared/types/Paginated';
 import api from './api';
 
 type Collection = '1940' | '1980';
@@ -37,8 +38,19 @@ export async function closest(latLng: {
   return resp.data.identifier;
 }
 
-export async function getOuttakeSummaries(): Promise<PhotoSummary[]> {
-  const resp = await api.get<PhotoSummary[]>('/photos/outtake-summaries');
+export async function getOuttakeSummaries(
+  pageSize = 100,
+  pageToken?: string
+): Promise<Paginated<PhotoSummary>> {
+  const resp = await api.get<Paginated<PhotoSummary>>(
+    '/photos/outtake-summaries',
+    {
+      params: {
+        pageToken,
+        pageSize,
+      },
+    }
+  );
   return resp.data;
 }
 
