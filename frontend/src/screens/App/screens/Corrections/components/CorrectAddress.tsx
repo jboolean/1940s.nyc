@@ -22,7 +22,10 @@ export default function CorrectAddress(): JSX.Element {
     <FieldSet disabled={!isLoginValidated}>
       <FieldSet.Legend>Correct address</FieldSet.Legend>
 
-      <p>Fix the address sometimes displayed with this photo.</p>
+      <p>
+        Fix the address sometimes displayed with this photo. Please enter only
+        the correct address. This does not move the photo on the map.
+      </p>
 
       <div>
         <TextInput

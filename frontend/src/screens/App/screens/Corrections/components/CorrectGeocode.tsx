@@ -11,8 +11,8 @@ import FieldSet from 'shared/components/FieldSet';
 import CoordinateInput from './CoordinateInput';
 import LocationPickerModal from './LocationPickerModal';
 
-import stylesheet from './CorrectGeocode.less';
 import Labeled from 'shared/components/Labeled';
+import stylesheet from './CorrectGeocode.less';
 
 export default function CorrectGeocode(): JSX.Element {
   const { openMap, correctedLng, correctedLat, setCorrectedLngLat } =
@@ -25,7 +25,10 @@ export default function CorrectGeocode(): JSX.Element {
     <FieldSet disabled={!isLoginValidated}>
       <FieldSet.Legend>Correct map position</FieldSet.Legend>
 
-      <p>Fix where the dot for this photo appears on the map.</p>
+      <p>
+        Fix where the dot for this photo appears on the map. Click{' '}
+        <i>Select on map</i> to find the coordinates of a location.
+      </p>
 
       <div className={stylesheet.coordinateInputRow}>
         <Labeled
