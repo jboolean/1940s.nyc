@@ -24,7 +24,8 @@ export default function CorrectAddress(): JSX.Element {
 
       <p>
         Fix the address sometimes displayed with this photo. Please enter only
-        the correct address. This does not move the photo on the map.
+        the house number and street of the correct address. This does not move
+        the photo on the map.
       </p>
 
       <div>
