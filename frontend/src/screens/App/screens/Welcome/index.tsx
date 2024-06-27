@@ -62,7 +62,7 @@ export default function Welcome({
           </div>
           <hr />
           <p className={stylesheet.finePrint}>
-            The photos on this site are property of the NYC Department of
+            The photos on this site were retrieved from the NYC Department of
             Records, <em>with which this site is not affiliated</em>. Photos
             were placed on the map in an automated fashion, and may be
             inaccurate.
