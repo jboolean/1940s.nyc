@@ -49,6 +49,8 @@ functions:
     stages:
       - production
     handler: convertImage.handler
+    memorySize: 4096
+    timeout: 30
     events:
       - s3:
           bucket: ${self:custom.bucket}

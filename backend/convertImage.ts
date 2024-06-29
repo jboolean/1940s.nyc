@@ -1,6 +1,7 @@
-import sharp from 'sharp';
 import AWS from 'aws-sdk';
+import sharp from 'sharp';
 
+import * as ImageAdjustUtils from './src/image-processing/ImageAdjustUtils';
 import * as LaserdiscUtils from './src/image-processing/LaserdiscUtils';
 
 const s3 = new AWS.S3();
@@ -50,6 +51,9 @@ export const handler = async (event): Promise<unknown> => {
   if (await LaserdiscUtils.isLaserdiscVideoFrame(inputBuffer)) {
     inputBuffer = await LaserdiscUtils.cropVideoFrame(inputBuffer);
   }
+
+  // Perform level normalization
+  inputBuffer = await ImageAdjustUtils.adjustLevels(inputBuffer);
 
   return Promise.all([
     // webp doesn't look that good, sorry webp
