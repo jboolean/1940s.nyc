@@ -96,6 +96,7 @@ export const handler = async (event): Promise<unknown> => {
       .resize(720, undefined, { withoutEnlargement: true })
       .jpeg({
         progressive: true,
+        quality: 95,
       })
       .toBuffer()
       .then((outputBuffer) =>
