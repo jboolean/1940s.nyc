@@ -13,6 +13,10 @@ const FILENAMES: Record<string, Template> = {
     prefix: 'jpg/',
     suffix: '.jpg',
   },
+  jpeg720: {
+    prefix: '720-jpg/',
+    suffix: '.jpg',
+  },
   jpeg420: {
     prefix: '420-jpg/',
     suffix: '.jpg',
@@ -72,7 +76,9 @@ export const handler = async (event): Promise<unknown> => {
     //   ),
 
     sharp(inputBuffer)
-      .jpeg()
+      .jpeg({
+        progressive: true,
+      })
       .toBuffer()
       .then((outputBuffer) =>
         s3
@@ -87,8 +93,29 @@ export const handler = async (event): Promise<unknown> => {
       ),
 
     sharp(inputBuffer)
+      .resize(720, undefined, { withoutEnlargement: true })
+      .jpeg({
+        progressive: true,
+        quality: 95,
+      })
+      .toBuffer()
+      .then((outputBuffer) =>
+        s3
+          .putObject({
+            Body: outputBuffer,
+            Bucket: srcBucket,
+            Key: makeFilename(FILENAMES.jpeg720, rootKey),
+            ACL: 'public-read',
+            ContentType: 'image/jpeg',
+          })
+          .promise()
+      ),
+
+    sharp(inputBuffer)
       .resize(420, undefined, { withoutEnlargement: true })
-      .jpeg()
+      .jpeg({
+        progressive: true,
+      })
       .toBuffer()
       .then((outputBuffer) =>
         s3
