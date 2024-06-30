@@ -59,7 +59,7 @@ export default function ViewerPane({
       />
       <ImageSwitcher
         className={stylesheet.image}
-        src={`${PHOTO_BASE}/jpg/${photoIdentifier}.jpg`}
+        src={`${PHOTO_BASE}/720-jpg/${photoIdentifier}.jpg`}
         alt="Historic photo of this location"
       />
     </div>
