@@ -69,5 +69,5 @@ export default [
   },
 ].map((image) => ({
   ...image,
-  src: `${PHOTO_BASE}/jpg/${image.identifier}.jpg`,
+  src: `${PHOTO_BASE}/720-jpg/${image.identifier}.jpg`,
 }));
