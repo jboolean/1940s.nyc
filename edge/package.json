@@ -335,7 +335,7 @@
     "printj": "^1.1.2",
     "process-nextick-args": "^2.0.1",
     "promise-queue": "^2.2.5",
-    "protobufjs": "^6.10.2",
+    "protobufjs": "^6.11.4",
     "psl": "^1.8.0",
     "pump": "^3.0.0",
     "punycode": "^2.1.1",
