@@ -1,0 +1,24 @@
+service: fourtiesnyc-edge-2
+
+plugins:
+  - serverless-plugin-typescript
+  - serverless-lambda-edge-pre-existing-cloudfront
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  stage: production
+  region: us-east-1
+
+functions:
+  originResponse:
+    handler: imageOriginResponse.handler
+    tags:
+      Project: fourtiesnyc
+    events:
+      - preExistingCloudFront:
+        distributionId: E27U2N3WTCAYNV
+        eventType: origin-response
+        includeBody: false
+        pathPattern: '*'
+        stage: production
