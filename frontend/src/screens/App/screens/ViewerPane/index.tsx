@@ -50,7 +50,9 @@ export default function ViewerPane({
             <ImageButtons />
           </div>
 
-          <p className={stylesheet.credit}>Photo © NYC Municipal Archives </p>
+          <p className={stylesheet.credit}>
+            Photo courtesy NYC Municipal Archives{' '}
+          </p>
         </div>
       </Overlay>
       <ColorLayer
