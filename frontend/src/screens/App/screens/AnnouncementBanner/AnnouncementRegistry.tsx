@@ -2,6 +2,17 @@ import React from 'react';
 import Announcment from './Announcement';
 
 const ANNOUNCEMENTS_REGISTRY: Announcment[] = [
+  // {
+  //   id: 'high-quality-imagery',
+  //   expiresAt: new Date('2024-08-15'),
+  //   render: () => {
+  //     return (
+  //       <React.Fragment>
+  //         <b>🎉 New:</b> Now with higher quality 1940s images
+  //       </React.Fragment>
+  //     );
+  //   },
+  // },
   {
     id: 'storytelling-launch-2',
     expiresAt: new Date('2023-04-21'),
