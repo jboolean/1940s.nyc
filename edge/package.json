@@ -383,7 +383,7 @@
     "slash": "^3.0.0",
     "snappy": "^6.3.5",
     "socket.io-client": "^2.3.1",
-    "socket.io-parser": "^3.3.1",
+    "socket.io-parser": "^3.3.4",
     "sort-keys": "^1.1.2",
     "sort-keys-length": "^1.0.1",
     "source-map": "^0.6.1",
