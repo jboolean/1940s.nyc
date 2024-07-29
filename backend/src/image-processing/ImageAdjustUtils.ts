@@ -6,8 +6,8 @@ const ROI_PCT = 0.9;
 
 const SAMPLE_WIDTH = 560;
 
-const BLACK_PERCENTILE = 1;
-const WHITE_PERCENTILE = 99;
+const BLACK_PERCENTILE = 0.5;
+const WHITE_PERCENTILE = 99.5;
 
 const percentile = (values: Uint8ClampedArray, p: number): number => {
   const index = (p / 100) * (values.length - 1);
