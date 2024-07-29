@@ -49,7 +49,7 @@ functions:
     stages:
       - production
     handler: convertImage.handler
-    memorySize: 4096
+    memorySize: 2048
     timeout: 30
     events:
       - s3:
