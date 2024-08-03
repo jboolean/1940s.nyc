@@ -56,12 +56,10 @@ export class AuthenticationController extends Controller {
   ): Promise<LoginResponse> {
     const userId = await getUserFromRequestOrCreateAndSetCookie(req);
     const { requestedEmail, returnToPath, requireVerifiedEmail } = loginRequest;
-    const ipAddress = req.ip;
     const apiBase = `${req.protocol}://${required(req.get('host'), 'host')}`;
     const result = await UserService.processLoginRequest(
       requestedEmail,
       userId,
-      ipAddress,
       apiBase,
       returnToPath,
       requireVerifiedEmail
