@@ -46,7 +46,7 @@
     "lint-staged": "^14.0.1",
     "prettier": "^2.8.1",
     "serverless": "^3.35.2",
-    "serverless-domain-manager": "^6.2.0",
+    "serverless-domain-manager": "^7.3.8",
     "serverless-lambda-edge-pre-existing-cloudfront": "^1.2.0",
     "serverless-offline": "^13.3.0",
     "serverless-plugin-select": "^2.0.0-rc.1",
