@@ -1,5 +1,5 @@
-import * as UserService from '../../business/users/UserService';
 import * as express from 'express';
+import * as UserService from '../../business/users/UserService';
 import { setAuthCookie } from './authCookieUtils';
 
 export const USER_TOKEN_COOKIE = 'user-token';
@@ -25,7 +25,7 @@ export async function getUserFromRequestOrCreateAndSetCookie(
   }
 
   if (!token || !userId) {
-    const userCreationResult = await UserService.createUser(req.ip);
+    const userCreationResult = await UserService.createUser(req.ip as string);
     userId = userCreationResult.userId;
     token = userCreationResult.token;
   }

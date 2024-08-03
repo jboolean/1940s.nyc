@@ -150,7 +150,6 @@ async function sendMagicLink(
 export async function processLoginRequest(
   requestedEmail: string,
   authenticatedUserId: number,
-  ipAddress: string,
   apiBase: string,
   returnToPath?: string,
   requireVerifiedEmail = false
