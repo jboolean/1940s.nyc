@@ -378,7 +378,7 @@
     "signal-exit": "^3.0.3",
     "simple-concat": "^1.0.1",
     "simple-get": "^4.0.0",
-    "simple-git": "^2.31.0",
+    "simple-git": "^3.16.0",
     "simple-swizzle": "^0.2.2",
     "slash": "^3.0.0",
     "snappy": "^6.3.5",
