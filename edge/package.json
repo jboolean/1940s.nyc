@@ -26,7 +26,7 @@
     "arraybuffer.slice": "^0.0.7",
     "asn1": "^0.2.4",
     "assert-plus": "^1.0.0",
-    "async": "^3.2.0",
+    "async": "^3.2.5",
     "async-limiter": "^1.0.1",
     "asynckit": "^0.4.0",
     "at-least-node": "^1.0.0",
