@@ -4,7 +4,7 @@
   "description": "Street view of 1940s New York City (monorepo)",
   "main": "index.js",
   "scripts": {
-    "prepare": "husky install && npm run install-submodules",
+    "prepare": "husky && npm run install-submodules",
     "lint-all": "./lint.sh",
     "install-submodules": "./install-submodules.sh"
   },
@@ -19,6 +19,6 @@
   },
   "homepage": "https://github.com/jboolean/1940s.nyc#readme",
   "devDependencies": {
-    "husky": "^8.0.3"
+    "husky": "^9.1.4"
   }
 }

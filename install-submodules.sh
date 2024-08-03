@@ -2,7 +2,8 @@
 
 APPS=(
   "frontend"
-  "backend"
+  "backend",
+  "edge"
 )
 
 for APP in "${APPS[@]}"; do
