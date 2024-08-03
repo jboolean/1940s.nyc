@@ -4,7 +4,7 @@
   "description": "Street view of 1940s New York City (monorepo)",
   "main": "index.js",
   "scripts": {
-    "prepare": "husky install && npm run install-submodules",
+    "prepare": "husky && npm run install-submodules",
     "lint-all": "./lint.sh",
     "install-submodules": "./install-submodules.sh"
   },
