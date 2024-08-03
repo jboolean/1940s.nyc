@@ -17,8 +17,8 @@
   "author": "Julian Boilen",
   "license": "UNLICENSED",
   "dependencies": {
-    "@sentry/react": "^7.36.0",
-    "@sentry/tracing": "^7.36.0",
+    "@sentry/react": "^7.114.0",
+    "@sentry/tracing": "^7.114.0",
     "@stripe/stripe-js": "^1.42.0",
     "@types/grecaptcha": "^3.0.4",
     "@types/react-router": "^5.1.20",
