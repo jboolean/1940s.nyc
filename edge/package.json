@@ -278,7 +278,7 @@
     "minizlib": "^2.1.2",
     "mkdirp": "^0.5.5",
     "mkdirp-classic": "^0.5.3",
-    "moment": "^2.29.1",
+    "moment": "^2.29.4",
     "ms": "^2.0.0",
     "mute-stream": "^0.0.8",
     "nan": "^2.14.2",
