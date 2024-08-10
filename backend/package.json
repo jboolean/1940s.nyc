@@ -57,7 +57,7 @@
     "@sentry/integrations": "^7.36.0",
     "@sentry/node": "^7.36.0",
     "@sentry/tracing": "^7.36.0",
-    "@types/multer": "^1.4.7",
+    "@types/multer": "^1.4.11",
     "aws-sdk": "^2.1368.0",
     "axios": "^1.7.3",
     "cookie-parser": "^1.4.6",
