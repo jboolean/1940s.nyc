@@ -27,7 +27,7 @@
     "@types/express": "^4.17.21",
     "@types/geojson": "^7946.0.10",
     "@types/http-errors": "^2.0.1",
-    "@types/jsonstream": "^0.8.31",
+    "@types/jsonstream": "^0.8.33",
     "@types/jsonwebtoken": "^9.0.4",
     "@types/lodash": "^4.14.191",
     "@types/node": "^20",
