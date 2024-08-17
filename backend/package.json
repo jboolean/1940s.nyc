@@ -25,7 +25,7 @@
     "@types/eslint": "^8.44.6",
     "@types/eslint-plugin-prettier": "^3.1.0",
     "@types/express": "^4.17.21",
-    "@types/geojson": "^7946.0.10",
+    "@types/geojson": "^7946.0.14",
     "@types/http-errors": "^2.0.1",
     "@types/jsonstream": "^0.8.33",
     "@types/jsonwebtoken": "^9.0.4",
