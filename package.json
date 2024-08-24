@@ -19,6 +19,6 @@
   },
   "homepage": "https://github.com/jboolean/1940s.nyc#readme",
   "devDependencies": {
-    "husky": "^9.1.4"
+    "husky": "^9.1.5"
   }
 }
