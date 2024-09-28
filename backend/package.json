@@ -29,7 +29,7 @@
     "@types/http-errors": "^2.0.1",
     "@types/jsonstream": "^0.8.33",
     "@types/jsonwebtoken": "^9.0.4",
-    "@types/lodash": "^4.14.191",
+    "@types/lodash": "^4.17.9",
     "@types/node": "^20",
     "@types/pg": "^8.6.5",
     "@types/prettier": "^2.7.1",
