@@ -94,7 +94,7 @@ export default function ReviewStories(): JSX.Element {
             </i>
           </li>
           <li>
-            &ldquo;I was looking for Pack&rsquo;s Pharmacy Store???&rdquo; —
+            &ldquo;I was looking for Pack&rsquo;s Pharmacy Store???&rdquo; —{' '}
             <i>Not a story</i>
           </li>
         </ul>
