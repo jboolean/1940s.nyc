@@ -1,13 +1,13 @@
+import classNames from 'classnames';
 import React from 'react';
 import Button from 'shared/components/Button';
 import Story from 'shared/components/Story';
 import { PHOTO_BASE } from 'shared/utils/apiConstants';
-import classNames from 'classnames';
 
 import useReviewStoriesStore from './stores/ReviewStoriesStore';
 
-import stylesheet from './ReviewStories.less';
 import { AdminStory } from 'screens/App/shared/types/Story';
+import stylesheet from './ReviewStories.less';
 
 const DATE_FORMATTER = new Intl.DateTimeFormat('en-US', {
   dateStyle: 'full',
@@ -70,6 +70,35 @@ export default function ReviewStories(): JSX.Element {
   return (
     <div className={stylesheet.container}>
       <h1>Review Stories</h1>
+
+      <details>
+        <summary>Review guidelines</summary>
+        <p>Examples of stories to reject</p>
+        <ul>
+          <li>
+            &ldquo;dvdsvdf&rdquo; — <i>This is junk content</i>
+          </li>
+          <li>
+            &ldquo;My house&rdquo; — <i>Not a story</i>
+          </li>
+          <li>
+            &ldquo;6th pct&rdquo; — <i>Not a story</i>
+          </li>
+          <li>
+            &ldquo;205 Riverside dr&rdquo; — <i>Adds no new information</i>
+          </li>
+          <li>
+            &ldquo;This is the wrong location&rdquo; —{' '}
+            <i>
+              User should use the <i>Fix</i> button instead
+            </i>
+          </li>
+          <li>
+            &ldquo;I was looking for Pack's Pharmacy Store??? &rdquo; —{' '}
+            <i>Not a story</i>
+          </li>
+        </ul>
+      </details>
 
       <div className={stylesheet.stories}>
         {reviewStoriesStore.stories.map((story) => (
