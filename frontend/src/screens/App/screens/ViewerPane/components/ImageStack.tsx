@@ -33,6 +33,7 @@ export default function ImageStack({
   return (
     <div className={className}>
       <ColorLayer
+        key={photoIdentifier}
         photoIdentifier={photoIdentifier}
         className={stylesheet.image}
       />
