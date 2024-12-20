@@ -5,7 +5,7 @@ import recordEvent from 'shared/utils/recordEvent';
 
 import Require from 'utils/Require';
 
-type View = {
+export type View = {
   key: string;
   element: React.ReactElement;
   preload: () => Promise<void>;
@@ -54,7 +54,7 @@ export default class ImageSwitcher extends React.Component<Props, State> {
     this.handleExited = this.handleExited.bind(this);
   }
 
-  componentDidUpdate(prevProps: Props, prevState: State): void {
+  componentDidUpdate(_prevProps: Props, prevState: State): void {
     if (this.props.view.key !== prevState.lastView.key && !this.state.hide) {
       // eslint-disable-next-line react/no-did-update-set-state
       this.setState(
@@ -64,9 +64,14 @@ export default class ImageSwitcher extends React.Component<Props, State> {
           lastView: this.props.view,
         },
         () => {
-          this.props.view.preload().then(() => {
-            this.handleNewImgLoad();
-          });
+          this.props.view.preload().then(
+            () => {
+              this.handleNewImgLoad();
+            },
+            (e) => {
+              console.error('Failed to preload image', e);
+            }
+          );
         }
       );
 
@@ -104,6 +109,12 @@ export default class ImageSwitcher extends React.Component<Props, State> {
   render(): JSX.Element {
     const { visibleView, hide, loaded } = this.state;
 
+    // Use the one from props if it is the same key so we get the most up-to-date element
+    const element =
+      visibleView.key === this.props.view.key
+        ? this.props.view.element
+        : visibleView.element;
+
     return (
       <CSSTransition
         appear={true}
@@ -112,7 +123,7 @@ export default class ImageSwitcher extends React.Component<Props, State> {
         timeout={150}
         onExited={this.handleExited}
       >
-        {visibleView.element}
+        {element}
       </CSSTransition>
     );
   }

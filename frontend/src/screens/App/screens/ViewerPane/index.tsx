@@ -2,7 +2,7 @@ import React from 'react';
 
 import classnames from 'classnames';
 
-import ImageSwitcher, { makeImgView } from './components/ImageSwitcher';
+import ImageSwitcher from './components/ImageSwitcher';
 
 import stylesheet from './ViewerPane.less';
 
@@ -10,9 +10,9 @@ import { useHistory, useParams } from 'react-router';
 import Alternates from './components/Alternates';
 import Overlay from './components/Overlay';
 
-import { PHOTO_BASE } from 'shared/utils/apiConstants';
 import ColorLayer from './components/ColorLayer';
 import ImageButtons from './components/ImageButtons';
+import * as ImageStack from './components/ImageStack';
 import Stories from './components/Stories';
 
 export default function ViewerPane({
@@ -60,10 +60,17 @@ export default function ViewerPane({
         photoIdentifier={photoIdentifier}
       />
       <ImageSwitcher
-        view={makeImgView({
-          src: `${PHOTO_BASE}/720-jpg/${photoIdentifier}.jpg`,
+        // view={makeImgView({
+        //   src: `${PHOTO_BASE}/720-jpg/${photoIdentifier}.jpg`,
+        //   className: stylesheet.image,
+        //   alt: 'Historic photo of this location',
+        // })}
+        view={ImageStack.makeImageSwitcherView({
+          photoIdentifier,
           className: stylesheet.image,
-          alt: 'Historic photo of this location',
+          imgProps: {
+            alt: 'Historic photo of this location',
+          },
         })}
       />
     </div>
