@@ -49,7 +49,6 @@ export default function ColorLayer({
           className={classNames(stylesheet.colorLayer, className)}
           src={colorizedImageSrc}
           onLoad={() => {
-            console.log('loaded', enabled);
             if (enabled) {
               handleImageLoaded();
             }
