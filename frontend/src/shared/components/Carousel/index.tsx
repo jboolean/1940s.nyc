@@ -1,6 +1,7 @@
 import React from 'react';
 import { CSSTransition, SwitchTransition } from 'react-transition-group';
 
+import preloadImage from 'shared/utils/preloadImage';
 import stylesheet from './Carousel.less';
 
 interface Image {
@@ -27,6 +28,12 @@ export default function Carousel({
       clearInterval(handle);
     };
   }, [images.length]);
+
+  // preload next image
+  React.useEffect(() => {
+    const nextI = (i + 1) % images.length;
+    void preloadImage(images[nextI].src);
+  }, [i, images]);
 
   const image = images[i];
 

@@ -7,6 +7,7 @@ import { PHOTO_BASE } from 'shared/utils/apiConstants';
 import ColorLayer from './ColorLayer';
 import { View } from './ImageSwitcher';
 
+import preloadImage from 'shared/utils/preloadImage';
 import stylesheet from './ImageStack.less';
 
 type Props = {
@@ -17,16 +18,6 @@ type Props = {
 
 const forgeBaseImageSrc = (photoIdentifier: string): string =>
   `${PHOTO_BASE}/720-jpg/${photoIdentifier}.jpg`;
-
-function preloadImage(url: string): Promise<void> {
-  return new Promise<void>((resolve, reject) => {
-    const img = new Image();
-    img.src = url;
-
-    img.addEventListener('load', () => resolve());
-    img.addEventListener('error', reject);
-  });
-}
 
 /**
  * An ImageStack keeps all the layers for one photo aligned and combined so they can be treated as one.
