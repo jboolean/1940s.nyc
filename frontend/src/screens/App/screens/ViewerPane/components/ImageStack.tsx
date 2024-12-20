@@ -1,8 +1,13 @@
 import React, { ImgHTMLAttributes } from 'react';
 
+import classNames from 'classnames';
+
 import { PHOTO_BASE } from 'shared/utils/apiConstants';
 
+import ColorLayer from './ColorLayer';
 import { View } from './ImageSwitcher';
+
+import stylesheet from './ImageStack.less';
 
 type Props = {
   photoIdentifier: string;
@@ -23,6 +28,10 @@ function preloadImage(url: string): Promise<void> {
   });
 }
 
+/**
+ * An ImageStack keeps all the layers for one photo aligned and combined so they can be treated as one.
+ * Layers: Base layer, high res layer, color layer.
+ */
 export default function ImageStack({
   photoIdentifier,
   imgProps,
@@ -32,14 +41,15 @@ export default function ImageStack({
 
   return (
     <div className={className}>
+      <ColorLayer
+        photoIdentifier={photoIdentifier}
+        className={stylesheet.image}
+      />
       <img
         data-image-type="base"
         {...imgProps}
         src={baseImageSrc}
-        style={{
-          display: 'block',
-          width: '100%',
-        }}
+        className={classNames(stylesheet.image, imgProps.className)}
       />
     </div>
   );

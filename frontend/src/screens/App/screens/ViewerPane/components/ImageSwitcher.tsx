@@ -41,6 +41,10 @@ export function makeImgView(
   };
 }
 
+/**
+ * ImageSwitcher can transition between any Views that conform to the View interface.
+ * The goal is to increase perceived load speed by starting an animation immediately while preloading the view.
+ */
 export default class ImageSwitcher extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);

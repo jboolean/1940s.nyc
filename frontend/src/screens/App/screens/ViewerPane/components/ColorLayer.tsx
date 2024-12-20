@@ -12,7 +12,7 @@ export default function ColorLayer({
   className,
 }: {
   photoIdentifier: string;
-  className: string;
+  className?: string;
 }): JSX.Element | null {
   const {
     colorEnabledForIdentifier,

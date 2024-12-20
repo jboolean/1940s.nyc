@@ -10,7 +10,6 @@ import { useHistory, useParams } from 'react-router';
 import Alternates from './components/Alternates';
 import Overlay from './components/Overlay';
 
-import ColorLayer from './components/ColorLayer';
 import ImageButtons from './components/ImageButtons';
 import * as ImageStack from './components/ImageStack';
 import Stories from './components/Stories';
@@ -55,19 +54,10 @@ export default function ViewerPane({
           </p>
         </div>
       </Overlay>
-      <ColorLayer
-        className={stylesheet.colorLayer}
-        photoIdentifier={photoIdentifier}
-      />
       <ImageSwitcher
-        // view={makeImgView({
-        //   src: `${PHOTO_BASE}/720-jpg/${photoIdentifier}.jpg`,
-        //   className: stylesheet.image,
-        //   alt: 'Historic photo of this location',
-        // })}
         view={ImageStack.makeImageSwitcherView({
           photoIdentifier,
-          className: stylesheet.image,
+          className: stylesheet.imageStack,
           imgProps: {
             alt: 'Historic photo of this location',
           },
