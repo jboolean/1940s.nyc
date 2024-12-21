@@ -2,7 +2,8 @@
     "compilerOptions": {
         "outDir": "dist/src",
         "noImplicitAny": true,
-        "noUnusedLocals": true,
+        "noUnusedLocals": false,
+        "noUnusedParameters": false,
         "importHelpers": true,
         "module": "commonjs",
         "target": "es5",
