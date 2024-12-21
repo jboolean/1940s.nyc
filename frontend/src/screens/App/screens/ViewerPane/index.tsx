@@ -38,8 +38,10 @@ const ZOOM_PAN_PINCH_EVENT_TYPES = [
   'mouseenter',
   'keyup',
   'keydown',
-  'click',
+  // 'click',
 ] as const;
+
+const HIT_AREA_EVENT_TYPES = ['pointerdown', 'click'] as const;
 
 const INITIAL_SCALE = 1.05;
 
@@ -64,10 +66,12 @@ export default function ViewerPane({
   // The overlay is on top and normally would capture all events, but we also need the zooming wrapper to see these events
   // This hook forwards events from the overlay to the wrapper
   useEventForwarding(
-    zoomHitAreaEl,
+    overlayRef.current,
     wrapperComponent,
     ZOOM_PAN_PINCH_EVENT_TYPES
   );
+
+  useEventForwarding(zoomHitAreaEl, wrapperComponent, HIT_AREA_EVENT_TYPES);
 
   // Reset the transform when the photo changes
   useEffect(() => {
