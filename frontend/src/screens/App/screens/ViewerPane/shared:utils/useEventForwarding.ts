@@ -14,12 +14,12 @@ type EventNames = keyof GlobalEventHandlersEventMap;
  * @param events - List of event names to forward
  */
 const useEventForwarding = (
-  overlayEl: HTMLElement,
+  sourceEl: HTMLElement,
   targetEl: HTMLElement,
   events: readonly EventNames[]
 ): void => {
   useEffect(() => {
-    if (!overlayEl || !targetEl) return;
+    if (!sourceEl || !targetEl) return;
 
     const reDispatchEvent = (
       event: GlobalEventHandlersEventMap[keyof GlobalEventHandlersEventMap]
@@ -34,16 +34,16 @@ const useEventForwarding = (
 
     // Attach listeners to the overlay
     events.forEach((eventName) => {
-      overlayEl.addEventListener(eventName, reDispatchEvent);
+      sourceEl.addEventListener(eventName, reDispatchEvent);
     });
 
     return () => {
       // Clean up listeners on unmount
       events.forEach((eventName) => {
-        overlayEl.removeEventListener(eventName, reDispatchEvent);
+        sourceEl.removeEventListener(eventName, reDispatchEvent);
       });
     };
-  }, [overlayEl, targetEl, events]);
+  }, [sourceEl, targetEl, events]);
 };
 
 export default useEventForwarding;
