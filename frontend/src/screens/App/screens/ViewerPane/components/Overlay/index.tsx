@@ -1,17 +1,21 @@
-import React from 'react';
+import React, { RefObject } from 'react';
 
-import { CSSTransition } from 'react-transition-group';
 import classnames from 'classnames';
+import { CSSTransition } from 'react-transition-group';
 
-import stylesheet from './Overlay.less';
 import { useFeatureFlag } from 'screens/App/shared/stores/FeatureFlagsStore';
 import FeatureFlag from 'screens/App/shared/types/FeatureFlag';
+import stylesheet from './Overlay.less';
 
 // Encapsulates overlay logic for fading children in and out
 export default function Overlay({
   className,
+  overlayRef,
   children,
-}: React.PropsWithChildren<{ className?: string }>): JSX.Element {
+}: React.PropsWithChildren<{
+  className?: string;
+  overlayRef?: RefObject<HTMLDivElement>;
+}>): JSX.Element {
   // This feature flag is useful in development to prevent the overlay from disappearing
   const alwaysShowOverlay = useFeatureFlag(FeatureFlag.ALWAYS_SHOW_OVERLAY);
 
@@ -75,6 +79,7 @@ export default function Overlay({
       onPointerOver={handleStartHover}
       onPointerLeave={handleEndHover}
       onPointerDown={handlePointerDown}
+      ref={overlayRef}
     >
       <CSSTransition
         in={isOverlayVisible}
