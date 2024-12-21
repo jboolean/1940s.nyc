@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import classnames from 'classnames';
 
 import { useHistory, useParams } from 'react-router';
 import {
   ReactZoomPanPinchContentRef,
+  ReactZoomPanPinchProps,
   TransformComponent,
   TransformWrapper,
 } from 'react-zoom-pan-pinch';
@@ -38,6 +39,8 @@ const ZOOM_PAN_PINCH_EVENT_TYPES = [
   'keydown',
 ] as const;
 
+const INITIAL_SCALE = 1.05;
+
 export default function ViewerPane({
   className,
 }: {
@@ -49,6 +52,7 @@ export default function ViewerPane({
   const overlayRef = React.useRef<HTMLDivElement>(null);
   const wrapperRef = React.useRef<ReactZoomPanPinchContentRef>(null);
   const wrapperComponent = wrapperRef.current?.instance?.wrapperComponent;
+  const [isZoomed, setIsZoomed] = React.useState(false);
 
   // The overlay is on top and normally would capture all events, but we also need the zooming wrapper to see these events
   // This hook forwards events from the overlay to the wrapper
@@ -58,8 +62,32 @@ export default function ViewerPane({
     ZOOM_PAN_PINCH_EVENT_TYPES
   );
 
+  // Reset the transform when the photo changes
+  useEffect(() => {
+    if (wrapperRef.current) wrapperRef.current.resetTransform();
+  }, [photoIdentifier, wrapperRef]);
+
+  const handleZoom: ReactZoomPanPinchProps['onTransformed'] = (
+    _ref,
+    state
+  ): void => {
+    const scale = state.scale;
+
+    setIsZoomed(scale > INITIAL_SCALE);
+  };
+
   return (
-    <TransformWrapper ref={wrapperRef}>
+    <TransformWrapper
+      ref={wrapperRef}
+      initialScale={INITIAL_SCALE}
+      centerOnInit={true}
+      initialPositionY={-50}
+      initialPositionX={-10}
+      onTransformed={handleZoom}
+      doubleClick={{
+        mode: isZoomed ? 'reset' : 'zoomIn',
+      }}
+    >
       <div className={classnames(stylesheet.container, className)}>
         <Overlay className={stylesheet.overlay} overlayRef={overlayRef}>
           <div className={stylesheet.overlayContentWrapper}>
@@ -102,6 +130,7 @@ export default function ViewerPane({
               imgProps: {
                 alt: 'Historic photo of this location',
               },
+              isFullResVisible: isZoomed,
             })}
           />{' '}
         </TransformComponent>
