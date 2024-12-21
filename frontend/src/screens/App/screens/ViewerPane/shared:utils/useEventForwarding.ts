@@ -34,7 +34,7 @@ const useEventForwarding = (
 
     // Attach listeners to the overlay
     events.forEach((eventName) => {
-      sourceEl.addEventListener(eventName, reDispatchEvent);
+      sourceEl.addEventListener(eventName, reDispatchEvent, { passive: true });
     });
 
     return () => {
