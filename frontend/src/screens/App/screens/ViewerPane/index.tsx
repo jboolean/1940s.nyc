@@ -27,6 +27,7 @@ const ZOOM_PAN_PINCH_EVENT_TYPES = [
   'touchstart',
   'touchend',
   'touchmove',
+  'pointerup',
   'pointerover',
   'pointerleave',
   'pointerdown',
@@ -84,23 +85,38 @@ export default function ViewerPane({
 
   // Simulate a double click upon a single click
   useEffect(() => {
+    let startX = 0;
+    let startY = 0;
+
     const toggleZoom = (e: PointerEvent): void => {
       if (e.target !== e.currentTarget) return;
       // If not a mouse, ignore
       if (e.pointerType !== 'mouse') return;
       // If not a single click, ignore
       if (e.detail !== 1) return;
+      const deltaX = e.clientX - startX;
+      const deltaY = e.clientY - startY;
+      const distance = Math.sqrt(deltaX ** 2 + deltaY ** 2);
+      // If the pointer moved more than 10 pixels, ignore
+      if (distance > 10) {
+        return;
+      }
+
       const wrapper = wrapperRef.current;
       if (!wrapper) return;
-      if (isZoomed) wrapper.resetTransform();
-      else {
-        wrapper.instance.onDoubleClick(e);
-      }
+      wrapper.instance.onDoubleClick(e);
+    };
+
+    const recordDown = (event: MouseEvent) => {
+      startX = event.clientX;
+      startY = event.clientY;
     };
 
     if (wrapperComponent) {
+      wrapperComponent.addEventListener('mousedown', recordDown);
       wrapperComponent.addEventListener('click', toggleZoom);
       return () => {
+        wrapperComponent.removeEventListener('mousedown', recordDown);
         wrapperComponent.removeEventListener('click', toggleZoom);
       };
     }
