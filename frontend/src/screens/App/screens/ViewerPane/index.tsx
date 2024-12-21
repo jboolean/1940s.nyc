@@ -107,7 +107,7 @@ export default function ViewerPane({
       wrapper.instance.onDoubleClick(e);
     };
 
-    const recordDown = (event: MouseEvent) => {
+    const recordDown = (event: MouseEvent): void => {
       startX = event.clientX;
       startY = event.clientY;
     };
