@@ -53,7 +53,7 @@ export default function Overlay({
     cancelPeekTimeout();
   };
 
-  const handlePointerUp: React.PointerEventHandler<HTMLDivElement> = (e) => {
+  const handlePointerUp: React.PointerEventHandler<HTMLDivElement> = () => {
     setIsOverlayVisible(!isOverlayVisible);
     cancelPeekTimeout();
   };
