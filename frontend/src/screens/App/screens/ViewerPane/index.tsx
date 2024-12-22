@@ -2,13 +2,14 @@ import React, { useEffect } from 'react';
 
 import classnames from 'classnames';
 
-import { useHistory, useParams } from 'react-router';
 import {
+  InnerTransformedContent,
   ReactZoomPanPinchContentRef,
   ReactZoomPanPinchProps,
   TransformComponent,
   TransformWrapper,
-} from 'react-zoom-pan-pinch';
+} from '@jboolean/react-zoom-pan-pinch';
+import { useHistory, useParams } from 'react-router';
 import Alternates from './components/Alternates';
 import ImageButtons from './components/ImageButtons';
 import * as ImageStack from './components/ImageStack';
@@ -17,33 +18,64 @@ import Overlay from './components/Overlay';
 import Stories from './components/Stories';
 
 import stylesheet from './ViewerPane.less';
-import useEventForwarding from './shared:utils/useEventForwarding';
-
-// react-zoom-pan-pinch relies on these events
-// We need to forward them from the overlay to the wrapper
-const ZOOM_PAN_PINCH_EVENT_TYPES = [
-  'wheel',
-  'dblclick',
-  'touchstart',
-  'touchend',
-  'touchmove',
-  'pointerup',
-  'pointerover',
-  'pointerleave',
-  'pointerdown',
-  'mousedown',
-  'mouseup',
-  'mousemove',
-  'mouseleave',
-  'mouseenter',
-  'keyup',
-  'keydown',
-  // 'click',
-] as const;
-
-const HIT_AREA_EVENT_TYPES = ['pointerdown', 'click'] as const;
+import useCanHover from './shared/utils/useCanHover';
 
 const INITIAL_SCALE = 1.05;
+
+const ClickToZoomHitArea = ({
+  wrapper,
+  isZoomed,
+  isPanning,
+}: {
+  wrapper: ReactZoomPanPinchContentRef;
+  isZoomed: boolean;
+  isPanning: boolean;
+}): JSX.Element | null => {
+  const canHover = useCanHover();
+
+  const startXRef = React.useRef<number>(0);
+  const startYRef = React.useRef<number>(0);
+
+  const handleZoomHitAreaMouseDown = (
+    e: React.MouseEvent<HTMLDivElement>
+  ): void => {
+    startXRef.current = e.clientX;
+    startYRef.current = e.clientY;
+  };
+
+  const handleZoomHitAreaClick = (
+    e: React.MouseEvent<HTMLDivElement>
+  ): void => {
+    if (!wrapper) return;
+    const { clientX, clientY } = e;
+
+    const deltaX = clientX - startXRef.current;
+    const deltaY = clientY - startYRef.current;
+    const distance = Math.sqrt(deltaX ** 2 + deltaY ** 2);
+    // If the pointer moved more than 10 pixels, ignore
+    if (distance > 10) {
+      return;
+    }
+
+    if (isZoomed) wrapper.resetTransform();
+    else wrapper.zoomToPoint(clientX, clientY, 3.8, 200, 'easeOut');
+  };
+
+  if (!canHover) {
+    return null;
+  }
+
+  return (
+    <div
+      onMouseDown={handleZoomHitAreaMouseDown}
+      onClick={handleZoomHitAreaClick}
+      className={classnames(stylesheet.zoomHitArea, stylesheet.zoomable, {
+        [stylesheet.zoomed]: isZoomed,
+        [stylesheet.panning]: isPanning,
+      })}
+    ></div>
+  );
+};
 
 export default function ViewerPane({
   className,
@@ -54,24 +86,10 @@ export default function ViewerPane({
   const history = useHistory();
 
   const overlayRef = React.useRef<HTMLDivElement>(null);
-  const zoomHitAreaRef = React.useRef<HTMLDivElement>(null);
-  const zoomHitAreaEl = zoomHitAreaRef.current;
   const wrapperRef = React.useRef<ReactZoomPanPinchContentRef>(null);
-  const wrapperComponent = wrapperRef.current?.instance?.wrapperComponent;
   const [isZoomed, setIsZoomed] = React.useState(false);
-
-  // This is just to trigger a re-render so the effect is re-run
-  const setIsHitAreaRefSet = React.useState(false)[1];
-
-  // The overlay is on top and normally would capture all events, but we also need the zooming wrapper to see these events
-  // This hook forwards events from the overlay to the wrapper
-  useEventForwarding(
-    overlayRef.current,
-    wrapperComponent,
-    ZOOM_PAN_PINCH_EVENT_TYPES
-  );
-
-  useEventForwarding(zoomHitAreaEl, wrapperComponent, HIT_AREA_EVENT_TYPES);
+  const [isPanning, setIsPanning] = React.useState(false);
+  const canHover = useCanHover();
 
   // Reset the transform when the photo changes
   useEffect(() => {
@@ -87,127 +105,104 @@ export default function ViewerPane({
     setIsZoomed(scale > INITIAL_SCALE);
   };
 
-  // Simulate a double click upon a single click
-  useEffect(() => {
-    let startX = 0;
-    let startY = 0;
-
-    const toggleZoom = (e: PointerEvent): void => {
-      if (e.target !== e.currentTarget) return;
-      // If not a mouse, ignore
-      if (e.pointerType !== 'mouse') return;
-      // If not a single click, ignore
-      if (e.detail !== 1) return;
-      const deltaX = e.clientX - startX;
-      const deltaY = e.clientY - startY;
-      const distance = Math.sqrt(deltaX ** 2 + deltaY ** 2);
-      // If the pointer moved more than 10 pixels, ignore
-      if (distance > 10) {
-        return;
-      }
-
-      const wrapper = wrapperRef.current;
-      if (!wrapper) return;
-      wrapper.instance.onDoubleClick(e);
-    };
-
-    const recordDown = (event: MouseEvent): void => {
-      startX = event.clientX;
-      startY = event.clientY;
-    };
-
-    if (wrapperComponent) {
-      wrapperComponent.addEventListener('mousedown', recordDown);
-      wrapperComponent.addEventListener('click', toggleZoom);
-      return () => {
-        wrapperComponent.removeEventListener('mousedown', recordDown);
-        wrapperComponent.removeEventListener('click', toggleZoom);
-      };
-    }
-  }, [wrapperComponent, isZoomed]);
-
   return (
     <TransformWrapper
       ref={wrapperRef}
       initialScale={INITIAL_SCALE}
       centerOnInit={true}
       initialPositionY={-50}
-      initialPositionX={-10}
+      initialPositionX={-20}
       onTransformed={handleZoom}
       doubleClick={{
+        // If you have a mouse, use single clicks implemented on the hit target
+        disabled: canHover,
         mode: isZoomed ? 'reset' : 'zoomIn',
         step: 1.5,
+        excluded: [stylesheet.panPinchExcluded],
       }}
       panning={{
-        excluded: [stylesheet.overlayContentWrapper],
+        excluded: [stylesheet.panPinchExcluded],
       }}
+      onPanningStart={() => setIsPanning(true)}
+      onPanningStop={() => setIsPanning(false)}
     >
       <div className={classnames(stylesheet.container, className)}>
-        <Overlay className={stylesheet.overlay} overlayRef={overlayRef}>
-          <div className={classnames(stylesheet.overlayContentWrapper)}>
-            <div className={stylesheet.floorFade} />
-
-            <button
-              className={stylesheet.closeButton}
-              onClick={() =>
-                history.push({ pathname: '..', hash: window.location.hash })
-              }
-            >
-              Close
-            </button>
-
-            <div className={stylesheet.alternates}>
-              <Alternates originalIdentifier={photoIdentifier} />
-            </div>
-
-            <div
-              key="zoomhitarea"
-              ref={(el) => {
-                zoomHitAreaRef.current = el;
-                setIsHitAreaRefSet(!!el);
-              }}
-              className={classnames(
-                stylesheet.zoomHitArea,
-                stylesheet.zoomable,
-                {
-                  [stylesheet.zoomed]: isZoomed,
-                }
-              )}
-            ></div>
-
-            <div className={stylesheet.stories}>
-              <Stories photoIdentifier={photoIdentifier} />
-            </div>
-
-            <div className={stylesheet.buttons}>
-              <ImageButtons />
-            </div>
-
-            <p className={stylesheet.credit}>
-              Photo courtesy NYC Municipal Archives{' '}
-            </p>
-          </div>
-        </Overlay>
         <TransformComponent
           wrapperClass={classnames(
             stylesheet.transformWrapper,
             stylesheet.zoomable,
             {
               [stylesheet.zoomed]: isZoomed,
+              [stylesheet.panning]: isPanning,
             }
           )}
-          contentClass={stylesheet.transformContent}
+          // This is a custom option from our forked version of react-zoom-pan-pinch
+          childrenIncludesContentWrapper={true}
         >
-          <ImageSwitcher
-            view={ImageStack.makeImageSwitcherView({
-              photoIdentifier,
-              className: stylesheet.imageStack,
-              imgProps: {
-                alt: 'Historic photo of this location',
-              },
-              isFullResVisible: isZoomed,
-            })}
-          />
+          <Overlay className={stylesheet.overlay} overlayRef={overlayRef}>
+            <div className={classnames(stylesheet.overlayContentWrapper)}>
+              <div className={stylesheet.floorFade} />
+
+              <button
+                className={stylesheet.closeButton}
+                onClick={() =>
+                  history.push({ pathname: '..', hash: window.location.hash })
+                }
+              >
+                Close
+              </button>
+
+              <div
+                className={classnames(
+                  stylesheet.alternates,
+                  stylesheet.panPinchExcluded
+                )}
+              >
+                <Alternates originalIdentifier={photoIdentifier} />
+              </div>
+
+              <ClickToZoomHitArea
+                wrapper={wrapperRef.current}
+                isZoomed={isZoomed}
+                isPanning={isPanning}
+              />
+
+              <div
+                className={classnames(
+                  stylesheet.stories,
+                  stylesheet.panPinchExcluded
+                )}
+              >
+                <Stories photoIdentifier={photoIdentifier} />
+              </div>
+
+              <div
+                className={classnames(
+                  stylesheet.buttons,
+                  stylesheet.panPinchExcluded
+                )}
+              >
+                <ImageButtons />
+              </div>
+
+              <p className={stylesheet.credit}>
+                Photo courtesy NYC Municipal Archives{' '}
+              </p>
+            </div>
+          </Overlay>
+
+          <InnerTransformedContent className={stylesheet.transformContent}>
+            <ImageSwitcher
+              view={ImageStack.makeImageSwitcherView({
+                photoIdentifier,
+                className: stylesheet.imageStack,
+                imgProps: {
+                  alt: 'Historic photo of this location',
+                },
+                isFullResVisible: isZoomed,
+              })}
+            />
+          </InnerTransformedContent>
         </TransformComponent>
       </div>
     </TransformWrapper>

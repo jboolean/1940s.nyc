@@ -27,20 +27,20 @@ module.exports = {
     }),
     new webpack.IgnorePlugin({ resourceRegExp: /^\.\/locale$/ }),
     new CopyPlugin({
-      patterns: [{ from: '_redirects' }, {from: 'terms.html'}],
+      patterns: [{ from: '_redirects' }, { from: 'terms.html' }],
     }),
-    new ESLintPlugin({ fix: true, }),
+    new ESLintPlugin({ fix: true, exclude: ['node_modules', '.yalc'] }),
   ],
   module: {
     rules: [
       {
         test: /\.jsx?$/,
-        exclude: /node_modules/,
+        exclude: /node_modules|.yalc/,
         use: ['babel-loader'],
       },
       {
         test: /\.tsx?$/,
-        exclude: /node_modules/,
+        exclude: /node_modules|.yalc/,
         loader: 'ts-loader',
       },
       {
@@ -67,7 +67,7 @@ module.exports = {
       {
         test: /\.svg$/,
         issuer: /\.(j|t)sx$/,
-        exclude: /node_modules/,
+        exclude: /node_modules|.yalc/,
         loader: 'svg-react-loader',
         resourceQuery: { not: [/asset/] },
         options: {

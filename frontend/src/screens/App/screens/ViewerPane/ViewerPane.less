@@ -96,6 +96,8 @@
     box-sizing: border-box;
 
     color: white;
+
+    user-select: all;
   }
 
   .buttons {
@@ -134,6 +136,15 @@
 
   .zoomHitArea {
     grid-area: zoomHitArea;
+  }
+
+  // Class name to exclude from pinch zoom
+  .panPinchExcluded {
+    user-select: text;
+  }
+
+  .panning {
+    cursor: grabbing !important;
   }
 
   .transformWrapper,
