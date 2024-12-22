@@ -53,7 +53,7 @@ export default function Overlay({
     cancelPeekTimeout();
   };
 
-  const handlePointerDown: React.PointerEventHandler<HTMLDivElement> = (e) => {
+  const handlePointerUp: React.PointerEventHandler<HTMLDivElement> = (e) => {
     if (e.target !== e.currentTarget) {
       return;
     }
@@ -78,7 +78,7 @@ export default function Overlay({
       className={classnames(stylesheet.overlay, className, {})}
       onPointerOver={handleStartHover}
       onPointerLeave={handleEndHover}
-      onPointerDown={handlePointerDown}
+      onPointerUp={handlePointerUp}
       ref={overlayRef}
     >
       <CSSTransition
