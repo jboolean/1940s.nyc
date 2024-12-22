@@ -54,9 +54,6 @@ export default function Overlay({
   };
 
   const handlePointerUp: React.PointerEventHandler<HTMLDivElement> = (e) => {
-    if (e.target !== e.currentTarget) {
-      return;
-    }
     setIsOverlayVisible(!isOverlayVisible);
     cancelPeekTimeout();
   };
@@ -89,12 +86,7 @@ export default function Overlay({
         mountOnEnter
         unmountOnExit
       >
-        <div
-          className={stylesheet.overlayContent}
-          onPointerDown={handlePointerDown}
-        >
-          {children}
-        </div>
+        <div className={stylesheet.overlayContent}>{children}</div>
       </CSSTransition>
     </div>
   );
