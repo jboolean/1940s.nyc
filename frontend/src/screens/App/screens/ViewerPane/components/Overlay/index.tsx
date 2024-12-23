@@ -80,6 +80,14 @@ export default function Overlay({
       console.log('canHover - ignoring');
       return;
     }
+    // only count events on overlay or overlaycontent
+    if (
+      e.target !== overlayRef.current &&
+      e.target !== overlayRef.current?.firstChild
+    ) {
+      console.log('ignoring event, not on overlay');
+      return;
+    }
     const deltaX = e.clientX - startXRef.current;
     const deltaY = e.clientY - startYRef.current;
     const distance = Math.sqrt(deltaX ** 2 + deltaY ** 2);
