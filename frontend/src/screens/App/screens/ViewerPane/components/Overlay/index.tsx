@@ -76,6 +76,10 @@ export default function Overlay({
       console.log('pointerId mismatch');
       return;
     }
+    if (canHover) {
+      console.log('canHover - ignoring');
+      return;
+    }
     const deltaX = e.clientX - startXRef.current;
     const deltaY = e.clientY - startYRef.current;
     const distance = Math.sqrt(deltaX ** 2 + deltaY ** 2);
