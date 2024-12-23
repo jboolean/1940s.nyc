@@ -17,7 +17,7 @@
   "author": "Julian Boilen",
   "license": "UNLICENSED",
   "dependencies": {
-    "@jboolean/react-zoom-pan-pinch": "^3.7.0",
+    "@jboolean/react-zoom-pan-pinch": "^3.7.1",
     "@sentry/react": "^7.119.2",
     "@sentry/tracing": "^7.114.0",
     "@stripe/stripe-js": "^1.42.0",
