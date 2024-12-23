@@ -5,6 +5,7 @@ import { CSSTransition } from 'react-transition-group';
 
 import { useFeatureFlag } from 'screens/App/shared/stores/FeatureFlagsStore';
 import FeatureFlag from 'screens/App/shared/types/FeatureFlag';
+import useCanHover from '../../shared/utils/useCanHover';
 import stylesheet from './Overlay.less';
 
 // Encapsulates overlay logic for fading children in and out
@@ -18,6 +19,10 @@ export default function Overlay({
 }>): JSX.Element {
   // This feature flag is useful in development to prevent the overlay from disappearing
   const alwaysShowOverlay = useFeatureFlag(FeatureFlag.ALWAYS_SHOW_OVERLAY);
+
+  // Okay so, my Android phone is reporting hover events of type "mouse"
+  // This will let us ignore those events on devices that cannot hover
+  const canHover = useCanHover();
 
   const startXRef = React.useRef<number>(0);
   const startYRef = React.useRef<number>(0);
@@ -50,7 +55,7 @@ export default function Overlay({
   const handleStartHover: React.PointerEventHandler<HTMLDivElement> = (
     e
   ): void => {
-    if (e.pointerType !== 'mouse') {
+    if (!canHover) {
       return;
     }
     console.log('handleHoverStart', e);
@@ -86,7 +91,7 @@ export default function Overlay({
   const handleEndHover: React.PointerEventHandler<HTMLDivElement> = (
     e
   ): void => {
-    if (e.pointerType !== 'mouse') {
+    if (!canHover) {
       return;
     }
     console.log('handleEndHover', e);
