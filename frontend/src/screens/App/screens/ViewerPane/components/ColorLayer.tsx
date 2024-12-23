@@ -12,7 +12,7 @@ export default function ColorLayer({
   className,
 }: {
   photoIdentifier: string;
-  className: string;
+  className?: string;
 }): JSX.Element | null {
   const {
     colorEnabledForIdentifier,
@@ -49,7 +49,6 @@ export default function ColorLayer({
           className={classNames(stylesheet.colorLayer, className)}
           src={colorizedImageSrc}
           onLoad={() => {
-            console.log('loaded', enabled);
             if (enabled) {
               handleImageLoaded();
             }

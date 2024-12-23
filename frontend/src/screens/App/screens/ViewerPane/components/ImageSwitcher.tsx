@@ -5,14 +5,21 @@ import recordEvent from 'shared/utils/recordEvent';
 
 import Require from 'utils/Require';
 
+export type View = {
+  key: string;
+  element: React.ReactElement;
+  preload: () => Promise<void>;
+};
 interface State {
-  lastSrc: string;
-  visibleSrc: string;
+  lastView: View;
+  visibleView: View;
   hide: boolean;
   loaded: boolean;
 }
 
-type Props = Require<ImgHTMLAttributes<unknown>, 'src'>;
+type Props = {
+  view: View;
+};
 
 import stylesheet from './ImageSwitcher.less';
 
@@ -23,12 +30,27 @@ function preloadImage(url: string, callback: () => void): void {
   img.addEventListener('error', callback);
 }
 
+// Make a view object for a basic img element
+export function makeImgView(
+  props: Require<ImgHTMLAttributes<unknown>, 'src'>
+): View {
+  return {
+    key: props.src,
+    element: <img key={props.src} {...props} />,
+    preload: () => new Promise((resolve) => preloadImage(props.src, resolve)),
+  };
+}
+
+/**
+ * ImageSwitcher can transition between any Views that conform to the View interface.
+ * The goal is to increase perceived load speed by starting an animation immediately while preloading the view.
+ */
 export default class ImageSwitcher extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
-      lastSrc: props.src,
-      visibleSrc: props.src,
+      lastView: props.view,
+      visibleView: props.view,
       hide: false,
       loaded: true,
     };
@@ -36,17 +58,24 @@ export default class ImageSwitcher extends React.Component<Props, State> {
     this.handleExited = this.handleExited.bind(this);
   }
 
-  componentDidUpdate(prevProps: Props, prevState: State): void {
-    if (this.props.src !== prevState.lastSrc && !this.state.hide) {
+  componentDidUpdate(_prevProps: Props, prevState: State): void {
+    if (this.props.view.key !== prevState.lastView.key && !this.state.hide) {
       // eslint-disable-next-line react/no-did-update-set-state
       this.setState(
         {
           hide: true,
           loaded: false,
-          lastSrc: this.props.src,
+          lastView: this.props.view,
         },
         () => {
-          preloadImage(this.props.src, this.handleNewImgLoad);
+          this.props.view.preload().then(
+            () => {
+              this.handleNewImgLoad();
+            },
+            (e) => {
+              console.error('Failed to preload image', e);
+            }
+          );
         }
       );
 
@@ -77,12 +106,18 @@ export default class ImageSwitcher extends React.Component<Props, State> {
 
   swapImage(): void {
     this.setState({
-      visibleSrc: this.props.src,
+      visibleView: this.props.view,
     });
   }
 
   render(): JSX.Element {
-    const { visibleSrc, hide, loaded } = this.state;
+    const { visibleView, hide, loaded } = this.state;
+
+    // Use the one from props if it is the same key so we get the most up-to-date element
+    const element =
+      visibleView.key === this.props.view.key
+        ? this.props.view.element
+        : visibleView.element;
 
     return (
       <CSSTransition
@@ -92,7 +127,7 @@ export default class ImageSwitcher extends React.Component<Props, State> {
         timeout={150}
         onExited={this.handleExited}
       >
-        <img {...this.props} src={visibleSrc} />
+        {element}
       </CSSTransition>
     );
   }

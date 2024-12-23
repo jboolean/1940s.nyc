@@ -12,6 +12,16 @@
   .colorLayer {
     // default state
     .faded();
+
+    z-index: 1;
+    position: absolute;
+
+    user-select: none;
+    pointer-events: none;
+
+    // We get low res color images and "upscale" them here by only using the color information
+    // and blending in the lightness of the full image
+    mix-blend-mode: color;
   }
 
   .enter,

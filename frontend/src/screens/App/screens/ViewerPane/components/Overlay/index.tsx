@@ -1,19 +1,32 @@
-import React from 'react';
+import React, { RefObject } from 'react';
 
-import { CSSTransition } from 'react-transition-group';
 import classnames from 'classnames';
+import { CSSTransition } from 'react-transition-group';
 
-import stylesheet from './Overlay.less';
 import { useFeatureFlag } from 'screens/App/shared/stores/FeatureFlagsStore';
 import FeatureFlag from 'screens/App/shared/types/FeatureFlag';
+import useCanHover from '../../shared/utils/useCanHover';
+import stylesheet from './Overlay.less';
 
 // Encapsulates overlay logic for fading children in and out
 export default function Overlay({
   className,
+  overlayRef,
   children,
-}: React.PropsWithChildren<{ className?: string }>): JSX.Element {
+}: React.PropsWithChildren<{
+  className?: string;
+  overlayRef?: RefObject<HTMLDivElement>;
+}>): JSX.Element {
   // This feature flag is useful in development to prevent the overlay from disappearing
   const alwaysShowOverlay = useFeatureFlag(FeatureFlag.ALWAYS_SHOW_OVERLAY);
+
+  // Okay so, my Android phone is reporting hover events of type "mouse"
+  // This will let us ignore those events on devices that cannot hover
+  const canHover = useCanHover();
+
+  const startXRef = React.useRef<number>(0);
+  const startYRef = React.useRef<number>(0);
+  const pointerIdRef = React.useRef<number | null>(null);
 
   const [isOverlayVisible, setIsOverlayVisible] =
     React.useState(alwaysShowOverlay);
@@ -39,10 +52,10 @@ export default function Overlay({
     }
   };
 
-  const handleStartHover: React.PointerEventHandler<HTMLDivElement> = (
-    e
-  ): void => {
-    if (e.pointerType !== 'mouse') {
+  const handleStartHover: React.PointerEventHandler<
+    HTMLDivElement
+  > = (): void => {
+    if (!canHover) {
       return;
     }
     setIsOverlayVisible(true);
@@ -50,17 +63,41 @@ export default function Overlay({
   };
 
   const handlePointerDown: React.PointerEventHandler<HTMLDivElement> = (e) => {
-    if (e.target !== e.currentTarget) {
+    pointerIdRef.current = e.pointerId;
+    startXRef.current = e.clientX;
+    startYRef.current = e.clientY;
+  };
+
+  const handlePointerUp: React.PointerEventHandler<HTMLDivElement> = (e) => {
+    if (e.pointerId !== pointerIdRef.current) {
+      return;
+    }
+    if (canHover) {
+      return;
+    }
+
+    // only count events on overlay or overlaycontent
+    if (
+      e.target !== overlayRef.current &&
+      e.target !== overlayRef.current?.firstChild
+    ) {
+      return;
+    }
+    const deltaX = e.clientX - startXRef.current;
+    const deltaY = e.clientY - startYRef.current;
+    const distance = Math.sqrt(deltaX ** 2 + deltaY ** 2);
+    // If the pointer moved more than 10 pixels, ignore
+    if (distance > 10) {
       return;
     }
     setIsOverlayVisible(!isOverlayVisible);
     cancelPeekTimeout();
   };
 
-  const handleEndHover: React.PointerEventHandler<HTMLDivElement> = (
-    e
-  ): void => {
-    if (e.pointerType !== 'mouse') {
+  const handleEndHover: React.PointerEventHandler<
+    HTMLDivElement
+  > = (): void => {
+    if (!canHover) {
       return;
     }
     if (alwaysShowOverlay) {
@@ -75,6 +112,8 @@ export default function Overlay({
       onPointerOver={handleStartHover}
       onPointerLeave={handleEndHover}
       onPointerDown={handlePointerDown}
+      onPointerUp={handlePointerUp}
+      ref={overlayRef}
     >
       <CSSTransition
         in={isOverlayVisible}
@@ -84,12 +123,7 @@ export default function Overlay({
         mountOnEnter
         unmountOnExit
       >
-        <div
-          className={stylesheet.overlayContent}
-          onPointerDown={handlePointerDown}
-        >
-          {children}
-        </div>
+        <div className={stylesheet.overlayContent}>{children}</div>
       </CSSTransition>
     </div>
   );
