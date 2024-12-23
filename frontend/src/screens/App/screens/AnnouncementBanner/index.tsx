@@ -19,7 +19,7 @@ export default function AnnouncementBanner(): JSX.Element | null {
     <div className={stylesheet.container}>
       {announcementToDisplay.render()}{' '}
       <button className={stylesheet.hideButton} onClick={hide}>
-        Hide
+        Hide this
       </button>
     </div>
   );
