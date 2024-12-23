@@ -52,9 +52,9 @@ export default function Overlay({
     }
   };
 
-  const handleStartHover: React.PointerEventHandler<HTMLDivElement> = (
-    e
-  ): void => {
+  const handleStartHover: React.PointerEventHandler<
+    HTMLDivElement
+  > = (): void => {
     if (!canHover) {
       return;
     }
@@ -94,9 +94,9 @@ export default function Overlay({
     cancelPeekTimeout();
   };
 
-  const handleEndHover: React.PointerEventHandler<HTMLDivElement> = (
-    e
-  ): void => {
+  const handleEndHover: React.PointerEventHandler<
+    HTMLDivElement
+  > = (): void => {
     if (!canHover) {
       return;
     }
