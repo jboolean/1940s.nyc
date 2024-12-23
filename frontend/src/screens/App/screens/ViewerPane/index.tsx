@@ -128,14 +128,11 @@ export default function ViewerPane({
     >
       <div className={classnames(stylesheet.container, className)}>
         <TransformComponent
-          wrapperClass={classnames(
-            stylesheet.transformWrapper,
-            stylesheet.zoomable,
-            {
-              [stylesheet.zoomed]: isZoomed,
-              [stylesheet.panning]: isPanning,
-            }
-          )}
+          wrapperClass={classnames(stylesheet.transformWrapper, {
+            [stylesheet.zoomable]: canHover,
+            [stylesheet.zoomed]: isZoomed,
+            [stylesheet.panning]: isPanning,
+          })}
           // This is a custom option from our forked version of react-zoom-pan-pinch
           childrenIncludesContentWrapper={true}
         >

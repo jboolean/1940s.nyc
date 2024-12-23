@@ -154,16 +154,14 @@
   }
 
   .zoomable {
-    @media (pointer: fine) {
-      cursor: zoom-in;
+    cursor: zoom-in;
 
-      & > * {
-        cursor: auto;
-      }
+    & > * {
+      cursor: auto;
+    }
 
-      &.zoomed {
-        cursor: zoom-out;
-      }
+    &.zoomed {
+      cursor: zoom-out;
     }
   }
 }
