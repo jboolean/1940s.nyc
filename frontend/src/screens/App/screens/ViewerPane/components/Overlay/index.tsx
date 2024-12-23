@@ -58,34 +58,29 @@ export default function Overlay({
     if (!canHover) {
       return;
     }
-    console.log('handleHoverStart', e);
     setIsOverlayVisible(true);
     cancelPeekTimeout();
   };
 
   const handlePointerDown: React.PointerEventHandler<HTMLDivElement> = (e) => {
-    console.log('handlePointerDown', e);
     pointerIdRef.current = e.pointerId;
     startXRef.current = e.clientX;
     startYRef.current = e.clientY;
   };
 
   const handlePointerUp: React.PointerEventHandler<HTMLDivElement> = (e) => {
-    console.log('handlePointerUp', e);
     if (e.pointerId !== pointerIdRef.current) {
-      console.log('pointerId mismatch');
       return;
     }
     if (canHover) {
-      console.log('canHover - ignoring');
       return;
     }
+
     // only count events on overlay or overlaycontent
     if (
       e.target !== overlayRef.current &&
       e.target !== overlayRef.current?.firstChild
     ) {
-      console.log('ignoring event, not on overlay');
       return;
     }
     const deltaX = e.clientX - startXRef.current;
@@ -93,7 +88,6 @@ export default function Overlay({
     const distance = Math.sqrt(deltaX ** 2 + deltaY ** 2);
     // If the pointer moved more than 10 pixels, ignore
     if (distance > 10) {
-      console.log('distance too far');
       return;
     }
     setIsOverlayVisible(!isOverlayVisible);
@@ -106,7 +100,6 @@ export default function Overlay({
     if (!canHover) {
       return;
     }
-    console.log('handleEndHover', e);
     if (alwaysShowOverlay) {
       return;
     }
@@ -120,9 +113,6 @@ export default function Overlay({
       onPointerLeave={handleEndHover}
       onPointerDown={handlePointerDown}
       onPointerUp={handlePointerUp}
-      onPointerCancel={(e) => {
-        console.log('handlePointerCancel', e);
-      }}
       ref={overlayRef}
     >
       <CSSTransition
