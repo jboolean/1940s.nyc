@@ -15,8 +15,9 @@ const COPY_BY_VARIANT = {
     title: 'Will you chip in on web hosting costs?',
     body: (
       <p>
-        This site is a labor of love, but it costs real money to host. If you
-        enjoy my site, consider pitching in a few dollars to keep it online.
+        This site is a labor of love, but processing and hosting 3.7TB of photos
+        costs real money. If you enjoy my site, consider pitching in a few
+        dollars to keep it online.
       </p>
     ),
   },
