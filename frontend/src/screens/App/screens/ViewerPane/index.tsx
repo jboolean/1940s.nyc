@@ -113,6 +113,9 @@ export default function ViewerPane({
       initialPositionY={-50}
       initialPositionX={-20}
       onTransformed={handleZoom}
+      wheel={{
+        excluded: [stylesheet.panPinchExcluded],
+      }}
       doubleClick={{
         // If you have a mouse, use single clicks implemented on the hit target
         disabled: canHover,
