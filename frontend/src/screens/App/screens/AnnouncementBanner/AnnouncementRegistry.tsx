@@ -3,6 +3,16 @@ import Announcment from './Announcement';
 
 const ANNOUNCEMENTS_REGISTRY: Announcment[] = [
   {
+    id: 'maintainance-2024-12-30',
+    expiresAt: new Date('2024-12-31'),
+    render: () => (
+      <React.Fragment>
+        🛠 I&apos;m performing maintenance. Some functions may not work. Come
+        back soon.
+      </React.Fragment>
+    ),
+  },
+  {
     id: 'zoom',
     expiresAt: new Date('2025-01-31'),
     render: () => (
