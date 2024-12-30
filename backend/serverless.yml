@@ -1,6 +1,8 @@
 service: fourtiesnyc
 package:
   individually: false
+  include:
+    - certs/*
 
 provider:
   name: aws

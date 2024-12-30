@@ -1,4 +1,6 @@
-import { createConnection, Connection, getConnectionManager } from 'typeorm';
+import * as fs from 'fs';
+import path from 'path';
+import { Connection, createConnection, getConnectionManager } from 'typeorm';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 
 export default function createConnectionIfNotExists(): Promise<Connection> {
@@ -10,6 +12,10 @@ export default function createConnectionIfNotExists(): Promise<Connection> {
     }
     return Promise.resolve(connection);
   }
+
+  const sslCert = fs.readFileSync(
+    path.join(__dirname, '..', 'certs/us-east-1-bundle.pem')
+  );
 
   const {
     DB_HOST: host,
@@ -26,6 +32,10 @@ export default function createConnectionIfNotExists(): Promise<Connection> {
     username,
     password,
     database,
+    ssl: {
+      rejectUnauthorized: true,
+      ca: sslCert.toString(),
+    },
     synchronize: false,
     logging: !!process.env.IS_OFFLINE,
     entities: [__dirname + '/entities/*{.ts,.js}'],
