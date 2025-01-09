@@ -76,6 +76,7 @@ Zustand is an unopinionated framework, but this project has opinions.
 - Stores should be structured and separate from rendering components
 - Stores should use Immer for easier immutability
 - Zustand does not natively support computeds, so we have a separate hook co-located with the store
+- Stores should clearly define their Actions and State, separately, using typescript interfaces
 
 A store must be created in a file called \*Store.ts and exported as the default export. Ad-hoc stores shouldn't be created in components.
 
