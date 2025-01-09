@@ -51,7 +51,7 @@ The files and directories in `src` are strictly organized into standard director
   ```
   - components
     - Schedule
-      - index.jsx // Manages state, loades data from the API
+      - index.jsx // Manages state, loads data from the API
       - Schedule.jsx // A pure React component that renders a Schedule
       - Schedule.less // styles used by Schedule.jsx
   ```
@@ -71,9 +71,13 @@ This project is based on React.
 
 Where state management is needed, [zustand](https://github.com/pmndrs/zustand) is used. It was added to this app in 2023, so legacy code uses Context.
 
-Zustand usage in this app follows a particular pattern:
+Zustand is an unopinionated framework, but this project has opinions.
 
-A store must be created in a file called \*Store.ts and exported. Ad-hoc stores shouln't be created in components.
+- Stores should be structured and separate from rendering components
+- Stores should use Immer for easier immutability
+- Zustand does not natively support computeds, so we have a separate hook co-located with the store
+
+A store must be created in a file called \*Store.ts and exported as the default export. Ad-hoc stores shouldn't be created in components.
 
 ```typescript
 import create from 'zustand';
@@ -128,7 +132,7 @@ This template above demonstrates how to structure a Zustand store with Immer for
 
 Key Features:
 • State and Actions: Define state and behavior in the same store.
-• Computed State: Use a dedicated custotm hook (useStoreComputeds) to derive and expose computed values from the store within the same file.
+• Computed State: Use a dedicated custom hook (useStoreComputeds) to derive and expose computed values from the store within the same file.
 
 ### LESS
 
