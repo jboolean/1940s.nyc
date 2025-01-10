@@ -101,28 +101,27 @@ Stories was the first user-generated content feature and is pretty self-containe
 
 Stories are moderated by admins. All stories are submitted to the moderation queue at http://1940s.nyc/admin/review-stories.
 
-Automatic moderation was considered but most of the rejected stories are not classic spam that could be detected by spam filters or CAPTCHAs but rather trolls and confused people.
+Automatic moderation was considered but most of the rejected stories are not spam that could be detected by spam filters or CAPTCHAs but trolls or users who misuse the feature.
 
 ### Users and authentication
 
-I didn't want to pay for an authentication service, and it seemed simple enough to build my own.
-I wanted a more seamless user experience without usernames and passwords, and often even without doing anything.
+For a seamless user experience and to reduce costs, a custom authentication system was built instead of using a third party service like Auth0.
 
-For any route tagged with `@Security('user-token')`, a user is created if one does not exist. The user is then considered logged in immediately without any information and is considered anonymous. Later, the user can provide, and optionally verify an email address. Specific features can check for verified email addresses if that level of security is needed. Corrections to geocodes, for example, require a verified email address. Colorization, however, can be done by anonymous users, allowing a "free trial" experience.
+For any route tagged with `@Security('user-token')`, a user is created if one does not exist. The user is then considered logged in immediately without any information and is considered anonymous. Later, the user can provide, and optionally verify an email address. Specific features can check for verified email addresses if that level of security is needed. Corrections to geocodes, for example, require a verified email address. Colorization, however, can be done by anonymous users, allowing a limited "free trial" experience.
 
 **Log-in process**: The user supplies an email address: if an account exists the user is sent a magic link to log in, or the email is associated with the current possibly anonymous account they are logged in with. Magic links are JWT tokens.
 
-Notably, **Stories** are not connected to Users because Stories were built first. Users primarily support the Colorization feature for payment and credit ledgering and the Corrections feature for safety.
+Notably, **Stories** are not connected to Users because Stories were built first with their own authentication mechanism. Users primarily support the Colorization feature for payment and credit ledgering and the Corrections feature for safety.
 
 ### Credit ledgering
 
-Users can purchase "Color tokens" to colorize images. This is managed via the Ledger system, which is just a ledger of credits issued and images colorized. Users can go negative as we allow one free colorization per day.
+Users can purchase "Color tokens" to colorize images. This is managed via the Ledger system, which is just a ledger of credits issued and images colorized. Users can go negative as we allow one free colorization per day as a trial.
 
-`LedgerService.withMeteredUsage` is a wrapper to wrap code that uses requires and consumes credits.
+`LedgerService.withMeteredUsage` is a wrapper to wrap code that requires and consumes credits.
 
 ### Admin users
 
-Admin users actually _do_ use an authentication service: Netlify Identity. This was built before end-user authentication and could potentially be updated to use the same system.
+Admin users actually _do_ use a third-party authentication service: Netlify Identity. This was built before end-user authentication and could potentially be updated to use the same system.
 
 Admin users have roles defined in Identity.
 
@@ -130,9 +129,10 @@ A route tag for an admin route looks like `@Security('netlify', ['moderator'])`.
 
 ### Email campaigns
 
-I was also too cheap to pay for a mailing list service like Mailchimp so I built one.
+1940s.nyc has an occasional newsletter. To avoid the costs of a third-party service like Mailchimp, a simple system was built into the app.
 
-It's pretty simple. When a campaign is enqueued via the API it just creates a record for every list member. A cron job sends out the emails in batches.
+It's pretty simple. When a campaign is enqueued via the API it just creates a sending record for every list member. A cron job sends out the unsent emails in batches.
+The email content lives in Postmark templates.
 
 There's currently no sign-up form for the mailing list. Addresses are just added whenever they provide an email via other app features like Stories.
 
