@@ -1,9 +1,9 @@
 import { ServerClient, TemplatedMessage } from 'postmark';
-import isProduction from '../../utils/isProduction';
-import { EmailResult, EmailService, TemplatedEmailData } from './EmailService';
-import EmailStreamType from '../templates/EmailStreamType';
-import required from '../../utils/required';
 import { MessageSendingResponse } from 'postmark/dist/client/models';
+import isProduction from '../../utils/isProduction';
+import required from '../../utils/required';
+import EmailStreamType from '../templates/EmailStreamType';
+import { EmailResult, EmailService, TemplatedEmailData } from './EmailService';
 
 const POSTMARK_TOKEN = required(process.env.POSTMARK_TOKEN, 'POSTMARK_TOKEN');
 const POSTMARK_SANDBOX_TOKEN = required(
@@ -11,7 +11,11 @@ const POSTMARK_SANDBOX_TOKEN = required(
   'POSTMARK_SANDBOX_TOKEN'
 );
 
-const DEV_ALLOWED_DOMAINS = ['@1940s.nyc', '@bounce-testing.postmarkapp.com'];
+const DEV_ALLOWED_DOMAINS = [
+  '@1940s.nyc',
+  '@bounce-testing.postmarkapp.com',
+  'blackhole.postmarkapp.com',
+];
 
 const streamIds: Record<EmailStreamType, string> = {
   [EmailStreamType.TRANSACTIONAL]: 'outbound',
