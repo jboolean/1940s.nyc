@@ -3,19 +3,19 @@ import React from 'react';
 import {
   // withRouter,
   useHistory,
-  useRouteMatch,
   useLocation,
+  useRouteMatch,
 } from 'react-router-dom';
 
-import mapboxgl from 'mapbox-gl';
 import classnames from 'classnames';
+import mapboxgl from 'mapbox-gl';
 
 import * as overlays from './overlays';
 
 export { OverlayId } from './overlays';
 
-import stylesheet from './MainMap.less';
 import { RouteComponentProps } from 'react-router';
+import stylesheet from './MainMap.less';
 
 const MAPBOX_STYLE = __DEV__
   ? 'mapbox://styles/julianboilen/ck5jrzrs11r1p1imia7qzjkm1/draft'
