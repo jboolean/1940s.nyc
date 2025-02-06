@@ -19,7 +19,8 @@
   "author": "Julian Boilen",
   "license": "ISC",
   "devDependencies": {
-    "@types/aws-lambda": "^8.10.125",
+    "@aws-sdk/client-s3": "^3.741.0",
+    "@types/aws-lambda": "^8.10.147",
     "@types/cookie-parser": "^1.4.3",
     "@types/cors": "^2.8.17",
     "@types/eslint": "^8.44.6",
@@ -58,7 +59,6 @@
     "@sentry/node": "^7.36.0",
     "@sentry/tracing": "^7.36.0",
     "@types/multer": "^1.4.11",
-    "aws-sdk": "^2.1692.0",
     "axios": "^1.7.4",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",

@@ -1,10 +1,16 @@
-import AWS from 'aws-sdk';
+import {
+  DeleteObjectsCommand,
+  GetObjectCommand,
+  PutObjectCommand,
+  S3Client,
+} from '@aws-sdk/client-s3';
+import { S3Event } from 'aws-lambda';
 import sharp from 'sharp';
 
 import * as ImageAdjustUtils from './src/image-processing/ImageAdjustUtils';
 import * as LaserdiscUtils from './src/image-processing/LaserdiscUtils';
 
-const s3 = new AWS.S3();
+const s3 = new S3Client();
 
 type Template = { prefix: string; suffix: string };
 
@@ -31,7 +37,7 @@ const INPUT_PREFIX = 'originals/';
 const getRootKey = (srcKey: string): string =>
   srcKey.substring(INPUT_PREFIX.length).replace(/\.\w+$/, '');
 
-export const handler = async (event): Promise<unknown> => {
+export const handler = async (event: S3Event): Promise<unknown> => {
   const srcBucket = event.Records[0].s3.bucket.name;
   const srcKey = event.Records[0].s3.object.key;
 
@@ -42,14 +48,18 @@ export const handler = async (event): Promise<unknown> => {
 
   const rootKey = getRootKey(srcKey);
 
-  const inputObject = await s3
-    .getObject({
+  const inputObject = await s3.send(
+    new GetObjectCommand({
       Bucket: srcBucket,
       Key: srcKey,
     })
-    .promise();
+  );
 
-  let inputBuffer = inputObject.Body as Buffer;
+  if (!inputObject.Body) {
+    throw new Error('Source object not found');
+  }
+
+  let inputBuffer = Buffer.from(await inputObject.Body.transformToByteArray());
 
   // Crop laserdisc video frames to eliminate borders and superimposed banner
   if (await LaserdiscUtils.isLaserdiscVideoFrame(inputBuffer)) {
@@ -81,15 +91,15 @@ export const handler = async (event): Promise<unknown> => {
       })
       .toBuffer()
       .then((outputBuffer) =>
-        s3
-          .putObject({
+        s3.send(
+          new PutObjectCommand({
             Body: outputBuffer,
             Bucket: srcBucket,
             Key: makeFilename(FILENAMES.jpeg, rootKey),
             ACL: 'public-read',
             ContentType: 'image/jpeg',
           })
-          .promise()
+        )
       ),
 
     sharp(inputBuffer)
@@ -100,15 +110,15 @@ export const handler = async (event): Promise<unknown> => {
       })
       .toBuffer()
       .then((outputBuffer) =>
-        s3
-          .putObject({
+        s3.send(
+          new PutObjectCommand({
             Body: outputBuffer,
             Bucket: srcBucket,
             Key: makeFilename(FILENAMES.jpeg720, rootKey),
             ACL: 'public-read',
             ContentType: 'image/jpeg',
           })
-          .promise()
+        )
       ),
 
     sharp(inputBuffer)
@@ -118,20 +128,20 @@ export const handler = async (event): Promise<unknown> => {
       })
       .toBuffer()
       .then((outputBuffer) =>
-        s3
-          .putObject({
+        s3.send(
+          new PutObjectCommand({
             Body: outputBuffer,
             Bucket: srcBucket,
             Key: makeFilename(FILENAMES.jpeg420, rootKey),
             ACL: 'public-read',
             ContentType: 'image/jpeg',
           })
-          .promise()
+        )
       ),
   ]);
 };
 
-export const deletionHandler = async (event): Promise<unknown> => {
+export const deletionHandler = async (event: S3Event): Promise<unknown> => {
   const srcBucket = event.Records[0].s3.bucket.name;
   const srcKey = event.Records[0].s3.object.key;
 
@@ -142,8 +152,8 @@ export const deletionHandler = async (event): Promise<unknown> => {
 
   const rootKey = getRootKey(srcKey);
 
-  return s3
-    .deleteObjects({
+  return s3.send(
+    new DeleteObjectsCommand({
       Bucket: srcBucket,
       Delete: {
         Objects: Object.values(FILENAMES)
@@ -153,5 +163,5 @@ export const deletionHandler = async (event): Promise<unknown> => {
           })),
       },
     })
-    .promise();
+  );
 };
