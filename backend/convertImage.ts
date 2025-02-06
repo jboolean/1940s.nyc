@@ -42,13 +42,16 @@ export const handler = async (event): Promise<unknown> => {
 
   const rootKey = getRootKey(srcKey);
 
-  const inputObject = await s3
-    .getObject({
-      Bucket: srcBucket,
-      Key: srcKey,
-    });
+  const inputObject = await s3.getObject({
+    Bucket: srcBucket,
+    Key: srcKey,
+  });
 
-  let inputBuffer = inputObject.Body as Buffer;
+  if (!inputObject.Body) {
+    throw new Error('Source object not found');
+  }
+
+  let inputBuffer = Buffer.from(await inputObject.Body.transformToByteArray());
 
   // Crop laserdisc video frames to eliminate borders and superimposed banner
   if (await LaserdiscUtils.isLaserdiscVideoFrame(inputBuffer)) {
@@ -80,14 +83,13 @@ export const handler = async (event): Promise<unknown> => {
       })
       .toBuffer()
       .then((outputBuffer) =>
-        s3
-          .putObject({
-            Body: outputBuffer,
-            Bucket: srcBucket,
-            Key: makeFilename(FILENAMES.jpeg, rootKey),
-            ACL: 'public-read',
-            ContentType: 'image/jpeg',
-          })
+        s3.putObject({
+          Body: outputBuffer,
+          Bucket: srcBucket,
+          Key: makeFilename(FILENAMES.jpeg, rootKey),
+          ACL: 'public-read',
+          ContentType: 'image/jpeg',
+        })
       ),
 
     sharp(inputBuffer)
@@ -98,14 +100,13 @@ export const handler = async (event): Promise<unknown> => {
       })
       .toBuffer()
       .then((outputBuffer) =>
-        s3
-          .putObject({
-            Body: outputBuffer,
-            Bucket: srcBucket,
-            Key: makeFilename(FILENAMES.jpeg720, rootKey),
-            ACL: 'public-read',
-            ContentType: 'image/jpeg',
-          })
+        s3.putObject({
+          Body: outputBuffer,
+          Bucket: srcBucket,
+          Key: makeFilename(FILENAMES.jpeg720, rootKey),
+          ACL: 'public-read',
+          ContentType: 'image/jpeg',
+        })
       ),
 
     sharp(inputBuffer)
@@ -115,14 +116,13 @@ export const handler = async (event): Promise<unknown> => {
       })
       .toBuffer()
       .then((outputBuffer) =>
-        s3
-          .putObject({
-            Body: outputBuffer,
-            Bucket: srcBucket,
-            Key: makeFilename(FILENAMES.jpeg420, rootKey),
-            ACL: 'public-read',
-            ContentType: 'image/jpeg',
-          })
+        s3.putObject({
+          Body: outputBuffer,
+          Bucket: srcBucket,
+          Key: makeFilename(FILENAMES.jpeg420, rootKey),
+          ACL: 'public-read',
+          ContentType: 'image/jpeg',
+        })
       ),
   ]);
 };
@@ -138,15 +138,14 @@ export const deletionHandler = async (event): Promise<unknown> => {
 
   const rootKey = getRootKey(srcKey);
 
-  return s3
-    .deleteObjects({
-      Bucket: srcBucket,
-      Delete: {
-        Objects: Object.values(FILENAMES)
-          .map((template) => makeFilename(template, rootKey))
-          .map((key) => ({
-            Key: key,
-          })),
-      },
-    });
+  return s3.deleteObjects({
+    Bucket: srcBucket,
+    Delete: {
+      Objects: Object.values(FILENAMES)
+        .map((template) => makeFilename(template, rootKey))
+        .map((key) => ({
+          Key: key,
+        })),
+    },
+  });
 };

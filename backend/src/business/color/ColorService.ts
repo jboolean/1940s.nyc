@@ -1,4 +1,3 @@
-import { ServiceException } from '@smithy/smithy-client';
 import { S3 } from '@aws-sdk/client-s3';
 import { NotFound } from 'http-errors';
 import * as LedgerService from '../ledger/LedgerService';
@@ -19,42 +18,36 @@ async function createColorVersion(
 ): Promise<void> {
   const resolution = useTestingResolution ? 'watermarked-sd' : 'sd';
 
-  try {
-    const s3Response = await s3.getObject({
-      Bucket: 'fourties-photos',
-      Key: sourceKey,
-    });
+  const s3Response = await s3.getObject({
+    Bucket: 'fourties-photos',
+    Key: sourceKey,
+  });
 
-    // Create buffer from image
-    const buffer = s3Response.Body as Buffer;
-
-    const { image: colorizedImageBase64 } =
-      await colorizeImageWithAutoPromptBase64({
-        image: buffer,
-        resolution: resolution,
-        prompt: PROMPT,
-        raw_captions: true,
-        auto_color: true,
-        white_balance: true,
-      });
-
-    const colorizedImage = Buffer.from(colorizedImageBase64, 'base64');
-
-    await s3.putObject({
-      Bucket: 'fourties-photos',
-      Key: destinationKey,
-      Body: colorizedImage,
-      ContentType: 'image/jpeg',
-    });
-  } catch (error: unknown) {
-    const awsError = error as ServiceException;
-
-    if (awsError.code === 'NoSuchKey') {
-      throw new NotFound('Original image not found');
-    }
-
-    throw error;
+  if (!s3Response.Body) {
+    throw new NotFound('Original image not found');
   }
+
+  // Create buffer from image
+  const buffer = Buffer.from(await s3Response.Body?.transformToByteArray());
+
+  const { image: colorizedImageBase64 } =
+    await colorizeImageWithAutoPromptBase64({
+      image: buffer,
+      resolution: resolution,
+      prompt: PROMPT,
+      raw_captions: true,
+      auto_color: true,
+      white_balance: true,
+    });
+
+  const colorizedImage = Buffer.from(colorizedImageBase64, 'base64');
+
+  await s3.putObject({
+    Bucket: 'fourties-photos',
+    Key: destinationKey,
+    Body: colorizedImage,
+    ContentType: 'image/jpeg',
+  });
 }
 
 /**
