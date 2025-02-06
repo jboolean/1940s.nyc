@@ -1,10 +1,15 @@
-import { S3 } from '@aws-sdk/client-s3';
+import {
+  GetObjectCommand,
+  HeadObjectCommand,
+  PutObjectCommand,
+  S3Client,
+} from '@aws-sdk/client-s3';
 import { NotFound } from 'http-errors';
 import * as LedgerService from '../ledger/LedgerService';
 import isProduction from '../utils/isProduction';
 import { colorizeImageWithAutoPromptBase64 } from '../utils/paletteApi';
 
-const s3 = new S3();
+const s3 = new S3Client();
 
 // A lot of engineering went into this prompt
 // One word can make a huge difference
@@ -18,10 +23,12 @@ async function createColorVersion(
 ): Promise<void> {
   const resolution = useTestingResolution ? 'watermarked-sd' : 'sd';
 
-  const s3Response = await s3.getObject({
-    Bucket: 'fourties-photos',
-    Key: sourceKey,
-  });
+  const s3Response = await s3.send(
+    new GetObjectCommand({
+      Bucket: 'fourties-photos',
+      Key: sourceKey,
+    })
+  );
 
   if (!s3Response.Body) {
     throw new NotFound('Original image not found');
@@ -42,12 +49,14 @@ async function createColorVersion(
 
   const colorizedImage = Buffer.from(colorizedImageBase64, 'base64');
 
-  await s3.putObject({
-    Bucket: 'fourties-photos',
-    Key: destinationKey,
-    Body: colorizedImage,
-    ContentType: 'image/jpeg',
-  });
+  await s3.send(
+    new PutObjectCommand({
+      Bucket: 'fourties-photos',
+      Key: destinationKey,
+      Body: colorizedImage,
+      ContentType: 'image/jpeg',
+    })
+  );
 }
 
 /**
@@ -66,10 +75,12 @@ export async function getColorizedImage(
 
   // Check if image already exists
   const headObjectResponse = await s3
-    .headObject({
-      Bucket: 'fourties-photos',
-      Key: destinationKey,
-    })
+    .send(
+      new HeadObjectCommand({
+        Bucket: 'fourties-photos',
+        Key: destinationKey,
+      })
+    )
     .catch(() => null);
 
   if (!headObjectResponse) {
