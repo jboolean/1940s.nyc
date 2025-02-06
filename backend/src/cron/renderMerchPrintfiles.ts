@@ -2,6 +2,7 @@ import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 
 import { getRepository } from 'typeorm';
 import renderToteBag from '../business/merch/renderToteBag';
+import isProduction from '../business/utils/isProduction';
 import CustomMerchItem from '../entities/CustomMerchItem';
 
 const s3 = new S3Client();
@@ -33,7 +34,11 @@ export default async function renderMerch(): Promise<void> {
 
     const buffer = await renderToteBag({ lat, lon });
 
-    const destinationKey = `merch/printfiles/${item.id}.png`;
+    const destinationDirectory = isProduction()
+      ? 'printfiles'
+      : 'printfiles-dev';
+
+    const destinationKey = `merch/${destinationDirectory}/${item.id}.png`;
 
     await s3.send(
       new PutObjectCommand({

@@ -99,8 +99,6 @@ functions:
       - schedule: rate(1 minute)
     timeout: 900
   renderMerchPrintfiles:
-    stages:
-      - production
     handler: cron.renderMerchPrintfiles
     events:
       - schedule: rate(5 minutes)
