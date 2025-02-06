@@ -1,13 +1,14 @@
-import 'source-map-support/register';
 import 'reflect-metadata';
+import 'source-map-support/register';
 import createConnection from './src/createConnection';
 
 import checkStaleStoriesImpl from './src/cron/checkStaleStories';
-import syncMapImpl from './src/cron/syncMap';
 import generateStoryTitlesImpl from './src/cron/generateStoryTitles';
+import renderMerchPrintfilesImpl from './src/cron/renderMerchPrintfiles';
+import syncMapImpl from './src/cron/syncMap';
 
-import * as Sentry from '@sentry/node';
 import { CaptureConsole as CaptureConsoleIntegration } from '@sentry/integrations';
+import * as Sentry from '@sentry/node';
 
 // Importing @sentry/tracing patches the global hub for tracing to work.
 import '@sentry/tracing';
@@ -31,27 +32,23 @@ async function setup(): Promise<void> {
   });
 }
 
-export const checkStaleStories = async (): Promise<void> => {
+const withSetup = async (impl: () => Promise<void>): Promise<void> => {
   await setup();
-
-  await checkStaleStoriesImpl();
+  await impl();
 };
 
-export const syncMap = async (): Promise<void> => {
-  await setup();
+export const checkStaleStories = (): Promise<void> =>
+  withSetup(checkStaleStoriesImpl);
 
-  await syncMapImpl();
-};
+export const syncMap = (): Promise<void> => withSetup(syncMapImpl);
 
-export const generateStoryTitles = async (): Promise<void> => {
-  await setup();
+export const generateStoryTitles = (): Promise<void> =>
+  withSetup(generateStoryTitlesImpl);
 
-  await generateStoryTitlesImpl();
-};
-
-export const sendEmailCampaigns = async (): Promise<void> => {
-  await setup();
-
+export const sendEmailCampaigns = withSetup(async (): Promise<void> => {
   await EmailCampaignService.sendPendingEmails(false);
   await EmailCampaignService.sendPendingEmails(true);
-};
+});
+
+export const renderMerchPrintfiles = (): Promise<void> =>
+  withSetup(renderMerchPrintfilesImpl);

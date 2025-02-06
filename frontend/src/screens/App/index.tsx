@@ -34,8 +34,10 @@ const thankYouInitial = searchParams.has('tipSuccess');
 const creditSuccessInitial = searchParams.has('creditPurchaseSuccess');
 const openTipJarOnLoad = searchParams.has('openTipJar');
 const noWelcome = searchParams.has('noWelcome');
+const noTipJar = searchParams.has('noTipJar');
 
 if (noWelcome) searchParams.delete('noWelcome');
+if (noTipJar) searchParams.delete('noTipJar');
 history.replace({
   pathname: history.location.pathname,
   hash: history.location.hash,
@@ -88,7 +90,7 @@ function Modals(): JSX.Element {
           setCreditPurchaseSuccessOpen(false);
         }}
       />
-      <TipJar />
+      {noTipJar ? null : <TipJar />}
     </>
   );
 }

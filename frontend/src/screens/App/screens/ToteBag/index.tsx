@@ -36,7 +36,8 @@ export default function ToteBag(): JSX.Element {
 
   return (
     <div
-      className={classNames(stylesheet.container, 'tote-bag-content')}
+      className={classNames(stylesheet.container)}
+      id="render-content"
       ref={containerRef}
     >
       <div className={stylesheet.front}>
@@ -48,9 +49,13 @@ export default function ToteBag(): JSX.Element {
         </div>
         <div className={stylesheet.box}>
           <div className={stylesheet.subhead}>
-            Street-level view of 1940s New York with thousands of your stories
+            <span className={stylesheet.hugLines}>
+              Street-level view of 1940s New York with thousands of your stories
+            </span>
           </div>
-          <div className={stylesheet.attribution}>{attributionText}</div>
+          <div className={stylesheet.attribution}>
+            <span className={stylesheet.hugLines}>{attributionText}</span>
+          </div>
         </div>
       </div>
     </div>

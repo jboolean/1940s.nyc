@@ -8,3 +8,5 @@ jspm_packages
 
 secrets.*.yml
 tsoa-build
+
+chromium
