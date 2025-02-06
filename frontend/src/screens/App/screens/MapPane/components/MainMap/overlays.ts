@@ -33,7 +33,7 @@ const overlaysToLayers: { [overlay in OverlayId]: LayerId[] } = {
   },
   get 'default-arial'() {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-return
-    return [...this['default-map'], ...this['arial-1951']];
+    return [...this['arial-1951']];
   },
   'arial-1924': ['arial-1924', 'nyc-label'],
   'arial-1951': ['arial-1951', 'nyc-label'],
