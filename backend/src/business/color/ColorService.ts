@@ -1,10 +1,11 @@
-import AWS, { AWSError } from 'aws-sdk';
+import { ServiceException } from '@smithy/smithy-client';
+import { S3 } from '@aws-sdk/client-s3';
 import { NotFound } from 'http-errors';
 import * as LedgerService from '../ledger/LedgerService';
 import isProduction from '../utils/isProduction';
 import { colorizeImageWithAutoPromptBase64 } from '../utils/paletteApi';
 
-const s3 = new AWS.S3();
+const s3 = new S3();
 
 // A lot of engineering went into this prompt
 // One word can make a huge difference
@@ -19,12 +20,10 @@ async function createColorVersion(
   const resolution = useTestingResolution ? 'watermarked-sd' : 'sd';
 
   try {
-    const s3Response = await s3
-      .getObject({
-        Bucket: 'fourties-photos',
-        Key: sourceKey,
-      })
-      .promise();
+    const s3Response = await s3.getObject({
+      Bucket: 'fourties-photos',
+      Key: sourceKey,
+    });
 
     // Create buffer from image
     const buffer = s3Response.Body as Buffer;
@@ -41,16 +40,14 @@ async function createColorVersion(
 
     const colorizedImage = Buffer.from(colorizedImageBase64, 'base64');
 
-    await s3
-      .putObject({
-        Bucket: 'fourties-photos',
-        Key: destinationKey,
-        Body: colorizedImage,
-        ContentType: 'image/jpeg',
-      })
-      .promise();
+    await s3.putObject({
+      Bucket: 'fourties-photos',
+      Key: destinationKey,
+      Body: colorizedImage,
+      ContentType: 'image/jpeg',
+    });
   } catch (error: unknown) {
-    const awsError = error as AWSError;
+    const awsError = error as ServiceException;
 
     if (awsError.code === 'NoSuchKey') {
       throw new NotFound('Original image not found');
@@ -80,7 +77,6 @@ export async function getColorizedImage(
       Bucket: 'fourties-photos',
       Key: destinationKey,
     })
-    .promise()
     .catch(() => null);
 
   if (!headObjectResponse) {

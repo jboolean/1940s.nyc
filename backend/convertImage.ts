@@ -1,10 +1,10 @@
-import AWS from 'aws-sdk';
+import { S3 } from '@aws-sdk/client-s3';
 import sharp from 'sharp';
 
 import * as ImageAdjustUtils from './src/image-processing/ImageAdjustUtils';
 import * as LaserdiscUtils from './src/image-processing/LaserdiscUtils';
 
-const s3 = new AWS.S3();
+const s3 = new S3();
 
 type Template = { prefix: string; suffix: string };
 
@@ -46,8 +46,7 @@ export const handler = async (event): Promise<unknown> => {
     .getObject({
       Bucket: srcBucket,
       Key: srcKey,
-    })
-    .promise();
+    });
 
   let inputBuffer = inputObject.Body as Buffer;
 
@@ -89,7 +88,6 @@ export const handler = async (event): Promise<unknown> => {
             ACL: 'public-read',
             ContentType: 'image/jpeg',
           })
-          .promise()
       ),
 
     sharp(inputBuffer)
@@ -108,7 +106,6 @@ export const handler = async (event): Promise<unknown> => {
             ACL: 'public-read',
             ContentType: 'image/jpeg',
           })
-          .promise()
       ),
 
     sharp(inputBuffer)
@@ -126,7 +123,6 @@ export const handler = async (event): Promise<unknown> => {
             ACL: 'public-read',
             ContentType: 'image/jpeg',
           })
-          .promise()
       ),
   ]);
 };
@@ -152,6 +148,5 @@ export const deletionHandler = async (event): Promise<unknown> => {
             Key: key,
           })),
       },
-    })
-    .promise();
+    });
 };
