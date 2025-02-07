@@ -57,7 +57,7 @@
   "dependencies": {
     "@sentry/integrations": "^7.36.0",
     "@sentry/node": "^7.36.0",
-    "@sentry/tracing": "^7.36.0",
+    "@sentry/tracing": "^7.120.3",
     "@types/multer": "^1.4.11",
     "axios": "^1.7.4",
     "cookie-parser": "^1.4.6",
