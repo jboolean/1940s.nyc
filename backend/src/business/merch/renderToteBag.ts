@@ -4,10 +4,8 @@ import chromium from '@sparticuz/chromium';
 import puppeteer from 'puppeteer-core';
 
 const IS_LOCAL = !!process.env.IS_LOCAL;
-// const FRONTEND_BASE_URL = process.env.FRONTEND_BASE_URL as string;
+const FRONTEND_BASE_URL = process.env.FRONTEND_BASE_URL as string;
 
-// TEMP remove me
-const FRONTEND_BASE_URL = 'http://dev.1940s.nyc:8080';
 // Install using `npx @puppeteer/browsers install chromium` locally
 const LOCAL_CHROMIUM_EXECUTABLE_PATH =
   './chromium/mac_arm-1416712/chrome-mac/Chromium.app/Contents/MacOS/Chromium';
