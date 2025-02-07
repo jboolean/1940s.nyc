@@ -27,7 +27,7 @@ provider:
     RECAPTCHA_SK: ${ssm:/${self:service}-${sls:stage}-recaptcha-sk}
     POSTMARK_TOKEN: ${ssm:/${self:service}-${sls:stage}-postmark-token}
     POSTMARK_SANDBOX_TOKEN: ${ssm:/${self:service}-${sls:stage}-postmark-sandbox-token}
-    FRONTEND_BASE_URL: ${env:FRONTEND_BASE_URL || ssm:/${self:service}-${sls:stage}-frontend-base-url}
+    FRONTEND_BASE_URL: ${env:FRONTEND_BASE_URL, ssm:/${self:service}-${sls:stage}-frontend-base-url}
     JWT_SECRET: ${ssm:/${self:service}-${sls:stage}-jwt-secret}
     MODERATORS_TO_EMAIL: ${ssm:/${self:service}-${sls:stage}-moderators-to-email}
     MAPBOX_SK: ${ssm:/${self:service}-${sls:stage}-mapbox-sk}
