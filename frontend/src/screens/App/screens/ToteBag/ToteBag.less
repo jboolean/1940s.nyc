@@ -1,0 +1,96 @@
+@import '../../../../shared/styles/colors.less';
+@import '../../../../shared/styles/fonts.less';
+
+:local {
+  @dpi: 150px;
+
+  .container {
+    display: block;
+    width: 17 * @dpi;
+    height: 33 * @dpi;
+    overflow: hidden;
+  }
+
+  .front {
+    display: block;
+    height: 50%;
+    position: relative;
+
+    background-color: @green;
+
+    overflow: hidden;
+
+    .logo {
+      display: inline-block;
+      margin-left: 50%;
+      position: relative;
+      transform: translateX(-50%);
+      top: 5.2 * @dpi;
+
+      padding: 0.4 * @dpi 0.9 * @dpi;
+
+      font-family: @font-family-serif-heading;
+      font-size: 159px;
+      font-variant-numeric: lining-nums;
+      text-align: center;
+
+      color: @creme;
+
+      border: 28px solid @creme;
+    }
+  }
+
+  .back {
+    display: block;
+    height: 50%;
+    overflow: hidden;
+    position: relative;
+
+    transform: rotate(180deg);
+    .box {
+      position: absolute;
+      left: 3.5 * @dpi;
+      bottom: 2.3 * @dpi;
+      max-width: 4 * @dpi;
+
+      font-size: 34px;
+      font-family: @font-family-sans;
+      line-height: 1.5;
+    }
+
+    .hugLines {
+      padding: 5px;
+      padding-right: 5px;
+      box-decoration-break: clone;
+    }
+
+    .subhead > .hugLines {
+      background-color: @green;
+      color: @creme;
+    }
+
+    .attribution > .hugLines {
+      background-color: @creme;
+      color: @font-color-dark;
+    }
+
+    .map {
+      display: block;
+      width: 50%;
+      height: 50%;
+
+      transform: scale(2);
+      transform-origin: top left;
+
+      :global(.mapbox-improve-map) {
+        display: none;
+      }
+
+      // Text is copied to our own element
+      :global(.mapboxgl-ctrl-attrib-inner),
+      :global(.mapboxgl-ctrl-attrib mapboxgl-compact) {
+        display: none;
+      }
+    }
+  }
+}

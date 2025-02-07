@@ -1,5 +1,9 @@
 // import canUseWebP from 'utils/canUseWebP';
 
+import { bboxPolygon, booleanIntersects } from '@turf/turf';
+import { Feature } from 'geojson';
+import boroughBoundaries from './Borough Boundaries simplified.json';
+
 const LAYER_IDS = [
   'arial-1924',
   'arial-1951',
@@ -21,6 +25,16 @@ export type OverlayId =
   | 'atlas-1930'
   | 'atlas-1956';
 
+const MANHATTAN_BOUNDS_GEOJSON = boroughBoundaries.features.find(
+  (feature) => feature.properties['boro_name'] === 'Manhattan'
+) as Feature;
+
+const attributionBoundaries: Partial<Record<LayerId, Feature>> = {
+  'atlas-1930': MANHATTAN_BOUNDS_GEOJSON,
+  'atlas-1956': MANHATTAN_BOUNDS_GEOJSON,
+  'atlas-1916': MANHATTAN_BOUNDS_GEOJSON,
+};
+
 // For tiles recompressed at edge
 // const ext = canUseWebP() ? 'webp' : 'png';
 
@@ -33,7 +47,7 @@ const overlaysToLayers: { [overlay in OverlayId]: LayerId[] } = {
   },
   get 'default-arial'() {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-return
-    return [...this['default-map'], ...this['arial-1951']];
+    return [...this['arial-1951']];
   },
   'arial-1924': ['arial-1924', 'nyc-label'],
   'arial-1951': ['arial-1951', 'nyc-label'],
@@ -134,11 +148,25 @@ export const setOverlay = (
   overlayId: OverlayId | null
 ): void => {
   const visibleLayers = overlayId ? overlaysToLayers[overlayId] : [];
+  const mapBounds = map.getBounds();
+
+  // Convert the map bounds into a Turf polygon
+  const viewportPolygon = bboxPolygon([
+    mapBounds.getWest(),
+    mapBounds.getSouth(),
+    mapBounds.getEast(),
+    mapBounds.getNorth(),
+  ]);
   LAYER_IDS.forEach((layerId) => {
+    const layerAttributionBounds = attributionBoundaries[layerId];
     map.setLayoutProperty(
       layerId,
       'visibility',
-      visibleLayers.includes(layerId) ? 'visible' : 'none'
+      visibleLayers.includes(layerId) &&
+        (!layerAttributionBounds ||
+          booleanIntersects(viewportPolygon, layerAttributionBounds))
+        ? 'visible'
+        : 'none'
     );
   });
 };

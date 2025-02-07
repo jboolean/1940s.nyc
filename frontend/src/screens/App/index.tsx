@@ -6,6 +6,7 @@ import AnnouncementBanner from './screens/AnnouncementBanner';
 import MapPane from './screens/MapPane';
 import Shutdown from './screens/Shutdown';
 import ThankYou from './screens/TipJar/ThankYou';
+import ToteBag from './screens/ToteBag';
 import ViewerPane from './screens/ViewerPane';
 import Welcome from './screens/Welcome';
 
@@ -16,6 +17,7 @@ import Outtakes from './screens/Outtakes';
 import { OptimizeExperimentsProvider } from 'shared/utils/OptimizeExperiments';
 import 'utils/optimize';
 import AdminRoutes from './screens/Admin/AdminRoutes';
+import Corrections from './screens/Corrections';
 import CreditPurchaseModal, {
   CreditPurchaseSuccessMessage,
 } from './screens/CreditPurchaseModal';
@@ -23,7 +25,6 @@ import EditStory from './screens/EditStory';
 import FeatureFlags from './screens/FeatureFlags';
 import SubmitStoryWizard from './screens/SubmitStoryWizard';
 import TipJar, { useTipJarStore } from './screens/TipJar';
-import Corrections from './screens/Corrections';
 
 const IS_SHUTDOWN = false;
 
@@ -33,8 +34,10 @@ const thankYouInitial = searchParams.has('tipSuccess');
 const creditSuccessInitial = searchParams.has('creditPurchaseSuccess');
 const openTipJarOnLoad = searchParams.has('openTipJar');
 const noWelcome = searchParams.has('noWelcome');
+const noTipJar = searchParams.has('noTipJar');
 
 if (noWelcome) searchParams.delete('noWelcome');
+if (noTipJar) searchParams.delete('noTipJar');
 history.replace({
   pathname: history.location.pathname,
   hash: history.location.hash,
@@ -87,7 +90,7 @@ function Modals(): JSX.Element {
           setCreditPurchaseSuccessOpen(false);
         }}
       />
-      <TipJar />
+      {noTipJar ? null : <TipJar />}
     </>
   );
 }
@@ -96,8 +99,13 @@ export default function App(): JSX.Element {
   return (
     <OptimizeExperimentsProvider>
       <div className={stylesheet.outermostContainer}>
-        <AnnouncementBanner />
         <Router history={history}>
+          <Switch>
+            <Route path="/render-merch"></Route>
+            <Route>
+              <AnnouncementBanner />
+            </Route>
+          </Switch>
           <div className={stylesheet.mainContentWrapper}>
             <div className={stylesheet.mainContentContainer}>
               <Modals />
@@ -128,6 +136,9 @@ export default function App(): JSX.Element {
                 </Route>
                 <Route path="/admin">
                   <AdminRoutes />
+                </Route>
+                <Route path="/render-merch/tote-bag">
+                  <ToteBag />
                 </Route>
                 {!IS_SHUTDOWN && <Redirect to="/map" />}
               </Switch>
