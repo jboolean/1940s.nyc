@@ -54,7 +54,10 @@ export default function ToteBag(): JSX.Element {
             </span>
           </div>
           <div className={stylesheet.attribution}>
-            <span className={stylesheet.hugLines}>{attributionText}</span>
+            {/* I can't get the correct attributions to show based on what's in the viewport, it just shows all of them, so we say "May show" */}
+            <span className={stylesheet.hugLines}>
+              May show: {attributionText}
+            </span>
           </div>
         </div>
       </div>

@@ -77,6 +77,12 @@ class MainMap extends React.PureComponent<PropsWithRouter> {
 
       this.syncUI();
     });
+
+    // Added to remove layers outside the viewport, to make the attribution correct
+    map.on('moveend', () => {
+      if (!map.isStyleLoaded()) return;
+      this.syncUI();
+    });
   }
 
   componentDidUpdate(prevProps: PropsWithRouter): void {
