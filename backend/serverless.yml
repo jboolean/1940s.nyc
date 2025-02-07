@@ -102,7 +102,7 @@ functions:
     handler: cron.renderMerchPrintfiles
     events:
       - schedule: rate(5 minutes)
-    timeout: 60
+    timeout: 120
     layers:
       - arn:aws:lambda:us-east-1:764866452798:layer:chrome-aws-lambda:50
     memorySize: 2048
