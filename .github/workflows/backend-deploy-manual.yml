@@ -9,7 +9,12 @@ on:
         type: choice
         options:
           - production
-          - staging    
+          - staging
+      frontendBaseUrl:
+        description: Frontend Base URL
+        required: false
+        default: 'https://staging.1940s.nyc'
+        type: string
 defaults:
   run:
     shell: bash
@@ -19,4 +24,5 @@ jobs:
     uses: ./.github/workflows/backend-deploy-reusable.yml
     with:
       stage: ${{ inputs.stage }}
+      frontendBaseUrl: ${{ inputs.frontendBaseUrl }}
     secrets: inherit
