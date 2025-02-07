@@ -5,10 +5,6 @@ on:
       stage:
         required: true
         type: string
-      frontendBaseUrl:
-        required: true
-        type: string
-        default: 'https://1940s.nyc'
     secrets:
       AWS_ACCESS_KEY_ID:
         required: true
@@ -39,5 +35,4 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID}}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY}}
           STAGE: ${{ inputs.stage }}
-          FRONTEND_BASE_URL: ${{ inputs.frontendBaseUrl }}
         run: npm run deploy
