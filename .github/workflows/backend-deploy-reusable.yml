@@ -6,8 +6,9 @@ on:
         required: true
         type: string
       frontendBaseUrl:
-        required: false
+        required: true
         type: string
+        default: 'https://1940s.nyc'
     secrets:
       AWS_ACCESS_KEY_ID:
         required: true
