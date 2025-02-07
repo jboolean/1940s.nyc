@@ -2,8 +2,10 @@ import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 
 import { getRepository } from 'typeorm';
 import renderToteBag from '../business/merch/renderToteBag';
+import absurd from '../business/utils/absurd';
 import isProduction from '../business/utils/isProduction';
 import CustomMerchItem from '../entities/CustomMerchItem';
+import MerchInternalVariant from '../enum/MerchInternalVariant';
 
 const s3 = new S3Client();
 
@@ -32,7 +34,16 @@ export default async function renderMerch(): Promise<void> {
 
     const { lat, lon } = customizationOptions;
 
-    const buffer = await renderToteBag({ lat, lon });
+    const variant = item.internalVariant;
+
+    let buffer: Buffer;
+    switch (variant) {
+      case MerchInternalVariant.TOTE_BAG_SMALL:
+        buffer = await renderToteBag({ lat, lon });
+        break;
+      default:
+        absurd(variant);
+    }
 
     const destinationDirectory = isProduction()
       ? 'printfiles'

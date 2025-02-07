@@ -5,6 +5,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import MerchInternalVariant from '../enum/MerchInternalVariant';
 
 interface CustomizationOptions {
   lat: number;
@@ -21,6 +22,9 @@ export default class CustomMerchItem {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @Column()
+  internalVariant: MerchInternalVariant;
 
   @Column({
     type: 'jsonb',
