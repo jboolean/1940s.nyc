@@ -2,18 +2,20 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import MerchInternalVariant from '../enum/MerchInternalVariant';
+import MerchOrder from './MerchOrder';
 
 interface CustomizationOptions {
   lat: number;
   lon: number;
 }
 
-@Entity('custom_merch_items')
-export default class CustomMerchItem {
+@Entity('merch_order_items')
+export default class MerchOrderItem {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -22,6 +24,9 @@ export default class CustomMerchItem {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @ManyToOne(() => MerchOrder, (order) => order.items)
+  order: MerchOrder;
 
   @Column()
   internalVariant: MerchInternalVariant;

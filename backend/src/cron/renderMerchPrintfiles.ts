@@ -4,7 +4,7 @@ import { getRepository } from 'typeorm';
 import renderToteBag from '../business/merch/renderToteBag';
 import absurd from '../business/utils/absurd';
 import isProduction from '../business/utils/isProduction';
-import CustomMerchItem from '../entities/CustomMerchItem';
+import MerchOrderItem from '../entities/MerchOrderItem';
 import MerchInternalVariant from '../enum/MerchInternalVariant';
 
 const s3 = new S3Client();
@@ -12,7 +12,7 @@ const s3 = new S3Client();
 const LIMIT = 5;
 
 export default async function renderMerch(): Promise<void> {
-  const repository = getRepository(CustomMerchItem);
+  const repository = getRepository(MerchOrderItem);
   const itemsToRender = await repository
     .createQueryBuilder('custom_merch_items')
     .where({

@@ -16,6 +16,8 @@ jobs:
         with:
           node-version: '20'
       - run: npm ci
+      - name: Generate Printful API
+        run: npm run generate-printful-api
       - name: Generate routes
         run: npm run routes
       - name: Deploy dry run 
@@ -31,6 +33,8 @@ jobs:
         with:
           node-version: '20'
       - run: npm ci
+      - name: Generate Printful API
+        run: npm run generate-printful-api
       - name: Generate routes
         run: npm run routes
       - run: npm run lint:strict
@@ -42,6 +46,8 @@ jobs:
         with:
           node-version: '20'
       - run: npm ci
+      - name: Generate Printful API
+        run: npm run generate-printful-api
       - name: Generate routes
         run: npm run routes
       - run: npm run types

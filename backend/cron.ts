@@ -13,6 +13,7 @@ import * as Sentry from '@sentry/node';
 // Importing @sentry/tracing patches the global hub for tracing to work.
 import '@sentry/tracing';
 import EmailCampaignService from './src/business/email/EmailCampaignService';
+import registerWebhooks from './src/business/merch/registerWebhooks';
 
 async function setup(): Promise<void> {
   await createConnection();
@@ -52,3 +53,6 @@ export const sendEmailCampaigns = withSetup(async (): Promise<void> => {
 
 export const renderMerchPrintfiles = (): Promise<void> =>
   withSetup(renderMerchPrintfilesImpl);
+
+// Technically not a cron job, but it's a good place to put it
+export const registerPrintfulWebhooks = withSetup(registerWebhooks);
