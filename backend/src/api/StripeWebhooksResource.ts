@@ -2,15 +2,20 @@ import express from 'express';
 import ipfilter from 'express-ipfilter';
 import stripe from './stripe';
 
+import compact from 'lodash/compact';
+import groupBy from 'lodash/groupBy';
 import Stripe from 'stripe';
 import EmailCampaignService from '../business/email/EmailCampaignService';
 import * as LedgerService from '../business/ledger/LedgerService';
+import * as MerchOrderService from '../business/merch/MerchOrderService';
 import * as UserService from '../business/users/UserService';
 import isProduction from '../business/utils/isProduction';
+import MerchInternalVariant from '../enum/MerchInternalVariant';
 const router = express.Router();
 
 type ProductMetadata = {
-  'product-type'?: 'color-credit';
+  'product-type'?: 'color-credit' | 'merch';
+  'merch-internal-variant'?: MerchInternalVariant;
 };
 
 const STRIPE_IPS = [
@@ -47,8 +52,13 @@ router.post<'/', unknown, unknown, Stripe.Event, unknown>(
         }
         break;
       }
+      case 'checkout.session.async_payment_succeeded':
       case 'checkout.session.completed': {
         const session = event.data.object as Stripe.Checkout.Session;
+        if (session.payment_status !== 'paid') {
+          console.warn('Checkout session was not paid', session);
+          break;
+        }
         // Retrieve the session to expand the line items
         const expandedSession = await stripe.checkout.sessions.retrieve(
           session.id,
@@ -67,16 +77,19 @@ router.post<'/', unknown, unknown, Stripe.Event, unknown>(
           : undefined;
 
         // See if they purchased credits
-        const creditsLineItem = expandedSession.line_items?.data.find(
+        const byProductType = groupBy(
+          expandedSession.line_items?.data,
           (lineItem) =>
             (
               (lineItem.price?.product as Stripe.Product)
                 .metadata as ProductMetadata
-            )['product-type'] === 'color-credit'
+            )['product-type']
         );
 
-        // fulfill credit purchase
-        if (creditsLineItem) {
+        const creditsLineItems = byProductType['color-credit'] ?? [];
+
+        // fulfill credit purchases
+        for (const creditsLineItem of creditsLineItems) {
           const quantity = creditsLineItem.quantity;
           if (typeof userId !== 'number') {
             throw new Error('userId is missing from purchase of credits');
@@ -95,7 +108,50 @@ router.post<'/', unknown, unknown, Stripe.Event, unknown>(
             paymentIntentId,
             subtotalAmountCents || 0
           );
-        } else {
+        }
+
+        const merchLineItems = byProductType['merch'] ?? [];
+        console.log('merch items', merchLineItems);
+        if (merchLineItems.length) {
+          const shippingAddress = {
+            name: expandedSession.shipping_details?.name,
+            line1:
+              expandedSession.shipping_details?.address?.line1 ?? undefined,
+            line2:
+              expandedSession.shipping_details?.address?.line2 ?? undefined,
+            city: expandedSession.shipping_details?.address?.city ?? undefined,
+            stateCode:
+              expandedSession.shipping_details?.address?.state ?? undefined,
+            postalCode:
+              expandedSession.shipping_details?.address?.postal_code ??
+              undefined,
+            countryCode:
+              expandedSession.shipping_details?.address?.country ?? undefined,
+          };
+
+          const order = await MerchOrderService.createEmptyMerchOrder(
+            session.id,
+            shippingAddress
+          );
+
+          const itemTypes = compact(
+            merchLineItems.map(
+              (lineItem) =>
+                (
+                  (lineItem.price?.product as Stripe.Product)
+                    .metadata as ProductMetadata
+                )['merch-internal-variant']
+            )
+          );
+
+          const orderItems = await MerchOrderService.createOrderItems(
+            order,
+            itemTypes
+          );
+          console.log('created order items', orderItems);
+        }
+
+        if (!creditsLineItems.length) {
           // Grant some credits from their non-credit payment, see comment on LedgerService
           if (
             userId &&

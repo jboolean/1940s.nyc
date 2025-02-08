@@ -43,9 +43,6 @@ export default class MerchOrderItem {
   @Column()
   printfileCreated: boolean;
 
-  @Column()
-  orderCreated: boolean;
-
   @Column({
     nullable: true,
   })

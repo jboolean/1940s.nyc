@@ -33,26 +33,25 @@ async function setup(): Promise<void> {
   });
 }
 
-const withSetup = async (impl: () => Promise<void>): Promise<void> => {
-  await setup();
-  await impl();
+const withSetup = (impl: () => Promise<void>): (() => Promise<void>) => {
+  return async () => {
+    await setup();
+    await impl();
+  };
 };
 
-export const checkStaleStories = (): Promise<void> =>
-  withSetup(checkStaleStoriesImpl);
+export const checkStaleStories = withSetup(checkStaleStoriesImpl);
 
-export const syncMap = (): Promise<void> => withSetup(syncMapImpl);
+export const syncMap = withSetup(syncMapImpl);
 
-export const generateStoryTitles = (): Promise<void> =>
-  withSetup(generateStoryTitlesImpl);
+export const generateStoryTitles = withSetup(generateStoryTitlesImpl);
 
-export const sendEmailCampaigns = withSetup(async (): Promise<void> => {
+export const sendEmailCampaigns = withSetup(async () => {
   await EmailCampaignService.sendPendingEmails(false);
   await EmailCampaignService.sendPendingEmails(true);
 });
 
-export const renderMerchPrintfiles = (): Promise<void> =>
-  withSetup(renderMerchPrintfilesImpl);
+export const renderMerchPrintfiles = withSetup(renderMerchPrintfilesImpl);
 
 // Technically not a cron job, but it's a good place to put it
 export const registerPrintfulWebhooks = withSetup(registerWebhooks);

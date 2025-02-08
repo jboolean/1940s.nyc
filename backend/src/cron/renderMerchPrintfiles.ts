@@ -18,7 +18,6 @@ export default async function renderMerch(): Promise<void> {
     .where({
       printfileCreated: false,
       customizationOptionsSubmitted: true,
-      orderCreated: false,
     })
     .limit(LIMIT)
     .getMany();

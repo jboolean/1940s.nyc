@@ -8,7 +8,7 @@ import {
 } from 'typeorm';
 import MerchOrderItem from './MerchOrderItem';
 
-@Entity('merch_order_items')
+@Entity('merch_orders')
 export default class MerchOrder {
   @PrimaryGeneratedColumn()
   id: number;
@@ -23,8 +23,8 @@ export default class MerchOrder {
   items: MerchOrderItem[];
 
   @Column()
-  printfulOrderId: number;
+  printfulOrderId?: number;
 
-  @Column()
-  stripeInvoiceId: number;
+  @Column({ unique: true })
+  stripeCheckoutSessionId: string;
 }
