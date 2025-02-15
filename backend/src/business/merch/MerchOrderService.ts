@@ -3,6 +3,8 @@ import MerchOrder from '../../entities/MerchOrder';
 import MerchOrderItem from '../../entities/MerchOrderItem';
 import ShippingAddress from '../../entities/ShippingAddress';
 import MerchInternalVariant from '../../enum/MerchInternalVariant';
+import MerchOrderFulfillmentState from '../../enum/MerchOrderFulfillmentState';
+import MerchOrderState from '../../enum/MerchOrderState';
 import * as PrintfulService from './PrintfulService';
 
 export async function createEmptyMerchOrder(
@@ -11,10 +13,9 @@ export async function createEmptyMerchOrder(
 ): Promise<MerchOrder> {
   const orderRepository = getRepository(MerchOrder);
   let order = new MerchOrder();
+  order.state = MerchOrderState.BUILDING;
   order.stripeCheckoutSessionId = stripeCheckoutSessionId;
-  console.log('Saving new order!');
   order = await orderRepository.save(order);
-  console.log('Saved new order');
 
   const printfulOrder = await PrintfulService.createEmptyOrder(
     order.id,
@@ -22,10 +23,10 @@ export async function createEmptyMerchOrder(
   );
 
   order.printfulOrderId = printfulOrder.id;
+  order.state = MerchOrderState.SUBMITTED_FOR_FULFILLMENT;
+  order.fulfillmentState = MerchOrderFulfillmentState.DRAFT;
 
   order = await orderRepository.save(order);
-
-  console.log('updated order with printful id', printfulOrder.id);
 
   return order;
 }

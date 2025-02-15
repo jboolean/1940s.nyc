@@ -29,6 +29,7 @@ export function makePrintfulItem(
       return {
         source: 'catalog',
         catalog_variant_id: printfulVariantId,
+        external_id: customMerchItemId.toString(),
         placements: [
           {
             placement: 'default',

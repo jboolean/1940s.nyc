@@ -6,6 +6,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import MerchOrderFulfillmentState from '../enum/MerchOrderFulfillmentState';
 import MerchOrderState from '../enum/MerchOrderState';
 import MerchOrderItem from './MerchOrderItem';
 
@@ -20,10 +21,13 @@ export default class MerchOrder {
   @Column()
   state: MerchOrderState;
 
+  @Column()
+  fulfillmentState: MerchOrderFulfillmentState | null;
+
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @OneToMany(() => MerchOrderItem, (item) => item.order)
+  @OneToMany(() => MerchOrderItem, (item) => item.order, { eager: true })
   items: MerchOrderItem[];
 
   @Column()

@@ -7,7 +7,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import MerchInternalVariant from '../enum/MerchInternalVariant';
-import MerchOrderState from '../enum/MerchOrderState';
+import MerchItemState from '../enum/MerchItemState';
 import MerchOrder from './MerchOrder';
 
 interface CustomizationOptions {
@@ -27,7 +27,7 @@ export default class MerchOrderItem {
   updatedAt: Date;
 
   @Column()
-  state: MerchOrderState;
+  state: MerchItemState;
 
   @ManyToOne(() => MerchOrder, (order) => order.items)
   order: MerchOrder;

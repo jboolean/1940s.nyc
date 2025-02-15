@@ -7,6 +7,8 @@ import {
   confirmOrder,
   createItemByOrderId,
   createOrder,
+  deleteItemById,
+  getItemsByOrderId,
   Order as PrintfulOrder,
   Address as PrintfulRecipient,
 } from '../utils/printfulApi';
@@ -46,6 +48,27 @@ export async function addItemToOrder(item: MerchOrderItem): Promise<void> {
     item.order.printfulOrderId,
     'item.order.printfulOrderId'
   );
+
+  // Idempotency
+  const itemsResp = await getItemsByOrderId({
+    path: {
+      order_id: printfulOrderId,
+    },
+  });
+  const existingItem = itemsResp.data?.data.find(
+    (i) => i.external_id === item.id.toString()
+  );
+  if (existingItem) {
+    console.warn('Item already exists in order. Deleting.', item.id);
+    await deleteItemById({
+      path: {
+        order_id: printfulOrderId,
+        order_item_id: existingItem.id,
+      },
+    });
+    return;
+  }
+
   await createItemByOrderId({
     path: {
       order_id: printfulOrderId,
@@ -79,9 +102,14 @@ export async function updateLocalStatus(
   }
 
   const newState = PrintfulToMerchOrderStatusMap[printfulOrderStatus];
-  if (newState !== order.state) {
-    console.log('Order transition', order.state, '->', newState);
-    order.state = newState;
+  if (newState !== order.fulfillmentState) {
+    console.log(
+      'Order fulfillment state transition',
+      order.state,
+      '->',
+      newState
+    );
+    order.fulfillmentState = newState;
     await orderRepository.save(order);
   }
 }

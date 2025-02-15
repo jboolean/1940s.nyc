@@ -2,6 +2,7 @@ import 'reflect-metadata';
 import 'source-map-support/register';
 import createConnection from './src/createConnection';
 
+import addMerchItemsToOrderImpl from './src/cron/addMerchItemsToOrder';
 import checkStaleStoriesImpl from './src/cron/checkStaleStories';
 import generateStoryTitlesImpl from './src/cron/generateStoryTitles';
 import renderMerchPrintfilesImpl from './src/cron/renderMerchPrintfiles';
@@ -51,7 +52,10 @@ export const sendEmailCampaigns = withSetup(async () => {
   await EmailCampaignService.sendPendingEmails(true);
 });
 
-export const renderMerchPrintfiles = withSetup(renderMerchPrintfilesImpl);
+export const renderMerchPrintfiles = withSetup(async () => {
+  await renderMerchPrintfilesImpl();
+  await addMerchItemsToOrderImpl();
+});
 
 // Technically not a cron job, but it's a good place to put it
 export const registerPrintfulWebhooks = withSetup(registerWebhooks);
