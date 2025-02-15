@@ -72,9 +72,13 @@ router.post<'/', unknown, unknown, Stripe.Event, unknown>(
             : null;
         const subtotalAmountCents = session.amount_subtotal;
 
-        const userId = session.metadata?.userId
-          ? parseInt(session.metadata.userId, 10)
-          : undefined;
+        const userId = await UserService.attachStripeCustomerAndDetermineUserId(
+          expandedSession.customer as string,
+          expandedSession.metadata?.userId
+            ? parseInt(expandedSession.metadata.userId, 10)
+            : undefined,
+          expandedSession.customer_details?.email ?? undefined
+        );
 
         // See if they purchased credits
         const byProductType = groupBy(
@@ -169,22 +173,6 @@ router.post<'/', unknown, unknown, Stripe.Event, unknown>(
               event
             );
           }
-        }
-
-        // Attach the customer to the user and also set an email if the user was anonymous
-        const customer = session.customer;
-        const email = session.customer_details?.email;
-        if (userId && typeof customer === 'string') {
-          await UserService.attachStripeCustomer(
-            userId,
-            customer,
-            email ?? undefined
-          );
-        } else {
-          console.warn(
-            'Stripe webhook missing required data to update user',
-            event
-          );
         }
         break;
       }
