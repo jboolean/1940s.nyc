@@ -75,32 +75,32 @@ functions:
   checkStaleStories:
     stages:
       - production
-    handler: cron.checkStaleStories
+    handler: checkStaleStories.handler
     events:
       - schedule: cron(30 11 * * ? *)
   syncMap:
     stages:
       - production
-    handler: cron.syncMap
+    handler: syncMap.handler
     events:
       - schedule: cron(0 12 * * ? *)
     timeout: 900
   generateStoryTitles:
     stages:
       - production
-    handler: cron.generateStoryTitles
+    handler: generateStoryTitles.handler
     events:
       - schedule: rate(5 minutes)
     timeout: 900
   sendEmailCampaigns:
     stages:
       - production
-    handler: cron.sendEmailCampaigns
+    handler: sendEmailCampaigns.handler
     events:
       - schedule: rate(1 minute)
     timeout: 900
   renderMerchPrintfiles:
-    handler: cron.renderMerchPrintfiles
+    handler: renderMerchPrintfiles.handler
     events:
       - schedule: rate(5 minutes)
     timeout: 120
@@ -108,7 +108,7 @@ functions:
       - arn:aws:lambda:us-east-1:764866452798:layer:chrome-aws-lambda:50
     memorySize: 2048
   registerPrintfulWebhooks:
-    handler: cron.registerPrintfulWebhooks
+    handler: registerPrintfulWebhooks.handler
     # Invoked manually
 custom:
   bucket: fourties-photos
