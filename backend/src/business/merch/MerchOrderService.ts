@@ -68,7 +68,7 @@ export async function cancelOrder(orderId: number): Promise<void> {
   const order = await orderRepository.findOneByOrFail({ id: orderId });
 
   if (
-    [
+    ![
       MerchOrderFulfillmentState.DRAFT,
       MerchOrderFulfillmentState.CANCELED,
       null,
