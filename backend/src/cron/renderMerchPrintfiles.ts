@@ -1,9 +1,9 @@
 import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 
 import { getRepository } from 'typeorm';
+import { getPrintfileKey } from '../business/merch/PrintfulItemBuildService';
 import renderToteBag from '../business/merch/renderToteBag';
 import absurd from '../business/utils/absurd';
-import isProduction from '../business/utils/isProduction';
 import MerchOrderItem from '../entities/MerchOrderItem';
 import MerchInternalVariant from '../enum/MerchInternalVariant';
 import MerchItemState from '../enum/MerchItemState';
@@ -44,11 +44,7 @@ export default async function renderMerch(): Promise<void> {
         absurd(variant);
     }
 
-    const destinationDirectory = isProduction()
-      ? 'printfiles'
-      : 'printfiles-dev';
-
-    const destinationKey = `merch/${destinationDirectory}/${item.id}.png`;
+    const destinationKey = getPrintfileKey(item.id);
 
     await s3.send(
       new PutObjectCommand({

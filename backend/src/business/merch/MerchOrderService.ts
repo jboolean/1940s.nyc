@@ -1,3 +1,4 @@
+import { BadRequest } from 'http-errors';
 import { getRepository } from 'typeorm';
 import MerchOrder from '../../entities/MerchOrder';
 import MerchOrderItem from '../../entities/MerchOrderItem';
@@ -5,6 +6,7 @@ import ShippingAddress from '../../entities/ShippingAddress';
 import MerchInternalVariant from '../../enum/MerchInternalVariant';
 import MerchOrderFulfillmentState from '../../enum/MerchOrderFulfillmentState';
 import MerchOrderState from '../../enum/MerchOrderState';
+import required from '../utils/required';
 import * as PrintfulService from './PrintfulService';
 
 export async function createEmptyMerchOrder(
@@ -45,4 +47,38 @@ export async function createOrderItems(
     return item;
   });
   return await itemRepository.save(items);
+}
+
+export async function submitOrderForFulfillment(
+  orderId: number
+): Promise<void> {
+  const orderRepository = getRepository(MerchOrder);
+  const order = await orderRepository.findOneByOrFail({ id: orderId });
+
+  await PrintfulService.submitOrderForFulfillment(
+    required(order.printfulOrderId, 'printfulOrderId')
+  );
+
+  order.state = MerchOrderState.SUBMITTED_FOR_FULFILLMENT;
+  await orderRepository.save(order);
+}
+
+export async function cancelOrder(orderId: number): Promise<void> {
+  const orderRepository = getRepository(MerchOrder);
+  const order = await orderRepository.findOneByOrFail({ id: orderId });
+
+  if (
+    [
+      MerchOrderFulfillmentState.DRAFT,
+      MerchOrderFulfillmentState.CANCELED,
+      null,
+    ].includes(order.fulfillmentState)
+  ) {
+    // In the future we could support canceling in Printful here.
+    // Printful has not built canceling into their v2 API yet.
+    throw new BadRequest('Cannot cancel order that is already submitted');
+  }
+  // TODO does this need to refund?
+  order.state = MerchOrderState.CANCELED;
+  await orderRepository.save(order);
 }

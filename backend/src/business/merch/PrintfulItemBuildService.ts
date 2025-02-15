@@ -10,10 +10,13 @@ const INTERNAL_VARIANT_TO_PRINTFUL_VARIANT: Record<
   [MerchInternalVariant.TOTE_BAG_SMALL]: 4533, // Product 84
 };
 
-function getPrintfileUrl(customMerchItemId: number): string {
+export function getPrintfileKey(customMerchItemId: number): string {
   const destinationDirectory = isProduction() ? 'printfiles' : 'printfiles-dev';
+  return `merch/${destinationDirectory}/${customMerchItemId}.png`;
+}
 
-  const destinationKey = `merch/${destinationDirectory}/${customMerchItemId}.png`;
+export function getPrintfileUrl(customMerchItemId: number): string {
+  const destinationKey = getPrintfileKey(customMerchItemId);
 
   return `https://photos.1940s.nyc/${destinationKey}`;
 }

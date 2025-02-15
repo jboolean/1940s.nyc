@@ -8,12 +8,8 @@ import {
 } from 'typeorm';
 import MerchInternalVariant from '../enum/MerchInternalVariant';
 import MerchItemState from '../enum/MerchItemState';
+import MerchCustomizationOptions from './MerchCustomizationOptions';
 import MerchOrder from './MerchOrder';
-
-interface CustomizationOptions {
-  lat: number;
-  lon: number;
-}
 
 @Entity('merch_order_items')
 export default class MerchOrderItem {
@@ -39,7 +35,7 @@ export default class MerchOrderItem {
     type: 'jsonb',
     nullable: true,
   })
-  customizationOptions: CustomizationOptions | null;
+  customizationOptions: MerchCustomizationOptions | null;
 
   @Column({
     nullable: true,
