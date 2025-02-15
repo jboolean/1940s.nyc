@@ -2,6 +2,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -9,6 +10,7 @@ import {
 import MerchOrderFulfillmentState from '../enum/MerchOrderFulfillmentState';
 import MerchOrderState from '../enum/MerchOrderState';
 import MerchOrderItem from './MerchOrderItem';
+import User from './User';
 
 @Entity('merch_orders')
 export default class MerchOrder {
@@ -35,4 +37,10 @@ export default class MerchOrder {
 
   @Column({ unique: true })
   stripeCheckoutSessionId: string;
+
+  @Column()
+  userId: number;
+
+  @ManyToOne(() => User)
+  user: User;
 }

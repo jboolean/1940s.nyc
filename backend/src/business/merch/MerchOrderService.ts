@@ -8,11 +8,13 @@ import MerchOrderState from '../../enum/MerchOrderState';
 import * as PrintfulService from './PrintfulService';
 
 export async function createEmptyMerchOrder(
+  userId: number,
   stripeCheckoutSessionId: string,
   shippingAddress: ShippingAddress
 ): Promise<MerchOrder> {
   const orderRepository = getRepository(MerchOrder);
   let order = new MerchOrder();
+  order.userId = userId;
   order.state = MerchOrderState.BUILDING;
   order.stripeCheckoutSessionId = stripeCheckoutSessionId;
   order = await orderRepository.save(order);

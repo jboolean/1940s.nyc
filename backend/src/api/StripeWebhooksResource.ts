@@ -115,7 +115,6 @@ router.post<'/', unknown, unknown, Stripe.Event, unknown>(
         }
 
         const merchLineItems = byProductType['merch'] ?? [];
-        console.log('merch items', merchLineItems);
         if (merchLineItems.length) {
           const shippingAddress = {
             name: expandedSession.shipping_details?.name,
@@ -134,6 +133,7 @@ router.post<'/', unknown, unknown, Stripe.Event, unknown>(
           };
 
           const order = await MerchOrderService.createEmptyMerchOrder(
+            userId,
             session.id,
             shippingAddress
           );
