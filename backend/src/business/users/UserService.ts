@@ -73,6 +73,7 @@ export async function attachStripeCustomer(
   const userRepository = getRepository(User);
   const user = await userRepository.findOneByOrFail({ id: userId });
   user.stripeCustomerId = stripeCustomerId;
+  // TODO needs to handle if another user has this email
   if (email && user.isAnonymous) user.email = email;
   await userRepository.save(user);
 }

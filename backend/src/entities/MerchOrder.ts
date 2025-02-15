@@ -6,6 +6,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import MerchOrderState from '../enum/MerchOrderState';
 import MerchOrderItem from './MerchOrderItem';
 
 @Entity('merch_orders')
@@ -15,6 +16,9 @@ export default class MerchOrder {
 
   @CreateDateColumn()
   createdAt: Date;
+
+  @Column()
+  state: MerchOrderState;
 
   @UpdateDateColumn()
   updatedAt: Date;

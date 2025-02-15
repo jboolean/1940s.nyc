@@ -6,6 +6,7 @@ import absurd from '../business/utils/absurd';
 import isProduction from '../business/utils/isProduction';
 import MerchOrderItem from '../entities/MerchOrderItem';
 import MerchInternalVariant from '../enum/MerchInternalVariant';
+import MerchItemState from '../enum/MerchItemState';
 
 const s3 = new S3Client();
 
@@ -16,8 +17,7 @@ export default async function renderMerch(): Promise<void> {
   const itemsToRender = await repository
     .createQueryBuilder('custom_merch_items')
     .where({
-      printfileCreated: false,
-      customizationOptionsSubmitted: true,
+      state: MerchItemState.CUSTOMIZED,
     })
     .limit(LIMIT)
     .getMany();
@@ -60,7 +60,7 @@ export default async function renderMerch(): Promise<void> {
     );
 
     await repository.update(item.id, {
-      printfileCreated: true,
+      state: () => MerchItemState.READY_FOR_FULFILLMENT,
     });
   }
 }

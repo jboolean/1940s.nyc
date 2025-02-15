@@ -1,5 +1,8 @@
+import { getRepository } from 'typeorm';
+import MerchOrder from '../../entities/MerchOrder';
 import MerchOrderItem from '../../entities/MerchOrderItem';
 import ShippingAddress from '../../entities/ShippingAddress';
+import PrintfulOrderStatus from '../../third-party/printful/PrintfulOrderStatus';
 import {
   confirmOrder,
   createItemByOrderId,
@@ -9,6 +12,7 @@ import {
 } from '../utils/printfulApi';
 import required from '../utils/required';
 import { makePrintfulItem } from './PrintfulItemBuildService';
+import PrintfulToMerchOrderStatusMap from './PrintfulToMerchOrderStatusMap';
 
 function toPrintfulRecipient(address: ShippingAddress): PrintfulRecipient {
   return {
@@ -58,4 +62,26 @@ export async function submitOrderForFulfillment(
       order_id: printfulOrderId,
     },
   });
+}
+
+export async function updateLocalStatus(
+  printfulOrderId: number,
+  printfulOrderStatus: PrintfulOrderStatus
+): Promise<void> {
+  const orderRepository = getRepository(MerchOrder);
+  const order = await orderRepository.findOneBy({
+    printfulOrderId,
+  });
+
+  if (!order) {
+    console.warn(`Order with printfulOrderId ${printfulOrderId} not found`);
+    return;
+  }
+
+  const newState = PrintfulToMerchOrderStatusMap[printfulOrderStatus];
+  if (newState !== order.state) {
+    console.log('Order transition', order.state, '->', newState);
+    order.state = newState;
+    await orderRepository.save(order);
+  }
 }

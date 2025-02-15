@@ -7,7 +7,7 @@ const INTERNAL_VARIANT_TO_PRINTFUL_VARIANT: Record<
   MerchInternalVariant,
   number
 > = {
-  [MerchInternalVariant.TOTE_BAG_SMALL]: 4533,
+  [MerchInternalVariant.TOTE_BAG_SMALL]: 4533, // Product 84
 };
 
 function getPrintfileUrl(customMerchItemId: number): string {

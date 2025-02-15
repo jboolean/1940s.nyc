@@ -7,6 +7,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import MerchInternalVariant from '../enum/MerchInternalVariant';
+import MerchOrderState from '../enum/MerchOrderState';
 import MerchOrder from './MerchOrder';
 
 interface CustomizationOptions {
@@ -25,6 +26,9 @@ export default class MerchOrderItem {
   @UpdateDateColumn()
   updatedAt: Date;
 
+  @Column()
+  state: MerchOrderState;
+
   @ManyToOne(() => MerchOrder, (order) => order.items)
   order: MerchOrder;
 
@@ -36,12 +40,6 @@ export default class MerchOrderItem {
     nullable: true,
   })
   customizationOptions: CustomizationOptions | null;
-
-  @Column()
-  customizationOptionsSubmitted: boolean;
-
-  @Column()
-  printfileCreated: boolean;
 
   @Column({
     nullable: true,
