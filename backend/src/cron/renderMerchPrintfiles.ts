@@ -56,7 +56,7 @@ export default async function renderMerch(): Promise<void> {
     );
 
     await repository.update(item.id, {
-      state: () => MerchItemState.READY_FOR_FULFILLMENT,
+      state: MerchItemState.READY_FOR_FULFILLMENT,
     });
   }
 }

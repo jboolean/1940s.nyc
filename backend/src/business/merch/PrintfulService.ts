@@ -66,7 +66,6 @@ export async function addItemToOrder(item: MerchOrderItem): Promise<void> {
         order_item_id: existingItem.id,
       },
     });
-    return;
   }
 
   await createItemByOrderId({

@@ -23,7 +23,7 @@ export default async function addMerchItemsToOrder(): Promise<void> {
     await PrintfulService.addItemToOrder(item);
 
     await itemRepository.update(item.id, {
-      state: () => MerchItemState.ADDED_TO_ORDER,
+      state: MerchItemState.ADDED_TO_ORDER,
     });
 
     // Determine if all items in the order have been added

@@ -81,14 +81,6 @@ export class MerchController extends Controller {
   }
 
   @Security('netlify', ['moderator'])
-  @Post('orders/{orderId}/submit-for-fulfillment')
-  public async submitOrderForFulfillment(
-    @Path('orderId') orderId: number
-  ): Promise<void> {
-    await MerchOrderService.submitOrderForFulfillment(orderId);
-  }
-
-  @Security('netlify', ['moderator'])
   @Patch('orders/{orderId}/state')
   public async updateOrderState(
     @Path('orderId') orderId: number,

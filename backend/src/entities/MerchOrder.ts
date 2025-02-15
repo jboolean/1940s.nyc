@@ -23,8 +23,8 @@ export default class MerchOrder {
   @Column()
   state: MerchOrderState;
 
-  @Column()
-  fulfillmentState: MerchOrderFulfillmentState | null;
+  @Column({ nullable: true })
+  fulfillmentState?: MerchOrderFulfillmentState;
 
   @UpdateDateColumn()
   updatedAt: Date;

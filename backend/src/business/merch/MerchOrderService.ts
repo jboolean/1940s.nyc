@@ -27,7 +27,7 @@ export async function createEmptyMerchOrder(
   );
 
   order.printfulOrderId = printfulOrder.id;
-  order.state = MerchOrderState.SUBMITTED_FOR_FULFILLMENT;
+  order.state = MerchOrderState.BUILDING;
   order.fulfillmentState = MerchOrderFulfillmentState.DRAFT;
 
   order = await orderRepository.save(order);
@@ -71,7 +71,7 @@ export async function cancelOrder(orderId: number): Promise<void> {
     ![
       MerchOrderFulfillmentState.DRAFT,
       MerchOrderFulfillmentState.CANCELED,
-      null,
+      undefined,
     ].includes(order.fulfillmentState)
   ) {
     // In the future we could support canceling in Printful here.
