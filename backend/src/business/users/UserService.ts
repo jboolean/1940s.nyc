@@ -61,20 +61,47 @@ export function getUser(userId: number): Promise<User> {
 /**
  * Attach the Stripe customer ID to the user.
  * Also set the email if the user was anonymous.
- * @param userId
+ *
+ * Note: Use the returned user id, which will probably be the one passed in, but may be different in edge cases.
+ *
+ * If the email is already on another user, we will return that user.
+ * If no user id is provided, we will create a new user.
+ * To avoid these edge cases, have the user log in before creating the Stripe checkout session.
+ * @param requestUserId
  * @param stripeCustomerId
  * @param email
+ * @returns Id of cannonical user for this request
  */
-export async function attachStripeCustomer(
-  userId: number,
+export async function attachStripeCustomerAndDetermineUserId(
   stripeCustomerId: string,
+  requestUserId?: number,
   email?: string
-): Promise<void> {
+): Promise<number> {
+  if (email) email = normalizeEmail(email);
+
   const userRepository = getRepository(User);
-  const user = await userRepository.findOneByOrFail({ id: userId });
+  let user: User | null = null;
+  if (requestUserId) {
+    user = await userRepository.findOneBy({ id: requestUserId });
+  }
+  const userByEmail = await userRepository.findOneBy({ email });
+  if (userByEmail && userByEmail.id !== user?.id) {
+    console.log(
+      'Email already on another user, using that user',
+      email,
+      userByEmail.id
+    );
+    user = userByEmail;
+  }
+  if (!user) {
+    user = new User();
+    user = await userRepository.save(user);
+  }
+
   user.stripeCustomerId = stripeCustomerId;
   if (email && user.isAnonymous) user.email = email;
   await userRepository.save(user);
+  return user.id;
 }
 
 export async function markEmailVerified(userId: number): Promise<void> {

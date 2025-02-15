@@ -13,13 +13,14 @@ import { RegisterRoutes } from '../tsoa-build/routes';
 import GeodataResource from './api/GeodataResource';
 
 import {
-  NextFunction,
   Request as ExRequest,
   Response as ExResponse,
+  NextFunction,
 } from 'express';
 import { IpDeniedError } from 'express-ipfilter';
 import { ValidateError } from 'tsoa';
 import PostmarkWebhooksResource from './api/PostmarkWebhooksResource';
+import PrintfulWebhooksResource from './api/PrintfulWebhooksResource';
 import StripeWebhooksResource from './api/StripeWebhooksResource';
 
 // Trust API Gateway
@@ -78,6 +79,7 @@ app.use(async (req, res, next) => {
 app.use('/geodata', GeodataResource);
 app.use('/stripe-webhooks', StripeWebhooksResource);
 app.use('/postmark-webhooks', PostmarkWebhooksResource);
+app.use('/printful-webhooks', PrintfulWebhooksResource);
 
 // Tsoa
 RegisterRoutes(app);

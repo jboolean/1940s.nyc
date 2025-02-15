@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "npm run routes && serverless offline start --stage dev --host dev.1940s.nyc --noPrependStageInUrl",
+    "start": "npm run generate-printful-api && npm run routes && serverless offline start --stage dev --host dev.1940s.nyc --noPrependStageInUrl",
     "debug": "export SLS_DEBUG=* && node --inspect ./node_modules/.bin/serverless offline --stage dev --host dev.1940s.nyc --noPrependStageInUrl",
     "routes": "tsoa routes",
     "deploy:dry": "serverless package --stage production",
@@ -14,12 +14,15 @@
     "lint:fix": "npm run lint -- --fix",
     "lint:strict": "npm run lint -- --max-warnings 0",
     "install-aws-sharp": "rm -rf node_modules/sharp && SHARP_IGNORE_GLOBAL_LIBVIPS=1 npm install --arch=x64 --platform=linux sharp",
-    "types": "tsc"
+    "types": "tsc",
+    "generate-printful-api": "cd src/third-party/printful/ && openapi-ts --file openapi-ts.config.json"
   },
   "author": "Julian Boilen",
   "license": "ISC",
   "devDependencies": {
     "@aws-sdk/client-s3": "^3.741.0",
+    "@hey-api/openapi-ts": "^0.64.1",
+    "@sparticuz/chromium": "^132.0.0",
     "@types/aws-lambda": "^8.10.147",
     "@types/cookie-parser": "^1.4.3",
     "@types/cors": "^2.8.17",
@@ -55,6 +58,7 @@
     "typescript": "^5.2.2"
   },
   "dependencies": {
+    "@hey-api/client-axios": "^0.6.1",
     "@sentry/integrations": "^7.36.0",
     "@sentry/node": "^7.36.0",
     "@sentry/tracing": "^7.36.0",
@@ -76,6 +80,7 @@
     "pg": "^8.8.0",
     "pg-query-stream": "^4.3.0",
     "postmark": "^4.0.4",
+    "puppeteer-core": "^24.1.1",
     "reflect-metadata": "^0.1.13",
     "serverless-http": "^3.2.0",
     "sharp": "^0.31.3",

@@ -8,3 +8,10 @@ jspm_packages
 
 secrets.*.yml
 tsoa-build
+
+chromium
+
+# yalc for local development
+.yalc
+yalc.lock
+yalc.sig
