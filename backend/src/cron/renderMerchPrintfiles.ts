@@ -31,14 +31,14 @@ export default async function renderMerch(): Promise<void> {
       continue;
     }
 
-    const { lat, lon } = customizationOptions;
+    const { lat, lng } = customizationOptions;
 
     const variant = item.internalVariant;
 
     let buffer: Buffer;
     switch (variant) {
       case MerchInternalVariant.TOTE_BAG_SMALL:
-        buffer = await renderToteBag({ lat, lon });
+        buffer = await renderToteBag({ lat, lng });
         break;
       default:
         absurd(variant);

@@ -16,10 +16,10 @@ const ZOOM = 17;
 
 export default async function renderToteBag({
   lat,
-  lon,
+  lng,
 }: {
   lat: number;
-  lon: number;
+  lng: number;
 }): Promise<Buffer> {
   const browser = await puppeteer.launch({
     args: IS_LOCAL ? puppeteer.defaultArgs() : chromium.args,
@@ -36,7 +36,7 @@ export default async function renderToteBag({
   await page.goto(
     `${FRONTEND_BASE_URL}/render-merch/tote-bag?noWelcome&noTipJar#${ZOOM}/${(
       lat + LAT_OFFSET
-    ).toFixed(6)}/${lon.toFixed(6)}`,
+    ).toFixed(6)}/${lng.toFixed(6)}`,
     {
       waitUntil: 'networkidle2',
     }
