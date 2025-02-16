@@ -40,7 +40,11 @@ export async function createEmptyOrder(
     },
   });
 
-  return required(orderResp.data?.data, 'orderResp.data.data');
+  const printfulOrder = orderResp.data?.data;
+  if (!printfulOrder) {
+    throw new Error('Failed to create order' + JSON.stringify(orderResp));
+  }
+  return printfulOrder;
 }
 
 export async function addItemToOrder(item: MerchOrderItem): Promise<void> {
