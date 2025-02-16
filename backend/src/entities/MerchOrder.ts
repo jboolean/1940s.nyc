@@ -9,6 +9,7 @@ import {
 } from 'typeorm';
 import MerchOrderFulfillmentState from '../enum/MerchOrderFulfillmentState';
 import MerchOrderState from '../enum/MerchOrderState';
+import MerchProvider from '../enum/MerchProvider';
 import MerchOrderItem from './MerchOrderItem';
 import User from './User';
 
@@ -23,6 +24,9 @@ export default class MerchOrder {
   @Column()
   state: MerchOrderState;
 
+  @Column()
+  provider: MerchProvider;
+
   @Column({ nullable: true })
   fulfillmentState?: MerchOrderFulfillmentState;
 
@@ -33,7 +37,7 @@ export default class MerchOrder {
   items: MerchOrderItem[];
 
   @Column()
-  printfulOrderId?: number;
+  providerOrderId?: number;
 
   @Column({ unique: true })
   stripeCheckoutSessionId: string;
