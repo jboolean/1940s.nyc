@@ -6,6 +6,8 @@ import ShippingAddress from '../../entities/ShippingAddress';
 import MerchInternalVariant from '../../enum/MerchInternalVariant';
 import MerchOrderFulfillmentState from '../../enum/MerchOrderFulfillmentState';
 import MerchOrderState from '../../enum/MerchOrderState';
+import MerchProvider from '../../enum/MerchProvider';
+import absurd from '../utils/absurd';
 import required from '../utils/required';
 import * as PrintfulService from './PrintfulService';
 
@@ -18,6 +20,7 @@ export async function createEmptyMerchOrder(
   let order = new MerchOrder();
   order.userId = userId;
   order.state = MerchOrderState.BUILDING;
+  order.provider = MerchProvider.PRINTFUL;
   order.stripeCheckoutSessionId = stripeCheckoutSessionId;
   order = await orderRepository.save(order);
 
@@ -26,7 +29,7 @@ export async function createEmptyMerchOrder(
     shippingAddress
   );
 
-  order.printfulOrderId = printfulOrder.id;
+  order.providerOrderId = printfulOrder.id;
   order.state = MerchOrderState.BUILDING;
   order.fulfillmentState = MerchOrderFulfillmentState.DRAFT;
 
@@ -55,9 +58,15 @@ export async function submitOrderForFulfillment(
   const orderRepository = getRepository(MerchOrder);
   const order = await orderRepository.findOneByOrFail({ id: orderId });
 
-  await PrintfulService.submitOrderForFulfillment(
-    required(order.printfulOrderId, 'printfulOrderId')
-  );
+  switch (order.provider) {
+    case MerchProvider.PRINTFUL:
+      await PrintfulService.submitOrderForFulfillment(
+        required(order.providerOrderId, 'providerOrderId')
+      );
+      break;
+    default:
+      absurd(order.provider);
+  }
 
   order.state = MerchOrderState.SUBMITTED_FOR_FULFILLMENT;
   await orderRepository.save(order);

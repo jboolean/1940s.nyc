@@ -45,7 +45,7 @@ export async function createEmptyOrder(
 
 export async function addItemToOrder(item: MerchOrderItem): Promise<void> {
   const printfulOrderId = required(
-    item.order.printfulOrderId,
+    item.order.providerOrderId,
     'item.order.printfulOrderId'
   );
 
@@ -92,7 +92,7 @@ export async function updateLocalStatus(
 ): Promise<void> {
   const orderRepository = getRepository(MerchOrder);
   const order = await orderRepository.findOneBy({
-    printfulOrderId,
+    providerOrderId: printfulOrderId,
   });
 
   if (!order) {
