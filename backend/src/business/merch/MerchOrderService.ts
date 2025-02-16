@@ -1,5 +1,5 @@
 import { BadRequest } from 'http-errors';
-import { getRepository } from 'typeorm';
+import { getConnection, getRepository } from 'typeorm';
 import MerchOrder from '../../entities/MerchOrder';
 import MerchOrderItem from '../../entities/MerchOrderItem';
 import ShippingAddress from '../../entities/ShippingAddress';
@@ -11,31 +11,45 @@ import absurd from '../utils/absurd';
 import required from '../utils/required';
 import * as PrintfulService from './PrintfulService';
 
-export async function createEmptyMerchOrder(
+export async function createMerchOrder(
   userId: number,
   stripeCheckoutSessionId: string,
-  shippingAddress: ShippingAddress
+  shippingAddress: ShippingAddress,
+  itemTypes: MerchInternalVariant[]
 ): Promise<MerchOrder> {
-  const orderRepository = getRepository(MerchOrder);
-  let order = new MerchOrder();
-  order.userId = userId;
-  order.state = MerchOrderState.BUILDING;
-  order.provider = MerchProvider.PRINTFUL;
-  order.stripeCheckoutSessionId = stripeCheckoutSessionId;
-  order = await orderRepository.save(order);
+  return getConnection().transaction(async (transactionalEntityManager) => {
+    const orderRepository =
+      transactionalEntityManager.getRepository(MerchOrder);
+    let order = new MerchOrder();
+    order.userId = userId;
+    order.state = MerchOrderState.BUILDING;
+    order.provider = MerchProvider.PRINTFUL;
+    order.stripeCheckoutSessionId = stripeCheckoutSessionId;
+    order = await orderRepository.save(order);
 
-  const printfulOrder = await PrintfulService.createEmptyOrder(
-    order.id,
-    shippingAddress
-  );
+    const printfulOrder = await PrintfulService.createEmptyOrder(
+      order.id,
+      shippingAddress
+    );
 
-  order.providerOrderId = printfulOrder.id;
-  order.state = MerchOrderState.BUILDING;
-  order.fulfillmentState = MerchOrderFulfillmentState.DRAFT;
+    order.providerOrderId = printfulOrder.id;
+    order.state = MerchOrderState.BUILDING;
+    order.fulfillmentState = MerchOrderFulfillmentState.DRAFT;
 
-  order = await orderRepository.save(order);
+    order = await orderRepository.save(order);
 
-  return order;
+    const itemRepository =
+      transactionalEntityManager.getRepository(MerchOrderItem);
+    const items = itemTypes.map((type) => {
+      const item = new MerchOrderItem();
+      item.order = order;
+      item.internalVariant = type;
+      return item;
+    });
+    await itemRepository.save(items);
+
+    return orderRepository.findOneByOrFail({ id: order.id });
+  });
 }
 
 export async function createOrderItems(

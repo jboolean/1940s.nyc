@@ -132,12 +132,6 @@ router.post<'/', unknown, unknown, Stripe.Event, unknown>(
               expandedSession.shipping_details?.address?.country ?? undefined,
           };
 
-          const order = await MerchOrderService.createEmptyMerchOrder(
-            userId,
-            session.id,
-            shippingAddress
-          );
-
           const itemTypes = compact(
             merchLineItems.map(
               (lineItem) =>
@@ -147,12 +141,14 @@ router.post<'/', unknown, unknown, Stripe.Event, unknown>(
                 )['merch-internal-variant']
             )
           );
-
-          const orderItems = await MerchOrderService.createOrderItems(
-            order,
+          const order = await MerchOrderService.createMerchOrder(
+            userId,
+            session.id,
+            shippingAddress,
             itemTypes
           );
-          console.log('created order items', orderItems);
+
+          console.log('Created merch order', order);
         }
 
         if (!creditsLineItems.length) {
