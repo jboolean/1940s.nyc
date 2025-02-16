@@ -110,7 +110,7 @@ router.post<'/', unknown, unknown, Stripe.Event, unknown>(
             userId,
             quantity,
             paymentIntentId,
-            subtotalAmountCents || 0
+            creditsLineItem.amount_subtotal || 0
           );
         }
 
