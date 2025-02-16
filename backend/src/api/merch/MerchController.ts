@@ -124,6 +124,22 @@ export class MerchController extends Controller {
     return orderToApi(order);
   }
 
+  @Security('user-token')
+  @Get('orders')
+  public async getMyOrders(
+    @Request() req: express.Request
+  ): Promise<MerchOrderApiModel[]> {
+    const userId = await getUserFromRequestOrCreateAndSetCookie(req);
+    const orders = await getRepository(MerchOrder)
+      .createQueryBuilder('order')
+      .innerJoinAndSelect('order.items', 'items')
+      .innerJoinAndSelect('order.user', 'user')
+      .where({ userId })
+      .getMany();
+
+    return orders.map(orderToApi);
+  }
+
   @Security('netlify', ['moderator'])
   @Get('orders/for-review')
   public async getOrdersForReview(): Promise<MerchOrderApiModel[]> {
