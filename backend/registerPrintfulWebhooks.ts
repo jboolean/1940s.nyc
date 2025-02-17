@@ -1,4 +1,4 @@
-import registerWebhooks from './src/business/merch/registerWebhooks';
+import registerPrintfulWebhooks from './src/business/merch/registerWebhooks';
 import withSetup from './withSetup';
 
-export const handler = withSetup(registerWebhooks);
+export const handler = withSetup(registerPrintfulWebhooks);
