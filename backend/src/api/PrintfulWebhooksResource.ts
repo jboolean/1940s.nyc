@@ -1,8 +1,7 @@
 import express from 'express';
-import {
-  onShipmentSent,
-  updateLocalStatus,
-} from '../business/merch/PrintfulService';
+import * as MerchOrderService from '../business/merch/MerchOrderService';
+import PrintfulToMerchOrderStatusMap from '../business/merch/PrintfulToMerchOrderStatusMap';
+import MerchProvider from '../enum/MerchProvider';
 import {
   OrderUpdated,
   ShipmentSent,
@@ -16,7 +15,13 @@ router.post<'/', unknown, unknown, Webhook, unknown>('/', async (req, res) => {
   switch (event.type) {
     case 'order_updated': {
       const order = (event as OrderUpdated).data.order;
-      await updateLocalStatus(order.id, order.status as PrintfulOrderStatus);
+      const newState =
+        PrintfulToMerchOrderStatusMap[order.status as PrintfulOrderStatus];
+      await MerchOrderService.onPrinterStatusChanged(
+        MerchProvider.PRINTFUL,
+        order.id,
+        newState
+      );
 
       break;
     }
@@ -24,7 +29,11 @@ router.post<'/', unknown, unknown, Webhook, unknown>('/', async (req, res) => {
       const shipmentSentEvent = event as ShipmentSent;
       const shipment = shipmentSentEvent.data.shipment;
       const order = shipmentSentEvent.data.order;
-      await onShipmentSent(order.id, shipment.tracking_number);
+      await MerchOrderService.onShipmentSent(
+        MerchProvider.PRINTFUL,
+        order.id,
+        shipment.tracking_url
+      );
       break;
     }
     default: {

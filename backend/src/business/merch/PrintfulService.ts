@@ -1,10 +1,5 @@
-import { getRepository } from 'typeorm';
-import MerchOrder from '../../entities/MerchOrder';
 import MerchOrderItem from '../../entities/MerchOrderItem';
 import ShippingAddress from '../../entities/ShippingAddress';
-import MerchOrderFulfillmentState from '../../enum/MerchOrderFulfillmentState';
-import MerchOrderState from '../../enum/MerchOrderState';
-import PrintfulOrderStatus from '../../third-party/printful/PrintfulOrderStatus';
 import {
   confirmOrder,
   createItemByOrderId,
@@ -16,7 +11,6 @@ import {
 } from '../utils/printfulApi';
 import required from '../utils/required';
 import { makePrintfulItem } from './PrintfulItemBuildService';
-import PrintfulToMerchOrderStatusMap from './PrintfulToMerchOrderStatusMap';
 
 function toPrintfulRecipient(address: ShippingAddress): PrintfulRecipient {
   return {
@@ -90,64 +84,4 @@ export async function submitOrderForFulfillment(
       order_id: printfulOrderId,
     },
   });
-}
-
-export async function updateLocalStatus(
-  printfulOrderId: number,
-  printfulOrderStatus: PrintfulOrderStatus
-): Promise<void> {
-  const orderRepository = getRepository(MerchOrder);
-  const order = await orderRepository.findOneBy({
-    providerOrderId: printfulOrderId,
-  });
-
-  if (!order) {
-    console.warn(`Order with printfulOrderId ${printfulOrderId} not found`);
-    return;
-  }
-
-  const newState = PrintfulToMerchOrderStatusMap[printfulOrderStatus];
-  if (newState !== order.fulfillmentState) {
-    console.log(
-      'Order fulfillment state transition',
-      order.state,
-      '->',
-      newState
-    );
-    order.fulfillmentState = newState;
-
-    // If needed, update the order state based on the fulfillment state
-    // Generally the order state is updated directly by this app, but if actions are taken directly in the printer, we need to update the state here
-    if (
-      [MerchOrderState.BUILDING, MerchOrderState.PENDING_SUBMISSION].includes(
-        order.state
-      )
-    ) {
-      if (newState === MerchOrderFulfillmentState.CANCELED) {
-        order.state = MerchOrderState.CANCELED;
-      } else if (newState !== MerchOrderFulfillmentState.DRAFT) {
-        // Any state besides draft means it was submitted for fulfillment
-        order.state = MerchOrderState.SUBMITTED_FOR_FULFILLMENT;
-      }
-    }
-    await orderRepository.save(order);
-  }
-}
-
-export async function onShipmentSent(
-  printfulOrderId: number,
-  trackingUrl: string
-): Promise<void> {
-  const orderRepository = getRepository(MerchOrder);
-  const order = await orderRepository.findOneBy({
-    providerOrderId: printfulOrderId,
-  });
-
-  if (!order) {
-    console.warn(`Order with printfulOrderId ${printfulOrderId} not found`);
-    return;
-  }
-
-  order.trackingUrl = trackingUrl;
-  await orderRepository.save(order);
 }
