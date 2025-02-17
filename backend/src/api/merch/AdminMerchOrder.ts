@@ -18,4 +18,5 @@ export interface MerchOrderApiModel {
   email?: string;
   state: MerchOrderState;
   items: MerchOrderItemApiModel[];
+  trackingUrl?: string;
 }

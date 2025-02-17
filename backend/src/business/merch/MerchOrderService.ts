@@ -105,3 +105,66 @@ export async function cancelOrder(orderId: number): Promise<void> {
   order.state = MerchOrderState.CANCELED;
   await orderRepository.save(order);
 }
+
+export async function onPrinterStatusChanged(
+  provider: MerchProvider,
+  providerOrderId: number,
+  newFulfillmentState: MerchOrderFulfillmentState
+): Promise<void> {
+  const orderRepository = getRepository(MerchOrder);
+  const order = await orderRepository.findOneBy({
+    provider,
+    providerOrderId,
+  });
+
+  if (!order) {
+    console.warn(`Order with providerOrderId ${providerOrderId} not found`);
+    return;
+  }
+
+  if (newFulfillmentState !== order.fulfillmentState) {
+    console.log(
+      'Order fulfillment state transition',
+      order.state,
+      '->',
+      newFulfillmentState
+    );
+    order.fulfillmentState = newFulfillmentState;
+
+    // If needed, update the order state based on the fulfillment state
+    // Generally the order state is updated directly by this app, but if actions are taken directly in the printer, we need to update the state here
+    if (
+      [MerchOrderState.BUILDING, MerchOrderState.PENDING_SUBMISSION].includes(
+        order.state
+      )
+    ) {
+      if (newFulfillmentState === MerchOrderFulfillmentState.CANCELED) {
+        order.state = MerchOrderState.CANCELED;
+      } else if (newFulfillmentState !== MerchOrderFulfillmentState.DRAFT) {
+        // Any state besides draft means it was submitted for fulfillment
+        order.state = MerchOrderState.SUBMITTED_FOR_FULFILLMENT;
+      }
+    }
+    await orderRepository.save(order);
+  }
+}
+
+export async function onShipmentSent(
+  provider: MerchProvider,
+  providerOrderId: number,
+  trackingUrl: string
+): Promise<void> {
+  const orderRepository = getRepository(MerchOrder);
+  const order = await orderRepository.findOneBy({
+    provider,
+    providerOrderId,
+  });
+
+  if (!order) {
+    console.warn(`Order with providerOrderId ${providerOrderId} not found`);
+    return;
+  }
+
+  order.trackingUrl = trackingUrl;
+  await orderRepository.save(order);
+}

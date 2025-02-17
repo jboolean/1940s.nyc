@@ -1,10 +1,5 @@
-import { getRepository } from 'typeorm';
-import MerchOrder from '../../entities/MerchOrder';
 import MerchOrderItem from '../../entities/MerchOrderItem';
 import ShippingAddress from '../../entities/ShippingAddress';
-import MerchOrderFulfillmentState from '../../enum/MerchOrderFulfillmentState';
-import MerchOrderState from '../../enum/MerchOrderState';
-import PrintfulOrderStatus from '../../third-party/printful/PrintfulOrderStatus';
 import {
   confirmOrder,
   createItemByOrderId,
@@ -16,7 +11,6 @@ import {
 } from '../utils/printfulApi';
 import required from '../utils/required';
 import { makePrintfulItem } from './PrintfulItemBuildService';
-import PrintfulToMerchOrderStatusMap from './PrintfulToMerchOrderStatusMap';
 
 function toPrintfulRecipient(address: ShippingAddress): PrintfulRecipient {
   return {
@@ -90,39 +84,4 @@ export async function submitOrderForFulfillment(
       order_id: printfulOrderId,
     },
   });
-}
-
-export async function updateLocalStatus(
-  printfulOrderId: number,
-  printfulOrderStatus: PrintfulOrderStatus
-): Promise<void> {
-  const orderRepository = getRepository(MerchOrder);
-  const order = await orderRepository.findOneBy({
-    providerOrderId: printfulOrderId,
-  });
-
-  if (!order) {
-    console.warn(`Order with printfulOrderId ${printfulOrderId} not found`);
-    return;
-  }
-
-  const newState = PrintfulToMerchOrderStatusMap[printfulOrderStatus];
-  if (newState !== order.fulfillmentState) {
-    console.log(
-      'Order fulfillment state transition',
-      order.state,
-      '->',
-      newState
-    );
-    order.fulfillmentState = newState;
-
-    // In case the order was submitted directly in the printer, update the order state
-    if (
-      order.state === MerchOrderState.PENDING_SUBMISSION &&
-      newState !== MerchOrderFulfillmentState.DRAFT
-    ) {
-      order.state = MerchOrderState.SUBMITTED_FOR_FULFILLMENT;
-    }
-    await orderRepository.save(order);
-  }
 }
