@@ -2,6 +2,8 @@ import { getRepository } from 'typeorm';
 import MerchOrder from '../../entities/MerchOrder';
 import MerchOrderItem from '../../entities/MerchOrderItem';
 import ShippingAddress from '../../entities/ShippingAddress';
+import MerchOrderFulfillmentState from '../../enum/MerchOrderFulfillmentState';
+import MerchOrderState from '../../enum/MerchOrderState';
 import PrintfulOrderStatus from '../../third-party/printful/PrintfulOrderStatus';
 import {
   confirmOrder,
@@ -113,6 +115,14 @@ export async function updateLocalStatus(
       newState
     );
     order.fulfillmentState = newState;
+
+    // In case the order was submitted directly in the printer, update the order state
+    if (
+      order.state === MerchOrderState.PENDING_SUBMISSION &&
+      newState !== MerchOrderFulfillmentState.DRAFT
+    ) {
+      order.state = MerchOrderState.SUBMITTED_FOR_FULFILLMENT;
+    }
     await orderRepository.save(order);
   }
 }
