@@ -126,3 +126,21 @@ export async function updateLocalStatus(
     await orderRepository.save(order);
   }
 }
+
+export async function onShipmentSent(
+  printfulOrderId: number,
+  trackingUrl: string
+): Promise<void> {
+  const orderRepository = getRepository(MerchOrder);
+  const order = await orderRepository.findOneBy({
+    providerOrderId: printfulOrderId,
+  });
+
+  if (!order) {
+    console.warn(`Order with printfulOrderId ${printfulOrderId} not found`);
+    return;
+  }
+
+  order.trackingUrl = trackingUrl;
+  await orderRepository.save(order);
+}

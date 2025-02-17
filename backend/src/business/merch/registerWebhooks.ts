@@ -8,7 +8,7 @@ const INTERESTED_EVENTS = [
   'order_updated',
   // 'order_failed',
   // 'order_canceled',
-  // 'shipment_sent',
+  'shipment_sent',
   // 'mockup_task_finished',
 ] as const;
 

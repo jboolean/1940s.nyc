@@ -47,4 +47,7 @@ export default class MerchOrder {
 
   @ManyToOne(() => User)
   user: User;
+
+  @Column({ nullable: true })
+  trackingUrl?: string;
 }

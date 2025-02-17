@@ -21,5 +21,6 @@ export function orderToApi(order: MerchOrder): MerchOrderApiModel {
     email: order.user.email ?? undefined,
     state: order.state,
     items: order.items.map(orderItemToApi),
+    trackingUrl: order.trackingUrl ?? undefined,
   };
 }
