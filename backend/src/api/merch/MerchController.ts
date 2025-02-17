@@ -22,7 +22,7 @@ import MerchItemState from '../../enum/MerchItemState';
 import MerchOrderFulfillmentState from '../../enum/MerchOrderFulfillmentState';
 import MerchOrderState from '../../enum/MerchOrderState';
 import { getUserFromRequestOrCreateAndSetCookie } from '../auth/userAuthUtils';
-import { MerchOrderApiModel } from './AdminMerchOrder';
+import { MerchOrderApiModel } from './OrderApiModel';
 import { orderToApi } from './orderToApi';
 
 @Route('/merch')
@@ -135,6 +135,7 @@ export class MerchController extends Controller {
       .innerJoinAndSelect('order.items', 'items')
       .innerJoinAndSelect('order.user', 'user')
       .where({ userId })
+      .orderBy('order.createdAt', 'DESC')
       .getMany();
 
     return orders.map(orderToApi);
@@ -148,6 +149,7 @@ export class MerchController extends Controller {
       .innerJoinAndSelect('order.items', 'items')
       .innerJoinAndSelect('order.user', 'user')
       .where({ state: MerchOrderState.PENDING_SUBMISSION })
+      .orderBy('order.createdAt', 'DESC')
       .getMany();
 
     return orders.map(orderToApi);
@@ -167,6 +169,7 @@ export class MerchController extends Controller {
           MerchOrderFulfillmentState.ON_HOLD,
         ],
       })
+      .orderBy('order.createdAt', 'DESC')
       .getMany();
 
     return orders.map(orderToApi);

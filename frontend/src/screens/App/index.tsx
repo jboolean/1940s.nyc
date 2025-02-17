@@ -23,6 +23,7 @@ import CreditPurchaseModal, {
 } from './screens/CreditPurchaseModal';
 import EditStory from './screens/EditStory';
 import FeatureFlags from './screens/FeatureFlags';
+import Orders from './screens/Merch/screens/Orders';
 import SubmitStoryWizard from './screens/SubmitStoryWizard';
 import TipJar, { useTipJarStore } from './screens/TipJar';
 
@@ -130,6 +131,9 @@ export default function App(): JSX.Element {
                 </Route>
                 <Route path={['/stories/photo/:identifier', '/stories']}>
                   <AllStories className={stylesheet.outtakesContainer} />
+                </Route>
+                <Route path="/orders">
+                  <Orders />
                 </Route>
                 <Route path="/labs">
                   <FeatureFlags />

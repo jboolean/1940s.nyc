@@ -67,7 +67,15 @@ const MANHATTAN = [
   -74.04772962763064, 40.68291694544512, -73.90665099539478, 40.87903804730722,
 ];
 
-export const installLayers = (map: mapboxgl.Map, photoLayer: string): void => {
+export const installLayers = (
+  map: mapboxgl.Map,
+  photoLayer: string,
+  {
+    fadeOverlays = true,
+  }: {
+    fadeOverlays?: boolean;
+  } = {}
+): void => {
   [
     {
       url: 'https://nypl-tiles.1940s.nyc/1067/{z}/{x}/{y}.png',
@@ -129,18 +137,20 @@ export const installLayers = (map: mapboxgl.Map, photoLayer: string): void => {
     );
   });
 
-  map.setLayerZoomRange('atlas-1930', 14, 24);
-  map.setPaintProperty('atlas-1930', 'raster-opacity', [
-    'interpolate',
-    ['linear'],
-    ['zoom'],
-    14,
-    0,
-    15,
-    0.1,
-    17,
-    1,
-  ]);
+  if (fadeOverlays) {
+    map.setLayerZoomRange('atlas-1930', 14, 24);
+    map.setPaintProperty('atlas-1930', 'raster-opacity', [
+      'interpolate',
+      ['linear'],
+      ['zoom'],
+      14,
+      0,
+      15,
+      0.1,
+      17,
+      1,
+    ]);
+  }
 };
 
 export const setOverlay = (
