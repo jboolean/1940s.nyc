@@ -116,12 +116,19 @@ export async function updateLocalStatus(
     );
     order.fulfillmentState = newState;
 
-    // In case the order was submitted directly in the printer, update the order state
+    // If needed, update the order state based on the fulfillment state
+    // Generally the order state is updated directly by this app, but if actions are taken directly in the printer, we need to update the state here
     if (
-      order.state === MerchOrderState.PENDING_SUBMISSION &&
-      newState !== MerchOrderFulfillmentState.DRAFT
+      [MerchOrderState.BUILDING, MerchOrderState.PENDING_SUBMISSION].includes(
+        order.state
+      )
     ) {
-      order.state = MerchOrderState.SUBMITTED_FOR_FULFILLMENT;
+      if (newState === MerchOrderFulfillmentState.CANCELED) {
+        order.state = MerchOrderState.CANCELED;
+      } else if (newState !== MerchOrderFulfillmentState.DRAFT) {
+        // Any state besides draft means it was submitted for fulfillment
+        order.state = MerchOrderState.SUBMITTED_FOR_FULFILLMENT;
+      }
     }
     await orderRepository.save(order);
   }
