@@ -29,6 +29,7 @@ export default function FourtiesModal({
   ...props
 }: FourtiesModalProps): JSX.Element {
   const [width, height] = useWindowSize();
+  // On small screens the modal is full width and uses the light theme
   const isFullWidthModal =
     width <= MODAL_WIDTH_MAX || height <= MODAL_HEIGHT_MAX;
   const theme = isFullWidthModal ? 'light' : 'dark';
