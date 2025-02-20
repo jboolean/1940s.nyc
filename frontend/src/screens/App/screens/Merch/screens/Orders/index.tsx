@@ -49,7 +49,7 @@ function OrderStatus({ order }: { order: Order }): JSX.Element {
       if (needsCustomization) {
         return (
           <span>
-            Click <i>Customize</i> so I can make you something unique!
+            Click <i>Customize</i> so I can make you something unique
           </span>
         );
       }
@@ -90,7 +90,7 @@ function OrderItem({ item }: { item: Order['items'][0] }): JSX.Element {
     <li key={item.id} className={stylesheet.orderItem}>
       <img
         src={itemImages[item.internalVariant]}
-        alt="Tote bag"
+        alt="Product image"
         className={stylesheet.itemImage}
       />
       <h3 className={stylesheet.itemName}>
