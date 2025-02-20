@@ -1,6 +1,7 @@
 import MerchCustomizationOptions from '../../entities/MerchCustomizationOptions';
 import MerchInternalVariant from '../../enum/MerchInternalVariant';
 import MerchItemState from '../../enum/MerchItemState';
+import MerchOrderFulfillmentState from '../../enum/MerchOrderFulfillmentState';
 import MerchOrderState from '../../enum/MerchOrderState';
 
 export interface MerchOrderItemApiModel {
@@ -17,6 +18,7 @@ export interface MerchOrderApiModel {
   userId: number;
   email?: string;
   state: MerchOrderState;
+  fulfillmentState?: MerchOrderFulfillmentState;
   items: MerchOrderItemApiModel[];
   trackingUrl?: string;
 }

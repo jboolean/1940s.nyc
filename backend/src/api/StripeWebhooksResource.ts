@@ -133,13 +133,16 @@ router.post<'/', unknown, unknown, Stripe.Event, unknown>(
           };
 
           const itemTypes = compact(
-            merchLineItems.map(
-              (lineItem) =>
-                (
-                  (lineItem.price?.product as Stripe.Product)
-                    .metadata as ProductMetadata
-                )['merch-internal-variant']
-            )
+            merchLineItems.flatMap((lineItem) => {
+              const variantType = (
+                (lineItem.price?.product as Stripe.Product)
+                  .metadata as ProductMetadata
+              )['merch-internal-variant'];
+              const quantity = lineItem.quantity ?? 1;
+              return Array<MerchInternalVariant | undefined>(quantity).fill(
+                variantType
+              );
+            })
           );
           const order = await MerchOrderService.createMerchOrder(
             userId,

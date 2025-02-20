@@ -19,6 +19,7 @@ export default function LoginForm({
     onSubmitLogin,
     isFollowMagicLinkMessageVisible,
     isVerifyEmailMessageVisible,
+    isEmailUpdatedMessageVisible,
   } = useLoginStore();
 
   return (
@@ -66,6 +67,11 @@ export default function LoginForm({
         <p className={stylesheet.magicLinkMessage}>
           Please verify your email address by clicking the link emailed to{' '}
           <i>{emailAddress}</i> to continue.
+        </p>
+      )}
+      {isEmailUpdatedMessageVisible && (
+        <p className={stylesheet.magicLinkMessage}>
+          Your email address on this account has been updated.
         </p>
       )}
     </form>

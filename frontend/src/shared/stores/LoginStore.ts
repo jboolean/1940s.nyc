@@ -11,6 +11,7 @@ interface State {
   isLoginValidated: boolean;
   isFollowMagicLinkMessageVisible: boolean;
   isVerifyEmailMessageVisible: boolean;
+  isEmailUpdatedMessageVisible: boolean;
 }
 
 interface Actions {
@@ -29,14 +30,19 @@ const useLoginStore = create(
     isLoginValidated: false,
     isFollowMagicLinkMessageVisible: false,
     isVerifyEmailMessageVisible: false,
+    isEmailUpdatedMessageVisible: false,
 
     initialize: () => {
+      set((draft) => {
+        draft.isLoginValidated = false;
+      });
       getMe()
         .then((me) => {
           set((draft) => {
             draft.emailAddress = me.email || '';
             draft.isFollowMagicLinkMessageVisible = false;
             draft.isVerifyEmailMessageVisible = false;
+            draft.isEmailUpdatedMessageVisible = false;
           });
         })
         .catch((err: unknown) => {
@@ -48,6 +54,7 @@ const useLoginStore = create(
       set((draft) => {
         draft.emailAddress = emailAddress;
         draft.isFollowMagicLinkMessageVisible = false;
+        draft.isEmailUpdatedMessageVisible = false;
         draft.isLoginValidated = false;
       });
     },
@@ -75,6 +82,12 @@ const useLoginStore = create(
           draft.isFollowMagicLinkMessageVisible = false;
           draft.isVerifyEmailMessageVisible = false;
         });
+        if (outcome === LoginOutcome.UpdatedEmailOnAuthenticatedAccount) {
+          set((draft) => {
+            // The user must follow the link to log into another account
+            draft.isEmailUpdatedMessageVisible = true;
+          });
+        }
       } else if (outcome === LoginOutcome.SentLinkToExistingAccount) {
         set((draft) => {
           // The user must follow the link to log into another account, or verify their email

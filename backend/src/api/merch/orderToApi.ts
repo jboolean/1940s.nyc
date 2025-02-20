@@ -1,7 +1,7 @@
 import { getPrintfileUrl } from '../../business/merch/PrintfulItemBuildService';
 import MerchOrder from '../../entities/MerchOrder';
 import MerchOrderItem from '../../entities/MerchOrderItem';
-import { MerchOrderApiModel, MerchOrderItemApiModel } from './AdminMerchOrder';
+import { MerchOrderApiModel, MerchOrderItemApiModel } from './OrderApiModel';
 
 export function orderItemToApi(item: MerchOrderItem): MerchOrderItemApiModel {
   return {
@@ -20,6 +20,7 @@ export function orderToApi(order: MerchOrder): MerchOrderApiModel {
     userId: order.userId,
     email: order.user.email ?? undefined,
     state: order.state,
+    fulfillmentState: order.fulfillmentState,
     items: order.items.map(orderItemToApi),
     trackingUrl: order.trackingUrl ?? undefined,
   };

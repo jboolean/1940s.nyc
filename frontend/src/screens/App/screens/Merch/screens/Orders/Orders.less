@@ -1,0 +1,71 @@
+@import '../../../../../../shared/styles/colors.less';
+
+:local {
+  .container {
+    margin: 1rem;
+  }
+
+  .aside {
+    background-color: @green;
+    color: @creme;
+    padding: 0.5rem;
+    margin: 1rem 0;
+  }
+
+  .linkButton {
+    display: inline;
+    padding: 0;
+    border: 0;
+    font: inherit;
+    text-decoration: underline;
+    cursor: pointer;
+    background: transparent;
+    color: currentColor;
+
+    appearance: none;
+  }
+
+  .ordersList {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .order {
+    display: block;
+    border-bottom: 1px solid @font-color-dark;
+    padding: 0;
+    margin: 0;
+  }
+
+  .orderItems {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .orderItem {
+    display: grid;
+    grid-template-columns: 10rem 1fr;
+    grid-template-rows: auto;
+    grid-template-areas:
+      'image name'
+      'image actions';
+
+    padding: 2rem 0;
+
+    .itemImage {
+      grid-area: image;
+      display: block;
+      width: 100%;
+    }
+
+    .itemName {
+      grid-area: name;
+    }
+
+    .itemActions {
+      grid-area: actions;
+    }
+  }
+}

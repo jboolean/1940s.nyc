@@ -23,6 +23,7 @@ import CreditPurchaseModal, {
 } from './screens/CreditPurchaseModal';
 import EditStory from './screens/EditStory';
 import FeatureFlags from './screens/FeatureFlags';
+import Orders from './screens/Merch/screens/Orders';
 import SubmitStoryWizard from './screens/SubmitStoryWizard';
 import TipJar, { useTipJarStore } from './screens/TipJar';
 
@@ -95,33 +96,46 @@ function Modals(): JSX.Element {
   );
 }
 
+function MainContentLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}): JSX.Element {
+  return (
+    <div className={stylesheet.outermostContainer}>
+      <AnnouncementBanner />
+      <Modals />
+      <div className={stylesheet.mainContentWrapper}>
+        <div className={stylesheet.mainContentContainer}>{children}</div>
+      </div>
+    </div>
+  );
+}
+
+function ContextWrappers({
+  children,
+}: {
+  children: React.ReactNode;
+}): JSX.Element {
+  return <OptimizeExperimentsProvider>{children}</OptimizeExperimentsProvider>;
+}
+
 export default function App(): JSX.Element {
   return (
-    <OptimizeExperimentsProvider>
-      <div className={stylesheet.outermostContainer}>
-        <Router history={history}>
-          <Switch>
-            <Route path="/render-merch"></Route>
-            <Route>
-              <AnnouncementBanner />
-            </Route>
-          </Switch>
-          <div className={stylesheet.mainContentWrapper}>
-            <div className={stylesheet.mainContentContainer}>
-              <Modals />
-
+    <ContextWrappers>
+      <Router history={history}>
+        <Switch>
+          {/* Routes with main layout (image viewer, announcements, modals) */}
+          <Route path={['/map', '/outtakes', '/stories']}>
+            <MainContentLayout>
               <Route path="/*/photo/:identifier">
                 <ViewerPane className={stylesheet.viewer} />
               </Route>
               <Switch>
-                {!IS_SHUTDOWN && (
-                  <Route
-                    path={['/map/photo/:identifier', '/map']}
-                    render={() => (
-                      <MapPane className={stylesheet.mapContainer} />
-                    )}
-                  />
-                )}
+                <Route
+                  path={['/map/photo/:identifier', '/map']}
+                  render={() => <MapPane className={stylesheet.mapContainer} />}
+                />
                 <Route path={['/outtakes/photo/:identifier', '/outtakes']}>
                   <Outtakes className={stylesheet.outtakesContainer} />
                 </Route>
@@ -131,21 +145,29 @@ export default function App(): JSX.Element {
                 <Route path={['/stories/photo/:identifier', '/stories']}>
                   <AllStories className={stylesheet.outtakesContainer} />
                 </Route>
-                <Route path="/labs">
-                  <FeatureFlags />
-                </Route>
-                <Route path="/admin">
-                  <AdminRoutes />
-                </Route>
-                <Route path="/render-merch/tote-bag">
-                  <ToteBag />
-                </Route>
-                {!IS_SHUTDOWN && <Redirect to="/map" />}
               </Switch>
-            </div>
-          </div>
-        </Router>
-      </div>
-    </OptimizeExperimentsProvider>
+            </MainContentLayout>
+          </Route>
+          <Route>
+            {/* Routes without main layout */}
+            <Switch>
+              <Route path="/orders">
+                <Orders />
+              </Route>
+              <Route path="/labs">
+                <FeatureFlags />
+              </Route>
+              <Route path="/admin">
+                <AdminRoutes />
+              </Route>
+              <Route path="/render-merch/tote-bag">
+                <ToteBag />
+              </Route>
+              <Redirect to="/map" />
+            </Switch>
+          </Route>
+        </Switch>
+      </Router>
+    </ContextWrappers>
   );
 }
