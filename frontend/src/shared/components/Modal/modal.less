@@ -109,11 +109,10 @@
   }
 }
 
-@media screen and (max-width: @modal-width-max),
-  screen and (max-height: @modal-height-max) {
-  .modal.small,
-  .modal.large,
-  .modal.x-large {
+.modal.fullWidth {
+  &.small,
+  &.large,
+  &.x-large {
     display: block;
     position: relative;
     transform: none;
@@ -127,11 +126,15 @@
     max-width: 100%;
     max-height: 100%;
 
-    background: @creme;
     text-align: left;
 
     hr {
       margin: 0;
     }
   }
+}
+
+.modal.color-theme-light {
+  background-color: @creme;
+  color: @font-color-dark;
 }

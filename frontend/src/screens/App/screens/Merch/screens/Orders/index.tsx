@@ -14,6 +14,7 @@ import {
 } from './shared/utils/Order';
 
 import Button from 'shared/components/Button';
+import { ColorThemeContext } from 'shared/components/ColorThemeContext';
 import ExternalIcon from 'shared/components/ExternalIcon';
 import stylesheet from './Orders.less';
 import ToteBagSmallImage from './assets/tote-bag-small-default.png';
@@ -147,17 +148,19 @@ export default function Orders(): JSX.Element {
       <LoginModal />
       <CustomizeModal />
       <aside className={stylesheet.aside}>
-        <p>
-          Not showing your orders?{' '}
-          <button onClick={openLogin} className={stylesheet.linkButton}>
-            Log into another account
-          </button>
-          .
-        </p>
-        <p>
-          For support email{' '}
-          <a href="mailto:julian@1940.nyc">julian@1940s.nyc</a>
-        </p>
+        <ColorThemeContext.Provider value="dark">
+          <p>
+            Not showing your orders?{' '}
+            <button onClick={openLogin} className={stylesheet.linkButton}>
+              Log into another account
+            </button>
+            .
+          </p>
+          <p>
+            For support email{' '}
+            <a href="mailto:julian@1940.nyc">julian@1940s.nyc</a>
+          </p>
+        </ColorThemeContext.Provider>
       </aside>
       <h1>Orders</h1>
       <div>

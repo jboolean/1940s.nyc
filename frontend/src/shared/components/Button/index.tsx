@@ -1,6 +1,7 @@
 import classNames from 'classnames';
 import React from 'react';
 
+import { ColorThemeContext } from '../ColorThemeContext';
 import stylesheet from './button.less';
 
 type ButtonStyleProps = {
@@ -26,17 +27,22 @@ export default function Button({
   ...props
 }: ButtonProps): JSX.Element {
   return (
-    <button
-      type="button"
-      {...props}
-      className={classNames(
-        stylesheet.button,
-        { [stylesheet.active]: isActive },
-        stylesheet[buttonStyle],
-        stylesheet[buttonTheme],
-        className
+    <ColorThemeContext.Consumer>
+      {(colorTheme) => (
+        <button
+          type="button"
+          {...props}
+          className={classNames(
+            stylesheet.button,
+            { [stylesheet.active]: isActive },
+            stylesheet[buttonStyle],
+            stylesheet[buttonTheme],
+            stylesheet['color-theme-' + colorTheme],
+            className
+          )}
+        />
       )}
-    />
+    </ColorThemeContext.Consumer>
   );
 }
 
@@ -48,15 +54,20 @@ export function ButtonStyledLink({
   ...props
 }: ButtonStyledLinkProps): JSX.Element {
   return (
-    <a
-      {...props}
-      className={classNames(
-        stylesheet.button,
-        { [stylesheet.active]: isActive },
-        stylesheet[buttonStyle],
-        stylesheet[buttonTheme],
-        className
+    <ColorThemeContext.Consumer>
+      {(colorTheme) => (
+        <a
+          {...props}
+          className={classNames(
+            stylesheet.button,
+            { [stylesheet.active]: isActive },
+            stylesheet[buttonStyle],
+            stylesheet[buttonTheme],
+            stylesheet['color-theme-' + colorTheme],
+            className
+          )}
+        />
       )}
-    />
+    </ColorThemeContext.Consumer>
   );
 }

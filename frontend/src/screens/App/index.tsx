@@ -112,9 +112,17 @@ function MainContentLayout({
   );
 }
 
+function ContextWrappers({
+  children,
+}: {
+  children: React.ReactNode;
+}): JSX.Element {
+  return <OptimizeExperimentsProvider>{children}</OptimizeExperimentsProvider>;
+}
+
 export default function App(): JSX.Element {
   return (
-    <OptimizeExperimentsProvider>
+    <ContextWrappers>
       <Router history={history}>
         <Switch>
           {/* Routes with main layout (image viewer, announcements, modals) */}
@@ -160,6 +168,6 @@ export default function App(): JSX.Element {
           </Route>
         </Switch>
       </Router>
-    </OptimizeExperimentsProvider>
+    </ContextWrappers>
   );
 }
