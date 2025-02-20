@@ -35,11 +35,19 @@ function createUserTokenForMagicLink(userId: number): string {
   });
 }
 
-export function getUserIdFromToken(token: string): number | undefined {
+export function getUserIdFromToken(
+  token: string,
+  {
+    ignoreExpiration = false,
+  }: {
+    ignoreExpiration?: boolean;
+  } = {}
+): number | undefined {
   try {
     const { sub } = jwt.verify(token, JWT_SECRET, {
       algorithms: ['HS256'],
       issuer: ISSUER,
+      ignoreExpiration,
     }) as { sub: string };
 
     if (!sub.startsWith(SUBJECT_PREFIX)) {
@@ -171,6 +179,19 @@ async function sendMagicLink(
   });
 
   await EmailService.sendTemplateEmail(emailMessage);
+}
+
+export async function sendMagicLinkToUser(
+  userId: number,
+  apiBase: string,
+  returnToPath?: string
+): Promise<void> {
+  const user = await getUser(userId);
+  if (!user.email) {
+    return;
+  }
+
+  return sendMagicLink(user.email, userId, apiBase, returnToPath);
 }
 
 /**
