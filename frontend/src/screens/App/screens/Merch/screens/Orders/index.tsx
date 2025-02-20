@@ -13,25 +13,48 @@ import {
   Order,
 } from './shared/utils/Order';
 
+import Button from 'shared/components/Button';
+import ExternalIcon from 'shared/components/ExternalIcon';
+import stylesheet from './Orders.less';
+import ToteBagSmallImage from './assets/tote-bag-small-default.png';
+
 const itemDisplayNames: Record<MerchInternalVariant, string> = {
   [MerchInternalVariant.TOTE_BAG_SMALL]: 'Tote bag',
 };
 
+const itemImages: Record<MerchInternalVariant, string> = {
+  [MerchInternalVariant.TOTE_BAG_SMALL]: ToteBagSmallImage,
+};
+
+function TrackOrderLink({ order }: { order: Order }): JSX.Element {
+  if (!order.trackingUrl) {
+    return null;
+  }
+  return (
+    <a href={order.trackingUrl} target="_blank" rel="noreferrer">
+      Track shipment <ExternalIcon />
+    </a>
+  );
+}
+
 function OrderStatus({ order }: { order: Order }): JSX.Element {
-  const { state, fulfillmentState, trackingUrl } = order;
-  const trackingText = trackingUrl ? (
-    <>
-      {' '}
-      <a href={trackingUrl} target="_blank" rel="noreferrer">
-        Click to track shipment
-      </a>
-      .
-    </>
-  ) : null;
+  const { state, fulfillmentState } = order;
+
   switch (state) {
-    case MerchOrderState.BUILDING:
-      // Not sure what to say here, it could require customization or being internally processed.
-      return null;
+    case MerchOrderState.BUILDING: {
+      const needsCustomization = order.items.some(
+        (item) => item.state === MerchItemState.PURCHASED
+      );
+      if (needsCustomization) {
+        return (
+          <span>
+            Click <i>Customize</i> to complete your unique order.
+          </span>
+        );
+      }
+      return <span>Order received.</span>;
+    }
+
     case MerchOrderState.PENDING_SUBMISSION:
     case MerchOrderState.SUBMITTED_FOR_FULFILLMENT:
       switch (fulfillmentState) {
@@ -40,15 +63,15 @@ function OrderStatus({ order }: { order: Order }): JSX.Element {
         case MerchOrderFulfillmentState.PENDING:
         case MerchOrderFulfillmentState.IN_PROGRESS:
         case MerchOrderFulfillmentState.PARTIAL:
-          return <span>Order is in process.{trackingText}</span>;
+          return <span>In process.</span>;
         case MerchOrderFulfillmentState.ON_HOLD:
-          return <span>Order is on hold. {trackingText}</span>;
+          return <span>On hold. </span>;
         case MerchOrderFulfillmentState.FAILED:
           return <span>Something went wrong</span>;
         case MerchOrderFulfillmentState.CANCELED:
-          return <span>Order canceled</span>;
+          return <span>Canceled</span>;
         case MerchOrderFulfillmentState.FULFILLED:
-          return <span>Order has been sent out. {trackingText}</span>;
+          return <span>Order shipped.</span>;
         default:
           return absurd(fulfillmentState);
       }
@@ -59,26 +82,50 @@ function OrderStatus({ order }: { order: Order }): JSX.Element {
   }
 }
 
-function OrdersList({ orders }: { orders: Order[] }): JSX.Element {
+function OrderItem({ item }: { item: Order['items'][0] }): JSX.Element {
   const { openItemForCustomizing } = useOrdersStore();
+
   return (
-    <ul>
+    <li key={item.id} className={stylesheet.orderItem}>
+      <img
+        src={itemImages[item.internalVariant]}
+        alt="Tote bag"
+        className={stylesheet.itemImage}
+      />
+      <h3 className={stylesheet.itemName}>
+        {itemDisplayNames[item.internalVariant]}
+      </h3>
+      <div className={stylesheet.itemActions}>
+        {item.state === MerchItemState.PURCHASED ? (
+          <Button
+            onClick={() => openItemForCustomizing(item)}
+            buttonStyle="primary"
+          >
+            Customize
+          </Button>
+        ) : null}
+      </div>
+    </li>
+  );
+}
+
+function OrdersList({ orders }: { orders: Order[] }): JSX.Element {
+  const formatter = new Intl.DateTimeFormat('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+  return (
+    <ul className={stylesheet.ordersList}>
       {orders.map((order) => (
-        <li key={order.id}>
-          <h2>Order #{order.id}</h2>
+        <li key={order.id} className={stylesheet.order}>
+          <h2>{formatter.format(new Date(order.createdAt))}</h2>
           <div>
-            <OrderStatus order={order} />
+            <OrderStatus order={order} /> <TrackOrderLink order={order} />
           </div>
-          <ol>
+          <ol className={stylesheet.orderItems}>
             {order.items.map((item) => (
-              <li key={item.id}>
-                <h3>{itemDisplayNames[item.internalVariant]}</h3>
-                {item.state === MerchItemState.PURCHASED ? (
-                  <button onClick={() => openItemForCustomizing(item)}>
-                    Customize
-                  </button>
-                ) : null}
-              </li>
+              <OrderItem key={item.id} item={item} />
             ))}
           </ol>
         </li>
@@ -95,14 +142,23 @@ export default function Orders(): JSX.Element {
   }, [loadOrders]);
 
   return (
-    <div>
-      <Link to="/">Back to home</Link>
+    <div className={stylesheet.container}>
+      <Link to="/">← Back to 1940s.nyc</Link>
       <LoginModal />
       <CustomizeModal />
-      <p>
-        Not showing your orders?{' '}
-        <button onClick={openLogin}>Log into another account</button>.
-      </p>
+      <aside className={stylesheet.aside}>
+        <p>
+          Not showing your orders?{' '}
+          <button onClick={openLogin} className={stylesheet.linkButton}>
+            Log into another account
+          </button>
+          .
+        </p>
+        <p>
+          For support email{' '}
+          <a href="mailto:julian@1940.nyc">julian@1940s.nyc</a>
+        </p>
+      </aside>
       <h1>Orders</h1>
       <div>
         {orders ? (
