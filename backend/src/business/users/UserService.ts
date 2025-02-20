@@ -127,12 +127,11 @@ export async function createUser(
   return { token, userId: user.id };
 }
 
-async function sendMagicLink(
-  emailAddress: string,
-  userId: number,
+export function createMagicLinkUrl(
   apiBase: string,
+  userId: number,
   returnToPath?: string
-): Promise<void> {
+): URL {
   const loginUrl: URL = new URL(
     '/authentication/login-with-magic-link',
     apiBase
@@ -147,6 +146,16 @@ async function sendMagicLink(
   }
 
   loginUrl.search = params.toString();
+  return loginUrl;
+}
+
+async function sendMagicLink(
+  emailAddress: string,
+  userId: number,
+  apiBase: string,
+  returnToPath?: string
+): Promise<void> {
+  const loginUrl = createMagicLinkUrl(apiBase, userId, returnToPath);
 
   const emailMessage = MagicLinkTemplate.createTemplatedEmail({
     to: emailAddress,
