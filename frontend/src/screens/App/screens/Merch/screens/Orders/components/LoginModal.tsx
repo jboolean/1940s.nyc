@@ -16,7 +16,7 @@ export default function LoginModal(): JSX.Element {
       onRequestClose={closeLogin}
       shouldCloseOnEsc
       shouldCloseOnOverlayClick
-      size="x-large"
+      size="small"
       isCloseButtonVisible={true}
     >
       <div>

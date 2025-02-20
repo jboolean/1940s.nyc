@@ -48,7 +48,7 @@ function OrderStatus({ order }: { order: Order }): JSX.Element {
       if (needsCustomization) {
         return (
           <span>
-            Click <i>Customize</i> to complete your unique order.
+            Click <i>Customize</i> so I can make you something unique!
           </span>
         );
       }

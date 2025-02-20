@@ -1,25 +1,25 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import React from 'react';
 
-import { OverlayId } from './components/MainMap';
 import classnames from 'classnames';
 import { Feature, Point } from 'geojson';
-import { closest } from 'utils/photosApi';
 import noop from 'lodash/noop';
 import uniqueId from 'lodash/uniqueId';
+import { closest } from 'utils/photosApi';
+import { OverlayId } from './components/MainMap';
 
+import { RouteComponentProps, withRouter } from 'react-router';
+import { Link } from 'react-router-dom';
 import stylesheet from './MapPane.less';
+import Geolocate from './components/Geolocate';
 import MainMap from './components/MainMap';
 import Search from './components/Search';
-import Geolocate from './components/Geolocate';
-import { withRouter, RouteComponentProps } from 'react-router';
-import { Link } from 'react-router-dom';
 
-import recordEvent from 'shared/utils/recordEvent';
-import ExternalIcon from './assets/external.svg?asset';
 import { NumericFormat } from 'react-number-format';
-import useAmountPresets from '../TipJar/useAmountPresets';
+import ExternalIcon from 'shared/components/ExternalIcon';
+import recordEvent from 'shared/utils/recordEvent';
 import { useTipJarStore } from '../TipJar';
+import useAmountPresets from '../TipJar/useAmountPresets';
 
 function SuggestedTip(): JSX.Element {
   const [lowestAmount] = useAmountPresets();
@@ -146,12 +146,7 @@ class MapPane extends React.Component<Props & RouteComponentProps, State> {
               alert('You you leaving 1940s.nyc for an unaffiliated site.');
             }}
           >
-            1980s{' '}
-            <img
-              src={ExternalIcon}
-              alt="External link"
-              className={stylesheet.externalIcon}
-            />
+            1980s <ExternalIcon />
           </a>
         </div>
         <div className={stylesheet.topControls}>
