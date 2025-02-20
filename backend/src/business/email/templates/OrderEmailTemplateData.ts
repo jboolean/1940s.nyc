@@ -1,5 +1,6 @@
 export interface OrderTemplateData {
   ordersUrl: string;
+  trackingUrl?: string;
 }
 
 export interface OrderMetadata {
