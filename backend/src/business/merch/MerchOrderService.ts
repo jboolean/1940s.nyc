@@ -7,9 +7,17 @@ import MerchInternalVariant from '../../enum/MerchInternalVariant';
 import MerchOrderFulfillmentState from '../../enum/MerchOrderFulfillmentState';
 import MerchOrderState from '../../enum/MerchOrderState';
 import MerchProvider from '../../enum/MerchProvider';
+import EmailService from '../email/EmailService';
+import OrderCustomizeTemplate from '../email/templates/OrderCustomizeTemplate';
+import * as UserService from '../users/UserService';
 import absurd from '../utils/absurd';
+import isProduction from '../utils/isProduction';
 import required from '../utils/required';
 import * as PrintfulService from './PrintfulService';
+
+const API_BASE = isProduction()
+  ? 'http://api.1940s.nyc'
+  : 'http://dev.1940s.nyc:3000';
 
 export async function createMerchOrder(
   userId: number,
@@ -48,7 +56,32 @@ export async function createMerchOrder(
     });
     await itemRepository.save(items);
 
-    return orderRepository.findOneByOrFail({ id: order.id });
+    order = await orderRepository.findOneByOrFail({ id: order.id });
+
+    const user = await UserService.getUser(userId);
+
+    if (user.email) {
+      // There really should be an email at this point, set earlier in the Stripe webhook
+
+      const orderCustomizeEmail = OrderCustomizeTemplate.createTemplatedEmail({
+        to: user.email,
+        templateContext: {
+          ordersUrl: UserService.createMagicLinkUrl(
+            API_BASE,
+            userId,
+            '/orders'
+          ).toString(),
+        },
+        metadata: {
+          orderId: order.id.toString(),
+          userId: user.id.toString(),
+        },
+      });
+
+      await EmailService.sendTemplateEmail(orderCustomizeEmail);
+    }
+
+    return order;
   });
 }
 

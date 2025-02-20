@@ -35,11 +35,19 @@ function createUserTokenForMagicLink(userId: number): string {
   });
 }
 
-export function getUserIdFromToken(token: string): number | undefined {
+export function getUserIdFromToken(
+  token: string,
+  {
+    ignoreExpiration = false,
+  }: {
+    ignoreExpiration?: boolean;
+  } = {}
+): number | undefined {
   try {
     const { sub } = jwt.verify(token, JWT_SECRET, {
       algorithms: ['HS256'],
       issuer: ISSUER,
+      ignoreExpiration,
     }) as { sub: string };
 
     if (!sub.startsWith(SUBJECT_PREFIX)) {
@@ -127,12 +135,11 @@ export async function createUser(
   return { token, userId: user.id };
 }
 
-async function sendMagicLink(
-  emailAddress: string,
-  userId: number,
+export function createMagicLinkUrl(
   apiBase: string,
+  userId: number,
   returnToPath?: string
-): Promise<void> {
+): URL {
   const loginUrl: URL = new URL(
     '/authentication/login-with-magic-link',
     apiBase
@@ -147,6 +154,16 @@ async function sendMagicLink(
   }
 
   loginUrl.search = params.toString();
+  return loginUrl;
+}
+
+async function sendMagicLink(
+  emailAddress: string,
+  userId: number,
+  apiBase: string,
+  returnToPath?: string
+): Promise<void> {
+  const loginUrl = createMagicLinkUrl(apiBase, userId, returnToPath);
 
   const emailMessage = MagicLinkTemplate.createTemplatedEmail({
     to: emailAddress,
@@ -162,6 +179,19 @@ async function sendMagicLink(
   });
 
   await EmailService.sendTemplateEmail(emailMessage);
+}
+
+export async function sendMagicLinkToUser(
+  userId: number,
+  apiBase: string,
+  returnToPath?: string
+): Promise<void> {
+  const user = await getUser(userId);
+  if (!user.email) {
+    return;
+  }
+
+  return sendMagicLink(user.email, userId, apiBase, returnToPath);
 }
 
 /**

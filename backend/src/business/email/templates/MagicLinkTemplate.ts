@@ -1,17 +1,17 @@
 import EmailTemplate from '../EmailTemplate';
 import EmailStreamType from './EmailStreamType';
-import Senders from './Senders';
 import {
-  MagicLinkTemplateData,
   MagicLinkMetadata,
+  MagicLinkTemplateData,
 } from './MagicLinkEmailTemplateData';
+import Senders from './Senders';
 
 class MagicLinkTemplate extends EmailTemplate<
   MagicLinkTemplateData,
   MagicLinkMetadata
 > {
   alias = 'magic-link';
-  from = Senders.PERSONAL;
+  from = Senders.SYSTEM;
   streamType = EmailStreamType.TRANSACTIONAL;
 }
 

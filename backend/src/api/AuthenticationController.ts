@@ -1,5 +1,5 @@
 import * as express from 'express';
-import { BadRequest, Unauthorized } from 'http-errors';
+import { BadRequest } from 'http-errors';
 import {
   Body,
   Controller,
@@ -38,6 +38,9 @@ type UserResponse = {
   email: string | null;
 };
 
+const getApiBase = (req: express.Request): string =>
+  `${req.protocol}://${required(req.get('host'), 'host')}`;
+
 @Route('authentication')
 export class AuthenticationController extends Controller {
   @Security('user-token')
@@ -56,7 +59,7 @@ export class AuthenticationController extends Controller {
   ): Promise<LoginResponse> {
     const userId = await getUserFromRequestOrCreateAndSetCookie(req);
     const { requestedEmail, returnToPath, requireVerifiedEmail } = loginRequest;
-    const apiBase = `${req.protocol}://${required(req.get('host'), 'host')}`;
+    const apiBase = getApiBase(req);
     const result = await UserService.processLoginRequest(
       requestedEmail,
       userId,
@@ -74,7 +77,7 @@ export class AuthenticationController extends Controller {
   }
 
   /**
-   * We take the temporary token from the query string and set a permenant token in a cookie.
+   * We take the temporary token from the query string and set a permanent token in a cookie.
    * @param magicToken A temporary token sent in a magic link
    * @param res
    * @param returnToPath The path to attach to the frontend base URL and redirect to after login
@@ -97,7 +100,23 @@ export class AuthenticationController extends Controller {
     const userId = UserService.getUserIdFromToken(magicToken);
 
     if (!userId) {
-      throw new Unauthorized('The link contains in invalid or expired token');
+      res.status(401).type('text/plain');
+
+      // If it's just expired, send a new link
+      const userIdExpired = UserService.getUserIdFromToken(magicToken, {
+        ignoreExpiration: true,
+      });
+      if (typeof userIdExpired !== 'undefined') {
+        await UserService.sendMagicLinkToUser(
+          userIdExpired,
+          getApiBase(req),
+          returnToPath
+        );
+        res.send('This link has expired. A new one has been emailed to you.');
+        return;
+      }
+      res.send('This link contains an invalid token');
+      return;
     }
 
     await UserService.markEmailVerified(userId);
