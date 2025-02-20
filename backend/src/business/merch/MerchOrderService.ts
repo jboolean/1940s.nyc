@@ -9,6 +9,8 @@ import MerchOrderState from '../../enum/MerchOrderState';
 import MerchProvider from '../../enum/MerchProvider';
 import EmailService from '../email/EmailService';
 import OrderCustomizeTemplate from '../email/templates/OrderCustomizeTemplate';
+import { OrderTemplateData } from '../email/templates/OrderEmailTemplateData';
+import OrderShippedTemplate from '../email/templates/OrderShippedTemplate';
 import * as UserService from '../users/UserService';
 import absurd from '../utils/absurd';
 import isProduction from '../utils/isProduction';
@@ -18,6 +20,17 @@ import * as PrintfulService from './PrintfulService';
 const API_BASE = isProduction()
   ? 'http://api.1940s.nyc'
   : 'http://dev.1940s.nyc:3000';
+
+function createOrderEmailTemplateData(order: MerchOrder): OrderTemplateData {
+  return {
+    ordersUrl: UserService.createMagicLinkUrl(
+      API_BASE,
+      order.userId,
+      '/orders'
+    ).toString(),
+    trackingUrl: order.trackingUrl ?? undefined,
+  };
+}
 
 export async function createMerchOrder(
   userId: number,
@@ -65,13 +78,7 @@ export async function createMerchOrder(
 
       const orderCustomizeEmail = OrderCustomizeTemplate.createTemplatedEmail({
         to: user.email,
-        templateContext: {
-          ordersUrl: UserService.createMagicLinkUrl(
-            API_BASE,
-            userId,
-            '/orders'
-          ).toString(),
-        },
+        templateContext: createOrderEmailTemplateData(order),
         metadata: {
           orderId: order.id.toString(),
           userId: user.id.toString(),
@@ -188,7 +195,7 @@ export async function onShipmentSent(
   trackingUrl: string
 ): Promise<void> {
   const orderRepository = getRepository(MerchOrder);
-  const order = await orderRepository.findOneBy({
+  let order = await orderRepository.findOneBy({
     provider,
     providerOrderId,
   });
@@ -199,5 +206,20 @@ export async function onShipmentSent(
   }
 
   order.trackingUrl = trackingUrl;
-  await orderRepository.save(order);
+  order = await orderRepository.save(order);
+
+  const user = await UserService.getUser(order.userId);
+
+  if (user.email) {
+    const orderShippedEmail = OrderShippedTemplate.createTemplatedEmail({
+      to: user.email,
+      templateContext: createOrderEmailTemplateData(order),
+      metadata: {
+        orderId: order.id.toString(),
+        userId: user.id.toString(),
+      },
+    });
+
+    await EmailService.sendTemplateEmail(orderShippedEmail);
+  }
 }
