@@ -12,6 +12,7 @@ const router = express.Router();
 
 router.post<'/', unknown, unknown, Webhook, unknown>('/', async (req, res) => {
   const event = req.body;
+  console.log('[Printful webhook]', event);
   switch (event.type) {
     case 'order_updated': {
       const order = (event as OrderUpdated).data.order;
