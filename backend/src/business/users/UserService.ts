@@ -1,9 +1,9 @@
 import { randomUUID } from 'crypto';
 import jwt from 'jsonwebtoken';
 import { getRepository } from 'typeorm';
-import stripe from '../../api/stripe';
 import User from '../../entities/User';
 import LoginOutcome from '../../enum/LoginOutcome';
+import stripe from '../../third-party/stripe';
 import EmailService from '../email/EmailService';
 import MagicLinkTemplate from '../email/templates/MagicLinkTemplate';
 import normalizeEmail from '../utils/normalizeEmail';

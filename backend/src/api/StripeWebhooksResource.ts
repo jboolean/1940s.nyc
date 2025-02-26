@@ -1,6 +1,6 @@
 import express from 'express';
 import ipfilter from 'express-ipfilter';
-import stripe from './stripe';
+import stripe from '../third-party/stripe';
 
 import compact from 'lodash/compact';
 import groupBy from 'lodash/groupBy';
