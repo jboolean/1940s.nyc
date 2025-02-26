@@ -4,7 +4,7 @@ import stripe from './stripe';
 
 import compact from 'lodash/compact';
 import groupBy from 'lodash/groupBy';
-import Stripe from 'stripe';
+import type Stripe from 'stripe';
 import EmailCampaignService from '../business/email/EmailCampaignService';
 import * as LedgerService from '../business/ledger/LedgerService';
 import * as MerchOrderService from '../business/merch/MerchOrderService';
