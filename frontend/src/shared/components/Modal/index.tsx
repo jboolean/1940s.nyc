@@ -11,7 +11,7 @@ import ReactModal from 'react-modal';
 import stylesheet from './modal.less';
 
 const MODAL_WIDTH_MAX = 800; // @modal-width-max
-const MODAL_HEIGHT_MAX = 600; // @modal-height-max
+const MODAL_HEIGHT_MAX = 725; // @modal-height-max
 
 export type FourtiesModalProps = React.PropsWithChildren<ReactModal.Props> & {
   size: 'large' | 'small' | 'x-large';
