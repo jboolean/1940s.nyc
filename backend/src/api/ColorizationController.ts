@@ -1,4 +1,6 @@
 import * as express from 'express';
+import { BadRequest } from 'http-errors';
+import Stripe from 'stripe';
 import {
   Body,
   Controller,
@@ -12,11 +14,9 @@ import {
 import * as ColorService from '../business/color/ColorService';
 import * as UserService from '../business/users/UserService';
 import isProduction from '../business/utils/isProduction';
-import { getUserFromRequestOrCreateAndSetCookie } from './auth/userAuthUtils';
-import stripe from './stripe';
-import Stripe from 'stripe';
-import { BadRequest } from 'http-errors';
 import required from '../business/utils/required';
+import stripe from '../third-party/stripe';
+import { getUserFromRequestOrCreateAndSetCookie } from './auth/userAuthUtils';
 
 type BuyCreditsSessionRequest = {
   quantity: number;
