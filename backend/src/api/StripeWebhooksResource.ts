@@ -4,7 +4,7 @@ import stripe from './stripe';
 
 import compact from 'lodash/compact';
 import groupBy from 'lodash/groupBy';
-import Stripe from 'stripe';
+import type Stripe from 'stripe';
 import EmailCampaignService from '../business/email/EmailCampaignService';
 import * as LedgerService from '../business/ledger/LedgerService';
 import * as MerchOrderService from '../business/merch/MerchOrderService';
@@ -45,7 +45,7 @@ router.post<'/', unknown, unknown, Stripe.Event, unknown>(
     const event = req.body;
     switch (event.type) {
       case 'payment_intent.succeeded': {
-        const paymentIntent = event.data.object as Stripe.PaymentIntent;
+        const paymentIntent = event.data.object;
         const email = paymentIntent.receipt_email;
         if (email) {
           await EmailCampaignService.addToMailingList(email, 'stripe');
@@ -54,7 +54,7 @@ router.post<'/', unknown, unknown, Stripe.Event, unknown>(
       }
       case 'checkout.session.async_payment_succeeded':
       case 'checkout.session.completed': {
-        const session = event.data.object as Stripe.Checkout.Session;
+        const session = event.data.object;
         if (session.payment_status !== 'paid') {
           console.warn('Checkout session was not paid', session);
           break;
