@@ -7,16 +7,23 @@
     grid-template-columns: min(50%, 450px) 1fr;
     height: 100%;
     margin: 0 -1rem;
+    box-sizing: border-box;
 
     & > * {
       border-right: 1px solid @font-color-dark;
       height: 100%;
       padding: 0 1rem;
+      box-sizing: border-box;
       &:last-child {
         border-right: none;
       }
     }
   }
+}
+
+.content {
+  overflow-y: auto;
+  height: 100%;
 }
 
 .introCopy {
