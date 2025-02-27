@@ -97,7 +97,11 @@ function GiftOption({
   );
 }
 
-const renderGift = ({ gift, frequency, minimumAmount }: Gift) => {
+const renderGift = ({
+  gift,
+  frequency,
+  minimumAmount,
+}: Gift): JSX.Element | null => {
   switch (gift) {
     case 'tote-bag':
       return (
