@@ -41,12 +41,12 @@ const TOTE_BAG_DEFAULTS = {
 
 const GIFT_REGISTRY: GiftRegistryItem[] = [
   {
-    minimumAmount: 800,
+    minimumAmount: 700,
     frequency: TipFrequency.MONTHLY,
     ...TOTE_BAG_DEFAULTS,
   },
   {
-    minimumAmount: 800 * 12,
+    minimumAmount: 700 * 12,
     frequency: TipFrequency.ONCE,
     ...TOTE_BAG_DEFAULTS,
   },

@@ -56,9 +56,10 @@ function Modals(): JSX.Element {
   const openTipJar = useTipJarStore((state) => state.open);
 
   React.useEffect(() => {
-    if (openTipJarOnLoad) {
-      openTipJar();
-    }
+    // FOR DEVELOPMENT TODO REMOVE
+    // if (true || openTipJarOnLoad) {
+    openTipJar();
+    // }
   }, [openTipJar]);
 
   return (
