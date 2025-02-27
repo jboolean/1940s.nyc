@@ -14,7 +14,7 @@ import MerchInternalVariant from '../enum/MerchInternalVariant';
 const router = express.Router();
 
 type ProductMetadata = {
-  'product-type'?: 'color-credit' | 'merch';
+  'product-type'?: 'color-credit' | 'merch' | 'tip';
   'merch-internal-variant'?: MerchInternalVariant;
 };
 
