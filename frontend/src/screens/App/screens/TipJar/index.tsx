@@ -1,12 +1,17 @@
+import classnames from 'classnames';
 import Modal from 'components/Modal';
 import React from 'react';
 import { NumericFormat } from 'react-number-format';
 
 import Button from 'shared/components/Button';
 import CurrencyInput from 'shared/components/CurrencyInput';
+import useElementId from 'shared/utils/useElementId';
+import TotBagImage from './assets/tote-bag-small-back.png';
 import stylesheet from './TipJar.less';
 import useTipJarStore from './TipJarStore';
 import useAmountPresets from './useAmountPresets';
+import Gift from './utils/Gift';
+import TipFrequency from './utils/TipFrequency';
 
 export { useTipJarStore };
 
@@ -17,7 +22,7 @@ const COPY_BY_VARIANT = {
       <p>
         This site is a labor of love, but processing and hosting 3.7TB of photos
         costs real money. If you enjoy my site, consider pitching in a few
-        dollars to keep it online.
+        dollars, or become a sustaining supporter to keep it going.
       </p>
     ),
   },
@@ -40,68 +45,210 @@ const COPY_BY_VARIANT = {
   },
 };
 
+function GiftOption({
+  title,
+  value,
+  minimum,
+  frequency,
+  description,
+  imageSrc,
+}: {
+  title: string;
+  value: Gift['gift'];
+  minimum: number;
+  frequency: TipFrequency;
+  description: React.ReactNode;
+  imageSrc: string;
+}): JSX.Element {
+  const { selectedGift, setSelectedGift } = useTipJarStore();
+  const id = useElementId('gift-option');
+  const minimumDollars = minimum / 100;
+  return (
+    <label className={classnames(stylesheet.giftOption)} htmlFor={id}>
+      <input
+        type="radio"
+        id={id}
+        name="gift"
+        value={value}
+        checked={selectedGift === value}
+        onChange={() => setSelectedGift(value)}
+        className={stylesheet.giftInput}
+      />
+      <img src={imageSrc} alt={title} className={stylesheet.giftImage} />
+      <div className={stylesheet.giftCopy}>
+        <div className={stylesheet.giftName}>{title}</div>
+        <div className={stylesheet.giftMinimum}>
+          <NumericFormat
+            displayType="text"
+            prefix="$"
+            value={minimumDollars}
+            decimalScale={minimumDollars % 1 === 0 ? 0 : 2}
+            fixedDecimalScale
+          />
+          {frequency === TipFrequency.MONTHLY ? ' / month' : ''} or more
+        </div>
+        <div className={stylesheet.giftDescription}>{description}</div>
+      </div>
+    </label>
+  );
+}
+
+const renderGift = ({ gift, frequency, minimumAmount }: Gift) => {
+  switch (gift) {
+    case 'tote-bag':
+      return (
+        <GiftOption
+          title="Custom 1940s.nyc tote bag"
+          value={gift}
+          minimum={minimumAmount}
+          frequency={frequency}
+          description={
+            <>
+              This custom-made bag features &ldquo;1940s.nyc&rdquo; printed on
+              the front, and a map of any NYC area of your choice on the back.
+              You&rsquo;ll get an email to select the area.
+            </>
+          }
+          imageSrc={TotBagImage}
+        />
+      );
+  }
+};
+
 export default function TipJar(): JSX.Element {
   const {
     amountDollars,
+    frequency,
     isOpen,
     isSubmitting,
     errorMessage,
     setAmountDollars,
+    setFrequency,
     handleRequestClose,
     handleSubmit,
     variant,
+    allGifts,
+    selectedGift,
+    setSelectedGift,
   } = useTipJarStore();
 
-  const amountPresets = useAmountPresets();
+  const amountPresets = useAmountPresets(frequency);
 
   const { title, body } = COPY_BY_VARIANT[variant];
 
+  const applicableGifts = allGifts.filter(
+    (gift) => gift.frequency === frequency
+  );
+
   return (
-    <Modal size="small" isOpen={isOpen} onRequestClose={handleRequestClose}>
-      <h1>{title}</h1>
-      {body}{' '}
-      <a
-        href="https://paypal.me/julianboilen"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        I’m also on PayPal.
-      </a>
-      <p>
-        Thank you, <br />
-        <em>– Julian</em>
-      </p>
-      <div className={stylesheet.presets}>
-        {amountPresets.map((presetAmount) => (
-          <Button
-            buttonStyle="secondary"
-            key={presetAmount}
-            onClick={() => setAmountDollars(presetAmount)}
-            isActive={presetAmount === amountDollars}
+    <Modal size="x-large" isOpen={isOpen} onRequestClose={handleRequestClose}>
+      <div className={stylesheet.content}>
+        <div className={stylesheet.introCopy}>
+          <h1>{title}</h1>
+          {body}{' '}
+          <p>
+            Thank you, <br />
+            <em>– Julian</em>
+          </p>
+          <a
+            href="https://paypal.me/julianboilen"
+            target="_blank"
+            rel="noopener noreferrer"
           >
-            <NumericFormat displayType="text" prefix="$" value={presetAmount} />
-          </Button>
-        ))}
+            I’m also on PayPal.
+          </a>
+        </div>
+        <div className={stylesheet.donationForm}>
+          <div className={stylesheet.buttonRow}>
+            {[
+              [TipFrequency.MONTHLY, 'Monthly support'],
+              [TipFrequency.ONCE, 'One-time tip'],
+            ].map(([v, label]: [TipFrequency, string]) => (
+              <Button
+                buttonStyle="secondary"
+                key={v}
+                onClick={() => setFrequency(v)}
+                isActive={v === frequency}
+              >
+                {label}
+              </Button>
+            ))}
+          </div>
+          <div className={classnames(stylesheet.presets, stylesheet.buttonRow)}>
+            {amountPresets.map((presetAmount) => (
+              <Button
+                buttonStyle="secondary"
+                disabled={!frequency}
+                key={presetAmount}
+                onClick={() => setAmountDollars(presetAmount)}
+                isActive={presetAmount === amountDollars}
+              >
+                <NumericFormat
+                  displayType="text"
+                  prefix="$"
+                  value={presetAmount}
+                  decimalScale={presetAmount % 1 === 0 ? 0 : 2}
+                  fixedDecimalScale
+                />
+              </Button>
+            ))}
+          </div>
+          {applicableGifts.length ? (
+            <div>
+              <div className={stylesheet.giftsHeading}>
+                Choose a thank-you gift
+              </div>
+              <div className={stylesheet.finePrint}>Shipping will be added</div>
+              <div className={stylesheet.gifts}>
+                <label
+                  className={classnames(
+                    stylesheet.giftOption,
+                    stylesheet.noGiftOption
+                  )}
+                >
+                  <input
+                    type="radio"
+                    name="gift"
+                    value={'none'}
+                    checked={!selectedGift}
+                    onChange={() => setSelectedGift(null)}
+                    className={stylesheet.giftInput}
+                  />
+
+                  <div className={stylesheet.giftCopy}>
+                    <div className={stylesheet.giftName}>No gift for me</div>
+                  </div>
+                </label>
+                {applicableGifts.map(renderGift)}
+              </div>
+            </div>
+          ) : null}
+          <div className={stylesheet.tipForm}>
+            <CurrencyInput
+              value={amountDollars}
+              allowNegative={false}
+              placeholder="$0"
+              fixedDecimalScale={amountDollars % 1 !== 0}
+              onValueChange={({ floatValue }) => {
+                setAmountDollars(floatValue);
+              }}
+              disabled={!frequency}
+              className={stylesheet.amountInput}
+            />
+            <Button
+              buttonStyle="primary"
+              onClick={handleSubmit}
+              disabled={!amountDollars || isSubmitting}
+            >
+              {frequency === TipFrequency.ONCE
+                ? 'Leave Tip'
+                : 'Support Monthly'}{' '}
+              →
+            </Button>
+          </div>
+          {errorMessage && <div>{errorMessage}</div>}
+        </div>
       </div>
-      <div className={stylesheet.tipForm}>
-        <CurrencyInput
-          value={amountDollars}
-          allowNegative={false}
-          placeholder="$0"
-          onValueChange={({ floatValue }) => {
-            setAmountDollars(floatValue);
-          }}
-          className={stylesheet.amountInput}
-        />
-        <Button
-          buttonStyle="primary"
-          onClick={handleSubmit}
-          disabled={!amountDollars || isSubmitting}
-        >
-          Leave Tip
-        </Button>
-      </div>
-      {errorMessage && <div>{errorMessage}</div>}
     </Modal>
   );
 }

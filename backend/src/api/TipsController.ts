@@ -6,6 +6,7 @@ import * as TipsService from '../business/tips/TipsService';
 import { getUserFromRequestOrCreateAndSetCookie } from './auth/userAuthUtils';
 
 import * as GiftRegistry from '../business/tips/GiftRegistry';
+import { Gift } from '../business/tips/GiftRegistry';
 import * as UserService from '../business/users/UserService';
 import TipFrequency from '../enum/TipFrequency';
 
@@ -14,7 +15,7 @@ type TipSessionRequest = {
   successUrl: string;
   cancelUrl: string;
   frequency?: TipFrequency;
-  gift?: GiftRegistry.Gift;
+  gift?: Gift;
 };
 
 interface GiftApiResponse {

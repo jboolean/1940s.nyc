@@ -1,9 +1,12 @@
+import pick from 'lodash/pick';
 import recordEvent from 'shared/utils/recordEvent';
 import create from 'zustand';
-import { immer } from 'zustand/middleware/immer';
 import { persist } from 'zustand/middleware';
+import { immer } from 'zustand/middleware/immer';
 import redirectToCheckout from './redirectToCheckout';
-import pick from 'lodash/pick';
+import Gift from './utils/Gift';
+import TipFrequency from './utils/TipFrequency';
+import getGifts from './utils/TipsApi';
 
 const TIP_JAR_DELAY = /* 2 minutes */ 1000 * 60 * 2;
 const RE_ENGAGE_DELAY = /* 3 months */ 1000 * 60 * 60 * 24 * 30 * 3;
@@ -15,6 +18,8 @@ interface Actions {
   handleSubmit(): Promise<void>;
   handleRequestClose(): void;
   setAmountDollars(amountDollars: number): void;
+  setFrequency(frequency: TipFrequency): void;
+  setSelectedGift(gift: Gift['gift'] | null): void;
 }
 
 interface State {
@@ -24,6 +29,9 @@ interface State {
   errorMessage: string | null;
   openedOn?: number;
   variant: 'default' | 'colorization';
+  frequency?: TipFrequency;
+  allGifts: Gift[];
+  selectedGift: Gift['gift'] | null;
 }
 
 const useTipJarStore = create(
@@ -34,6 +42,9 @@ const useTipJarStore = create(
       amountDollars: undefined,
       errorMessage: null,
       variant: 'default',
+      frequency: TipFrequency.MONTHLY,
+      allGifts: [],
+      selectedGift: null,
 
       open: (variant: Variant = 'default') => {
         set((draft) => {
@@ -41,9 +52,18 @@ const useTipJarStore = create(
           draft.openedOn = new Date().getTime();
           draft.variant = variant;
         });
+        getGifts()
+          .then((gifts) => {
+            set((draft) => {
+              draft.allGifts = gifts;
+            });
+          })
+          .catch((error) => {
+            console.error('Failed to fetch gifts', error);
+          });
       },
       handleSubmit: async () => {
-        const { amountDollars } = get();
+        const { amountDollars, frequency, selectedGift } = get();
         if (Number.isNaN(amountDollars) || amountDollars <= 0) return;
         set((draft) => {
           draft.isSubmitting = true;
@@ -57,7 +77,11 @@ const useTipJarStore = create(
         });
         try {
           // Input is dollars, convert to cents
-          await redirectToCheckout(amountDollars * 100);
+          await redirectToCheckout(
+            amountDollars * 100,
+            frequency,
+            selectedGift ?? undefined
+          );
         } catch (error) {
           set((draft) => {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
@@ -76,8 +100,45 @@ const useTipJarStore = create(
         });
       },
       setAmountDollars: (amountDollars: number) => {
+        const { frequency, selectedGift, allGifts } = get();
+        const giftObject = allGifts.find(
+          (g) => g.gift === selectedGift && g.frequency === frequency
+        );
         set((draft) => {
           draft.amountDollars = amountDollars;
+          if (giftObject && amountDollars < giftObject.minimumAmount / 100) {
+            draft.selectedGift = null;
+          }
+        });
+      },
+      setFrequency: (frequency: TipFrequency) => {
+        set((draft) => {
+          draft.frequency = frequency;
+        });
+      },
+      setSelectedGift: (gift: Gift['gift'] | null) => {
+        const { frequency, amountDollars, allGifts } = get();
+        const giftObject = allGifts.find(
+          (g) => g.gift === gift && g.frequency === frequency
+        );
+        if (!giftObject) {
+          set((draft) => {
+            draft.selectedGift = null;
+          });
+          return;
+        }
+        const minimumAmountDollars = giftObject.minimumAmount / 100;
+        // If the selected gift has a minimum amount and the current amount is less than that, set the amount to the minimum
+        if (
+          giftObject &&
+          (!amountDollars || amountDollars < minimumAmountDollars)
+        ) {
+          set((draft) => {
+            draft.amountDollars = minimumAmountDollars;
+          });
+        }
+        set((draft) => {
+          draft.selectedGift = gift;
         });
       },
     })),
