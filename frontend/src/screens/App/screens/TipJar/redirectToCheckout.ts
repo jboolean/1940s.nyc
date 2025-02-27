@@ -1,5 +1,5 @@
-import getStripe from 'utils/getStripe';
 import api from 'utils/api';
+import getStripe from 'utils/getStripe';
 
 export default async function redirectToCheckout(
   amount: number
@@ -11,6 +11,7 @@ export default async function redirectToCheckout(
     amount,
     successUrl,
     cancelUrl,
+    // frequency: 'monthly',
   };
   const stripe = await getStripe();
   const sessionResp = await api.post<{ sessionId: string }>(
