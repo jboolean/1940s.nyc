@@ -53,7 +53,7 @@ function GiftOption({
   description,
   imageSrc,
 }: {
-  title: string;
+  title: React.ReactNode;
   value: Gift['gift'];
   minimum: number;
   frequency: TipFrequency;
@@ -74,7 +74,11 @@ function GiftOption({
         onChange={() => setSelectedGift(value)}
         className={stylesheet.giftInput}
       />
-      <img src={imageSrc} alt={title} className={stylesheet.giftImage} />
+      <img
+        src={imageSrc}
+        alt="Product image"
+        className={stylesheet.giftImage}
+      />
       <div className={stylesheet.giftCopy}>
         <div className={stylesheet.giftName}>{title}</div>
         <div className={stylesheet.giftMinimum}>
@@ -98,7 +102,11 @@ const renderGift = ({ gift, frequency, minimumAmount }: Gift) => {
     case 'tote-bag':
       return (
         <GiftOption
-          title="Custom 1940s.nyc tote bag"
+          title={
+            <>
+              Custom <i>1940s.nyc</i> tote bag
+            </>
+          }
           value={gift}
           minimum={minimumAmount}
           frequency={frequency}
