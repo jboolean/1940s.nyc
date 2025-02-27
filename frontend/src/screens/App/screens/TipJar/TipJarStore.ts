@@ -1,3 +1,4 @@
+import { Draft } from 'immer';
 import pick from 'lodash/pick';
 import recordEvent from 'shared/utils/recordEvent';
 import create from 'zustand';
@@ -33,6 +34,21 @@ interface State {
   allGifts: Gift[];
   selectedGift: Gift['gift'] | null;
 }
+
+// Shared helper for validating the selected gift
+const validateSelectedGift = (draft: Draft<State>): void => {
+  const { frequency, selectedGift, allGifts, amountDollars } = draft;
+  const giftObject = allGifts.find(
+    (g) => g.gift === selectedGift && g.frequency === frequency
+  );
+  if (
+    giftObject &&
+    (amountDollars === undefined ||
+      amountDollars < giftObject.minimumAmount / 100)
+  ) {
+    draft.selectedGift = null;
+  }
+};
 
 const useTipJarStore = create(
   persist(
@@ -70,15 +86,17 @@ const useTipJarStore = create(
           draft.errorMessage = null;
         });
 
+        const amountMinorUnits = Math.round(amountDollars * 100);
+
         recordEvent({
           category: 'Tip Jar',
           action: 'Click Checkout',
-          value: amountDollars * 100,
+          value: amountMinorUnits,
         });
         try {
           // Input is dollars, convert to cents
           await redirectToCheckout(
-            amountDollars * 100,
+            amountMinorUnits,
             frequency,
             selectedGift ?? undefined
           );
@@ -100,20 +118,15 @@ const useTipJarStore = create(
         });
       },
       setAmountDollars: (amountDollars: number) => {
-        const { frequency, selectedGift, allGifts } = get();
-        const giftObject = allGifts.find(
-          (g) => g.gift === selectedGift && g.frequency === frequency
-        );
         set((draft) => {
           draft.amountDollars = amountDollars;
-          if (giftObject && amountDollars < giftObject.minimumAmount / 100) {
-            draft.selectedGift = null;
-          }
+          validateSelectedGift(draft);
         });
       },
       setFrequency: (frequency: TipFrequency) => {
         set((draft) => {
           draft.frequency = frequency;
+          validateSelectedGift(draft);
         });
       },
       setSelectedGift: (gift: Gift['gift'] | null) => {
