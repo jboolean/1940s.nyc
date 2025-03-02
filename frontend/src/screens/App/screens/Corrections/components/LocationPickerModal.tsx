@@ -1,6 +1,6 @@
+import round from 'lodash/round';
 import mapboxgl from 'mapbox-gl';
 import React from 'react';
-import round from 'lodash/round';
 
 import useCorrectionsStore, {
   useCorrectionsStoreComputeds,
@@ -62,6 +62,7 @@ export default function LocationPickerModal(): JSX.Element {
     map.current.on('style.load', () => {
       map.current.removeLayer('photos-1940s');
       map.current.removeLayer('photos-1940s-wide-zoom');
+      map.current.setLayoutProperty('lot-label', 'visibility', 'visible');
 
       map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
     });

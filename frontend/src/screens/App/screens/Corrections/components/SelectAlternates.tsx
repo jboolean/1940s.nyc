@@ -17,14 +17,24 @@ export default function SelectAlternates({
 }: {
   description: React.ReactNode;
 }): JSX.Element {
-  const { alternatesSelections, toggleAlternateSelection } =
-    useCorrectionsStore();
+  const {
+    alternatesSelections,
+    toggleAlternateSelection,
+    selectAllAlternates,
+    deselectAllAlternates,
+    alternatesAttested,
+    setAlternatesAttested,
+  } = useCorrectionsStore();
   const { isLoginValidated } = useLoginStore();
 
   const idPrefix = useElementId('corrections-');
 
   const handleAlternateSelectionChange = (identifier: string): void => {
     toggleAlternateSelection(identifier);
+  };
+
+  const handleAttestedChange = (): void => {
+    setAlternatesAttested(!alternatesAttested);
   };
 
   return (
@@ -64,6 +74,36 @@ export default function SelectAlternates({
                 </React.Fragment>
               ))}
             </div>
+            <div>
+              <button
+                type="button"
+                onClick={selectAllAlternates}
+                className={stylesheet.multiSelectButton}
+              >
+                Select All
+              </button>
+              {' | '}
+              <button
+                type="button"
+                onClick={deselectAllAlternates}
+                className={stylesheet.multiSelectButton}
+              >
+                Deselect All
+              </button>
+            </div>
+            <label className={stylesheet.attestedLabel}>
+              <input
+                type="checkbox"
+                id="attested"
+                name="attested"
+                checked={alternatesAttested}
+                onChange={handleAttestedChange}
+                disabled={!isLoginValidated}
+                required
+              />
+              I&rsquo;ve reviewed these other photos and selected any of the
+              same place
+            </label>
           </div>
         </FieldSet>
       ) : (

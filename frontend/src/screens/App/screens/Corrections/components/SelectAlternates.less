@@ -2,6 +2,7 @@
 @import '../../../../../shared/styles/colors.less';
 @import '../../../../../shared/styles/viewport.less';
 @import '../../../../../shared/styles/utils.less';
+@import '../../../../../shared/styles/ui.less';
 
 .alternates {
   text-align: initial;
@@ -64,5 +65,19 @@
     object-fit: cover;
     height: 100%;
     width: 100%;
+  }
+}
+
+.multiSelectButton {
+  .linkButton();
+  margin-top: 1rem;
+}
+
+.attestedLabel {
+  margin-top: 1rem;
+  display: block;
+  font-weight: bold;
+  input {
+    margin-right: 0.5rem;
   }
 }
