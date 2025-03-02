@@ -17,8 +17,12 @@ export default function SelectAlternates({
 }: {
   description: React.ReactNode;
 }): JSX.Element {
-  const { alternatesSelections, toggleAlternateSelection } =
-    useCorrectionsStore();
+  const {
+    alternatesSelections,
+    toggleAlternateSelection,
+    selectAllAlternates,
+    deselectAllAlternates,
+  } = useCorrectionsStore();
   const { isLoginValidated } = useLoginStore();
 
   const idPrefix = useElementId('corrections-');
@@ -63,6 +67,23 @@ export default function SelectAlternates({
                   </label>
                 </React.Fragment>
               ))}
+            </div>
+            <div>
+              <button
+                type="button"
+                onClick={selectAllAlternates}
+                className={stylesheet.multiSelectButton}
+              >
+                Select All
+              </button>
+              {' | '}
+              <button
+                type="button"
+                onClick={deselectAllAlternates}
+                className={stylesheet.multiSelectButton}
+              >
+                Deselect All
+              </button>
             </div>
           </div>
         </FieldSet>

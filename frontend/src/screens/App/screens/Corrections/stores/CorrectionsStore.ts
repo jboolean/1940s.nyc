@@ -32,6 +32,8 @@ interface Actions {
   initialize: (photo: string) => void;
   close: () => void;
   toggleAlternateSelection: (identifier: string) => void;
+  selectAllAlternates: () => void;
+  deselectAllAlternates: () => void;
   openMap: () => void;
   closeMap: () => void;
   setCorrectedLngLat: (lng: number, lat: number) => void;
@@ -83,7 +85,7 @@ const useCorrectionsStore = create(
           set((draft) => {
             alternates.forEach(({ identifier }) => {
               if (identifier === photo) return;
-              draft.alternatesSelections[identifier] = true;
+              draft.alternatesSelections[identifier] = false;
             });
           });
         })
@@ -103,6 +105,22 @@ const useCorrectionsStore = create(
       set((draft) => {
         draft.alternatesSelections[identifier] =
           !get().alternatesSelections[identifier];
+      });
+    },
+
+    selectAllAlternates: () => {
+      set((draft) => {
+        Object.keys(draft.alternatesSelections).forEach((identifier) => {
+          draft.alternatesSelections[identifier] = true;
+        });
+      });
+    },
+
+    deselectAllAlternates: () => {
+      set((draft) => {
+        Object.keys(draft.alternatesSelections).forEach((identifier) => {
+          draft.alternatesSelections[identifier] = false;
+        });
       });
     },
 

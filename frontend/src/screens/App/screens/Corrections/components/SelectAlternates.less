@@ -2,6 +2,7 @@
 @import '../../../../../shared/styles/colors.less';
 @import '../../../../../shared/styles/viewport.less';
 @import '../../../../../shared/styles/utils.less';
+@import '../../../../../shared/styles/ui.less';
 
 .alternates {
   text-align: initial;
@@ -65,4 +66,9 @@
     height: 100%;
     width: 100%;
   }
+}
+
+.multiSelectButton {
+  .linkButton();
+  margin-top: 1rem;
 }

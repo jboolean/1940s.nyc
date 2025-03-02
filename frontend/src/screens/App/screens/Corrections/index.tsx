@@ -12,9 +12,9 @@ import CorrectAddress from './components/CorrectAddress';
 import CorrectGeocode from './components/CorrectGeocode';
 import PhotoMetadata from './components/PhotoMetadata';
 
-import stylesheet from './Corrections.less';
 import FieldSet from 'shared/components/FieldSet';
 import SelectAlternates from './components/SelectAlternates';
+import stylesheet from './Corrections.less';
 
 const CorrectionsDialogContent = (): JSX.Element | null => {
   const { photo, submit, correctionType, setCorrectionType } =
@@ -88,15 +88,16 @@ const CorrectionsDialogContent = (): JSX.Element | null => {
             description={
               correctionType === 'geocode' ? (
                 <>
-                  Are these photos of the same place? If they are not moved
-                  together they will be dissociated. <br />
+                  Are these photos of the same place? Click to choose additional
+                  photos to move to the same location. Photos not selected to be
+                  moved will be dissociated. <br />
                   80s photos left without a 40s photo at the same location are
                   hidden from the site.
                 </>
               ) : (
                 <>
-                  Are these photos of the same place? Select photos to update
-                  the address for all of them.
+                  Are these photos of the same place? Click to choose additional
+                  photos to update.
                 </>
               )
             }
