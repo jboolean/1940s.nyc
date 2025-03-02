@@ -1,6 +1,7 @@
 import create from 'zustand';
 import { immer } from 'zustand/middleware/immer';
 
+import { isEmpty } from 'lodash';
 import useLoginStore from 'shared/stores/LoginStore';
 import { getAlternatePhotos, getPhoto, Photo } from 'shared/utils/photosApi';
 import {
@@ -14,6 +15,7 @@ interface State {
   photoId: string | null;
   photo: Photo | null;
   alternatesSelections: Record<string, boolean>;
+  alternatesAttested: boolean;
 
   isMapOpen: boolean;
   correctedLng: number | null;
@@ -34,6 +36,7 @@ interface Actions {
   toggleAlternateSelection: (identifier: string) => void;
   selectAllAlternates: () => void;
   deselectAllAlternates: () => void;
+  setAlternatesAttested: (attested: boolean) => void;
   openMap: () => void;
   closeMap: () => void;
   setCorrectedLngLat: (lng: number, lat: number) => void;
@@ -49,6 +52,7 @@ const useCorrectionsStore = create(
     photoId: null,
     photo: null,
     alternatesSelections: {},
+    alternatesAttested: false,
     isMapOpen: false,
     correctedLng: null,
     correctedLat: null,
@@ -124,6 +128,12 @@ const useCorrectionsStore = create(
       });
     },
 
+    setAlternatesAttested: (attested: boolean) => {
+      set((draft) => {
+        draft.alternatesAttested = attested;
+      });
+    },
+
     openMap: () => {
       set((draft) => {
         draft.isMapOpen = true;
@@ -196,6 +206,8 @@ export function useCorrectionsStoreComputeds(): ComputedState {
     correctedLat,
     correctedLng,
     correctionType,
+    alternatesSelections,
+    alternatesAttested,
   } = useCorrectionsStore();
   const defaultGeocode = photo?.effectiveGeocode;
   return {
@@ -203,10 +215,11 @@ export function useCorrectionsStoreComputeds(): ComputedState {
     previousLat: defaultGeocode?.lngLat.lat ?? null,
     previousAddress: photo?.address ?? null,
     canSubmit:
-      (correctionType === 'geocode' &&
+      (alternatesAttested || isEmpty(alternatesSelections)) &&
+      ((correctionType === 'geocode' &&
         correctedLat !== null &&
         correctedLng !== null) ||
-      (correctionType === 'address' && correctedAddress !== null),
+        (correctionType === 'address' && correctedAddress !== null)),
   };
 }
 

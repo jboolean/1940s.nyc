@@ -22,6 +22,8 @@ export default function SelectAlternates({
     toggleAlternateSelection,
     selectAllAlternates,
     deselectAllAlternates,
+    alternatesAttested,
+    setAlternatesAttested,
   } = useCorrectionsStore();
   const { isLoginValidated } = useLoginStore();
 
@@ -29,6 +31,10 @@ export default function SelectAlternates({
 
   const handleAlternateSelectionChange = (identifier: string): void => {
     toggleAlternateSelection(identifier);
+  };
+
+  const handleAttestedChange = (): void => {
+    setAlternatesAttested(!alternatesAttested);
   };
 
   return (
@@ -85,6 +91,19 @@ export default function SelectAlternates({
                 Deselect All
               </button>
             </div>
+            <label className={stylesheet.attestedLabel}>
+              <input
+                type="checkbox"
+                id="attested"
+                name="attested"
+                checked={alternatesAttested}
+                onChange={handleAttestedChange}
+                disabled={!isLoginValidated}
+                required
+              />
+              I&rsquo;ve reviewed these other photos and selected any of the
+              same place
+            </label>
           </div>
         </FieldSet>
       ) : (
