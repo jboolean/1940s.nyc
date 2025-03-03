@@ -65,6 +65,7 @@ const useCorrectionsStore = create(
         draft.isOpen = true;
         draft.photo = null;
         draft.alternatesSelections = {};
+        draft.alternatesAttested = false;
         draft.isMapOpen = false;
         draft.correctedLng = null;
         draft.correctedLat = null;
