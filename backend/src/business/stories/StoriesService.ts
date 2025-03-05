@@ -1,4 +1,6 @@
+import { getRepository } from 'typeorm';
 import Story from '../../entities/Story';
+import User from '../../entities/User';
 import StoryState from '../../enum/StoryState';
 import StoryRepository from '../../repositories/StoryRepository';
 import {
@@ -20,6 +22,7 @@ function getStoryOrThrow(
 
 async function onStorySubmitted(storyId: Story['id']): Promise<void> {
   const story = await getStoryOrThrow(storyId, StoryState.SUBMITTED);
+  const userRepository = getRepository(User);
 
   const hasSubmittedBefore = story.hasEverSubmitted;
 
@@ -36,6 +39,22 @@ async function onStorySubmitted(storyId: Story['id']): Promise<void> {
   await StoryRepository().update(story.id, {
     hasEverSubmitted: true,
   });
+
+  try {
+    // If user with this email is banned, reject the story
+    const maybeUser = await userRepository.findOneBy({
+      email: story.storytellerEmail ?? '',
+    });
+    const isUserBanned = maybeUser?.isBanned ?? false;
+    if (isUserBanned) {
+      await StoryRepository().update(story.id, {
+        state: StoryState.REJECTED,
+        lastReviewer: 'system',
+      });
+    }
+  } catch (e) {
+    console.error('Error auto-reviewing story', e);
+  }
 }
 
 async function onStoryPublished(storyId: Story['id']): Promise<void> {
