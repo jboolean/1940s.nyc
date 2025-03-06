@@ -8,6 +8,10 @@ import useCorrectionsStore, {
 
 import FourtiesModal from 'shared/components/Modal';
 
+import {
+  installLayers,
+  setOverlay,
+} from '../../MapPane/components/MainMap/overlays';
 import stylesheet from './LocationPickerModal.less';
 
 const MAPBOX_STYLE = __DEV__
@@ -73,6 +77,10 @@ export default function LocationPickerModal(): JSX.Element {
       map.current.setLayoutProperty('lot-label', 'visibility', 'visible');
 
       map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
+      installLayers(map.current, 'photos-1940s', {
+        fadeOverlays: false,
+      });
+      setOverlay(map.current, 'default-map');
     });
 
     map.current.on('moveend', () => {
