@@ -8,6 +8,10 @@ import useCorrectionsStore, {
 
 import FourtiesModal from 'shared/components/Modal';
 
+import {
+  installLayers,
+  setOverlay,
+} from '../../MapPane/components/MainMap/overlays';
 import stylesheet from './LocationPickerModal.less';
 
 const MAPBOX_STYLE = __DEV__
@@ -25,6 +29,7 @@ export default function LocationPickerModal(): JSX.Element {
     correctedLng,
     correctedLat,
     setCorrectedLngLat,
+    photo,
   } = useCorrectionsStore(
     ({
       isMapOpen,
@@ -32,12 +37,14 @@ export default function LocationPickerModal(): JSX.Element {
       correctedLng,
       correctedLat,
       setCorrectedLngLat,
+      photo,
     }) => ({
       isMapOpen,
       closeMap,
       correctedLng,
       correctedLat,
       setCorrectedLngLat,
+      photo,
     })
   );
   const { previousLng, previousLat } = useCorrectionsStoreComputeds();
@@ -60,11 +67,19 @@ export default function LocationPickerModal(): JSX.Element {
     });
 
     map.current.on('style.load', () => {
-      map.current.removeLayer('photos-1940s');
+      // map.current.removeLayer('photos-1940s');
+      map.current.setFilter('photos-1940s', [
+        '!=',
+        ['get', 'photoIdentifier'],
+        photo.identifier || null,
+      ]);
       map.current.removeLayer('photos-1940s-wide-zoom');
-      map.current.setLayoutProperty('lot-label', 'visibility', 'visible');
 
       map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
+      installLayers(map.current, 'photos-1940s', {
+        fadeOverlays: false,
+      });
+      setOverlay(map.current, ['default-map', 'bbl-label']);
     });
 
     map.current.on('moveend', () => {
