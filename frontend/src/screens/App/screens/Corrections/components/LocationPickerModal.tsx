@@ -74,13 +74,12 @@ export default function LocationPickerModal(): JSX.Element {
         photo.identifier || null,
       ]);
       map.current.removeLayer('photos-1940s-wide-zoom');
-      map.current.setLayoutProperty('lot-label', 'visibility', 'visible');
 
       map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
       installLayers(map.current, 'photos-1940s', {
         fadeOverlays: false,
       });
-      setOverlay(map.current, 'default-map');
+      setOverlay(map.current, ['default-map', 'bbl-label']);
     });
 
     map.current.on('moveend', () => {

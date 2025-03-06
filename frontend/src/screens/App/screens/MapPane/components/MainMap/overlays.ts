@@ -2,6 +2,8 @@
 
 import { bboxPolygon, booleanIntersects } from '@turf/turf';
 import { Feature } from 'geojson';
+import compact from 'lodash/compact';
+import flatMap from 'lodash/flatMap';
 import boroughBoundaries from './Borough Boundaries simplified.json';
 
 const LAYER_IDS = [
@@ -12,6 +14,8 @@ const LAYER_IDS = [
   'atlas-1930',
   'atlas-1956',
   'nyc-label',
+  'lot-label',
+  'block-label',
 ] as const;
 
 type LayerId = typeof LAYER_IDS[number];
@@ -23,7 +27,8 @@ export type OverlayId =
   | 'district'
   | 'atlas-1916'
   | 'atlas-1930'
-  | 'atlas-1956';
+  | 'atlas-1956'
+  | 'bbl-label';
 
 const MANHATTAN_BOUNDS_GEOJSON = boroughBoundaries.features.find(
   (feature) => feature.properties['boro_name'] === 'Manhattan'
@@ -55,6 +60,7 @@ const overlaysToLayers: { [overlay in OverlayId]: LayerId[] } = {
   'atlas-1916': ['atlas-1916'],
   'atlas-1930': ['atlas-1930'],
   'atlas-1956': ['atlas-1956'],
+  'bbl-label': ['block-label', 'lot-label'],
 };
 
 const NYC_ATTRIBUTION =
@@ -155,9 +161,17 @@ export const installLayers = (
 
 export const setOverlay = (
   map: mapboxgl.Map,
-  overlayId: OverlayId | null
+  overlayId: OverlayId | null | OverlayId[]
 ): void => {
-  const visibleLayers = overlayId ? overlaysToLayers[overlayId] : [];
+  // If overlayId is not an arary, convert it to an array
+  const overlayIds: OverlayId[] = compact(
+    Array.isArray(overlayId) ? overlayId : [overlayId]
+  );
+
+  const visibleLayers = flatMap(
+    overlayIds,
+    (overlayId) => overlaysToLayers[overlayId]
+  );
   const mapBounds = map.getBounds();
 
   // Convert the map bounds into a Turf polygon
