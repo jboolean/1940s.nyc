@@ -97,6 +97,9 @@ export default function ReviewStories(): JSX.Element {
             &ldquo;I was looking for Pack&rsquo;s Pharmacy Store???&rdquo; —{' '}
             <i>Not a story</i>
           </li>
+          <li>
+            Stories that primarily advertise or direct users away
+          </li>
         </ul>
       </details>
 
