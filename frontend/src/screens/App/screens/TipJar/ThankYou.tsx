@@ -1,8 +1,8 @@
-import React from 'react';
 import Modal from 'components/Modal';
 import qs from 'qs';
-import recordEvent from 'shared/utils/recordEvent';
+import React from 'react';
 import { useHistory } from 'react-router-dom';
+import recordEvent from 'shared/utils/recordEvent';
 
 export default function ThankYou({
   isOpen,

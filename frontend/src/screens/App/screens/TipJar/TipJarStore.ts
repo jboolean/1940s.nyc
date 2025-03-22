@@ -1,10 +1,12 @@
 import { Draft } from 'immer';
 import pick from 'lodash/pick';
+import useLoginStore from 'shared/stores/LoginStore';
 import recordEvent from 'shared/utils/recordEvent';
 import create from 'zustand';
 import { persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import redirectToCheckout from './redirectToCheckout';
+import redirectToCustomerPortal from './redirectToCustomerPortal';
 import Gift from './utils/Gift';
 import TipFrequency from './utils/TipFrequency';
 import getGifts from './utils/TipsApi';
@@ -21,6 +23,9 @@ interface Actions {
   setAmountDollars(amountDollars: number): void;
   setFrequency(frequency: TipFrequency): void;
   setSelectedGift(gift: Gift['gift'] | null): void;
+  openLogin: () => void;
+  closeLogin: () => void;
+  redirectToCustomerPortal: () => Promise<void>;
 }
 
 interface State {
@@ -33,6 +38,7 @@ interface State {
   frequency?: TipFrequency;
   allGifts: Gift[];
   selectedGift: Gift['gift'] | null;
+  isLoginOpen: boolean;
 }
 
 // Shared helper for validating the selected gift
@@ -61,12 +67,14 @@ const useTipJarStore = create(
       frequency: TipFrequency.MONTHLY,
       allGifts: [],
       selectedGift: null,
+      isLoginOpen: false,
 
       open: (variant: Variant = 'default') => {
         set((draft) => {
           draft.isOpen = true;
           draft.openedOn = new Date().getTime();
           draft.variant = variant;
+          draft.isLoginOpen = false;
         });
         getGifts()
           .then((gifts) => {
@@ -153,6 +161,20 @@ const useTipJarStore = create(
         set((draft) => {
           draft.selectedGift = gift;
         });
+      },
+      openLogin: () => {
+        set((draft) => {
+          draft.isLoginOpen = true;
+          useLoginStore.getState().initialize();
+        });
+      },
+      closeLogin: () => {
+        set((draft) => {
+          draft.isLoginOpen = false;
+        });
+      },
+      redirectToCustomerPortal: async () => {
+        await redirectToCustomerPortal();
       },
     })),
     {

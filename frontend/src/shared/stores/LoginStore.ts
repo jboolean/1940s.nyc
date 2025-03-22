@@ -12,6 +12,7 @@ interface State {
   isFollowMagicLinkMessageVisible: boolean;
   isVerifyEmailMessageVisible: boolean;
   isEmailUpdatedMessageVisible: boolean;
+  isLoadingMe: boolean;
 }
 
 interface Actions {
@@ -31,10 +32,12 @@ const useLoginStore = create(
     isFollowMagicLinkMessageVisible: false,
     isVerifyEmailMessageVisible: false,
     isEmailUpdatedMessageVisible: false,
+    isLoadingMe: false,
 
     initialize: () => {
       set((draft) => {
         draft.isLoginValidated = false;
+        draft.isLoadingMe = true;
       });
       getMe()
         .then((me) => {
@@ -47,6 +50,11 @@ const useLoginStore = create(
         })
         .catch((err: unknown) => {
           console.warn('Error fetching me', err);
+        })
+        .finally(() => {
+          set((draft) => {
+            draft.isLoadingMe = false;
+          });
         });
     },
 

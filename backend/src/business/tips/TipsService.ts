@@ -111,3 +111,20 @@ export async function createTipCheckoutSession({
 
   return session.id;
 }
+
+export async function createCustomerPortalSession(
+  user: User,
+  returnUrl: string
+): Promise<string> {
+  const stripeCustomerId = user.stripeCustomerId;
+  if (!stripeCustomerId) {
+    throw new Error('User has no Stripe customer ID');
+  }
+
+  const session = await stripe.billingPortal.sessions.create({
+    customer: stripeCustomerId,
+    return_url: returnUrl,
+  });
+
+  return session.url;
+}
