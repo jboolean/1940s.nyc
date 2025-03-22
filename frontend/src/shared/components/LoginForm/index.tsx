@@ -20,6 +20,7 @@ export default function LoginForm({
     isFollowMagicLinkMessageVisible,
     isVerifyEmailMessageVisible,
     isEmailUpdatedMessageVisible,
+    isLoadingMe,
   } = useLoginStore();
 
   return (
@@ -43,7 +44,7 @@ export default function LoginForm({
               onChange={({ target: { value } }) => {
                 onEmailAddressChange(value);
               }}
-              disabled={isLoginValidated}
+              disabled={isLoginValidated || isLoadingMe}
             />
           )}
         />

@@ -5,8 +5,10 @@ import { NumericFormat } from 'react-number-format';
 
 import Button from 'shared/components/Button';
 import CurrencyInput from 'shared/components/CurrencyInput';
+import TextButton from 'shared/components/TextButton';
 import useElementId from 'shared/utils/useElementId';
 import TotBagImage from './assets/tote-bag-small-back.png';
+import LoginToManageModal from './LoginToManageModal';
 import stylesheet from './TipJar.less';
 import useTipJarStore from './TipJarStore';
 import useAmountPresets from './useAmountPresets';
@@ -142,6 +144,7 @@ export default function TipJar(): JSX.Element {
     allGifts,
     selectedGift,
     setSelectedGift,
+    openLogin,
   } = useTipJarStore();
 
   const amountPresets = useAmountPresets(frequency);
@@ -154,6 +157,7 @@ export default function TipJar(): JSX.Element {
 
   return (
     <Modal size="x-large" isOpen={isOpen} onRequestClose={handleRequestClose}>
+      <LoginToManageModal />
       <div className={stylesheet.content}>
         <div className={stylesheet.introCopy}>
           <h1>{title}</h1>
@@ -169,6 +173,15 @@ export default function TipJar(): JSX.Element {
           >
             I’m also on PayPal.
           </a>
+          <p>
+            <TextButton onClick={openLogin}>
+              Manage recurring support or update payment information in the{' '}
+              <strong>
+                <i>Supporter Dashboard</i>
+              </strong>{' '}
+              →
+            </TextButton>
+          </p>
         </div>
         <div className={stylesheet.donationForm}>
           <div className={stylesheet.buttonRow}>

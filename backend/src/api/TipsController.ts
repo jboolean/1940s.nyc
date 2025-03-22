@@ -18,6 +18,10 @@ type TipSessionRequest = {
   gift?: Gift;
 };
 
+type CustomerPortalRequest = {
+  returnUrl: string;
+};
+
 interface GiftApiResponse {
   gift: GiftRegistry.Gift;
   minimumAmount: number;
@@ -68,5 +72,19 @@ export class TipsController {
         frequency: gift.frequency,
       };
     });
+  }
+
+  @Security('user-token')
+  @Post('/customer-portal-session')
+  public async createCustomerPortalSession(
+    @Body() { returnUrl }: CustomerPortalRequest,
+    @Request() req: express.Request
+  ): Promise<{ url: string }> {
+    const userId = await getUserFromRequestOrCreateAndSetCookie(req);
+
+    const user = await UserService.getUser(userId);
+    const url = await TipsService.createCustomerPortalSession(user, returnUrl);
+
+    return { url: url };
   }
 }

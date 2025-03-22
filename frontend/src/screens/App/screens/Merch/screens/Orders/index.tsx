@@ -16,6 +16,7 @@ import {
 import Button from 'shared/components/Button';
 import { ColorThemeContext } from 'shared/components/ColorThemeContext';
 import ExternalIcon from 'shared/components/ExternalIcon';
+import TextButton from 'shared/components/TextButton';
 import stylesheet from './Orders.less';
 import ToteBagSmallImage from './assets/tote-bag-small-default.png';
 
@@ -151,9 +152,9 @@ export default function Orders(): JSX.Element {
         <ColorThemeContext.Provider value="dark">
           <p>
             Not showing your orders?{' '}
-            <button onClick={openLogin} className={stylesheet.linkButton}>
+            <TextButton onClick={openLogin}>
               Log into another account
-            </button>
+            </TextButton>
             .
           </p>
           <p>
