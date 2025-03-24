@@ -111,7 +111,11 @@ const useTipJarStore = create(
         } catch (error) {
           set((draft) => {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-            draft.errorMessage = error?.message || 'Something went wrong';
+            draft.errorMessage =
+              // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+              error?.response?.data?.error ??
+              // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+              (error?.message || 'Something went wrong');
           });
         } finally {
           set((draft) => {

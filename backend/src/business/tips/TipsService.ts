@@ -1,3 +1,4 @@
+import { BadRequest } from 'http-errors';
 import type Stripe from 'stripe';
 import User from '../../entities/User';
 import TipFrequency from '../../enum/TipFrequency';
@@ -43,6 +44,10 @@ export async function createTipCheckoutSession({
     ? GiftRegistry.getGift(requestedGiftId, frequency, amount)
     : undefined;
   const hasGift = !!gift;
+
+  if (isSubscription && user?.stripeSupportSubscriptionId) {
+    throw new BadRequest('There is already a subscription for this user');
+  }
 
   const session = await stripe.checkout.sessions.create(
     {
@@ -118,7 +123,7 @@ export async function createCustomerPortalSession(
 ): Promise<string> {
   const stripeCustomerId = user.stripeCustomerId;
   if (!stripeCustomerId) {
-    throw new Error('User has no Stripe customer ID');
+    throw new BadRequest('User has no Stripe account');
   }
 
   const session = await stripe.billingPortal.sessions.create({

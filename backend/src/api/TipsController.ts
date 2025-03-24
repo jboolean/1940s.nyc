@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
 import * as express from 'express';
-import { InternalServerError } from 'http-errors';
+import { HttpError, InternalServerError } from 'http-errors';
 import { Body, Get, Post, Request, Route, Security } from 'tsoa';
 import * as TipsService from '../business/tips/TipsService';
 import { getUserFromRequestOrCreateAndSetCookie } from './auth/userAuthUtils';
@@ -58,6 +58,9 @@ export class TipsController {
 
       return { sessionId: sessionId };
     } catch (err) {
+      if (err instanceof HttpError) {
+        throw err;
+      }
       console.error('Failed to create session', err);
       throw new InternalServerError('Failed to create session');
     }
