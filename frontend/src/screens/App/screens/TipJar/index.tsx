@@ -171,15 +171,12 @@ export default function TipJar(): JSX.Element {
             target="_blank"
             rel="noopener noreferrer"
           >
-            I’m also on PayPal.
+            I’m also on <i>PayPal</i>.
           </a>
           <p>
             <TextButton onClick={openLogin}>
               Manage recurring support or update payment information in the{' '}
-              <strong>
-                <i>Supporter Dashboard</i>
-              </strong>{' '}
-              →
+              <i>Supporter Dashboard</i> →
             </TextButton>
           </p>
         </div>
