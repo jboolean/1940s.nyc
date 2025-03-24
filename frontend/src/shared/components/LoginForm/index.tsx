@@ -9,8 +9,10 @@ import stylesheet from './LoginForm.less';
 
 export default function LoginForm({
   requireVerifiedEmail,
+  newEmailBehavior,
 }: {
   requireVerifiedEmail?: boolean;
+  newEmailBehavior?: 'update' | 'reject';
 }): JSX.Element {
   const {
     emailAddress,
@@ -20,6 +22,7 @@ export default function LoginForm({
     isFollowMagicLinkMessageVisible,
     isVerifyEmailMessageVisible,
     isEmailUpdatedMessageVisible,
+    isAccountDoesNotExistMessageVisible,
     isLoadingMe,
   } = useLoginStore();
 
@@ -27,7 +30,7 @@ export default function LoginForm({
     <form
       onSubmit={(e) => {
         e.preventDefault();
-        onSubmitLogin({ requireVerifiedEmail });
+        onSubmitLogin({ requireVerifiedEmail, newEmailBehavior });
       }}
     >
       <div className={stylesheet.emailRow}>
@@ -52,27 +55,32 @@ export default function LoginForm({
         <Button
           type="submit"
           buttonStyle="primary"
-          disabled={isLoginValidated || !emailAddress}
+          disabled={isLoginValidated || !emailAddress || isLoadingMe}
           className={stylesheet.submitButton}
         >
           Continue
         </Button>
       </div>
       {isFollowMagicLinkMessageVisible && (
-        <p className={stylesheet.magicLinkMessage}>
+        <p className={stylesheet.resultMessage}>
           You already have an account. Please click the link emailed to{' '}
           <i>{emailAddress}</i> to log in.
         </p>
       )}
       {isVerifyEmailMessageVisible && (
-        <p className={stylesheet.magicLinkMessage}>
+        <p className={stylesheet.resultMessage}>
           Please verify your email address by clicking the link emailed to{' '}
           <i>{emailAddress}</i> to continue.
         </p>
       )}
       {isEmailUpdatedMessageVisible && (
-        <p className={stylesheet.magicLinkMessage}>
+        <p className={stylesheet.resultMessage}>
           Your email address on this account has been updated.
+        </p>
+      )}
+      {isAccountDoesNotExistMessageVisible && (
+        <p className={stylesheet.resultMessage}>
+          No account found for <i>{emailAddress}</i>.
         </p>
       )}
     </form>

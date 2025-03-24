@@ -28,6 +28,9 @@ type LoginRequest = {
   // Use before sensitive actions
   // Remember to check isEmailVerified before performing sensitive actions
   requireVerifiedEmail?: boolean;
+
+  // If the user is already logged in, and the email is different, should we update the email on a named account?
+  newEmailBehavior?: 'update' | 'reject';
 };
 
 type LoginResponse = {
@@ -58,14 +61,20 @@ export class AuthenticationController extends Controller {
     @Request() req: express.Request
   ): Promise<LoginResponse> {
     const userId = await getUserFromRequestOrCreateAndSetCookie(req);
-    const { requestedEmail, returnToPath, requireVerifiedEmail } = loginRequest;
+    const {
+      requestedEmail,
+      returnToPath,
+      requireVerifiedEmail,
+      newEmailBehavior,
+    } = loginRequest;
     const apiBase = getApiBase(req);
     const result = await UserService.processLoginRequest(
       requestedEmail,
       userId,
       apiBase,
       returnToPath,
-      requireVerifiedEmail
+      requireVerifiedEmail,
+      newEmailBehavior
     );
 
     console.log('Login requested', {

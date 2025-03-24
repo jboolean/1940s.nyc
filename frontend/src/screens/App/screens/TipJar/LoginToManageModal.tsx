@@ -38,7 +38,7 @@ export default function LoginToManageModal(): JSX.Element {
           <i>Supporter Dashboard</i> to manage subscriptions and payments.
         </p>
 
-        <LoginForm />
+        <LoginForm newEmailBehavior="reject" />
       </div>
     </FourtiesModal>
   );

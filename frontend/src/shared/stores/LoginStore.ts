@@ -12,6 +12,7 @@ interface State {
   isFollowMagicLinkMessageVisible: boolean;
   isVerifyEmailMessageVisible: boolean;
   isEmailUpdatedMessageVisible: boolean;
+  isAccountDoesNotExistMessageVisible: boolean;
   isLoadingMe: boolean;
 }
 
@@ -20,8 +21,10 @@ interface Actions {
   onEmailAddressChange: (emailAddress: string) => void;
   onSubmitLogin: ({
     requireVerifiedEmail,
+    newEmailBehavior,
   }: {
     requireVerifiedEmail: boolean;
+    newEmailBehavior?: 'update' | 'reject';
   }) => void;
 }
 
@@ -32,6 +35,7 @@ const useLoginStore = create(
     isFollowMagicLinkMessageVisible: false,
     isVerifyEmailMessageVisible: false,
     isEmailUpdatedMessageVisible: false,
+    isAccountDoesNotExistMessageVisible: false,
     isLoadingMe: false,
 
     initialize: () => {
@@ -67,7 +71,7 @@ const useLoginStore = create(
       });
     },
 
-    onSubmitLogin: async ({ requireVerifiedEmail }) => {
+    onSubmitLogin: async ({ requireVerifiedEmail, newEmailBehavior }) => {
       const searchParams = new URLSearchParams(window.location.search);
       searchParams.set('noWelcome', 'true');
       const returnToPath =
@@ -78,6 +82,7 @@ const useLoginStore = create(
       const outcome = await processLoginRequest(
         get().emailAddress,
         returnToPath,
+        newEmailBehavior,
         requireVerifiedEmail
       );
       if (
@@ -92,7 +97,6 @@ const useLoginStore = create(
         });
         if (outcome === LoginOutcome.UpdatedEmailOnAuthenticatedAccount) {
           set((draft) => {
-            // The user must follow the link to log into another account
             draft.isEmailUpdatedMessageVisible = true;
           });
         }
@@ -105,6 +109,11 @@ const useLoginStore = create(
         set((draft) => {
           // The user must follow the link to verify their email
           draft.isVerifyEmailMessageVisible = true;
+        });
+      } else if (outcome === LoginOutcome.AccountDoesNotExist) {
+        set((draft) => {
+          // No such account, authentication failed
+          draft.isAccountDoesNotExistMessageVisible = true;
         });
       }
     },
