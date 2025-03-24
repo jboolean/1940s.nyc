@@ -23,6 +23,7 @@ const API_BASE = isProduction()
 
 function createOrderEmailTemplateData(order: MerchOrder): OrderTemplateData {
   return {
+    orderId: order.id.toString(),
     ordersUrl: UserService.createMagicLinkUrl(
       API_BASE,
       order.userId,
