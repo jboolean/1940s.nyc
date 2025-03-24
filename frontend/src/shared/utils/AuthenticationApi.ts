@@ -5,11 +5,13 @@ export enum LoginOutcome {
   UpdatedEmailOnAuthenticatedAccount = 'updated_email_on_authenticated_account',
   SentLinkToExistingAccount = 'sent_link_to_existing_account',
   SentLinkToVerifyEmail = 'sent_link_to_verify_email',
+  AccountDoesNotExist = 'account_does_not_exist',
 }
 
 export async function processLoginRequest(
   requestedEmail: string,
   returnToPath?: string,
+  newEmailBehavior?: 'update' | 'reject',
   requireVerifiedEmail = false
 ): Promise<LoginOutcome> {
   const resp = await api.post<{ outcome: LoginOutcome }>(
@@ -18,6 +20,7 @@ export async function processLoginRequest(
       requestedEmail,
       returnToPath,
       requireVerifiedEmail,
+      newEmailBehavior,
     }
   );
   return resp.data.outcome;

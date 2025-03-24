@@ -27,7 +27,7 @@ export default function LoginModal(): JSX.Element {
           account.
         </p>
 
-        <LoginForm />
+        <LoginForm newEmailBehavior="reject" />
 
         {isLoginValidated && (
           <p>You are logged in. Close this dialog to return to your orders.</p>
