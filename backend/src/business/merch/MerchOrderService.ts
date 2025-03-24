@@ -224,3 +224,29 @@ export async function onShipmentSent(
     await EmailService.sendTemplateEmail(orderShippedEmail);
   }
 }
+
+export async function getOrdersForReview(): Promise<MerchOrder[]> {
+  return getRepository(MerchOrder)
+    .createQueryBuilder('order')
+    .innerJoinAndSelect('order.items', 'items')
+    .innerJoinAndSelect('order.user', 'user')
+    .where({ state: MerchOrderState.PENDING_SUBMISSION })
+    .orderBy('order.createdAt', 'DESC')
+    .getMany();
+}
+
+export async function getOrdersWithExceptions(): Promise<MerchOrder[]> {
+  return await getRepository(MerchOrder)
+    .createQueryBuilder('order')
+    .innerJoinAndSelect('order.items', 'items')
+    .innerJoinAndSelect('order.user', 'user')
+    .where({ state: MerchOrderState.SUBMITTED_FOR_FULFILLMENT })
+    .andWhere('order.fulfillmentState in (:...states)', {
+      states: [
+        MerchOrderFulfillmentState.FAILED,
+        MerchOrderFulfillmentState.ON_HOLD,
+      ],
+    })
+    .orderBy('order.createdAt', 'DESC')
+    .getMany();
+}

@@ -78,6 +78,12 @@ functions:
     handler: checkStaleStories.handler
     events:
       - schedule: cron(30 11 * * ? *)
+  checkMerchQueue:
+    stages:
+      - production
+    handler: checkMerchQueue.handler
+    events:
+      - schedule: cron(30 11 * * ? *)
   syncMap:
     stages:
       - production

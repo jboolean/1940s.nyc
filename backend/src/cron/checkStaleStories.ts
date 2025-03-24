@@ -1,7 +1,7 @@
+import EmailService from '../business/email/EmailService';
+import ReviewQueueStaleTemplate from '../business/email/templates/StoriesReviewQueueStaleTemplate';
 import StoryState from '../enum/StoryState';
 import StoryRepository from '../repositories/StoryRepository';
-import EmailService from '../business/email/EmailService';
-import ReviewQueueStaleTemplate from '../business/email/templates/ReviewQueueStaleTemplate';
 
 const STALENESS_THRESHOLD_MS = 1000 * 60 * 60 * 24 * 2;
 
