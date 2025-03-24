@@ -39,6 +39,13 @@ export default class User {
   })
   stripeCustomerId!: string | null;
 
+  @Column({
+    type: String,
+    nullable: true,
+    name: 'stripe_support_subscription',
+  })
+  stripeSupportSubscriptionId!: string | null;
+
   get isAnonymous(): boolean {
     return !this.email;
   }

@@ -175,6 +175,29 @@ router.post<'/', unknown, unknown, Stripe.Event, unknown>(
         }
         break;
       }
+      // Used to track active subscriptions
+      case 'customer.subscription.deleted':
+      case 'customer.subscription.updated': {
+        const subscription = event.data.object;
+        const user = await UserService.getUserByStripeCustomerId(
+          subscription.customer as string
+        );
+        if (!user) {
+          console.warn('No user found for stripe customer id', subscription);
+          return;
+        }
+        if (event.type === 'customer.subscription.deleted') {
+          console.log('Subscription deleted', subscription);
+          await UserService.updateSupportSubscription(user.id, null);
+        } else if (
+          subscription.status === 'active' &&
+          user.stripeSupportSubscriptionId !== subscription.id
+        ) {
+          console.log('New subscription is active', subscription);
+          await UserService.updateSupportSubscription(user.id, subscription.id);
+        }
+        break;
+      }
     }
     res.status(200).send();
   }

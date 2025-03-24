@@ -112,6 +112,21 @@ export async function attachStripeCustomerAndDetermineUserId(
   return user.id;
 }
 
+export async function getUserByStripeCustomerId(
+  stripeCustomerId: string
+): Promise<User | null> {
+  const userRepository = getRepository(User);
+  return userRepository.findOneBy({ stripeCustomerId });
+}
+
+export async function updateSupportSubscription(
+  userId: number,
+  stripeSupportSubscriptionId: string | null
+): Promise<void> {
+  const userRepository = getRepository(User);
+  await userRepository.update(userId, { stripeSupportSubscriptionId });
+}
+
 export async function markEmailVerified(userId: number): Promise<void> {
   const userRepository = getRepository(User);
   await userRepository.update(userId, { isEmailVerified: true });
