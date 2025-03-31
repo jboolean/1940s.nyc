@@ -2,14 +2,14 @@ import EmailTemplate from '../EmailTemplate';
 import EmailStreamType from './EmailStreamType';
 import Senders from './Senders';
 
-type StoryEmailTemplateData = {
+type StoryReviewEmailTemplateData = {
   storiesCount: number;
   reviewStoriesUrl: string;
   stats: { reviewer: string; count: number }[];
 };
 
-class ReviewQueueStaleTemplate extends EmailTemplate<
-  StoryEmailTemplateData,
+class StoriesReviewQueueStaleTemplate extends EmailTemplate<
+  StoryReviewEmailTemplateData,
   Record<string, never>
 > {
   alias = 'review-queue-stale';
@@ -17,4 +17,4 @@ class ReviewQueueStaleTemplate extends EmailTemplate<
   streamType = EmailStreamType.TRANSACTIONAL;
 }
 
-export default new ReviewQueueStaleTemplate();
+export default new StoriesReviewQueueStaleTemplate();

@@ -19,7 +19,6 @@ import MerchCustomizationOptions from '../../entities/MerchCustomizationOptions'
 import MerchOrder from '../../entities/MerchOrder';
 import MerchOrderItem from '../../entities/MerchOrderItem';
 import MerchItemState from '../../enum/MerchItemState';
-import MerchOrderFulfillmentState from '../../enum/MerchOrderFulfillmentState';
 import MerchOrderState from '../../enum/MerchOrderState';
 import { getUserFromRequestOrCreateAndSetCookie } from '../auth/userAuthUtils';
 import { MerchOrderApiModel } from './OrderApiModel';
@@ -144,13 +143,7 @@ export class MerchController extends Controller {
   @Security('netlify', ['moderator'])
   @Get('orders/for-review')
   public async getOrdersForReview(): Promise<MerchOrderApiModel[]> {
-    const orders = await getRepository(MerchOrder)
-      .createQueryBuilder('order')
-      .innerJoinAndSelect('order.items', 'items')
-      .innerJoinAndSelect('order.user', 'user')
-      .where({ state: MerchOrderState.PENDING_SUBMISSION })
-      .orderBy('order.createdAt', 'DESC')
-      .getMany();
+    const orders = await MerchOrderService.getOrdersForReview();
 
     return orders.map(orderToApi);
   }
@@ -158,19 +151,7 @@ export class MerchController extends Controller {
   @Security('netlify', ['moderator'])
   @Get('orders/needs-attention')
   public async getOrdersNeedingAttention(): Promise<MerchOrderApiModel[]> {
-    const orders = await getRepository(MerchOrder)
-      .createQueryBuilder('order')
-      .innerJoinAndSelect('order.items', 'items')
-      .innerJoinAndSelect('order.user', 'user')
-      .where({ state: MerchOrderState.SUBMITTED_FOR_FULFILLMENT })
-      .andWhere('order.fulfillmentState in (:...states)', {
-        states: [
-          MerchOrderFulfillmentState.FAILED,
-          MerchOrderFulfillmentState.ON_HOLD,
-        ],
-      })
-      .orderBy('order.createdAt', 'DESC')
-      .getMany();
+    const orders = await MerchOrderService.getOrdersWithExceptions();
 
     return orders.map(orderToApi);
   }

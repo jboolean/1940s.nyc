@@ -1,4 +1,5 @@
 export interface OrderTemplateData {
+  orderId: string;
   ordersUrl: string;
   trackingUrl?: string;
 }
