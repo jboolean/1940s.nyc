@@ -8,7 +8,7 @@ const FRONTEND_BASE_URL = process.env.FRONTEND_BASE_URL as string;
 
 // Install using `npx @puppeteer/browsers install chromium` locally
 const LOCAL_CHROMIUM_EXECUTABLE_PATH =
-  './chromium/mac_arm-1420837/chrome-mac/Chromium.app/Contents/MacOS/Chromium';
+  './chromium/mac_arm-1447349/chrome-mac/Chromium.app/Contents/MacOS/Chromium';
 
 // Move center to account for tote bag bottom
 const LAT_OFFSET = -0.0007;

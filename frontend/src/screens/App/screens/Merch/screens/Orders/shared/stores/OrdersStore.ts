@@ -7,6 +7,7 @@ import * as merchApi from '../utils/merchApi';
 interface State {
   orders: Order[] | null;
   isLoadingOrders: boolean;
+  step: 'front' | 'back';
 
   isLoginOpen: boolean;
   customizing: OrderItem | null;
@@ -23,6 +24,8 @@ interface Actions {
   dismissCustomizing: () => void;
   setDraftCustomizationOptions: (options: MerchCustomizationOptions) => void;
   saveCustomization: () => Promise<void>;
+  submitForPrinting: () => Promise<void>;
+  goToOtherSideOfBag: () => void;
 }
 
 const useOrdersStore = create(
@@ -32,6 +35,7 @@ const useOrdersStore = create(
     isLoginOpen: false,
     customizing: null,
     draftCustomizationOptions: null,
+    step: 'back',
 
     initialize: async () => {
       useLoginStore.getState().initialize();
@@ -40,6 +44,7 @@ const useOrdersStore = create(
         draft.isLoadingOrders = true;
         draft.customizing = null;
         draft.isLoginOpen = false;
+        draft.step = 'back';
       });
 
       // const orders = await api.getOrders();
@@ -65,11 +70,17 @@ const useOrdersStore = create(
       set((draft) => {
         draft.customizing = item;
         draft.draftCustomizationOptions = item.customizationOptions;
+        draft.step = 'back';
       });
     },
     dismissCustomizing: () => {
       set((draft) => {
         draft.customizing = null;
+      });
+    },
+    goToOtherSideOfBag: () => {
+      set((draft) => {
+        draft.step = draft.step === 'front' ? 'back' : 'front';
       });
     },
     setDraftCustomizationOptions: (options: MerchCustomizationOptions) => {
@@ -78,7 +89,7 @@ const useOrdersStore = create(
       });
     },
     saveCustomization: async () => {
-      const { customizing, draftCustomizationOptions, initialize } = get();
+      const { customizing, draftCustomizationOptions } = get();
       if (!customizing || !draftCustomizationOptions) {
         throw new Error('No item or customization options to save');
       }
@@ -86,6 +97,13 @@ const useOrdersStore = create(
         customizing.id,
         draftCustomizationOptions
       );
+    },
+    submitForPrinting: async () => {
+      const { customizing, draftCustomizationOptions, initialize } = get();
+      if (!customizing || !draftCustomizationOptions) {
+        throw new Error('No item or customization options to save');
+      }
+
       const confirmedFinalize = confirm(
         'Are you sure want to send for printing? Once sent, it cannot be changed.'
       );

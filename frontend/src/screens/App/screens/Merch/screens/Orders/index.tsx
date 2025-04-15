@@ -87,7 +87,7 @@ function OrderItem({ item }: { item: Order['items'][0] }): JSX.Element {
   const { openItemForCustomizing } = useOrdersStore();
 
   return (
-    <li key={item.id} className={stylesheet.orderItem}>
+    <li key={item.id} className={stylesheet.orderItem} data-item-id={item.id}>
       <img
         src={itemImages[item.internalVariant]}
         alt="Product image"
