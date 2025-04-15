@@ -2,37 +2,17 @@ import React from 'react';
 
 import classNames from 'classnames';
 
-import MainMap from '../MapPane/components/MainMap';
+import BagBack from './components/Back';
+import BagFront, { Color } from './components/Front';
 
+import { useLocation } from 'react-router';
 import stylesheet from './ToteBag.less';
 
 export default function ToteBag(): JSX.Element {
   const containerRef = React.useRef<HTMLDivElement>(null);
-  const [attributionText, setAttributionText] = React.useState<string>('');
 
-  React.useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
-
-    const attributionEl = container.querySelector(
-      '.mapboxgl-ctrl-attrib-inner'
-    );
-    if (!attributionEl) return;
-
-    const observer = new MutationObserver(() => {
-      const text = (attributionEl as HTMLElement).innerText;
-      const improveText =
-        attributionEl.querySelector('.mapbox-improve-map')?.textContent || '';
-
-      if (text) {
-        setAttributionText(text.replace(improveText, ''));
-      }
-    });
-
-    observer.observe(attributionEl, { childList: true });
-
-    return () => observer.disconnect();
-  }, [containerRef]);
+  const location = useLocation();
+  const urlParams = new URLSearchParams(location.search);
 
   return (
     <div
@@ -40,24 +20,16 @@ export default function ToteBag(): JSX.Element {
       id="render-content"
       ref={containerRef}
     >
-      <div className={stylesheet.front}>
-        <h1 className={stylesheet.logo}>1940s.nyc</h1>
-      </div>
-      <div className={stylesheet.back}>
-        <div className={stylesheet.map}>
-          <MainMap panOnClick={false} overlay="default-map" />
-        </div>
-        <div className={stylesheet.box}>
-          <div className={stylesheet.subhead}>
-            <span className={stylesheet.hugLines}>
-              Street-level view of 1940s New York with thousands of your stories
-            </span>
-          </div>
-          <div className={stylesheet.attribution}>
-            <span className={stylesheet.hugLines}>Maps: {attributionText}</span>
-          </div>
-        </div>
-      </div>
+      <BagFront
+        foregroundColor={
+          (urlParams.get('foregroundColor') ?? undefined) as Color
+        }
+        backgroundColor={
+          (urlParams.get('backgroundColor') ?? undefined) as Color
+        }
+        style={(urlParams.get('style') ?? undefined) as 'outline' | 'solid'}
+      />
+      <BagBack />
     </div>
   );
 }

@@ -16,7 +16,36 @@
     height: 50%;
     position: relative;
 
-    background-color: @green;
+    // Define colors map
+    @colors: {
+      green: @green;
+      red: @red;
+      creme: @creme;
+      dark: @font-color-dark;
+    };
+
+    // Create and call color classes mixin
+    .generate-color-classes() {
+      each(@colors, {
+        &.background-@{key} {
+          background-color: @value;
+        }
+        &.foreground-@{key} .logo {
+          color: @value;
+          border-color: @value;
+        }
+        &.style-solid {
+          &.background-@{key} .logo {
+            color: @value;
+          }
+          &.foreground-@{key} .logo {
+            background-color: @value;
+            border-color: @value;
+          }
+        }
+      });
+    }
+    .generate-color-classes();
 
     overflow: hidden;
 
