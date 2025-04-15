@@ -33,7 +33,7 @@ export default function ToteBag(): JSX.Element {
   }, [containerRef]);
 
   return (
-    <div className={stylesheet.back}>
+    <div className={stylesheet.back} ref={containerRef}>
       <div className={stylesheet.map}>
         <MainMap panOnClick={false} overlay="default-map" />
       </div>
