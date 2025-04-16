@@ -6,6 +6,7 @@ import { NumericFormat } from 'react-number-format';
 import Button from 'shared/components/Button';
 import CurrencyInput from 'shared/components/CurrencyInput';
 import TextButton from 'shared/components/TextButton';
+import useLoginStore from 'shared/stores/LoginStore';
 import useElementId from 'shared/utils/useElementId';
 import TotBagImage from './assets/tote-bag-small-back.png';
 import LoginToManageModal from './LoginToManageModal';
@@ -147,6 +148,17 @@ export default function TipJar(): JSX.Element {
     openLogin,
   } = useTipJarStore();
 
+  const {
+    initialize: initializeLoginStore,
+    emailAddress,
+    logout,
+  } = useLoginStore();
+
+  React.useEffect(() => {
+    initializeLoginStore();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const amountPresets = useAmountPresets(frequency);
 
   const { title, body } = COPY_BY_VARIANT[variant];
@@ -245,6 +257,12 @@ export default function TipJar(): JSX.Element {
                 {applicableGifts.map(renderGift)}
               </div>
             </div>
+          ) : null}
+          {emailAddress ? (
+            <p>
+              You are logged in as <i>{emailAddress}</i>.{' '}
+              <TextButton onClick={logout}>Not me, log out</TextButton>
+            </p>
           ) : null}
           <div className={stylesheet.tipForm}>
             <CurrencyInput

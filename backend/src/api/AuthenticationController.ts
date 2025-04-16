@@ -13,7 +13,7 @@ import {
 import * as UserService from '../business/users/UserService';
 import required from '../business/utils/required';
 import LoginOutcome from '../enum/LoginOutcome';
-import { setAuthCookie } from './auth/authCookieUtils';
+import { clearAuthCookie, setAuthCookie } from './auth/authCookieUtils';
 import { getUserFromRequestOrCreateAndSetCookie } from './auth/userAuthUtils';
 import { Email } from './CommonApiTypes';
 
@@ -144,5 +144,10 @@ export class AuthenticationController extends Controller {
     );
 
     res.redirect(redirectUrl.toString());
+  }
+
+  @Post('/logout')
+  public logout(@Request() req: express.Request): void {
+    clearAuthCookie(required(req.res, 'res'));
   }
 }

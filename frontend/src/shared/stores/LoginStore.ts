@@ -3,6 +3,7 @@ import { immer } from 'zustand/middleware/immer';
 import {
   getMe,
   LoginOutcome,
+  logout,
   processLoginRequest,
 } from '../utils/AuthenticationApi';
 
@@ -26,6 +27,7 @@ interface Actions {
     requireVerifiedEmail: boolean;
     newEmailBehavior?: 'update' | 'reject';
   }) => void;
+  logout: () => void;
 }
 
 const useLoginStore = create(
@@ -116,6 +118,10 @@ const useLoginStore = create(
           draft.isAccountDoesNotExistMessageVisible = true;
         });
       }
+    },
+    logout: async () => {
+      await logout();
+      get().initialize();
     },
   }))
 );

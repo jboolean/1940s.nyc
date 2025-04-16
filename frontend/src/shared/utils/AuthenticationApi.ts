@@ -30,3 +30,7 @@ export async function getMe(): Promise<{ email: string | null }> {
   const resp = await api.get<{ email: string | null }>('/authentication/me');
   return resp.data;
 }
+
+export async function logout(): Promise<void> {
+  await api.post('/authentication/logout');
+}
