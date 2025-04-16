@@ -17,3 +17,7 @@ export function setAuthCookie(token: string, res: Express.Response): void {
 export function getAuthCookie(req: Express.Request): string | undefined {
   return (req.cookies as Cookies)[USER_TOKEN_COOKIE];
 }
+
+export function clearAuthCookie(res: Express.Response): void {
+  res.clearCookie(USER_TOKEN_COOKIE);
+}

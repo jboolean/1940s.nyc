@@ -35,6 +35,7 @@ export async function createTipCheckoutSession({
   frequency: TipFrequency;
   gift?: GiftRegistry.Gift;
 }): Promise<string> {
+  console.log('Creating tip checkout session', user);
   const userId = user?.id;
   const stripeCustomerId: string | undefined =
     user?.stripeCustomerId ?? undefined;
