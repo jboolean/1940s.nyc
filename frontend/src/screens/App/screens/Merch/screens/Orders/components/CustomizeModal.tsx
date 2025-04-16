@@ -200,7 +200,7 @@ const CustomizeFront = (): JSX.Element => {
 
   return (
     <>
-      <p>Choose a style for the front of the bag.</p>
+      <p>Choose a design for the reverse side of the bag.</p>
 
       <div className={stylesheet.frontStylePresets}>
         {FRONT_STYLE_PRESETS.map((stylePreset) => {
