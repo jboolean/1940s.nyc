@@ -179,6 +179,7 @@ export default function TipJar(): JSX.Element {
               <i>Supporter Dashboard</i> →
             </TextButton>
           </p>
+          <p>1940s.nyc is not associated with the NYC Department of Records.</p>
         </div>
         <div className={stylesheet.donationForm}>
           <div className={stylesheet.buttonRow}>
