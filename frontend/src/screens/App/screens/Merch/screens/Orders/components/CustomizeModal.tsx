@@ -163,9 +163,7 @@ const CustomizeBack = (): JSX.Element => {
       <p>
         Your unique tote bag will be printed with a map of your favorite
         neighborhood. Drag the map so the marker is in the center of the area
-        you want to feature.
-        <br />
-        Manhattan has a historic map, and looks great printed. Other areas use a
+        you want to feature. Manhattan has a historic map, other areas use a
         modern map. All locations feature tags from the thousands of personal
         stories on the site, and dots for every photo. Printed zoom level is not
         adjustable.
