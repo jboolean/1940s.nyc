@@ -6,6 +6,7 @@ import * as merchApi from '../utils/merchApi';
 
 interface State {
   orders: Order[] | null;
+  isSavingCustomization: boolean;
   isLoadingOrders: boolean;
   step: 'front' | 'back';
 
@@ -31,6 +32,7 @@ interface Actions {
 const useOrdersStore = create(
   immer<State & Actions>((set, get) => ({
     orders: null,
+    isSavingCustomization: false,
     isLoadingOrders: false,
     isLoginOpen: false,
     customizing: null,
@@ -93,10 +95,16 @@ const useOrdersStore = create(
       if (!customizing || !draftCustomizationOptions) {
         throw new Error('No item or customization options to save');
       }
-      await merchApi.updateCustomizationOptions(
-        customizing.id,
-        draftCustomizationOptions
-      );
+      set((draft) => {
+        draft.isSavingCustomization = true;
+      });
+      await merchApi
+        .updateCustomizationOptions(customizing.id, draftCustomizationOptions)
+        .finally(() => {
+          set((draft) => {
+            draft.isSavingCustomization = false;
+          });
+        });
     },
     submitForPrinting: async () => {
       const { customizing, draftCustomizationOptions, initialize } = get();

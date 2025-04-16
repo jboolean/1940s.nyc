@@ -240,13 +240,14 @@ const CustomizeFront = (): JSX.Element => {
 
 export default function CustomizeModal(): JSX.Element {
   const {
-    draftCustomizationOptions,
     customizing,
     dismissCustomizing,
-    step,
-    saveCustomization,
-    submitForPrinting,
+    draftCustomizationOptions,
     goToOtherSideOfBag,
+    isSavingCustomization,
+    saveCustomization,
+    step,
+    submitForPrinting,
   } = useOrdersStore();
   return (
     <FourtiesModal
@@ -268,6 +269,7 @@ export default function CustomizeModal(): JSX.Element {
               goToOtherSideOfBag();
             }}
             buttonStyle={'secondary'}
+            disabled={isSavingCustomization}
           >
             Customize other side 🔄
           </Button>
@@ -276,7 +278,7 @@ export default function CustomizeModal(): JSX.Element {
               await saveCustomization();
               await submitForPrinting();
             }}
-            disabled={!draftCustomizationOptions}
+            disabled={!draftCustomizationOptions || isSavingCustomization}
             buttonStyle={'primary'}
           >
             Send for printing
