@@ -1,18 +1,32 @@
 /* eslint-disable camelcase */
 import * as express from 'express';
-import { InternalServerError } from 'http-errors';
-import { Body, Post, Request, Route, Security } from 'tsoa';
+import { HttpError, InternalServerError } from 'http-errors';
+import { Body, Get, Post, Request, Route, Security } from 'tsoa';
+import * as TipsService from '../business/tips/TipsService';
 import { getUserFromRequestOrCreateAndSetCookie } from './auth/userAuthUtils';
-import stripe from './stripe';
 
+import * as GiftRegistry from '../business/tips/GiftRegistry';
+import { Gift } from '../business/tips/GiftRegistry';
 import * as UserService from '../business/users/UserService';
+import TipFrequency from '../enum/TipFrequency';
 
 type TipSessionRequest = {
   amount: number;
   successUrl: string;
   cancelUrl: string;
+  frequency?: TipFrequency;
+  gift?: Gift;
 };
 
+type CustomerPortalRequest = {
+  returnUrl: string;
+};
+
+interface GiftApiResponse {
+  gift: GiftRegistry.Gift;
+  minimumAmount: number;
+  frequency: TipFrequency;
+}
 @Route('tips')
 export class TipsController {
   @Security('user-token')
@@ -21,48 +35,59 @@ export class TipsController {
     @Body() body: TipSessionRequest,
     @Request() req: express.Request
   ): Promise<{ sessionId: string }> {
-    const { amount, successUrl, cancelUrl } = body;
+    const {
+      amount,
+      successUrl,
+      cancelUrl,
+      gift,
+      frequency = TipFrequency.ONCE,
+    } = body;
     const userId = await getUserFromRequestOrCreateAndSetCookie(req);
 
     const user = await UserService.getUser(userId);
 
-    const stripeCustomerId: string | undefined =
-      user?.stripeCustomerId ?? undefined;
-    const hasExistingCustomer = !!stripeCustomerId;
-
     try {
-      const session = await stripe.checkout.sessions.create({
-        cancel_url: cancelUrl,
-        mode: 'payment',
-        success_url: successUrl,
-        line_items: [
-          {
-            price_data: {
-              currency: 'USD',
-              product_data: {
-                name: 'Tip for 1940s.nyc',
-              },
-              unit_amount: amount,
-            },
-            quantity: 1,
-          },
-        ],
-        metadata: {
-          userId,
-        },
-        customer: stripeCustomerId,
-        // History: Stripe used to always create a customer, then it started creating "guest customers" instead (annoying!). This is to force it to always create a customer which we can attach to the user in the webhook.
-        customer_creation: hasExistingCustomer ? undefined : 'always',
-        customer_email: hasExistingCustomer
-          ? undefined
-          : user?.email ?? undefined,
-        payment_intent_data: {},
+      const sessionId = await TipsService.createTipCheckoutSession({
+        amountMinorUnits: amount,
+        successUrl,
+        cancelUrl,
+        user,
+        frequency,
+        gift,
       });
 
-      return { sessionId: session.id };
+      return { sessionId: sessionId };
     } catch (err) {
+      if (err instanceof HttpError) {
+        throw err;
+      }
       console.error('Failed to create session', err);
       throw new InternalServerError('Failed to create session');
     }
+  }
+
+  @Get('/gifts')
+  public getGifts(): GiftApiResponse[] {
+    return GiftRegistry.getAllAvailableGifts().map((gift) => {
+      return {
+        gift: gift.gift,
+        minimumAmount: gift.minimumAmount,
+        frequency: gift.frequency,
+      };
+    });
+  }
+
+  @Security('user-token')
+  @Post('/customer-portal-session')
+  public async createCustomerPortalSession(
+    @Body() { returnUrl }: CustomerPortalRequest,
+    @Request() req: express.Request
+  ): Promise<{ url: string }> {
+    const userId = await getUserFromRequestOrCreateAndSetCookie(req);
+
+    const user = await UserService.getUser(userId);
+    const url = await TipsService.createCustomerPortalSession(user, returnUrl);
+
+    return { url: url };
   }
 }

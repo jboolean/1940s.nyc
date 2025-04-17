@@ -1,4 +1,39 @@
 @import '../../../../shared/styles/colors.less';
+@import '../../../../shared/styles/viewport.less';
+
+@media screen and (min-width: (@modal-width-max + 1px)) {
+  .content {
+    display: grid;
+    grid-template-columns: min(50%, 450px) 1fr;
+    height: 100%;
+    margin: 0 -1rem;
+    box-sizing: border-box;
+
+    & > * {
+      border-right: 1px solid @font-color-dark;
+      height: 100%;
+      padding: 0 1rem;
+      box-sizing: border-box;
+      &:last-child {
+        border-right: none;
+      }
+    }
+  }
+}
+
+.content {
+  overflow-y: auto;
+  height: 100%;
+}
+
+.introCopy {
+  padding-bottom: 1rem;
+}
+
+.donationForm {
+  overflow-y: auto;
+  text-align: left;
+}
 
 .tipForm > * {
   display: inline-block;
@@ -6,15 +41,102 @@
 }
 
 .amountInput {
-  width: 3em;
+  width: 4em;
   font-size: 200%;
 }
 
-.presets {
-  margin: 2rem 0;
+.buttonRow {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(7rem, 1fr));
+  margin-bottom: 1rem;
+
+  button {
+    padding: 1rem !important;
+  }
 }
 
-.presets > * {
-  margin-right: 1rem;
+.giftsHeading {
+  font-weight: bold;
+  // font-size: 125%;
+  margin-bottom: 0.5ex;
+}
+
+.finePrint {
+  // font-size: 12px;
+}
+
+.gifts {
+  margin: 1rem 0;
+  text-align: left;
+  max-width: 40rem;
+}
+
+.giftOption {
+  display: grid;
+  grid-template-columns: 2rem 7rem 1fr;
+  grid-template-rows: auto;
+  grid-template-areas:
+    'input image copy'
+    'input image copy';
+
+  text-align: left;
+
   margin-bottom: 1rem;
+
+  .giftImage {
+    grid-area: image;
+    display: block;
+    width: 100%;
+  }
+
+  .giftName {
+    font-weight: bold;
+  }
+
+  .giftDescription {
+    margin-top: 0.5rem;
+  }
+
+  .giftImage {
+    filter: drop-shadow(0 2px 2px fade(@font-color-dark, 10%));
+  }
+
+  .giftCopy {
+    grid-area: copy;
+  }
+
+  &.noGiftOption .giftCopy {
+    grid-column: image-start / copy-end;
+  }
+
+  input[type='radio'] {
+    appearance: none;
+    background-color: transparent;
+    margin: 0;
+    font: inherit;
+    color: currentColor;
+    width: 1.15em;
+    height: 1.15em;
+    border: 0.15em solid currentColor;
+    border-radius: 50%;
+    transform: translateY(-0.075em);
+
+    // to align the ::before circle with the radio button
+    display: grid;
+    place-items: center;
+
+    &::before {
+      content: '';
+      width: 0.65em;
+      height: 0.65em;
+      border-radius: 50%;
+      transform: scale(0);
+      transition: 120ms transform ease-in-out;
+      box-shadow: inset 1em 1em @font-color-dark;
+    }
+
+    &:checked::before {
+      transform: scale(1);
+    }
+  }
 }

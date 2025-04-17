@@ -3,6 +3,7 @@ import { immer } from 'zustand/middleware/immer';
 import {
   getMe,
   LoginOutcome,
+  logout,
   processLoginRequest,
 } from '../utils/AuthenticationApi';
 
@@ -12,6 +13,8 @@ interface State {
   isFollowMagicLinkMessageVisible: boolean;
   isVerifyEmailMessageVisible: boolean;
   isEmailUpdatedMessageVisible: boolean;
+  isAccountDoesNotExistMessageVisible: boolean;
+  isLoadingMe: boolean;
 }
 
 interface Actions {
@@ -19,9 +22,12 @@ interface Actions {
   onEmailAddressChange: (emailAddress: string) => void;
   onSubmitLogin: ({
     requireVerifiedEmail,
+    newEmailBehavior,
   }: {
     requireVerifiedEmail: boolean;
+    newEmailBehavior?: 'update' | 'reject';
   }) => void;
+  logout: () => void;
 }
 
 const useLoginStore = create(
@@ -31,10 +37,13 @@ const useLoginStore = create(
     isFollowMagicLinkMessageVisible: false,
     isVerifyEmailMessageVisible: false,
     isEmailUpdatedMessageVisible: false,
+    isAccountDoesNotExistMessageVisible: false,
+    isLoadingMe: false,
 
     initialize: () => {
       set((draft) => {
         draft.isLoginValidated = false;
+        draft.isLoadingMe = true;
       });
       getMe()
         .then((me) => {
@@ -47,6 +56,11 @@ const useLoginStore = create(
         })
         .catch((err: unknown) => {
           console.warn('Error fetching me', err);
+        })
+        .finally(() => {
+          set((draft) => {
+            draft.isLoadingMe = false;
+          });
         });
     },
 
@@ -59,7 +73,7 @@ const useLoginStore = create(
       });
     },
 
-    onSubmitLogin: async ({ requireVerifiedEmail }) => {
+    onSubmitLogin: async ({ requireVerifiedEmail, newEmailBehavior }) => {
       const searchParams = new URLSearchParams(window.location.search);
       searchParams.set('noWelcome', 'true');
       const returnToPath =
@@ -70,6 +84,7 @@ const useLoginStore = create(
       const outcome = await processLoginRequest(
         get().emailAddress,
         returnToPath,
+        newEmailBehavior,
         requireVerifiedEmail
       );
       if (
@@ -84,7 +99,6 @@ const useLoginStore = create(
         });
         if (outcome === LoginOutcome.UpdatedEmailOnAuthenticatedAccount) {
           set((draft) => {
-            // The user must follow the link to log into another account
             draft.isEmailUpdatedMessageVisible = true;
           });
         }
@@ -98,7 +112,16 @@ const useLoginStore = create(
           // The user must follow the link to verify their email
           draft.isVerifyEmailMessageVisible = true;
         });
+      } else if (outcome === LoginOutcome.AccountDoesNotExist) {
+        set((draft) => {
+          // No such account, authentication failed
+          draft.isAccountDoesNotExistMessageVisible = true;
+        });
       }
+    },
+    logout: async () => {
+      await logout();
+      get().initialize();
     },
   }))
 );

@@ -1,9 +1,9 @@
 import { randomUUID } from 'crypto';
 import jwt from 'jsonwebtoken';
 import { getRepository } from 'typeorm';
-import stripe from '../../api/stripe';
 import User from '../../entities/User';
 import LoginOutcome from '../../enum/LoginOutcome';
+import stripe from '../../third-party/stripe';
 import EmailService from '../email/EmailService';
 import MagicLinkTemplate from '../email/templates/MagicLinkTemplate';
 import normalizeEmail from '../utils/normalizeEmail';
@@ -112,6 +112,21 @@ export async function attachStripeCustomerAndDetermineUserId(
   return user.id;
 }
 
+export async function getUserByStripeCustomerId(
+  stripeCustomerId: string
+): Promise<User | null> {
+  const userRepository = getRepository(User);
+  return userRepository.findOneBy({ stripeCustomerId });
+}
+
+export async function updateSupportSubscription(
+  userId: number,
+  stripeSupportSubscriptionId: string | null
+): Promise<void> {
+  const userRepository = getRepository(User);
+  await userRepository.update(userId, { stripeSupportSubscriptionId });
+}
+
 export async function markEmailVerified(userId: number): Promise<void> {
   const userRepository = getRepository(User);
   await userRepository.update(userId, { isEmailVerified: true });
@@ -209,7 +224,8 @@ export async function processLoginRequest(
   authenticatedUserId: number,
   apiBase: string,
   returnToPath?: string,
-  requireVerifiedEmail = false
+  requireVerifiedEmail = false,
+  newEmailBehavior: 'update' | 'reject' = 'update'
 ): Promise<LoginOutcome> {
   const userRepository = getRepository(User);
 
@@ -249,33 +265,37 @@ export async function processLoginRequest(
     );
     return LoginOutcome.SentLinkToExistingAccount;
   } else {
-    // Either account is anonymous or the current user is changing their email
-    // Stays logged in, but updates account info
-    currentUser.email = normalizeEmail(requestedEmail);
-    currentUser.isEmailVerified = false;
-    await userRepository.save(currentUser);
+    if (newEmailBehavior === 'update' || currentUser.isAnonymous) {
+      // Either account is anonymous or the current user is changing their email
+      // Stays logged in, but updates account info
+      currentUser.email = normalizeEmail(requestedEmail);
+      currentUser.isEmailVerified = false;
+      await userRepository.save(currentUser);
 
-    if (currentUser.stripeCustomerId) {
-      try {
-        await stripe.customers.update(currentUser.stripeCustomerId, {
-          email: currentUser.email,
-        });
-      } catch (e) {
-        console.error('Error updating Stripe customer', e);
+      if (currentUser.stripeCustomerId) {
+        try {
+          await stripe.customers.update(currentUser.stripeCustomerId, {
+            email: currentUser.email,
+          });
+        } catch (e) {
+          console.error('Error updating Stripe customer', e);
+        }
       }
-    }
 
-    if (requireVerifiedEmail) {
-      // We require a verified email, and this user's email has just changed.
-      await sendMagicLink(
-        required(currentUser.email, 'email'),
-        currentUser.id,
-        apiBase,
-        returnToPath
-      );
-      return LoginOutcome.SentLinkToVerifyEmail;
-    }
+      if (requireVerifiedEmail) {
+        // We require a verified email, and this user's email has just changed.
+        await sendMagicLink(
+          required(currentUser.email, 'email'),
+          currentUser.id,
+          apiBase,
+          returnToPath
+        );
+        return LoginOutcome.SentLinkToVerifyEmail;
+      }
 
-    return LoginOutcome.UpdatedEmailOnAuthenticatedAccount;
+      return LoginOutcome.UpdatedEmailOnAuthenticatedAccount;
+    } else {
+      return LoginOutcome.AccountDoesNotExist;
+    }
   }
 }

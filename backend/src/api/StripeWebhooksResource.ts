@@ -1,6 +1,6 @@
 import express from 'express';
 import ipfilter from 'express-ipfilter';
-import stripe from './stripe';
+import stripe from '../third-party/stripe';
 
 import compact from 'lodash/compact';
 import groupBy from 'lodash/groupBy';
@@ -14,7 +14,7 @@ import MerchInternalVariant from '../enum/MerchInternalVariant';
 const router = express.Router();
 
 type ProductMetadata = {
-  'product-type'?: 'color-credit' | 'merch';
+  'product-type'?: 'color-credit' | 'merch' | 'tip';
   'merch-internal-variant'?: MerchInternalVariant;
 };
 
@@ -172,6 +172,29 @@ router.post<'/', unknown, unknown, Stripe.Event, unknown>(
               event
             );
           }
+        }
+        break;
+      }
+      // Used to track active subscriptions
+      case 'customer.subscription.deleted':
+      case 'customer.subscription.updated': {
+        const subscription = event.data.object;
+        const user = await UserService.getUserByStripeCustomerId(
+          subscription.customer as string
+        );
+        if (!user) {
+          console.warn('No user found for stripe customer id', subscription);
+          return;
+        }
+        if (event.type === 'customer.subscription.deleted') {
+          console.log('Subscription deleted', subscription);
+          await UserService.updateSupportSubscription(user.id, null);
+        } else if (
+          subscription.status === 'active' &&
+          user.stripeSupportSubscriptionId !== subscription.id
+        ) {
+          console.log('New subscription is active', subscription);
+          await UserService.updateSupportSubscription(user.id, subscription.id);
         }
         break;
       }
