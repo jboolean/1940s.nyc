@@ -17,8 +17,12 @@ const recurringForFrequency: Record<
   },
 };
 
-const RECURRING_PRODUCT_ID = isProduction() ? 'XXX' : 'prod_RqWpsbQnybLsmU';
-const ONE_TIME_PRODUCT_ID = isProduction() ? 'XXX' : 'prod_RqWxloaBN1Gqnd';
+const RECURRING_PRODUCT_ID = isProduction()
+  ? 'prod_S9HJnU8utlvPTX'
+  : 'prod_RqWpsbQnybLsmU';
+const ONE_TIME_PRODUCT_ID = isProduction()
+  ? 'prod_S9HKYT98DRZT6J'
+  : 'prod_RqWxloaBN1Gqnd';
 
 export async function createTipCheckoutSession({
   amountMinorUnits: amount,
