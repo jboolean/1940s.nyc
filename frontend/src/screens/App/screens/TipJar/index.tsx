@@ -109,6 +109,7 @@ const renderGift = ({
     case 'tote-bag':
       return (
         <GiftOption
+          key={gift}
           title={
             <>
               Custom <i>1940s.nyc</i> tote bag
@@ -119,9 +120,10 @@ const renderGift = ({
           frequency={frequency}
           description={
             <>
-              This custom-made bag features &ldquo;1940s.nyc&rdquo; printed on
-              the front, and a map of any NYC area of your choice on the back.
-              You&rsquo;ll get an email to select the area.
+              This custom-made bag features &ldquo;1940s.nyc&rdquo; on the front
+              in one of six color options, and a map of any NYC area of your
+              choice on the back. You&rsquo;ll get an email to select the area
+              and colors.
             </>
           }
           imageSrc={TotBagImage}
