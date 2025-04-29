@@ -112,7 +112,7 @@ const renderGift = ({
           key={gift}
           title={
             <>
-              Custom <i>1940s.nyc</i> tote bag
+              Custom <i>1940s.nyc</i> tote
             </>
           }
           value={gift}
