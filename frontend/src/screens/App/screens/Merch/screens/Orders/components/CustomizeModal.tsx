@@ -23,31 +23,31 @@ const MAPBOX_STYLE = __DEV__
   ? 'mapbox://styles/julianboilen/ck5jrzrs11r1p1imia7qzjkm1/draft'
   : 'mapbox://styles/julianboilen/ck5jrzrs11r1p1imia7qzjkm1';
 
+import OutlineCremeDarkImage from './assets/outline-creme-dark.png';
+import OutlineCremeGreenImage from './assets/outline-creme-green.png';
+import OutlineCremeRedImage from './assets/outline-creme-red.png';
 import OutlineDarkCremeImage from './assets/outline-dark-creme.png';
 import OutlineGreenCremeImage from './assets/outline-green-creme.png';
 import OutlineRedCremeImage from './assets/outline-red-creme.png';
-import SolidCremeDarkImage from './assets/solid-creme-dark.png';
-import SolidCremeGreenImage from './assets/solid-creme-green.png';
-import SolidCremeRedImage from './assets/solid-creme-red.png';
 
 const FRONT_STYLE_PRESETS = [
   {
-    style: 'solid',
+    style: 'outline',
     foregroundColor: 'creme',
     backgroundColor: 'green',
-    image: SolidCremeGreenImage,
+    image: OutlineCremeGreenImage,
   },
   {
-    style: 'solid',
+    style: 'outline',
     foregroundColor: 'creme',
     backgroundColor: 'red',
-    image: SolidCremeRedImage,
+    image: OutlineCremeRedImage,
   },
   {
-    style: 'solid',
+    style: 'outline',
     foregroundColor: 'creme',
     backgroundColor: 'dark',
-    image: SolidCremeDarkImage,
+    image: OutlineCremeDarkImage,
   },
   {
     style: 'outline',
