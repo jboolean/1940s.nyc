@@ -156,6 +156,8 @@ export default function TipJar(): JSX.Element {
     logout,
   } = useLoginStore();
 
+  const currencyInputRef = React.useRef<HTMLInputElement>(null);
+
   React.useEffect(() => {
     initializeLoginStore();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -229,6 +231,25 @@ export default function TipJar(): JSX.Element {
                 />
               </Button>
             ))}
+            <Button
+              buttonStyle="secondary"
+              disabled={!frequency}
+              key="other"
+              onClick={() => {
+                if (currencyInputRef.current) {
+                  currencyInputRef.current.focus();
+                  currencyInputRef.current.setSelectionRange(
+                    1,
+                    currencyInputRef.current.value.length
+                  );
+                }
+              }}
+              isActive={
+                !amountPresets.includes(amountDollars) && amountDollars > 0
+              }
+            >
+              Other
+            </Button>
           </div>
           {applicableGifts.length ? (
             <div>
@@ -268,6 +289,7 @@ export default function TipJar(): JSX.Element {
           ) : null}
           <div className={stylesheet.tipForm}>
             <CurrencyInput
+              getInputRef={currencyInputRef}
               value={amountDollars}
               allowNegative={false}
               placeholder="$0"
