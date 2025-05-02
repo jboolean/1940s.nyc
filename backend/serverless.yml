@@ -30,6 +30,7 @@ provider:
     FRONTEND_BASE_URL: ${ssm:/${self:service}-${sls:stage}-frontend-base-url}
     JWT_SECRET: ${ssm:/${self:service}-${sls:stage}-jwt-secret}
     MODERATORS_TO_EMAIL: ${ssm:/${self:service}-${sls:stage}-moderators-to-email}
+    MERCH_REVIEWER_EMAILS: ${ssm:/${self:service}-${sls:stage}-merch-reviewer-emails}
     MAPBOX_SK: ${ssm:/${self:service}-${sls:stage}-mapbox-sk}
     OPENAI_SK: ${ssm:/${self:service}-${sls:stage}-openai-sk}
     RAPIDAPI_API_KEY: ${ssm:/${self:service}-${sls:stage}-rapidapi-api-key}

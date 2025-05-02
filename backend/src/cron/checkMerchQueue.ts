@@ -17,7 +17,7 @@ export default async function checkMerchQueue(): Promise<void> {
       ordersCount,
     },
     metadata: {},
-    to: process.env.MODERATORS_TO_EMAIL ?? '',
+    to: process.env.MERCH_REVIEWER_EMAILS ?? '',
   });
 
   await EmailService.sendTemplateEmail(email);
