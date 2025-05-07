@@ -62,7 +62,7 @@
     "@sentry/node": "^7.36.0",
     "@sentry/tracing": "^7.36.0",
     "@types/multer": "^1.4.11",
-    "axios": "^1.7.4",
+    "axios": "^1.9.0",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "express": "^4.21.0",
