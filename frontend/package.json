@@ -85,7 +85,7 @@
     "@types/react-window-infinite-loader": "~1.0.9",
     "@types/webpack": "^5.28.5",
     "@types/webpack-bundle-analyzer": "^4.6.0",
-    "@types/webpack-dev-server": "^3.11.2",
+    "@types/webpack-dev-server": "^4.7.1",
     "@types/webpack-merge": "^4.1.5",
     "@typescript-eslint/eslint-plugin": "^6.7.5",
     "ajv": "^8.12.0",
