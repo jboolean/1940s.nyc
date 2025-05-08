@@ -70,7 +70,7 @@ const FRONT_STYLE_PRESETS = [
 ] as const;
 
 const STYLE_DEFAULTS = {
-  style: 'solid',
+  style: 'outline',
   foregroundColor: 'creme',
   backgroundColor: 'green',
 };
