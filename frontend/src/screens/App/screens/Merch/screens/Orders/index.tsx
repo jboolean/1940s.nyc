@@ -2,16 +2,16 @@ import React, { useEffect } from 'react';
 
 import { Link } from 'react-router-dom';
 import absurd from 'shared/utils/absurd';
-import CustomizeModal from './components/CustomizeModal';
-import LoginModal from './components/LoginModal';
-import useOrdersStore from './shared/stores/OrdersStore';
 import {
   MerchInternalVariant,
   MerchItemState,
   MerchOrderFulfillmentState,
   MerchOrderState,
   Order,
-} from './shared/utils/Order';
+} from 'shared/utils/merch/Order';
+import CustomizeModal from './components/CustomizeModal';
+import LoginModal from './components/LoginModal';
+import useOrdersStore from './shared/stores/OrdersStore';
 
 import Button from 'shared/components/Button';
 import { ColorThemeContext } from 'shared/components/ColorThemeContext';

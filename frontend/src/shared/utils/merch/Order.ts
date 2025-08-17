@@ -45,11 +45,14 @@ export interface OrderItem {
   internalVariant: MerchInternalVariant;
   customizationOptions?: MerchCustomizationOptions;
   state: MerchItemState;
+  printfileUrl?: string;
 }
 
 export interface Order {
   id: number;
   createdAt: string;
+  userId: number;
+  email?: string;
   state: MerchOrderState;
   fulfillmentState?: MerchOrderFulfillmentState;
   items: OrderItem[];

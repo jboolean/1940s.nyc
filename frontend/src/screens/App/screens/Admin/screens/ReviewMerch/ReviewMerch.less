@@ -1,0 +1,68 @@
+@import '../../../../../../shared/styles/colors.less';
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.orders {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.order {
+  border: 1px solid @creme;
+  padding: 20px;
+}
+
+.orderHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+  gap: 20px;
+}
+
+.metadata {
+  flex: 1;
+}
+
+.buttons {
+  display: flex;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.items {
+  border-top: 1px solid @creme;
+  padding-top: 20px;
+}
+
+.item {
+  border: 1px solid @creme;
+  padding: 15px;
+  margin-bottom: 10px;
+}
+
+.customization {
+  margin-top: 10px;
+  padding: 10px;
+  background: @creme;
+}
+
+.attentionSection {
+  margin-top: 40px;
+}
+
+@media (max-width: 768px) {
+  .orderHeader {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .buttons {
+    justify-content: center;
+  }
+}

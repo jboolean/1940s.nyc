@@ -10,8 +10,8 @@ import {
   setOverlay,
 } from 'screens/App/screens/MapPane/components/MainMap/overlays';
 import Button from 'shared/components/Button';
+import { MerchCustomizationOptions } from 'shared/utils/merch/Order';
 import useElementId from 'shared/utils/useElementId';
-import { MerchCustomizationOptions } from '../shared/utils/Order';
 import stylesheet from './CustomizeModal.less';
 
 const DEFAULT_LNG_LAT = {

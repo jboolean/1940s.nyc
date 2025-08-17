@@ -1,8 +1,12 @@
 import useLoginStore from 'shared/stores/LoginStore';
+import {
+  MerchCustomizationOptions,
+  Order,
+  OrderItem,
+} from 'shared/utils/merch/Order';
+import * as merchApi from 'shared/utils/merch/merchApi';
 import create from 'zustand';
 import { immer } from 'zustand/middleware/immer';
-import { MerchCustomizationOptions, Order, OrderItem } from '../utils/Order';
-import * as merchApi from '../utils/merchApi';
 
 interface State {
   orders: Order[] | null;
