@@ -4,6 +4,7 @@ import Senders from './Senders';
 
 type OrdersQueueTemplateData = {
   ordersCount: number;
+  reviewMerchUrl: string;
 };
 
 class MerchOrdersQueueTemplate extends EmailTemplate<

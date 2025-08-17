@@ -2,6 +2,15 @@ import EmailService from '../business/email/EmailService';
 import ReviewQueueStaleTemplate from '../business/email/templates/MerchOrdersQueueTemplate';
 import { getOrdersForReview } from '../business/merch/MerchOrderService';
 
+function forgeReviewMerchUrl(): string {
+  const reviewMerchUrl: URL = new URL(
+    `/admin/review-merch`,
+    process.env.FRONTEND_BASE_URL
+  );
+
+  return reviewMerchUrl.toString();
+}
+
 export default async function checkMerchQueue(): Promise<void> {
   const ordersForReview = await getOrdersForReview();
 
@@ -15,6 +24,7 @@ export default async function checkMerchQueue(): Promise<void> {
   const email = ReviewQueueStaleTemplate.createTemplatedEmail({
     templateContext: {
       ordersCount,
+      reviewMerchUrl: forgeReviewMerchUrl(),
     },
     metadata: {},
     to: process.env.MERCH_REVIEWER_EMAILS ?? '',
