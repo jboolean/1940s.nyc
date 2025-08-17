@@ -71,10 +71,13 @@ const NYPL_ATTRIBUTION =
 
 const MANHATTAN = [
   -74.04772962763064, 40.68291694544512, -73.90665099539478, 40.87903804730722,
-];
+] as const;
+
+// Generic map interface that works with both MapBox and MapLibre
+type GenericMap = mapboxgl.Map | maplibregl.Map;
 
 export const installLayers = (
-  map: mapboxgl.Map,
+  map: GenericMap,
   photoLayer: string,
   {
     fadeOverlays = true,
@@ -127,7 +130,9 @@ export const installLayers = (
       tiles: [mapSpec.url],
       attribution: mapSpec.attribution,
       tileSize: 256,
-      ...(mapSpec.bounds ? { bounds: mapSpec.bounds } : {}),
+      ...(mapSpec.bounds
+        ? { bounds: mapSpec.bounds as [number, number, number, number] }
+        : {}),
     });
 
     map.addLayer(
@@ -160,7 +165,7 @@ export const installLayers = (
 };
 
 export const setOverlay = (
-  map: mapboxgl.Map,
+  map: GenericMap,
   overlayId: OverlayId | null | OverlayId[]
 ): void => {
   // If overlayId is not an arary, convert it to an array
