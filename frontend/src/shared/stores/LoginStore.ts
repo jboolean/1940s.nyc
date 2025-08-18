@@ -10,6 +10,7 @@ import {
 interface State {
   emailAddress: string;
   isLoginValidated: boolean;
+  isLoggedInToNonAnonymousAccount: boolean;
   isFollowMagicLinkMessageVisible: boolean;
   isVerifyEmailMessageVisible: boolean;
   isEmailUpdatedMessageVisible: boolean;
@@ -34,6 +35,7 @@ const useLoginStore = create(
   immer<State & Actions>((set, get) => ({
     emailAddress: '',
     isLoginValidated: false,
+    isLoggedInToNonAnonymousAccount: false,
     isFollowMagicLinkMessageVisible: false,
     isVerifyEmailMessageVisible: false,
     isEmailUpdatedMessageVisible: false,
@@ -43,12 +45,15 @@ const useLoginStore = create(
     initialize: () => {
       set((draft) => {
         draft.isLoginValidated = false;
+        draft.isLoggedInToNonAnonymousAccount = false;
         draft.isLoadingMe = true;
       });
       getMe()
         .then((me) => {
           set((draft) => {
             draft.emailAddress = me.email || '';
+            // If getMe returns an email, the user is logged in to a non-anonymous account
+            draft.isLoggedInToNonAnonymousAccount = !!me.email;
             draft.isFollowMagicLinkMessageVisible = false;
             draft.isVerifyEmailMessageVisible = false;
             draft.isEmailUpdatedMessageVisible = false;
@@ -70,6 +75,7 @@ const useLoginStore = create(
         draft.isFollowMagicLinkMessageVisible = false;
         draft.isEmailUpdatedMessageVisible = false;
         draft.isLoginValidated = false;
+        // Don't reset isLoggedInToNonAnonymousAccount here as it's based on the server state
       });
     },
 
@@ -94,6 +100,7 @@ const useLoginStore = create(
         set((draft) => {
           // We stay logged into the current account and can proceed
           draft.isLoginValidated = true;
+          draft.isLoggedInToNonAnonymousAccount = true;
           draft.isFollowMagicLinkMessageVisible = false;
           draft.isVerifyEmailMessageVisible = false;
         });
