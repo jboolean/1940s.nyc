@@ -30,7 +30,7 @@ type LoginRequest = {
   requireVerifiedEmail?: boolean;
 
   // If the user is already logged in, and the email is different, should we update the email on a named account?
-  newEmailBehavior?: 'update' | 'reject';
+  newEmailBehavior?: 'update' | 'reject' | 'create';
 };
 
 type LoginResponse = {

@@ -12,6 +12,9 @@ import classNames from 'classnames';
 
 import stylesheet from './welcome.less';
 
+// Set to false to disable email requirement
+const REQUIRE_EMAIL = true;
+
 interface Props {
   isOpen: boolean;
   onRequestClose: () => void;
@@ -25,11 +28,13 @@ export default function Welcome({
 
   const { isLoggedInToNonAnonymousAccount, isLoadingMe } = useLoginStore();
 
-  // Only allow closing if user is logged in to a non-anonymous account
-  const canClose = isLoggedInToNonAnonymousAccount && !isLoadingMe;
+  // Only require login if REQUIRE_EMAIL is true
+  const isEmailRequirementMet = REQUIRE_EMAIL
+    ? isLoggedInToNonAnonymousAccount && !isLoadingMe
+    : true;
 
   const handleClose = (): void => {
-    if (canClose) {
+    if (isEmailRequirementMet) {
       onRequestClose();
     }
   };
@@ -40,7 +45,7 @@ export default function Welcome({
       className={stylesheet.welcomeModal}
       onRequestClose={handleClose}
       shouldCloseOnOverlayClick={false}
-      shouldCloseOnEsc={canClose}
+      shouldCloseOnEsc={isEmailRequirementMet}
       size="large"
       isCloseButtonVisible={false}
       carouselProps={{
@@ -62,14 +67,14 @@ export default function Welcome({
             <strong>Zoom in! Every dot&nbsp;is&nbsp;a&nbsp;photo.</strong>
           </p>
 
-          {!canClose ? (
+          {REQUIRE_EMAIL && !isEmailRequirementMet ? (
             <div className={stylesheet.loginSection}>
               <p>
                 <strong>
                   An email address is temporarily required to access the site.
                 </strong>
               </p>
-              <LoginForm />
+              <LoginForm newEmailBehavior="create" />
             </div>
           ) : (
             <div
@@ -134,7 +139,7 @@ export default function Welcome({
             </a>
           </p>
         </div>
-        {canClose && (
+        {(!REQUIRE_EMAIL || isEmailRequirementMet) && (
           <div
             className={classNames(
               stylesheet.buttonContainer,

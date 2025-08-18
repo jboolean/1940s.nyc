@@ -225,7 +225,7 @@ export async function processLoginRequest(
   apiBase: string,
   returnToPath?: string,
   requireVerifiedEmail = false,
-  newEmailBehavior: 'update' | 'reject' = 'update'
+  newEmailBehavior: 'update' | 'reject' | 'create' = 'update'
 ): Promise<LoginOutcome> {
   const userRepository = getRepository(User);
 
@@ -265,7 +265,27 @@ export async function processLoginRequest(
     );
     return LoginOutcome.SentLinkToExistingAccount;
   } else {
-    if (newEmailBehavior === 'update' || currentUser.isAnonymous) {
+    if (newEmailBehavior === 'create' && !currentUser.isAnonymous) {
+      // Create a new account for the new email if current account is non-anonymous
+      const newUser = new User();
+      newUser.email = normalizeEmail(requestedEmail);
+      newUser.isEmailVerified = false;
+      newUser.ipAddress = currentUser.ipAddress; // Keep the same IP for tracking
+      await userRepository.save(newUser);
+
+      if (requireVerifiedEmail) {
+        // We require a verified email for the new account
+        await sendMagicLink(
+          required(newUser.email, 'email'),
+          newUser.id,
+          apiBase,
+          returnToPath
+        );
+        return LoginOutcome.SentLinkToVerifyEmail;
+      }
+
+      return LoginOutcome.CreatedNewAccount as LoginOutcome;
+    } else if (newEmailBehavior === 'update' || currentUser.isAnonymous) {
       // Either account is anonymous or the current user is changing their email
       // Stays logged in, but updates account info
       currentUser.email = normalizeEmail(requestedEmail);

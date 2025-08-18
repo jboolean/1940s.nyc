@@ -15,6 +15,7 @@ interface State {
   isVerifyEmailMessageVisible: boolean;
   isEmailUpdatedMessageVisible: boolean;
   isAccountDoesNotExistMessageVisible: boolean;
+  isNewAccountCreatedMessageVisible: boolean;
   isLoadingMe: boolean;
 }
 
@@ -26,7 +27,7 @@ interface Actions {
     newEmailBehavior,
   }: {
     requireVerifiedEmail: boolean;
-    newEmailBehavior?: 'update' | 'reject';
+    newEmailBehavior?: 'update' | 'reject' | 'create';
   }) => void;
   logout: () => void;
 }
@@ -40,6 +41,7 @@ const useLoginStore = create(
     isVerifyEmailMessageVisible: false,
     isEmailUpdatedMessageVisible: false,
     isAccountDoesNotExistMessageVisible: false,
+    isNewAccountCreatedMessageVisible: false,
     isLoadingMe: false,
 
     initialize: () => {
@@ -57,6 +59,7 @@ const useLoginStore = create(
             draft.isFollowMagicLinkMessageVisible = false;
             draft.isVerifyEmailMessageVisible = false;
             draft.isEmailUpdatedMessageVisible = false;
+            draft.isNewAccountCreatedMessageVisible = false;
           });
         })
         .catch((err: unknown) => {
@@ -95,7 +98,8 @@ const useLoginStore = create(
       );
       if (
         outcome === LoginOutcome.AlreadyAuthenticated ||
-        outcome === LoginOutcome.UpdatedEmailOnAuthenticatedAccount
+        outcome === LoginOutcome.UpdatedEmailOnAuthenticatedAccount ||
+        outcome === LoginOutcome.CreatedNewAccount
       ) {
         set((draft) => {
           // We stay logged into the current account and can proceed
@@ -107,6 +111,11 @@ const useLoginStore = create(
         if (outcome === LoginOutcome.UpdatedEmailOnAuthenticatedAccount) {
           set((draft) => {
             draft.isEmailUpdatedMessageVisible = true;
+          });
+        }
+        if (outcome === LoginOutcome.CreatedNewAccount) {
+          set((draft) => {
+            draft.isNewAccountCreatedMessageVisible = true;
           });
         }
       } else if (outcome === LoginOutcome.SentLinkToExistingAccount) {

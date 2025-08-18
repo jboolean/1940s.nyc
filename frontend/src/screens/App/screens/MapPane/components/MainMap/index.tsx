@@ -162,11 +162,25 @@ function withRouterRef<
 
     if (!canShowMap) {
       return (
-        <div className={stylesheet.loginOverlay}>
-          <div className={stylesheet.loginContent}>
+        <div
+          style={{
+            height: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: '#f5f5f5',
+            padding: '2rem',
+          }}
+        >
+          <div
+            style={{
+              textAlign: 'center',
+              maxWidth: '400px',
+            }}
+          >
             <h2>Login Required</h2>
             <p>Please log in to view the map.</p>
-            <LoginForm />
+            <LoginForm newEmailBehavior="create" />
           </div>
         </div>
       );

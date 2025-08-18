@@ -6,12 +6,13 @@ export enum LoginOutcome {
   SentLinkToExistingAccount = 'sent_link_to_existing_account',
   SentLinkToVerifyEmail = 'sent_link_to_verify_email',
   AccountDoesNotExist = 'account_does_not_exist',
+  CreatedNewAccount = 'created_new_account',
 }
 
 export async function processLoginRequest(
   requestedEmail: string,
   returnToPath?: string,
-  newEmailBehavior?: 'update' | 'reject',
+  newEmailBehavior?: 'update' | 'reject' | 'create',
   requireVerifiedEmail = false
 ): Promise<LoginOutcome> {
   const resp = await api.post<{ outcome: LoginOutcome }>(
