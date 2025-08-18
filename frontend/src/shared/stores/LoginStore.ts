@@ -10,10 +10,12 @@ import {
 interface State {
   emailAddress: string;
   isLoginValidated: boolean;
+  isLoggedInToNonAnonymousAccount: boolean;
   isFollowMagicLinkMessageVisible: boolean;
   isVerifyEmailMessageVisible: boolean;
   isEmailUpdatedMessageVisible: boolean;
   isAccountDoesNotExistMessageVisible: boolean;
+  isNewAccountCreatedMessageVisible: boolean;
   isLoadingMe: boolean;
 }
 
@@ -25,7 +27,7 @@ interface Actions {
     newEmailBehavior,
   }: {
     requireVerifiedEmail: boolean;
-    newEmailBehavior?: 'update' | 'reject';
+    newEmailBehavior?: 'update' | 'reject' | 'create';
   }) => void;
   logout: () => void;
 }
@@ -34,24 +36,30 @@ const useLoginStore = create(
   immer<State & Actions>((set, get) => ({
     emailAddress: '',
     isLoginValidated: false,
+    isLoggedInToNonAnonymousAccount: false,
     isFollowMagicLinkMessageVisible: false,
     isVerifyEmailMessageVisible: false,
     isEmailUpdatedMessageVisible: false,
     isAccountDoesNotExistMessageVisible: false,
+    isNewAccountCreatedMessageVisible: false,
     isLoadingMe: false,
 
     initialize: () => {
       set((draft) => {
         draft.isLoginValidated = false;
+        draft.isLoggedInToNonAnonymousAccount = false;
         draft.isLoadingMe = true;
       });
       getMe()
         .then((me) => {
           set((draft) => {
             draft.emailAddress = me.email || '';
+            // If getMe returns an email, the user is logged in to a non-anonymous account
+            draft.isLoggedInToNonAnonymousAccount = !!me.email;
             draft.isFollowMagicLinkMessageVisible = false;
             draft.isVerifyEmailMessageVisible = false;
             draft.isEmailUpdatedMessageVisible = false;
+            draft.isNewAccountCreatedMessageVisible = false;
           });
         })
         .catch((err: unknown) => {
@@ -70,6 +78,7 @@ const useLoginStore = create(
         draft.isFollowMagicLinkMessageVisible = false;
         draft.isEmailUpdatedMessageVisible = false;
         draft.isLoginValidated = false;
+        // Don't reset isLoggedInToNonAnonymousAccount here as it's based on the server state
       });
     },
 
@@ -89,17 +98,24 @@ const useLoginStore = create(
       );
       if (
         outcome === LoginOutcome.AlreadyAuthenticated ||
-        outcome === LoginOutcome.UpdatedEmailOnAuthenticatedAccount
+        outcome === LoginOutcome.UpdatedEmailOnAuthenticatedAccount ||
+        outcome === LoginOutcome.CreatedNewAccount
       ) {
         set((draft) => {
           // We stay logged into the current account and can proceed
           draft.isLoginValidated = true;
+          draft.isLoggedInToNonAnonymousAccount = true;
           draft.isFollowMagicLinkMessageVisible = false;
           draft.isVerifyEmailMessageVisible = false;
         });
         if (outcome === LoginOutcome.UpdatedEmailOnAuthenticatedAccount) {
           set((draft) => {
             draft.isEmailUpdatedMessageVisible = true;
+          });
+        }
+        if (outcome === LoginOutcome.CreatedNewAccount) {
+          set((draft) => {
+            draft.isNewAccountCreatedMessageVisible = true;
           });
         }
       } else if (outcome === LoginOutcome.SentLinkToExistingAccount) {

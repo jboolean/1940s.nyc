@@ -2,6 +2,8 @@ import React from 'react';
 import { useFeatureFlag } from 'screens/App/shared/stores/FeatureFlagsStore';
 import FeatureFlag from 'screens/App/shared/types/FeatureFlag';
 import Button from 'shared/components/Button';
+import LoginForm from 'shared/components/LoginForm';
+import useLoginStore from 'shared/stores/LoginStore';
 
 import PhotoAsideModal from '../PhotoAsideModal';
 import carouselImages from './carouselImages';
@@ -9,6 +11,9 @@ import carouselImages from './carouselImages';
 import classNames from 'classnames';
 
 import stylesheet from './welcome.less';
+
+// Set to false to disable email requirement
+const REQUIRE_EMAIL = true;
 
 interface Props {
   isOpen: boolean;
@@ -21,13 +26,26 @@ export default function Welcome({
   // Used to hide this annoying modal in development
   const isWelcomeDisabled = useFeatureFlag(FeatureFlag.DISABLE_WELCOME_MODAL);
 
+  const { isLoggedInToNonAnonymousAccount, isLoadingMe } = useLoginStore();
+
+  // Only require login if REQUIRE_EMAIL is true
+  const isEmailRequirementMet = REQUIRE_EMAIL
+    ? isLoggedInToNonAnonymousAccount && !isLoadingMe
+    : true;
+
+  const handleClose = (): void => {
+    if (isEmailRequirementMet) {
+      onRequestClose();
+    }
+  };
+
   return (
     <PhotoAsideModal
       isOpen={isOpen && !isWelcomeDisabled}
       className={stylesheet.welcomeModal}
-      onRequestClose={onRequestClose}
+      onRequestClose={handleClose}
       shouldCloseOnOverlayClick={false}
-      shouldCloseOnEsc
+      shouldCloseOnEsc={isEmailRequirementMet}
       size="large"
       isCloseButtonVisible={false}
       carouselProps={{
@@ -48,18 +66,31 @@ export default function Welcome({
             <br />
             <strong>Zoom in! Every dot&nbsp;is&nbsp;a&nbsp;photo.</strong>
           </p>
-          <div
-            className={classNames(
-              stylesheet.buttonContainer,
-              stylesheet.mobileButton,
-              stylesheet.mobileOnly
-            )}
-            onClick={onRequestClose}
-          >
-            <Button buttonStyle="primary" className={stylesheet.explore}>
-              Start Exploring
-            </Button>
-          </div>
+
+          {REQUIRE_EMAIL && !isEmailRequirementMet ? (
+            <div className={stylesheet.loginSection}>
+              <p>
+                <strong>
+                  An email address is temporarily required to access the site.
+                </strong>
+              </p>
+              <LoginForm newEmailBehavior="create" />
+            </div>
+          ) : (
+            <div
+              className={classNames(
+                stylesheet.buttonContainer,
+                stylesheet.mobileButton,
+                stylesheet.mobileOnly
+              )}
+              onClick={handleClose}
+            >
+              <Button buttonStyle="primary" className={stylesheet.explore}>
+                Start Exploring
+              </Button>
+            </div>
+          )}
+
           <hr />
           <p className={stylesheet.finePrint}>
             The photos on this site were retrieved from the NYC Department of
@@ -108,17 +139,19 @@ export default function Welcome({
             </a>
           </p>
         </div>
-        <div
-          className={classNames(
-            stylesheet.buttonContainer,
-            stylesheet.desktopOnly
-          )}
-          onClick={onRequestClose}
-        >
-          <Button buttonStyle="primary" className={stylesheet.explore}>
-            Start Exploring
-          </Button>
-        </div>
+        {(!REQUIRE_EMAIL || isEmailRequirementMet) && (
+          <div
+            className={classNames(
+              stylesheet.buttonContainer,
+              stylesheet.desktopOnly
+            )}
+            onClick={handleClose}
+          >
+            <Button buttonStyle="primary" className={stylesheet.explore}>
+              Start Exploring
+            </Button>
+          </div>
+        )}
       </div>
     </PhotoAsideModal>
   );

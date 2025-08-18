@@ -14,6 +14,7 @@ import stylesheet from './App.less';
 import AllStories from './screens/AllStories';
 import Outtakes from './screens/Outtakes';
 
+import useLoginStore from 'shared/stores/LoginStore';
 import { OptimizeExperimentsProvider } from 'shared/utils/OptimizeExperiments';
 import 'utils/optimize';
 import AdminRoutes from './screens/Admin/AdminRoutes';
@@ -117,6 +118,12 @@ function ContextWrappers({
 }: {
   children: React.ReactNode;
 }): JSX.Element {
+  const initialize = useLoginStore((state) => state.initialize);
+
+  React.useEffect(() => {
+    initialize();
+  }, [initialize]);
+
   return <OptimizeExperimentsProvider>{children}</OptimizeExperimentsProvider>;
 }
 

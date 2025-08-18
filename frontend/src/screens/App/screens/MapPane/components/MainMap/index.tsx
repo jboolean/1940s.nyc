@@ -10,6 +10,8 @@ import {
 import classnames from 'classnames';
 import mapboxgl from 'mapbox-gl';
 
+import LoginForm from 'shared/components/LoginForm';
+import useLoginStore from 'shared/stores/LoginStore';
 import * as overlays from './overlays';
 
 export { OverlayId } from './overlays';
@@ -153,6 +155,37 @@ function withRouterRef<
     const match = useRouteMatch();
     const location = useLocation();
     const history = useHistory();
+    const { isLoggedInToNonAnonymousAccount, isLoadingMe } = useLoginStore();
+
+    // Only show map if user is logged in to a non-anonymous account
+    const canShowMap = isLoggedInToNonAnonymousAccount && !isLoadingMe;
+
+    if (!canShowMap) {
+      return (
+        <div
+          style={{
+            height: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: '#f5f5f5',
+            padding: '2rem',
+          }}
+        >
+          <div
+            style={{
+              textAlign: 'center',
+              maxWidth: '400px',
+            }}
+          >
+            <h2>Login Required</h2>
+            <p>Please log in to view the map.</p>
+            <LoginForm newEmailBehavior="create" />
+          </div>
+        </div>
+      );
+    }
+
     return (
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- I give up on types
       // @ts-ignore

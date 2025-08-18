@@ -12,7 +12,7 @@ export default function LoginForm({
   newEmailBehavior,
 }: {
   requireVerifiedEmail?: boolean;
-  newEmailBehavior?: 'update' | 'reject';
+  newEmailBehavior?: 'update' | 'reject' | 'create';
 }): JSX.Element {
   const {
     emailAddress,
@@ -23,6 +23,7 @@ export default function LoginForm({
     isVerifyEmailMessageVisible,
     isEmailUpdatedMessageVisible,
     isAccountDoesNotExistMessageVisible,
+    isNewAccountCreatedMessageVisible,
     isLoadingMe,
   } = useLoginStore();
 
@@ -81,6 +82,11 @@ export default function LoginForm({
       {isAccountDoesNotExistMessageVisible && (
         <p className={stylesheet.resultMessage}>
           No account found for <i>{emailAddress}</i>.
+        </p>
+      )}
+      {isNewAccountCreatedMessageVisible && (
+        <p className={stylesheet.resultMessage}>
+          A new account has been created for <i>{emailAddress}</i>.
         </p>
       )}
     </form>
