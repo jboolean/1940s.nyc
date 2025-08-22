@@ -43,7 +43,7 @@
     "@typescript-eslint/eslint-plugin": "^5.61.0",
     "@typescript-eslint/parser": "^5.61.1",
     "eslint": "^8.52.0",
-    "eslint-config-jboolean": "^0.1.0",
+    "eslint-config-jboolean": "^1.0.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.2.1",
     "lint-staged": "^14.0.1",
