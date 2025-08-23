@@ -29,6 +29,7 @@ interface Props {
   className?: string;
   panOnClick: boolean;
   overlay: overlays.OverlayId;
+  requireLogin?: boolean;
 }
 
 type PropsWithRouter = Props & RouteComponentProps<{ identifier?: string }>;
@@ -148,7 +149,7 @@ All the types got very confusing, sorry.
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 function withRouterRef<
-  OuterProps,
+  OuterProps extends Props,
   C = React.ComponentType<OuterProps & RouteComponentProps>
 >(Component: C) {
   return React.forwardRef<C, OuterProps>(function WithRouterRef(props, ref) {
@@ -158,7 +159,10 @@ function withRouterRef<
     const { isLoggedInToNonAnonymousAccount, isLoadingMe } = useLoginStore();
 
     // Only show map if user is logged in to a non-anonymous account
-    const canShowMap = isLoggedInToNonAnonymousAccount && !isLoadingMe;
+    // But allow override if requireLogin is explicitly set to false
+    const canShowMap =
+      props.requireLogin === false ||
+      (isLoggedInToNonAnonymousAccount && !isLoadingMe);
 
     if (!canShowMap) {
       return (
