@@ -141,14 +141,8 @@ custom:
     minify: false
     external:
       - sharp
-      - reflect-metadata
     packager: npm
-    define:
-      __dirname: '__dirname'
-    keepNames: true
-    platform: node
-    target: node18
-    format: cjs
+    plugins: esbuild.js
   bucket: fourties-photos
   domain:
     production: api.1940s.nyc
