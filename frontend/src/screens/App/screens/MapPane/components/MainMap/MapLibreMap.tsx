@@ -5,6 +5,7 @@ import { useHistory, useLocation, useRouteMatch } from 'react-router-dom';
 import classnames from 'classnames';
 import * as maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
+import { Protocol as PmTilesProtocol } from 'pmtiles';
 
 import { MapInterface, MapProps } from './MapInterface';
 import * as overlays from './overlays';
@@ -14,9 +15,12 @@ export { OverlayId } from './overlays';
 import { RouteComponentProps } from 'react-router';
 import stylesheet from './MainMap.less';
 
-const MAPLIBRE_STYLE = 'https://tiles.openfreemap.org/styles/liberty';
+import mapStyleUrl from './fourties.protomaps.style.json';
 
 const PHOTO_LAYER = 'photos-1940s';
+
+const pmtilesProtocol = new PmTilesProtocol();
+maplibregl.addProtocol('pmtiles', pmtilesProtocol.tile);
 
 type PropsWithRouter = MapProps & RouteComponentProps<{ identifier?: string }>;
 
@@ -28,9 +32,10 @@ class MapLibreMap
   private map: maplibregl.Map;
 
   componentDidMount(): void {
+    console.log(mapStyleUrl);
     const map: maplibregl.Map = new maplibregl.Map({
       container: this.mapContainer,
-      style: MAPLIBRE_STYLE,
+      style: mapStyleUrl as unknown as string,
       center: [-73.99397, 40.7093],
       zoom: 13.69,
       maxBounds: [
@@ -40,6 +45,8 @@ class MapLibreMap
       hash: true,
     });
     this.map = map;
+
+    map.addControl(new maplibregl.AttributionControl());
 
     map.on('click', PHOTO_LAYER, (e) => {
       const { panOnClick } = this.props;

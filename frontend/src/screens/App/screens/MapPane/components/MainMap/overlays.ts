@@ -168,7 +168,7 @@ export const setOverlay = (
   map: GenericMap,
   overlayId: OverlayId | null | OverlayId[]
 ): void => {
-  // If overlayId is not an arary, convert it to an array
+  // If overlayId is not an array, convert it to an array
   const overlayIds: OverlayId[] = compact(
     Array.isArray(overlayId) ? overlayId : [overlayId]
   );
