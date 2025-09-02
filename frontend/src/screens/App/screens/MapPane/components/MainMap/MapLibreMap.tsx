@@ -43,10 +43,11 @@ class MapLibreMap
         [-73.70027209999999, 40.9175771], // NE
       ],
       hash: true,
+      attributionControl: {
+        compact: false,
+      },
     });
     this.map = map;
-
-    map.addControl(new maplibregl.AttributionControl());
 
     map.on('click', PHOTO_LAYER, (e) => {
       const { panOnClick } = this.props;

@@ -45,6 +45,7 @@ module.exports = {
       },
       {
         test: /\.(css|less)$/,
+        exclude: /node_modules/,
         use: [
           MiniCssExtractPlugin.loader,
           {
@@ -58,6 +59,21 @@ module.exports = {
           },
           'postcss-loader',
           'less-loader',
+        ],
+      },
+      {
+        test: /\.css$/,
+        include: /node_modules/,
+        use: [
+          MiniCssExtractPlugin.loader,
+          {
+            loader: 'css-loader',
+            options: {
+              modules: false,
+              importLoaders: 1,
+            },
+          },
+          'postcss-loader',
         ],
       },
       {
