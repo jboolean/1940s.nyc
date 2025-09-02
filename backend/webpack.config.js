@@ -25,10 +25,6 @@ module.exports = {
     extensions: ['.ts', '.js'],
   },
   externals: [
-    nodeExternals({
-      // Exclude large dependencies that should not be bundled
-      allowlist: [],
-    }),
     'sharp',
     'puppeteer-core',
     '@sparticuz/chromium',
