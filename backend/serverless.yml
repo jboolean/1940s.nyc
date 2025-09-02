@@ -3,7 +3,6 @@ package:
   individually: false
   include:
     - certs/*
-    - layers/*
 
 provider:
   name: aws
