@@ -7,6 +7,7 @@ import noop from 'lodash/noop';
 import uniqueId from 'lodash/uniqueId';
 import { closest } from 'utils/photosApi';
 import { OverlayId } from './components/MainMap';
+import { MapInterface } from './components/MainMap/MapInterface';
 
 import { RouteComponentProps, withRouter } from 'react-router';
 import { Link } from 'react-router-dom';
@@ -50,7 +51,7 @@ function withTipJar<P extends TipJarProps, C extends React.ComponentType<P>>(
   return WithTipJar;
 }
 class MapPane extends React.Component<Props & RouteComponentProps, State> {
-  map?: typeof MainMap;
+  map?: MapInterface;
   private idPrefix: string;
   historyUnlisten: () => void | null = null;
 
