@@ -61,7 +61,6 @@
     "serverless-webpack": "^5.15.2",
     "swc-loader": "^0.2.6",
     "ts-loader": "^9.5.4",
-    "ttypescript": "^1.5.15",
     "typescript": "^5.2.2",
     "typescript-eslint": "^8.42.0",
     "typescript-transform-paths": "^3.5.5",
