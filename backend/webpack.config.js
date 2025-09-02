@@ -25,6 +25,13 @@ module.exports = {
     extensions: ['.ts', '.js'],
   },
   externals: [
+    nodeExternals({
+      // Exclude devDependencies from being processed by webpack
+      modulesFromFile: {
+        exclude: ['devDependencies'],
+      },
+    }),
+    // Only externalize the packages that cause problems in Lambda
     'sharp',
     'puppeteer-core',
     '@sparticuz/chromium',
