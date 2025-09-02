@@ -3,7 +3,8 @@ package:
   individually: false
   patterns:
     - 'certs/**'
-    - 'tippecanoe-layer.zip'
+    - '!chromium/**'
+    - '!tippecanoe-layer.zip'
 
 provider:
   name: aws
