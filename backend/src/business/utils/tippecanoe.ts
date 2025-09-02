@@ -107,8 +107,11 @@ export default async function tippecanoe(
     }
   }
 
+  // Use tippecanoe command (available in PATH via Lambda layer)
+  const tippecanoePath = 'tippecanoe';
+
   // Spawn tippecanoe process
-  const tippecanoeProcess = spawn('tippecanoe', args, {
+  const tippecanoeProcess = spawn(tippecanoePath, args, {
     stdio: ['pipe', 'pipe', 'pipe'],
   });
 
@@ -127,11 +130,14 @@ export default async function tippecanoe(
       reject(new Error(`Tippecanoe process error: ${error.message}`));
     });
 
-    tippecanoeProcess.on('exit', (code) => {
+    tippecanoeProcess.on('exit', (code, signal) => {
       if (code === 0) {
         resolve();
       } else {
-        reject(new Error(`Tippecanoe exited with code ${code ?? 'unknown'}`));
+        const errorMsg = `Tippecanoe exited with code ${code ?? 'unknown'}${
+          signal ? ` (signal: ${signal})` : ''
+        }`;
+        reject(new Error(errorMsg));
       }
     });
   });

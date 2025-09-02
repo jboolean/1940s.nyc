@@ -109,6 +109,7 @@ functions:
     events:
       - schedule: cron(10 12 * * ? *)
     timeout: 900
+    memorySize: 4096
     layers:
       - Ref: TippecanoeLambdaLayer
   generateStoryTitles:
