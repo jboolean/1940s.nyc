@@ -23,7 +23,21 @@ module.exports = {
   resolve: {
     extensions: ['.ts', '.js'],
   },
-  externals: [nodeExternals(), 'sharp', /^@aws-sdk\//],
+  externals: [
+    nodeExternals({
+      // Exclude large dependencies that should not be bundled
+      allowlist: [],
+    }),
+    'sharp',
+    'puppeteer-core',
+    '@sparticuz/chromium',
+    'aws-sdk',
+    /^@aws-sdk\//,
+    /^@swc\//,
+    'typescript',
+    'ts-loader',
+    'webpack',
+  ],
   module: {
     rules: [
       {
