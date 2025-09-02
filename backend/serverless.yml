@@ -3,6 +3,7 @@ package:
   individually: false
   include:
     - certs/*
+    - tippecanoe-layer.zip
 
 provider:
   name: aws
@@ -43,7 +44,8 @@ plugins:
 
 layers:
   tippecanoe:
-    path: layers/tippecanoe
+    package:
+      artifact: tippecanoe-layer.zip
     name: tippecanoe-layer
     description: felt/tippecanoe
 
