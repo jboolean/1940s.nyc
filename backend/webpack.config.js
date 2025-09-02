@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 const nodeExternals = require('webpack-node-externals');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 const isProduction = process.env.NODE_ENV === 'production';
 
@@ -61,5 +62,20 @@ module.exports = {
     // Prevent webpack from optimizing away reflect-metadata
     sideEffects: false,
   },
-  devtool: isProduction ? 'source-map' : 'eval-source-map',
+  devtool: isProduction ? false : 'eval-source-map',
+  plugins: [
+    new CopyWebpackPlugin({
+      patterns: [
+        {
+          from: 'certs',
+          to: 'certs',
+        },
+      ],
+    }),
+  ],
+  stats: {
+    assets: true,
+    modules: true,
+    chunks: true,
+  },
 };
