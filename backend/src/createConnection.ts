@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import path from 'path';
+import 'reflect-metadata';
 import { Connection, createConnection, getConnectionManager } from 'typeorm';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 
@@ -20,7 +21,42 @@ import Photo from './entities/Photo';
 import Story from './entities/Story';
 import User from './entities/User';
 
+// Force entity class metadata to be evaluated
+const ENTITIES = [
+  AddressCorrection,
+  CampaignSend,
+  EffectiveAddress,
+  EffectiveGeocode,
+  GeocodeCorrection,
+  GeocodeResult,
+  LedgerEntry,
+  MailingListMember,
+  MerchOrder,
+  MerchOrderItem,
+  Photo,
+  Story,
+  User,
+];
+// Validate metadata exists for all entities
+function validateEntityMetadata(): void {
+  for (const entity of ENTITIES) {
+    const metadata: unknown = Reflect.getMetadata(
+      'design:type',
+      entity.prototype,
+      'id'
+    );
+    if (!metadata) {
+      console.error(`Missing metadata for entity: ${entity.name}`);
+    }
+  }
+}
+
 export default function createConnectionIfNotExists(): Promise<Connection> {
+  // Validate metadata in development/debug mode
+  if (process.env.IS_OFFLINE || process.env.NODE_ENV !== 'production') {
+    validateEntityMetadata();
+  }
+
   const connectionManager = getConnectionManager();
   if (connectionManager.has('default')) {
     const connection = connectionManager.get('default');
@@ -55,23 +91,7 @@ export default function createConnectionIfNotExists(): Promise<Connection> {
     },
     synchronize: false,
     logging: !!process.env.IS_OFFLINE,
-    entities: [
-      AddressCorrection,
-      CampaignSend,
-      EffectiveAddress,
-      EffectiveGeocode,
-      GeocodeCorrection,
-      GeocodeResult,
-      LedgerEntry,
-      MailingListMember,
-
-      MerchOrder,
-      MerchOrderItem,
-      Photo,
-
-      Story,
-      User,
-    ],
+    entities: ENTITIES,
     namingStrategy: new SnakeNamingStrategy(),
   });
 }

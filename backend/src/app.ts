@@ -1,3 +1,5 @@
+import 'reflect-metadata';
+
 import { CaptureConsole as CaptureConsoleIntegration } from '@sentry/integrations';
 import * as Sentry from '@sentry/node';
 import * as Tracing from '@sentry/tracing';

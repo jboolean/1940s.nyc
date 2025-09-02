@@ -42,13 +42,24 @@ module.exports = {
     rules: [
       {
         test: /\.ts$/,
-        use: 'ts-loader',
+        use: {
+          loader: 'ts-loader',
+          options: {
+            transpileOnly: false,
+            compilerOptions: {
+              emitDecoratorMetadata: true,
+              experimentalDecorators: true,
+            },
+          },
+        },
         exclude: /node_modules/,
       },
     ],
   },
   optimization: {
     minimize: isProduction,
+    // Prevent webpack from optimizing away reflect-metadata
+    sideEffects: false,
   },
   devtool: isProduction ? 'source-map' : 'eval-source-map',
 };
