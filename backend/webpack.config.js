@@ -3,6 +3,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 const nodeExternals = require('webpack-node-externals');
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 // Check multiple environment indicators for production mode
 const isProduction =
@@ -75,6 +76,14 @@ module.exports = {
   },
   devtool: isProduction ? false : 'eval-source-map',
   plugins: [
+    new CopyWebpackPlugin({
+      patterns: [
+        {
+          from: 'certs',
+          to: 'certs',
+        },
+      ],
+    }),
     ...(shouldAnalyze
       ? [
           new BundleAnalyzerPlugin({

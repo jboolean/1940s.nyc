@@ -47,10 +47,12 @@
     "@typescript-eslint/eslint-plugin": "^5.61.0",
     "@typescript-eslint/parser": "^5.61.1",
     "babel-loader": "^10.0.0",
+    "copy-webpack-plugin": "^13.0.1",
     "eslint": "^8.52.0",
     "eslint-config-jboolean": "^0.1.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.2.1",
+    "js-yaml": "^4.1.0",
     "lint-staged": "^14.0.1",
     "prettier": "^2.8.1",
     "serverless": "^3.35.2",
@@ -66,8 +68,7 @@
     "typescript-transform-paths": "^3.5.5",
     "webpack": "^5.101.3",
     "webpack-bundle-analyzer": "^4.10.2",
-    "webpack-node-externals": "^3.0.0",
-    "js-yaml": "^4.1.0"
+    "webpack-node-externals": "^3.0.0"
   },
   "dependencies": {
     "@hey-api/client-axios": "^0.6.1",
