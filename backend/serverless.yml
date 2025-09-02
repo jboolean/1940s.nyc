@@ -45,7 +45,7 @@ plugins:
 layers:
   tippecanoe:
     package:
-      artifact: ./layers/tippecanoe-layer.zip
+      artifact: layers/tippecanoe-layer.zip
     name: tippecanoe-layer
     description: felt/tippecanoe
 
