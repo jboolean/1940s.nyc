@@ -4,6 +4,7 @@ package:
   patterns:
     - 'certs/**'
     - '!chromium/**'
+    - '!tippecanoe-layer.zip'
 
 provider:
   name: aws
@@ -41,6 +42,13 @@ plugins:
   - serverless-webpack
   - serverless-domain-manager
   - serverless-offline
+
+layers:
+  tippecanoe:
+    package:
+      artifact: tippecanoe-layer.zip
+    name: tippecanoe-layer
+    description: felt/tippecanoe
 
 functions:
   app:
@@ -93,6 +101,16 @@ functions:
     events:
       - schedule: cron(0 12 * * ? *)
     timeout: 900
+  syncMapSelfHosted:
+    stages:
+      - production
+      - staging
+    handler: syncMapSelfHosted.handler
+    events:
+      - schedule: cron(10 12 * * ? *)
+    timeout: 900
+    layers:
+      - Ref: TippecanoeLambdaLayer
   generateStoryTitles:
     stages:
       - production

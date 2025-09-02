@@ -1,4 +1,5 @@
 import 'reflect-metadata';
+
 import 'source-map-support/register';
 import createConnection from './src/createConnection';
 
