@@ -15,7 +15,11 @@
     "lint:strict": "npm run lint -- --max-warnings 0",
     "install-aws-sharp": "rm -rf node_modules/sharp && SHARP_IGNORE_GLOBAL_LIBVIPS=1 npm install --arch=x64 --platform=linux sharp",
     "types": "tsc",
-    "generate-printful-api": "cd src/third-party/printful/ && openapi-ts --file openapi-ts.config.json"
+    "generate-printful-api": "cd src/third-party/printful/ && openapi-ts --file openapi-ts.config.json",
+    "analyze-bundle": "ANALYZE_BUNDLE=true npm run deploy:dry",
+    "bundle-size": "node -e \"const fs = require('fs'); const path = require('path'); const bundleDir = '.serverless'; if (fs.existsSync(bundleDir)) { const files = fs.readdirSync(bundleDir).filter(f => f.endsWith('.zip')); files.forEach(f => { const size = fs.statSync(path.join(bundleDir, f)).size; console.log(f + ': ' + (size / 1024 / 1024).toFixed(2) + ' MB'); }); } else { console.log('No .serverless directory found. Run deploy:dry first.'); }\"",
+    "check-dependencies": "node scripts/analyze-dependencies.js",
+    "check-serverless": "node scripts/check-serverless-config.js"
   },
   "author": "Julian Boilen",
   "license": "ISC",
@@ -65,7 +69,9 @@
     "typescript-eslint": "^8.42.0",
     "typescript-transform-paths": "^3.5.5",
     "webpack": "^5.101.3",
-    "webpack-node-externals": "^3.0.0"
+    "webpack-bundle-analyzer": "^4.10.2",
+    "webpack-node-externals": "^3.0.0",
+    "js-yaml": "^4.1.0"
   },
   "dependencies": {
     "@hey-api/client-axios": "^0.6.1",

@@ -2,8 +2,16 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 const nodeExternals = require('webpack-node-externals');
+const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 
-const isProduction = process.env.NODE_ENV === 'production';
+// Check multiple environment indicators for production mode
+const isProduction =
+  process.env.NODE_ENV === 'production' ||
+  process.env.SLS_STAGE === 'production' ||
+  process.env.SLS_STAGE === 'staging';
+
+// Enable bundle analysis when ANALYZE_BUNDLE is set
+const shouldAnalyze = process.env.ANALYZE_BUNDLE === 'true';
 
 module.exports = {
   mode: isProduction ? 'production' : 'development',
@@ -34,9 +42,13 @@ module.exports = {
     'aws-sdk',
     /^@aws-sdk\//,
     /^@swc\//,
+    /^@tsoa\//,
+    'tsoa',
     'typescript',
     'ts-loader',
+    'ts-node',
     'webpack',
+    'eslint',
   ],
   module: {
     rules: [
@@ -61,5 +73,26 @@ module.exports = {
     // Prevent webpack from optimizing away reflect-metadata
     sideEffects: false,
   },
-  devtool: isProduction ? 'source-map' : 'eval-source-map',
+  devtool: isProduction ? false : 'eval-source-map',
+  plugins: [
+    ...(shouldAnalyze
+      ? [
+          new BundleAnalyzerPlugin({
+            analyzerMode: 'static',
+            reportFilename: 'bundle-report.html',
+            openAnalyzer: false,
+            generateStatsFile: true,
+            statsFilename: 'bundle-stats.json',
+          }),
+        ]
+      : []),
+  ],
+  stats: {
+    assets: true,
+    modules: true,
+    chunks: true,
+    reasons: shouldAnalyze,
+    usedExports: shouldAnalyze,
+    providedExports: shouldAnalyze,
+  },
 };

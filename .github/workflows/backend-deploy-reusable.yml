@@ -32,6 +32,47 @@ jobs:
         run: npm run lint:strict
       - name: Types
         run: npm run types
+      - name: Check Dependencies
+        run: npm run check-dependencies
+      - name: Check Serverless Config
+        run: npm run check-serverless
+      - name: Analyze Bundle (Dry Run)
+        run: npm run analyze-bundle
+      - name: Bundle Size Report
+        run: npm run bundle-size
+      - name: Show Webpack Stats
+        run: |
+          if [ -f "bundle-stats.json" ]; then
+            echo "📊 Webpack Bundle Stats Summary:"
+            node -e "
+              const stats = JSON.parse(require('fs').readFileSync('bundle-stats.json', 'utf8'));
+              console.log('Total assets:', stats.assets?.length || 0);
+              console.log('Total modules:', stats.modules?.length || 0);
+              console.log('Total chunks:', stats.chunks?.length || 0);
+              if (stats.assets) {
+                console.log('\\nLargest assets:');
+                stats.assets
+                  .sort((a, b) => b.size - a.size)
+                  .slice(0, 10)
+                  .forEach(asset => {
+                    const sizeMB = (asset.size / 1024 / 1024).toFixed(2);
+                    console.log(\`- \${asset.name}: \${sizeMB} MB\`);
+                  });
+              }
+            "
+          else
+            echo "No bundle stats found"
+          fi
+      - name: Upload Bundle Analysis
+        uses: actions/upload-artifact@v4
+        with:
+          name: bundle-analysis-${{ inputs.stage }}
+          path: |
+            backend/bundle-report.html
+            backend/bundle-stats.json
+            backend/.serverless/
+          retention-days: 7
+        if: always()
       - name: Deploy
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID}}

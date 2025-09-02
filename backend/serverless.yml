@@ -147,11 +147,19 @@ custom:
         - 'sharp'
         - 'aws-sdk'
         - '@swc/core'
+        - '@swc/helpers'
         - 'typescript'
         - 'ts-loader'
         - 'webpack'
         - 'webpack-node-externals'
+        - '@tsoa/cli'
+        - '@tsoa'
+        - 'tsoa'
+        - 'eslint'
+        - 'eslint-config-jboolean'
+        - 'ts-node'
     packager: 'npm'
+    keepOutputDirectory: false
   bucket: fourties-photos
   domain:
     production: api.1940s.nyc
