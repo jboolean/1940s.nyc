@@ -3,6 +3,23 @@ import path from 'path';
 import { Connection, createConnection, getConnectionManager } from 'typeorm';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 
+// Import all entities directly for webpack compatibility
+import AddressCorrection from './entities/AddressCorrection';
+import CampaignSend from './entities/CampaignSend';
+import EffectiveAddress from './entities/EffectiveAddress';
+import EffectiveGeocode from './entities/EffectiveGeocode';
+import GeocodeCorrection from './entities/GeocodeCorrection';
+import GeocodeResult from './entities/GeocodeResult';
+import LedgerEntry from './entities/LedgerEntry';
+import MailingListMember from './entities/MailingListMember';
+
+import MerchOrder from './entities/MerchOrder';
+import MerchOrderItem from './entities/MerchOrderItem';
+import Photo from './entities/Photo';
+
+import Story from './entities/Story';
+import User from './entities/User';
+
 export default function createConnectionIfNotExists(): Promise<Connection> {
   const connectionManager = getConnectionManager();
   if (connectionManager.has('default')) {
@@ -38,7 +55,23 @@ export default function createConnectionIfNotExists(): Promise<Connection> {
     },
     synchronize: false,
     logging: !!process.env.IS_OFFLINE,
-    entities: [__dirname + '/entities/*{.ts,.js}'],
+    entities: [
+      AddressCorrection,
+      CampaignSend,
+      EffectiveAddress,
+      EffectiveGeocode,
+      GeocodeCorrection,
+      GeocodeResult,
+      LedgerEntry,
+      MailingListMember,
+
+      MerchOrder,
+      MerchOrderItem,
+      Photo,
+
+      Story,
+      User,
+    ],
     namingStrategy: new SnakeNamingStrategy(),
   });
 }

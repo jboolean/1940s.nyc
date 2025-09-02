@@ -38,7 +38,7 @@ provider:
     PRINTFUL_SK: ${ssm:/${self:service}-${sls:stage}-printful-sk}
 plugins:
   - serverless-plugin-select
-  - serverless-esbuild
+  - serverless-webpack
   - serverless-domain-manager
   - serverless-offline
 
@@ -136,13 +136,13 @@ functions:
     handler: registerPrintfulWebhooks.handler
     # Invoked manually
 custom:
-  esbuild:
-    bundle: true
-    minify: false
-    external:
-      - sharp
-    packager: npm
-    plugins: esbuild.js
+  webpack:
+    webpackConfig: 'webpack.config.js'
+    includeModules:
+      forceExclude:
+        - '@aws-sdk/client-s3'
+        - '@sparticuz/chromium'
+    packager: 'npm'
   bucket: fourties-photos
   domain:
     production: api.1940s.nyc

@@ -5,6 +5,7 @@ jspm_packages
 # Serverless directories
 .serverless
 .build
+.webpack
 
 secrets.*.yml
 tsoa-build
