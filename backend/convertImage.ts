@@ -59,7 +59,9 @@ export const handler = async (event: S3Event): Promise<unknown> => {
     throw new Error('Source object not found');
   }
 
-  let inputBuffer = Buffer.from(await inputObject.Body.transformToByteArray());
+  let inputBuffer: Buffer = Buffer.from(
+    await inputObject.Body.transformToByteArray()
+  );
 
   // Crop laserdisc video frames to eliminate borders and superimposed banner
   if (await LaserdiscUtils.isLaserdiscVideoFrame(inputBuffer)) {
