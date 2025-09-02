@@ -14,7 +14,7 @@ export default function createConnectionIfNotExists(): Promise<Connection> {
   }
 
   const sslCert = fs.readFileSync(
-    path.join(__dirname, '..', 'certs/us-east-1-bundle.pem')
+    path.join(process.cwd(), 'certs/us-east-1-bundle.pem')
   );
 
   const {

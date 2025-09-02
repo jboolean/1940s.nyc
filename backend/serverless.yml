@@ -1,9 +1,9 @@
 service: fourtiesnyc
 package:
   individually: false
-  include:
-    - certs/*
-    - tippecanoe-layer.zip
+  patterns:
+    - 'certs/**'
+    - 'tippecanoe-layer.zip'
 
 provider:
   name: aws
@@ -142,6 +142,8 @@ custom:
     external:
       - sharp
     packager: npm
+    define:
+      __dirname: '__dirname'
   bucket: fourties-photos
   domain:
     production: api.1940s.nyc
