@@ -1,8 +1,9 @@
 service: fourtiesnyc
 package:
   individually: false
-  include:
-    - certs/*
+  patterns:
+    - 'certs/**'
+    - '!chromium/**'
 
 provider:
   name: aws
@@ -37,7 +38,7 @@ provider:
     PRINTFUL_SK: ${ssm:/${self:service}-${sls:stage}-printful-sk}
 plugins:
   - serverless-plugin-select
-  - serverless-plugin-typescript
+  - serverless-webpack
   - serverless-domain-manager
   - serverless-offline
 
@@ -118,6 +119,8 @@ functions:
     handler: registerPrintfulWebhooks.handler
     # Invoked manually
 custom:
+  webpack:
+    webpackConfig: 'webpack.config.js'
   bucket: fourties-photos
   domain:
     production: api.1940s.nyc

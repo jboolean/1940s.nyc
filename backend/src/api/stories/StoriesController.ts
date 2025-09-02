@@ -1,6 +1,3 @@
-import Express from 'express';
-import isNumber from 'lodash/isNumber';
-import map from 'lodash/map';
 import {
   Body,
   Controller,
@@ -14,7 +11,10 @@ import {
   Request,
   Route,
   Security,
-} from 'tsoa';
+} from '@tsoa/runtime';
+import Express from 'express';
+import isNumber from 'lodash/isNumber';
+import map from 'lodash/map';
 
 import { UserData as NetlifyUserData } from 'gotrue-js';
 import { BadRequest, Forbidden, NotFound } from 'http-errors';

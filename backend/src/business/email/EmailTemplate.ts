@@ -7,7 +7,7 @@ abstract class EmailTemplate<
   Metadata extends Record<keyof Metadata, string>
 > {
   abstract readonly alias: string;
-  abstract readonly from: typeof Senders[keyof typeof Senders];
+  abstract readonly from: (typeof Senders)[keyof typeof Senders];
   abstract readonly streamType: EmailStreamType;
 
   createTemplatedEmail({

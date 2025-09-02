@@ -1,5 +1,3 @@
-import * as express from 'express';
-import { BadRequest } from 'http-errors';
 import {
   Body,
   Controller,
@@ -9,7 +7,9 @@ import {
   Request,
   Route,
   Security,
-} from 'tsoa';
+} from '@tsoa/runtime';
+import * as express from 'express';
+import { BadRequest } from 'http-errors';
 import * as UserService from '../business/users/UserService';
 import required from '../business/utils/required';
 import LoginOutcome from '../enum/LoginOutcome';

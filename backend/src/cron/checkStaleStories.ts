@@ -17,9 +17,10 @@ function forgeReviewStoriesUrl(): string {
 async function getReviewerStats(): Promise<
   { reviewer: string; count: number }[]
 > {
-  const stats = (await StoryRepository().query(
-    `select last_reviewer as reviewer, count(*) as count from stories where last_reviewer is not null group by last_reviewer order by count(*) desc;`
-  )) as Promise<{ reviewer: string; count: number }[]>;
+  const stats: { reviewer: string; count: number }[] =
+    await StoryRepository().query(
+      `select last_reviewer as reviewer, count(*) as count from stories where last_reviewer is not null group by last_reviewer order by count(*) desc;`
+    );
   return stats;
 }
 

@@ -1,3 +1,5 @@
+import 'reflect-metadata';
+
 import { CaptureConsole as CaptureConsoleIntegration } from '@sentry/integrations';
 import * as Sentry from '@sentry/node';
 import * as Tracing from '@sentry/tracing';
@@ -12,13 +14,13 @@ import { HttpError, NotFound } from 'http-errors';
 import { RegisterRoutes } from '../tsoa-build/routes';
 import GeodataResource from './api/GeodataResource';
 
+import { ValidateError } from '@tsoa/runtime';
 import {
   Request as ExRequest,
   Response as ExResponse,
   NextFunction,
 } from 'express';
 import { IpDeniedError } from 'express-ipfilter';
-import { ValidateError } from 'tsoa';
 import PostmarkWebhooksResource from './api/PostmarkWebhooksResource';
 import PrintfulWebhooksResource from './api/PrintfulWebhooksResource';
 import StripeWebhooksResource from './api/StripeWebhooksResource';

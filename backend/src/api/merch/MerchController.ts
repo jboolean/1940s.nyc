@@ -1,5 +1,3 @@
-import * as express from 'express';
-import { BadRequest, NotFound } from 'http-errors';
 import {
   Body,
   Controller,
@@ -11,7 +9,9 @@ import {
   Request,
   Route,
   Security,
-} from 'tsoa';
+} from '@tsoa/runtime';
+import * as express from 'express';
+import { BadRequest, NotFound } from 'http-errors';
 import { getRepository } from 'typeorm';
 import * as MerchOrderService from '../../business/merch/MerchOrderService';
 import absurd from '../../business/utils/absurd';

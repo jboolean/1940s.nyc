@@ -1,6 +1,3 @@
-import * as express from 'express';
-import { BadRequest, NotFound } from 'http-errors';
-import querystring from 'querystring';
 import {
   Controller,
   Get,
@@ -9,7 +6,10 @@ import {
   Request,
   Route,
   SuccessResponse,
-} from 'tsoa';
+} from '@tsoa/runtime';
+import * as express from 'express';
+import { BadRequest, NotFound } from 'http-errors';
+import querystring from 'querystring';
 import { getRepository, In } from 'typeorm';
 import Paginated from '../../business/pagination/Paginated';
 import mapPaginated from '../../business/utils/mapPaginated';
@@ -62,10 +62,10 @@ export class PhotosController extends Controller {
       throw new BadRequest('lngLat required');
     }
 
-    const result = (await photoRepo.query(
+    const result: { identifier: string }[] = await photoRepo.query(
       'select identifier from effective_geocodes_view where lng_lat ~= point($1, $2)',
       [lng, lat]
-    )) as { identifier: string }[];
+    );
 
     const ids = result.map((r) => r.identifier);
 
@@ -85,10 +85,11 @@ export class PhotosController extends Controller {
   ): Promise<PhotoApiModel> {
     const photoRepo = getRepository(Photo);
 
-    const result = (await photoRepo.query(
-      'SELECT *, lng_lat<@>point($1, $2) AS distance FROM effective_geocodes_view WHERE collection = $3 ORDER BY distance LIMIT 1',
-      [lng, lat, collection ?? '1940']
-    )) as { identifier: string; distance: number }[];
+    const result: { identifier: string; distance: number }[] =
+      await photoRepo.query(
+        'SELECT *, lng_lat<@>point($1, $2) AS distance FROM effective_geocodes_view WHERE collection = $3 ORDER BY distance LIMIT 1',
+        [lng, lat, collection ?? '1940']
+      );
 
     if (!result.length) {
       throw new NotFound();

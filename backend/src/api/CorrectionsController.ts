@@ -1,6 +1,6 @@
+import { Body, Post, Request, Route, Security } from '@tsoa/runtime';
 import * as express from 'express';
 import { Forbidden } from 'http-errors';
-import { Body, Post, Request, Route, Security } from 'tsoa';
 import { getRepository } from 'typeorm';
 import * as UserService from '../business/users/UserService';
 import AddressCorrection from '../entities/AddressCorrection';
