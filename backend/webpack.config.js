@@ -15,7 +15,6 @@ module.exports = {
     checkStaleStories: './checkStaleStories.ts',
     checkMerchQueue: './checkMerchQueue.ts',
     syncMap: './syncMap.ts',
-    syncMapSelfHosted: './syncMapSelfHosted.ts',
     generateStoryTitles: './generateStoryTitles.ts',
     sendEmailCampaigns: './sendEmailCampaigns.ts',
     renderMerchPrintfiles: './renderMerchPrintfiles.ts',
