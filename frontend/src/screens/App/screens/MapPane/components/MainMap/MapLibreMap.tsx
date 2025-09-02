@@ -32,7 +32,6 @@ class MapLibreMap
   private map: maplibregl.Map;
 
   componentDidMount(): void {
-    console.log(mapStyleUrl);
     const map: maplibregl.Map = new maplibregl.Map({
       container: this.mapContainer,
       style: mapStyleUrl as unknown as string,
