@@ -26,11 +26,16 @@ module.exports = {
   },
   externals: [
     nodeExternals({
-      // Exclude devDependencies from being processed by webpack
+      // Bundle all production dependencies, only externalize devDependencies
       modulesFromFile: {
-        exclude: ['devDependencies'],
+        include: ['devDependencies'],
       },
     }),
+    // Explicitly externalize problematic devDependencies
+    '@tsoa/cli',
+    'typescript',
+    'eslint',
+    'webpack',
     // Only externalize the packages that cause problems in Lambda
     'sharp',
     'puppeteer-core',
@@ -62,6 +67,29 @@ module.exports = {
     sideEffects: false,
   },
   devtool: isProduction ? false : 'eval-source-map',
+  ignoreWarnings: [
+    // Suppress TypeORM driver warnings for unused drivers
+    /mongodb/,
+    /mssql/,
+    /mysql/,
+    /mysql2/,
+    /oracledb/,
+    /pg/,
+    /pg-native/,
+    /pg-query-stream/,
+    /react-native-sqlite-storage/,
+    /redis/,
+    /sqlite3/,
+    /sql.js/,
+    /typeorm-aurora-data-api-driver/,
+    /@google-cloud\/spanner/,
+    /@sap\/hana-client/,
+    /better-sqlite3/,
+    /ioredis/,
+    // Suppress other common warnings
+    /Critical dependency: the request of a dependency is an expression/,
+    /Module not found: Error: Can't resolve/,
+  ],
   plugins: [
     new CopyWebpackPlugin({
       patterns: [
