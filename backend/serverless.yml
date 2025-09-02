@@ -139,19 +139,6 @@ functions:
 custom:
   webpack:
     webpackConfig: 'webpack.config.js'
-    includeModules:
-      forceExclude:
-        - '@aws-sdk/client-s3'
-        - '@sparticuz/chromium'
-        - 'puppeteer-core'
-        - 'sharp'
-        - 'aws-sdk'
-        - '@swc/core'
-        - 'typescript'
-        - 'ts-loader'
-        - 'webpack'
-        - 'webpack-node-externals'
-    packager: 'npm'
   bucket: fourties-photos
   domain:
     production: api.1940s.nyc

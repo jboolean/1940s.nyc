@@ -34,10 +34,6 @@ module.exports = {
     '@sparticuz/chromium',
     'aws-sdk',
     /^@aws-sdk\//,
-    /^@swc\//,
-    'typescript',
-    'ts-loader',
-    'webpack',
   ],
   module: {
     rules: [
