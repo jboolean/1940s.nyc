@@ -16,10 +16,13 @@
     "install-aws-sharp": "rm -rf node_modules/sharp && SHARP_IGNORE_GLOBAL_LIBVIPS=1 npm install --arch=x64 --platform=linux sharp",
     "types": "tsc",
     "generate-printful-api": "cd src/third-party/printful/ && openapi-ts --file openapi-ts.config.json",
-    "analyze-bundle": "ANALYZE_BUNDLE=true npm run deploy:dry",
+    "analyze-bundle": "ANALYZE_BUNDLE=true SLS_STAGE=production webpack --config webpack.config.js",
+    "analyze-bundle-serverless": "ANALYZE_BUNDLE=true npm run deploy:dry",
     "bundle-size": "node -e \"const fs = require('fs'); const path = require('path'); const bundleDir = '.serverless'; if (fs.existsSync(bundleDir)) { const files = fs.readdirSync(bundleDir).filter(f => f.endsWith('.zip')); files.forEach(f => { const size = fs.statSync(path.join(bundleDir, f)).size; console.log(f + ': ' + (size / 1024 / 1024).toFixed(2) + ' MB'); }); } else { console.log('No .serverless directory found. Run deploy:dry first.'); }\"",
     "check-dependencies": "node scripts/analyze-dependencies.js",
-    "check-serverless": "node scripts/check-serverless-config.js"
+    "check-serverless": "node scripts/check-serverless-config.js",
+    "package-local": "serverless package --stage local",
+    "analyze-package": "node scripts/analyze-package-size.js"
   },
   "author": "Julian Boilen",
   "license": "ISC",

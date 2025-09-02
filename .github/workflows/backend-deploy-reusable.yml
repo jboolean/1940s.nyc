@@ -36,10 +36,13 @@ jobs:
         run: npm run check-dependencies
       - name: Check Serverless Config
         run: npm run check-serverless
-      - name: Analyze Bundle (Dry Run)
-        run: npm run analyze-bundle
-      - name: Bundle Size Report
-        run: npm run bundle-size
+      - name: Package Service (Dry Run)
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID}}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY}}
+        run: serverless package --stage ${{ inputs.stage }}
+      - name: Analyze Package Contents
+        run: npm run analyze-package
       - name: Show Webpack Stats
         run: |
           if [ -f "bundle-stats.json" ]; then
