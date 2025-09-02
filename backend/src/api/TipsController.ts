@@ -1,7 +1,7 @@
 /* eslint-disable camelcase */
+import { Body, Get, Post, Request, Route, Security } from '@tsoa/runtime';
 import * as express from 'express';
 import { HttpError, InternalServerError } from 'http-errors';
-import { Body, Get, Post, Request, Route, Security } from 'tsoa';
 import * as TipsService from '../business/tips/TipsService';
 import { getUserFromRequestOrCreateAndSetCookie } from './auth/userAuthUtils';
 

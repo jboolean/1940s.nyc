@@ -1,6 +1,6 @@
-import { Body, Controller, Post, Route, Security } from 'tsoa';
-import EmailCampaignService from '../business/email/EmailCampaignService';
+import { Body, Controller, Post, Route, Security } from '@tsoa/runtime';
 import { BadRequest } from 'http-errors';
+import EmailCampaignService from '../business/email/EmailCampaignService';
 import { Email } from './CommonApiTypes';
 
 type MailingListRequest = {

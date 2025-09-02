@@ -1,6 +1,3 @@
-import * as express from 'express';
-import { BadRequest, NotFound } from 'http-errors';
-import querystring from 'querystring';
 import {
   Controller,
   Get,
@@ -9,7 +6,10 @@ import {
   Request,
   Route,
   SuccessResponse,
-} from 'tsoa';
+} from '@tsoa/runtime';
+import * as express from 'express';
+import { BadRequest, NotFound } from 'http-errors';
+import querystring from 'querystring';
 import { getRepository, In } from 'typeorm';
 import Paginated from '../../business/pagination/Paginated';
 import mapPaginated from '../../business/utils/mapPaginated';
