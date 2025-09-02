@@ -54,7 +54,7 @@
     "serverless-domain-manager": "^7.3.8",
     "serverless-lambda-edge-pre-existing-cloudfront": "^1.2.0",
     "serverless-offline": "^13.8.3",
-    "serverless-plugin-select": "^2.0.0-rc.1",
+    "serverless-plugin-conditional-functions": "^1.0.0",
     "serverless-webpack": "^5.15.2",
     "ts-loader": "^9.5.4",
     "typescript": "^5.2.2",
