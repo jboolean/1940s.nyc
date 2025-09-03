@@ -20,6 +20,7 @@
   "author": "Julian Boilen",
   "license": "ISC",
   "devDependencies": {
+    "@aws-sdk/client-cloudfront": "^3.741.0",
     "@aws-sdk/client-s3": "^3.741.0",
     "@hey-api/openapi-ts": "^0.64.1",
     "@sparticuz/chromium": "^132.0.0",

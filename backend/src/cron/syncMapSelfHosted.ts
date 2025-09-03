@@ -1,3 +1,4 @@
+import { CloudFrontClient, CreateInvalidationCommand } from '@aws-sdk/client-cloudfront';
 import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { createReadStream } from 'fs';
 import { getRepository } from 'typeorm';
@@ -7,6 +8,7 @@ import EffectiveAddress from '../entities/EffectiveAddress';
 import EffectiveGeocode from '../entities/EffectiveGeocode';
 
 const s3 = new S3Client();
+const cloudFront = new CloudFrontClient();
 
 export default async function syncMap(): Promise<void> {
   console.log('Refreshing effective addresses...');
@@ -45,6 +47,26 @@ export default async function syncMap(): Promise<void> {
       CacheControl: 'max-age=86400',
     })
   );
+
+  console.log('Creating CloudFront invalidation...');
+  const distributionId = process.env.MAPTILES_CLOUDFRONT_DISTRIBUTION_ID;
+  if (distributionId) {
+    await cloudFront.send(
+      new CreateInvalidationCommand({
+        DistributionId: distributionId,
+        InvalidationBatch: {
+          Paths: {
+            Quantity: 1,
+            Items: ['/photos-1940s.pmtiles'],
+          },
+          CallerReference: `sync-map-${Date.now()}`,
+        },
+      })
+    );
+    console.log('CloudFront invalidation created successfully.');
+  } else {
+    console.log('MAPTILES_CLOUDFRONT_DISTRIBUTION_ID not set, skipping invalidation.');
+  }
 
   console.log('Sync of map data complete.');
 }
