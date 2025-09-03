@@ -38,7 +38,7 @@ provider:
     RAPIDAPI_API_KEY: ${ssm:/${self:service}-${sls:stage}-rapidapi-api-key}
     PRINTFUL_SK: ${ssm:/${self:service}-${sls:stage}-printful-sk}
 plugins:
-  - serverless-plugin-select
+  - serverless-plugin-conditional-functions
   - serverless-webpack
   - serverless-domain-manager
   - serverless-offline
@@ -59,8 +59,7 @@ functions:
           path: /{proxy+}
           method: ANY
   convertImage:
-    stages:
-      - production
+    enabled: '"${sls:stage}" == "production"'
     handler: convertImage.handler
     memorySize: 2048
     timeout: 30
@@ -72,8 +71,7 @@ functions:
             - prefix: originals/
           existing: true
   deleteImage:
-    stages:
-      - production
+    enabled: '"${sls:stage}" == "production"'
     handler: convertImage.deletionHandler
     events:
       - s3:
@@ -83,28 +81,23 @@ functions:
             - prefix: originals/
           existing: true
   checkStaleStories:
-    stages:
-      - production
+    enabled: '"${sls:stage}" == "production"'
     handler: checkStaleStories.handler
     events:
       - schedule: cron(30 11 * * ? *)
   checkMerchQueue:
-    stages:
-      - production
+    enabled: '"${sls:stage}" == "production"'
     handler: checkMerchQueue.handler
     events:
       - schedule: cron(30 11 * * ? *)
   syncMap:
-    stages:
-      - production
+    enabled: '"${sls:stage}" == "production"'
     handler: syncMap.handler
     events:
       - schedule: cron(0 12 * * ? *)
     timeout: 900
   syncMapSelfHosted:
-    stages:
-      - production
-      - staging
+    enabled: '"${sls:stage}" == "production" || "${sls:stage}" == "staging"'
     handler: syncMapSelfHosted.handler
     events:
       - schedule: cron(10 12 * * ? *)
@@ -113,15 +106,13 @@ functions:
     layers:
       - Ref: TippecanoeLambdaLayer
   generateStoryTitles:
-    stages:
-      - production
+    enabled: '"${sls:stage}" == "production"'
     handler: generateStoryTitles.handler
     events:
       - schedule: rate(5 minutes)
     timeout: 900
   sendEmailCampaigns:
-    stages:
-      - production
+    enabled: '"${sls:stage}" == "production"'
     handler: sendEmailCampaigns.handler
     events:
       - schedule: rate(1 minute)
