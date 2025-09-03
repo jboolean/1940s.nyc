@@ -18,10 +18,6 @@ provider:
           Action: 
             - s3:*
           Resource: "*"
-        - Effect: Allow
-          Action:
-            - cloudfront:CreateInvalidation
-          Resource: "*"
   environment:
     STAGE: ${sls:stage}
     DB_HOST: ${ssm:/${self:service}-${sls:stage}-db-host}
@@ -41,7 +37,6 @@ provider:
     OPENAI_SK: ${ssm:/${self:service}-${sls:stage}-openai-sk}
     RAPIDAPI_API_KEY: ${ssm:/${self:service}-${sls:stage}-rapidapi-api-key}
     PRINTFUL_SK: ${ssm:/${self:service}-${sls:stage}-printful-sk}
-    MAPTILES_CLOUDFRONT_DISTRIBUTION_ID: ${ssm:/${self:service}-${sls:stage}-maptiles-cloudfront-distribution-id}
 plugins:
   - serverless-plugin-conditional-functions
   - serverless-webpack
