@@ -38,7 +38,6 @@ module.exports = {
     'webpack',
     // Only externalize the packages that cause problems in Lambda
     'sharp',
-    'puppeteer-core',
     '@sparticuz/chromium',
     'aws-sdk',
     /^@aws-sdk\//,
