@@ -15,7 +15,7 @@ export { OverlayId } from './overlays';
 import { RouteComponentProps } from 'react-router';
 import stylesheet from './MainMap.less';
 
-import mapStyleUrl from './fourties.protomaps.style.json';
+import mapStyleUrl from 'screens/App/shared/mapStyles/fourties.protomaps.style.json';
 
 const PHOTO_LAYER = 'photos-1940s';
 
