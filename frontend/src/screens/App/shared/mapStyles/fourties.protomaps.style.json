@@ -1505,7 +1505,8 @@
         "symbol-placement": "point",
         "text-font": ["News Gothic Std Oblique"],
         "text-field": ["get", "addr_housenumber"],
-        "text-size": 12
+        "text-size": 12,
+        "visibility": "none"
       },
       "paint": {
         "text-color": "#91888b",
@@ -5668,7 +5669,7 @@
       "id": "lot-label",
       "type": "symbol",
       "source": "bbl",
-      "source-layer": "MapPLUTO",
+      "source-layer": "lots",
       "minzoom": 17,
       "layout": {
         "text-font": ["News Gothic Std Oblique"],
@@ -5688,11 +5689,12 @@
       "id": "block-label",
       "type": "symbol",
       "source": "bbl",
-      "source-layer": "MapPLUTO",
+      "source-layer": "blocks",
       "minzoom": 13,
       "layout": {
         "text-field": ["concat", "Block ", ["to-string", ["get", "Block"]]],
         "text-offset": [2, 0],
+        "text-font": ["News Gothic Std Oblique"],
         "visibility": "none"
       },
       "paint": {
