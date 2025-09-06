@@ -1,5 +1,6 @@
 {
   "version": 8,
+  "metadata": {"maputnik:renderer": "mlgljs"},
   "sources": {
     "protomaps": {
       "type": "vector",
@@ -16,29 +17,35 @@
       "url": "pmtiles://https://maptiles.1940s.nyc/photos-1940s.pmtiles"
     }
   },
+  "sprite": [
+    {
+      "id": "default",
+      "url": "https://protomaps.github.io/basemaps-assets/sprites/v4/light"
+    },
+    {"id": "custom", "url": "https://maptiles.1940s.nyc/assets/sprites/custom"}
+  ],
+  "glyphs": "https://maptiles.1940s.nyc/assets/fonts/{fontstack}/{range}.pbf",
   "layers": [
     {
       "id": "background",
       "type": "background",
-      "paint": {
-        "background-color": "#cccccc"
-      }
+      "paint": {"background-color": "#fcf6e9"}
     },
     {
       "id": "earth",
       "type": "fill",
-      "filter": ["==", "$type", "Polygon"],
       "source": "protomaps",
       "source-layer": "earth",
-      "paint": {
-        "fill-color": "#e2dfda"
-      }
+      "filter": ["==", "$type", "Polygon"],
+      "layout": {"visibility": "none"},
+      "paint": {"fill-color": "#fcf6e9"}
     },
     {
       "id": "landcover",
       "type": "fill",
       "source": "protomaps",
       "source-layer": "landcover",
+      "layout": {"visibility": "none"},
       "paint": {
         "fill-color": [
           "match",
@@ -66,66 +73,28 @@
       "source": "protomaps",
       "source-layer": "landuse",
       "filter": [
-        "in",
-        "kind",
-        "national_park",
-        "park",
-        "cemetery",
-        "protected_area",
-        "nature_reserve",
-        "forest",
-        "golf_course",
-        "wood",
-        "nature_reserve",
-        "forest",
-        "scrub",
-        "grassland",
-        "grass",
-        "military",
-        "naval_base",
-        "airfield"
+        "all",
+        [
+          "in",
+          "kind",
+          "national_park",
+          "park",
+          "cemetery",
+          "protected_area",
+          "forest",
+          "golf_course",
+          "nature_reserve",
+          "forest",
+          "scrub",
+          "military",
+          "naval_base",
+          "airfield"
+        ]
       ],
+      "layout": {"visibility": "visible"},
       "paint": {
         "fill-opacity": ["interpolate", ["linear"], ["zoom"], 6, 0, 11, 1],
-        "fill-color": [
-          "case",
-          [
-            "in",
-            ["get", "kind"],
-            [
-              "literal",
-              [
-                "national_park",
-                "park",
-                "cemetery",
-                "protected_area",
-                "nature_reserve",
-                "forest",
-                "golf_course"
-              ]
-            ]
-          ],
-          "#9cd3b4",
-          [
-            "in",
-            ["get", "kind"],
-            ["literal", ["wood", "nature_reserve", "forest"]]
-          ],
-          "#a0d9a0",
-          ["in", ["get", "kind"], ["literal", ["scrub", "grassland", "grass"]]],
-          "#99d2bb",
-          ["in", ["get", "kind"], ["literal", ["glacier"]]],
-          "#e7e7e7",
-          ["in", ["get", "kind"], ["literal", ["sand"]]],
-          "#e2e0d7",
-          [
-            "in",
-            ["get", "kind"],
-            ["literal", ["military", "naval_base", "airfield"]]
-          ],
-          "#c6dcdc",
-          "#e2dfda"
-        ]
+        "fill-color": "#9cb366"
       }
     },
     {
@@ -134,10 +103,8 @@
       "source": "protomaps",
       "source-layer": "landuse",
       "filter": ["in", "kind", "allotments", "village_green", "playground"],
-      "paint": {
-        "fill-color": "#9cd3b4",
-        "fill-opacity": 0.7
-      }
+      "layout": {"visibility": "visible"},
+      "paint": {"fill-color": "#83a03e", "fill-opacity": 0.7}
     },
     {
       "id": "landuse_hospital",
@@ -145,9 +112,8 @@
       "source": "protomaps",
       "source-layer": "landuse",
       "filter": ["==", "kind", "hospital"],
-      "paint": {
-        "fill-color": "#e4dad9"
-      }
+      "layout": {"visibility": "none"},
+      "paint": {"fill-color": "#e4dad9"}
     },
     {
       "id": "landuse_industrial",
@@ -155,9 +121,8 @@
       "source": "protomaps",
       "source-layer": "landuse",
       "filter": ["==", "kind", "industrial"],
-      "paint": {
-        "fill-color": "#d1dde1"
-      }
+      "layout": {"visibility": "none"},
+      "paint": {"fill-color": "#d1dde1"}
     },
     {
       "id": "landuse_school",
@@ -165,9 +130,8 @@
       "source": "protomaps",
       "source-layer": "landuse",
       "filter": ["in", "kind", "school", "university", "college"],
-      "paint": {
-        "fill-color": "#e4ded7"
-      }
+      "layout": {"visibility": "none"},
+      "paint": {"fill-color": "#e4ded7"}
     },
     {
       "id": "landuse_beach",
@@ -175,9 +139,16 @@
       "source": "protomaps",
       "source-layer": "landuse",
       "filter": ["in", "kind", "beach"],
-      "paint": {
-        "fill-color": "#e8e4d0"
-      }
+      "paint": {"fill-color": "#e8e4d0"}
+    },
+    {
+      "id": "landuse_wood",
+      "type": "fill",
+      "source": "protomaps",
+      "source-layer": "landuse",
+      "filter": ["in", "kind", "wood"],
+      "layout": {"visibility": "visible"},
+      "paint": {"fill-color": "#83a03e"}
     },
     {
       "id": "landuse_zoo",
@@ -185,9 +156,8 @@
       "source": "protomaps",
       "source-layer": "landuse",
       "filter": ["in", "kind", "zoo"],
-      "paint": {
-        "fill-color": "#c6dcdc"
-      }
+      "layout": {"visibility": "visible"},
+      "paint": {"fill-color": "#83a03e"}
     },
     {
       "id": "landuse_aerodrome",
@@ -195,9 +165,8 @@
       "source": "protomaps",
       "source-layer": "landuse",
       "filter": ["in", "kind", "aerodrome"],
-      "paint": {
-        "fill-color": "#dadbdf"
-      }
+      "layout": {"visibility": "none"},
+      "paint": {"fill-color": "#dadbdf"}
     },
     {
       "id": "roads_runway",
@@ -205,8 +174,17 @@
       "source": "protomaps",
       "source-layer": "roads",
       "filter": ["==", "kind_detail", "runway"],
+      "layout": {"visibility": "visible"},
       "paint": {
-        "line-color": "#e9e9ed",
+        "line-color": [
+          "interpolate",
+          ["linear"],
+          ["zoom"],
+          13,
+          "hsl(55, 100%, 48%)",
+          15,
+          "hsl(55, 28%, 82%)"
+        ],
         "line-width": [
           "interpolate",
           ["exponential", 1.6],
@@ -228,7 +206,15 @@
       "minzoom": 13,
       "filter": ["==", "kind_detail", "taxiway"],
       "paint": {
-        "line-color": "#e9e9ed",
+        "line-color": [
+          "interpolate",
+          ["linear"],
+          ["zoom"],
+          13,
+          "hsl(55, 100%, 48%)",
+          15,
+          "hsl(55, 28%, 82%)"
+        ],
         "line-width": [
           "interpolate",
           ["exponential", 1.6],
@@ -248,19 +234,16 @@
       "source": "protomaps",
       "source-layer": "landuse",
       "filter": ["any", ["in", "kind", "runway", "taxiway"]],
-      "paint": {
-        "fill-color": "#e9e9ed"
-      }
+      "layout": {"visibility": "none"},
+      "paint": {"fill-color": "#e9e9ed"}
     },
     {
       "id": "water",
       "type": "fill",
-      "filter": ["==", "$type", "Polygon"],
       "source": "protomaps",
       "source-layer": "water",
-      "paint": {
-        "fill-color": "#80deea"
-      }
+      "filter": ["==", "$type", "Polygon"],
+      "paint": {"fill-color": "#87b6a8"}
     },
     {
       "id": "water_stream",
@@ -269,10 +252,7 @@
       "source-layer": "water",
       "minzoom": 14,
       "filter": ["in", "kind", "stream"],
-      "paint": {
-        "line-color": "#80deea",
-        "line-width": 0.5
-      }
+      "paint": {"line-color": "#80deea", "line-width": 0.5}
     },
     {
       "id": "water_river",
@@ -281,6 +261,7 @@
       "source-layer": "water",
       "minzoom": 9,
       "filter": ["in", "kind", "river"],
+      "layout": {"visibility": "none"},
       "paint": {
         "line-color": "#80deea",
         "line-width": [
@@ -302,9 +283,8 @@
       "source": "protomaps",
       "source-layer": "landuse",
       "filter": ["in", "kind", "pedestrian", "dam"],
-      "paint": {
-        "fill-color": "#e3e0d4"
-      }
+      "layout": {"visibility": "visible"},
+      "paint": {"fill-color": ["literal", "#e3e0d4"]}
     },
     {
       "id": "landuse_pier",
@@ -312,9 +292,7 @@
       "source": "protomaps",
       "source-layer": "landuse",
       "filter": ["==", "kind", "pier"],
-      "paint": {
-        "fill-color": "#e0e0e0"
-      }
+      "paint": {"fill-color": "#fcf6e9"}
     },
     {
       "id": "roads_tunnels_other_casing",
@@ -410,6 +388,7 @@
         ["!has", "is_bridge"],
         ["==", "kind", "major_road"]
       ],
+      "layout": {"visibility": "none"},
       "paint": {
         "line-color": "#e0e0e0",
         "line-dasharray": [3, 2],
@@ -447,8 +426,17 @@
         ["==", "kind", "highway"],
         ["!has", "is_link"]
       ],
+      "layout": {"visibility": "visible"},
       "paint": {
-        "line-color": "#e0e0e0",
+        "line-color": [
+          "interpolate",
+          ["linear"],
+          ["zoom"],
+          13,
+          "hsl(55, 100%, 48%)",
+          15,
+          "#dedcc4"
+        ],
         "line-dasharray": [6, 0.5],
         "line-gap-width": [
           "interpolate",
@@ -468,9 +456,9 @@
           7,
           0,
           7.5,
-          1,
+          0,
           20,
-          15
+          0
         ]
       }
     },
@@ -572,8 +560,17 @@
         ["==", ["get", "kind"], "highway"],
         ["!", ["has", "is_link"]]
       ],
+      "layout": {"visibility": "visible"},
       "paint": {
-        "line-color": "#d5d5d5",
+        "line-color": [
+          "interpolate",
+          ["linear"],
+          ["zoom"],
+          13,
+          "hsl(55, 100%, 48%)",
+          15,
+          "hsl(55, 28%, 82%)"
+        ],
         "line-width": [
           "interpolate",
           ["exponential", 1.6],
@@ -588,7 +585,8 @@
           5,
           18,
           15
-        ]
+        ],
+        "line-opacity": 0.5
       }
     },
     {
@@ -596,11 +594,10 @@
       "type": "fill",
       "source": "protomaps",
       "source-layer": "buildings",
+      "minzoom": 13,
       "filter": ["in", "kind", "building", "building_part"],
-      "paint": {
-        "fill-color": "#cccccc",
-        "fill-opacity": 0.5
-      }
+      "layout": {"visibility": "visible"},
+      "paint": {"fill-color": "#d44b21", "fill-opacity": 1}
     },
     {
       "id": "roads_pier",
@@ -670,8 +667,17 @@
         ["==", "kind", "minor_road"],
         ["!=", "kind_detail", "service"]
       ],
+      "layout": {"visibility": "none"},
       "paint": {
-        "line-color": "#e0e0e0",
+        "line-color": [
+          "interpolate",
+          ["linear"],
+          ["zoom"],
+          13,
+          "hsl(55, 100%, 48%)",
+          15,
+          "#dedcc4"
+        ],
         "line-gap-width": [
           "interpolate",
           ["exponential", 1.6],
@@ -703,6 +709,7 @@
       "source-layer": "roads",
       "minzoom": 13,
       "filter": ["has", "is_link"],
+      "layout": {"visibility": "none"},
       "paint": {
         "line-color": "#e0e0e0",
         "line-gap-width": [
@@ -778,6 +785,7 @@
         ["==", "kind", "highway"],
         ["!has", "is_link"]
       ],
+      "layout": {"visibility": "none"},
       "paint": {
         "line-color": "#e0e0e0",
         "line-gap-width": [
@@ -817,7 +825,15 @@
         ["!=", "kind_detail", "pier"]
       ],
       "paint": {
-        "line-color": "#ebebeb",
+        "line-color": [
+          "interpolate",
+          ["linear"],
+          ["zoom"],
+          13,
+          "hsl(55, 100%, 48%)",
+          15,
+          "#dedcc4"
+        ],
         "line-dasharray": [3, 1],
         "line-width": [
           "interpolate",
@@ -836,8 +852,17 @@
       "source": "protomaps",
       "source-layer": "roads",
       "filter": ["has", "is_link"],
+      "layout": {"visibility": "visible"},
       "paint": {
-        "line-color": "#ffffff",
+        "line-color": [
+          "interpolate",
+          ["linear"],
+          ["zoom"],
+          13,
+          "hsl(55, 100%, 48%)",
+          15,
+          "#dedcc4"
+        ],
         "line-width": [
           "interpolate",
           ["exponential", 1.6],
@@ -864,7 +889,15 @@
         ["==", "kind_detail", "service"]
       ],
       "paint": {
-        "line-color": "#ebebeb",
+        "line-color": [
+          "interpolate",
+          ["linear"],
+          ["zoom"],
+          13,
+          "hsl(55, 100%, 48%)",
+          15,
+          "#dedcc4"
+        ],
         "line-width": [
           "interpolate",
           ["exponential", 1.6],
@@ -888,15 +921,16 @@
         ["==", "kind", "minor_road"],
         ["!=", "kind_detail", "service"]
       ],
+      "layout": {"visibility": "visible"},
       "paint": {
         "line-color": [
           "interpolate",
-          ["exponential", 1.6],
+          ["linear"],
           ["zoom"],
-          11,
-          "#ebebeb",
-          16,
-          "#ffffff"
+          13,
+          "hsl(55, 100%, 48%)",
+          15,
+          "#dedcc4"
         ],
         "line-width": [
           "interpolate",
@@ -925,8 +959,17 @@
         ["!has", "is_bridge"],
         ["==", "kind", "major_road"]
       ],
+      "layout": {"visibility": "none"},
       "paint": {
-        "line-color": "#e0e0e0",
+        "line-color": [
+          "interpolate",
+          ["linear"],
+          ["zoom"],
+          13,
+          "hsl(55, 100%, 48%)",
+          15,
+          "#dedcc4"
+        ],
         "line-gap-width": [
           "interpolate",
           ["exponential", 1.6],
@@ -960,8 +1003,17 @@
         ["!has", "is_bridge"],
         ["==", "kind", "major_road"]
       ],
+      "layout": {"visibility": "visible"},
       "paint": {
-        "line-color": "#ffffff",
+        "line-color": [
+          "interpolate",
+          ["linear"],
+          ["zoom"],
+          13,
+          "hsl(55, 100%, 48%)",
+          15,
+          "#dedcc4"
+        ],
         "line-width": [
           "interpolate",
           ["exponential", 1.6],
@@ -990,6 +1042,7 @@
         ["==", "kind", "highway"],
         ["!has", "is_link"]
       ],
+      "layout": {"visibility": "none"},
       "paint": {
         "line-color": "#e0e0e0",
         "line-gap-width": [
@@ -1026,23 +1079,52 @@
         ["==", "kind", "highway"],
         ["!has", "is_link"]
       ],
+      "layout": {"visibility": "visible"},
       "paint": {
-        "line-color": "#ffffff",
+        "line-color": [
+          "interpolate",
+          ["linear"],
+          ["zoom"],
+          13,
+          "hsl(55, 100%, 48%)",
+          15,
+          "#dedcc4"
+        ],
         "line-width": [
           "interpolate",
-          ["exponential", 1.6],
+          ["exponential", 1.5],
           ["zoom"],
           3,
           0,
           6,
-          1.1,
+          0.75,
           12,
-          1.6,
-          15,
-          5,
+          2,
           18,
-          15
+          32
         ]
+      }
+    },
+    {
+      "id": "roads_rail-copy",
+      "type": "line",
+      "source": "protomaps",
+      "source-layer": "roads",
+      "minzoom": 13,
+      "filter": ["all", ["==", "kind", "rail"], ["!=", "is_tunnel", true]],
+      "layout": {"visibility": "visible"},
+      "paint": {
+        "line-color": ["literal", "#817774"],
+        "line-width": [
+          "interpolate",
+          ["exponential", 1],
+          ["zoom"],
+          14,
+          0.75,
+          20,
+          1
+        ],
+        "line-opacity": 1
       }
     },
     {
@@ -1050,22 +1132,22 @@
       "type": "line",
       "source": "protomaps",
       "source-layer": "roads",
-      "filter": ["==", "kind", "rail"],
+      "minzoom": 13,
+      "filter": ["all", ["==", "kind", "rail"], ["!=", "is_tunnel", true]],
+      "layout": {"visibility": "visible"},
       "paint": {
-        "line-dasharray": [0.3, 0.75],
-        "line-opacity": 0.5,
-        "line-color": "#a7b1b3",
+        "line-dasharray": ["literal", [0.25, 10]],
+        "line-color": ["literal", "#817774"],
         "line-width": [
           "interpolate",
-          ["exponential", 1.6],
+          ["exponential", 1.25],
           ["zoom"],
-          3,
-          0,
-          6,
-          0.15,
-          18,
-          9
-        ]
+          14,
+          2,
+          20,
+          4
+        ],
+        "line-opacity": 1
       }
     },
     {
@@ -1111,6 +1193,7 @@
       "source-layer": "roads",
       "minzoom": 12,
       "filter": ["all", ["has", "is_bridge"], ["in", "kind", "other", "path"]],
+      "layout": {"visibility": "none"},
       "paint": {
         "line-color": "#e0e0e0",
         "line-gap-width": [
@@ -1131,6 +1214,7 @@
       "source-layer": "roads",
       "minzoom": 12,
       "filter": ["all", ["has", "is_bridge"], ["has", "is_link"]],
+      "layout": {"visibility": "none"},
       "paint": {
         "line-color": "#e0e0e0",
         "line-gap-width": [
@@ -1162,6 +1246,7 @@
       "source-layer": "roads",
       "minzoom": 12,
       "filter": ["all", ["has", "is_bridge"], ["==", "kind", "minor_road"]],
+      "layout": {"visibility": "none"},
       "paint": {
         "line-color": "#e0e0e0",
         "line-gap-width": [
@@ -1195,6 +1280,7 @@
       "source-layer": "roads",
       "minzoom": 12,
       "filter": ["all", ["has", "is_bridge"], ["==", "kind", "major_road"]],
+      "layout": {"visibility": "none"},
       "paint": {
         "line-color": "#e0e0e0",
         "line-gap-width": [
@@ -1226,6 +1312,7 @@
       "source-layer": "roads",
       "minzoom": 12,
       "filter": ["all", ["has", "is_bridge"], ["in", "kind", "other", "path"]],
+      "layout": {"visibility": "none"},
       "paint": {
         "line-color": "#ebebeb",
         "line-dasharray": [2, 1],
@@ -1247,6 +1334,7 @@
       "source-layer": "roads",
       "minzoom": 12,
       "filter": ["all", ["has", "is_bridge"], ["==", "kind", "minor_road"]],
+      "layout": {"visibility": "none"},
       "paint": {
         "line-color": "#ffffff",
         "line-width": [
@@ -1271,6 +1359,7 @@
       "source-layer": "roads",
       "minzoom": 12,
       "filter": ["all", ["has", "is_bridge"], ["has", "is_link"]],
+      "layout": {"visibility": "none"},
       "paint": {
         "line-color": "#ffffff",
         "line-width": [
@@ -1293,6 +1382,7 @@
       "source-layer": "roads",
       "minzoom": 12,
       "filter": ["all", ["has", "is_bridge"], ["==", "kind", "major_road"]],
+      "layout": {"visibility": "none"},
       "paint": {
         "line-color": "#f5f5f5",
         "line-width": [
@@ -1322,6 +1412,7 @@
         ["==", "kind", "highway"],
         ["!has", "is_link"]
       ],
+      "layout": {"visibility": "none"},
       "paint": {
         "line-color": "#e0e0e0",
         "line-gap-width": [
@@ -1359,6 +1450,7 @@
         ["==", "kind", "highway"],
         ["!has", "is_link"]
       ],
+      "layout": {"visibility": "none"},
       "paint": {
         "line-color": "#ffffff",
         "line-width": [
@@ -1387,7 +1479,7 @@
       "filter": ["==", "kind", "address"],
       "layout": {
         "symbol-placement": "point",
-        "text-font": ["Noto Sans Italic"],
+        "text-font": ["News Gothic Std Oblique"],
         "text-field": ["get", "addr_housenumber"],
         "text-size": 12
       },
@@ -1406,7 +1498,7 @@
       "filter": ["in", "kind", "river", "stream"],
       "layout": {
         "symbol-placement": "line",
-        "text-font": ["Noto Sans Italic"],
+        "text-font": ["Spectral SC Medium"],
         "text-field": [
           "case",
           [
@@ -1447,7 +1539,7 @@
                     "case",
                     ["==", ["get", "script"], "Devanagari"],
                     ["literal", ["Noto Sans Devanagari Regular v1"]],
-                    ["literal", ["Noto Sans Regular"]]
+                    ["literal", ["News Gothic Std Medium"]]
                   ]
                 }
               ],
@@ -1485,7 +1577,7 @@
                   "case",
                   ["==", ["get", "script"], "Devanagari"],
                   ["literal", ["Noto Sans Devanagari Regular v1"]],
-                  ["literal", ["Noto Sans Regular"]]
+                  ["literal", ["News Gothic Std Medium"]]
                 ]
               },
               "\n",
@@ -1496,7 +1588,7 @@
                   "case",
                   ["==", ["get", "script2"], "Devanagari"],
                   ["literal", ["Noto Sans Devanagari Regular v1"]],
-                  ["literal", ["Noto Sans Regular"]]
+                  ["literal", ["News Gothic Std Medium"]]
                 ]
               }
             ],
@@ -1520,7 +1612,7 @@
                     "case",
                     ["==", ["get", "script2"], "Devanagari"],
                     ["literal", ["Noto Sans Devanagari Regular v1"]],
-                    ["literal", ["Noto Sans Regular"]]
+                    ["literal", ["News Gothic Std Medium"]]
                   ]
                 }
               ],
@@ -1541,7 +1633,7 @@
                     "case",
                     ["==", ["get", "script"], "Devanagari"],
                     ["literal", ["Noto Sans Devanagari Regular v1"]],
-                    ["literal", ["Noto Sans Regular"]]
+                    ["literal", ["News Gothic Std Medium"]]
                   ]
                 }
               ]
@@ -1562,7 +1654,7 @@
                   "case",
                   ["==", ["get", "script"], "Devanagari"],
                   ["literal", ["Noto Sans Devanagari Regular v1"]],
-                  ["literal", ["Noto Sans Regular"]]
+                  ["literal", ["News Gothic Std Medium"]]
                 ]
               },
               "\n",
@@ -1573,7 +1665,7 @@
                   "case",
                   ["==", ["get", "script2"], "Devanagari"],
                   ["literal", ["Noto Sans Devanagari Regular v1"]],
-                  ["literal", ["Noto Sans Regular"]]
+                  ["literal", ["News Gothic Std Medium"]]
                 ]
               },
               "\n",
@@ -1584,7 +1676,7 @@
                   "case",
                   ["==", ["get", "script3"], "Devanagari"],
                   ["literal", ["Noto Sans Devanagari Regular v1"]],
-                  ["literal", ["Noto Sans Regular"]]
+                  ["literal", ["News Gothic Std Medium"]]
                 ]
               }
             ],
@@ -1608,7 +1700,7 @@
                     "case",
                     ["==", ["get", "script2"], "Devanagari"],
                     ["literal", ["Noto Sans Devanagari Regular v1"]],
-                    ["literal", ["Noto Sans Regular"]]
+                    ["literal", ["News Gothic Std Medium"]]
                   ]
                 },
                 "\n",
@@ -1619,7 +1711,7 @@
                     "case",
                     ["==", ["get", "script3"], "Devanagari"],
                     ["literal", ["Noto Sans Devanagari Regular v1"]],
-                    ["literal", ["Noto Sans Regular"]]
+                    ["literal", ["News Gothic Std Medium"]]
                   ]
                 }
               ],
@@ -1641,7 +1733,7 @@
                     "case",
                     ["==", ["get", "script"], "Devanagari"],
                     ["literal", ["Noto Sans Devanagari Regular v1"]],
-                    ["literal", ["Noto Sans Regular"]]
+                    ["literal", ["News Gothic Std Medium"]]
                   ]
                 },
                 "\n",
@@ -1652,7 +1744,7 @@
                     "case",
                     ["==", ["get", "script3"], "Devanagari"],
                     ["literal", ["Noto Sans Devanagari Regular v1"]],
-                    ["literal", ["Noto Sans Regular"]]
+                    ["literal", ["News Gothic Std Medium"]]
                   ]
                 }
               ],
@@ -1673,7 +1765,7 @@
                     "case",
                     ["==", ["get", "script"], "Devanagari"],
                     ["literal", ["Noto Sans Devanagari Regular v1"]],
-                    ["literal", ["Noto Sans Regular"]]
+                    ["literal", ["News Gothic Std Medium"]]
                   ]
                 },
                 "\n",
@@ -1684,7 +1776,7 @@
                     "case",
                     ["==", ["get", "script2"], "Devanagari"],
                     ["literal", ["Noto Sans Devanagari Regular v1"]],
-                    ["literal", ["Noto Sans Regular"]]
+                    ["literal", ["News Gothic Std Medium"]]
                   ]
                 }
               ]
@@ -1692,12 +1784,322 @@
           ]
         ],
         "text-size": 12,
-        "text-letter-spacing": 0.2
+        "text-letter-spacing": 1,
+        "text-transform": "none"
+      },
+      "paint": {"text-halo-width": 1, "text-color": "#0b1804"}
+    },
+    {
+      "id": "poi_label_park",
+      "type": "symbol",
+      "source": "protomaps",
+      "source-layer": "pois",
+      "filter": [
+        "all",
+        [
+          "in",
+          ["get", "kind"],
+          ["literal", ["beach", "forest", "park", "cemetery"]]
+        ],
+        [">=", ["zoom"], ["+", ["get", "min_zoom"], 0]]
+      ],
+      "layout": {
+        "text-font": ["Spectral SC Light"],
+        "text-field": [
+          "case",
+          [
+            "all",
+            ["any", ["has", "name"], ["has", "pgf:name"]],
+            ["!", ["any", ["has", "name2"], ["has", "pgf:name2"]]],
+            ["!", ["any", ["has", "name3"], ["has", "pgf:name3"]]]
+          ],
+          [
+            "case",
+            ["has", "script"],
+            [
+              "case",
+              [
+                "any",
+                ["is-supported-script", ["get", "name"]],
+                ["has", "pgf:name"]
+              ],
+              [
+                "format",
+                ["coalesce", ["get", "name:en"], ["get", "name:en"]],
+                {},
+                "\n",
+                {},
+                [
+                  "case",
+                  [
+                    "all",
+                    ["!", ["has", "name:en"]],
+                    ["has", "name:en"],
+                    ["!", ["has", "script"]]
+                  ],
+                  "",
+                  ["coalesce", ["get", "pgf:name"], ["get", "name"]]
+                ],
+                {
+                  "text-font": [
+                    "case",
+                    ["==", ["get", "script"], "Devanagari"],
+                    ["literal", ["Noto Sans Devanagari Regular v1"]],
+                    ["literal", ["News Gothic Std Medium"]]
+                  ]
+                }
+              ],
+              ["get", "name:en"]
+            ],
+            [
+              "format",
+              [
+                "coalesce",
+                ["get", "name:en"],
+                ["get", "pgf:name"],
+                ["get", "name"]
+              ],
+              {}
+            ]
+          ],
+          [
+            "all",
+            ["any", ["has", "name"], ["has", "pgf:name"]],
+            ["any", ["has", "name2"], ["has", "pgf:name2"]],
+            ["!", ["any", ["has", "name3"], ["has", "pgf:name3"]]]
+          ],
+          [
+            "case",
+            ["all", ["has", "script"], ["has", "script2"]],
+            [
+              "format",
+              ["get", "name:en"],
+              {},
+              "\n",
+              {},
+              ["coalesce", ["get", "pgf:name"], ["get", "name"]],
+              {
+                "text-font": [
+                  "case",
+                  ["==", ["get", "script"], "Devanagari"],
+                  ["literal", ["Noto Sans Devanagari Regular v1"]],
+                  ["literal", ["News Gothic Std Medium"]]
+                ]
+              },
+              "\n",
+              {},
+              ["coalesce", ["get", "pgf:name2"], ["get", "name2"]],
+              {
+                "text-font": [
+                  "case",
+                  ["==", ["get", "script2"], "Devanagari"],
+                  ["literal", ["Noto Sans Devanagari Regular v1"]],
+                  ["literal", ["News Gothic Std Medium"]]
+                ]
+              }
+            ],
+            [
+              "case",
+              ["has", "script2"],
+              [
+                "format",
+                [
+                  "coalesce",
+                  ["get", "name:en"],
+                  ["get", "pgf:name"],
+                  ["get", "name"]
+                ],
+                {},
+                "\n",
+                {},
+                ["coalesce", ["get", "pgf:name2"], ["get", "name2"]],
+                {
+                  "text-font": [
+                    "case",
+                    ["==", ["get", "script2"], "Devanagari"],
+                    ["literal", ["Noto Sans Devanagari Regular v1"]],
+                    ["literal", ["News Gothic Std Medium"]]
+                  ]
+                }
+              ],
+              [
+                "format",
+                [
+                  "coalesce",
+                  ["get", "name:en"],
+                  ["get", "pgf:name2"],
+                  ["get", "name2"]
+                ],
+                {},
+                "\n",
+                {},
+                ["coalesce", ["get", "pgf:name"], ["get", "name"]],
+                {
+                  "text-font": [
+                    "case",
+                    ["==", ["get", "script"], "Devanagari"],
+                    ["literal", ["Noto Sans Devanagari Regular v1"]],
+                    ["literal", ["News Gothic Std Medium"]]
+                  ]
+                }
+              ]
+            ]
+          ],
+          [
+            "case",
+            ["all", ["has", "script"], ["has", "script2"], ["has", "script3"]],
+            [
+              "format",
+              ["get", "name:en"],
+              {},
+              "\n",
+              {},
+              ["coalesce", ["get", "pgf:name"], ["get", "name"]],
+              {
+                "text-font": [
+                  "case",
+                  ["==", ["get", "script"], "Devanagari"],
+                  ["literal", ["Noto Sans Devanagari Regular v1"]],
+                  ["literal", ["News Gothic Std Medium"]]
+                ]
+              },
+              "\n",
+              {},
+              ["coalesce", ["get", "pgf:name2"], ["get", "name2"]],
+              {
+                "text-font": [
+                  "case",
+                  ["==", ["get", "script2"], "Devanagari"],
+                  ["literal", ["Noto Sans Devanagari Regular v1"]],
+                  ["literal", ["News Gothic Std Medium"]]
+                ]
+              },
+              "\n",
+              {},
+              ["coalesce", ["get", "pgf:name3"], ["get", "name3"]],
+              {
+                "text-font": [
+                  "case",
+                  ["==", ["get", "script3"], "Devanagari"],
+                  ["literal", ["Noto Sans Devanagari Regular v1"]],
+                  ["literal", ["News Gothic Std Medium"]]
+                ]
+              }
+            ],
+            [
+              "case",
+              ["!", ["has", "script"]],
+              [
+                "format",
+                [
+                  "coalesce",
+                  ["get", "name:en"],
+                  ["get", "pgf:name"],
+                  ["get", "name"]
+                ],
+                {},
+                "\n",
+                {},
+                ["coalesce", ["get", "pgf:name2"], ["get", "name2"]],
+                {
+                  "text-font": [
+                    "case",
+                    ["==", ["get", "script2"], "Devanagari"],
+                    ["literal", ["Noto Sans Devanagari Regular v1"]],
+                    ["literal", ["News Gothic Std Medium"]]
+                  ]
+                },
+                "\n",
+                {},
+                ["coalesce", ["get", "pgf:name3"], ["get", "name3"]],
+                {
+                  "text-font": [
+                    "case",
+                    ["==", ["get", "script3"], "Devanagari"],
+                    ["literal", ["Noto Sans Devanagari Regular v1"]],
+                    ["literal", ["News Gothic Std Medium"]]
+                  ]
+                }
+              ],
+              ["!", ["has", "script2"]],
+              [
+                "format",
+                [
+                  "coalesce",
+                  ["get", "name:en"],
+                  ["get", "pgf:name2"],
+                  ["get", "name2"]
+                ],
+                {},
+                "\n",
+                {},
+                ["coalesce", ["get", "pgf:name"], ["get", "name"]],
+                {
+                  "text-font": [
+                    "case",
+                    ["==", ["get", "script"], "Devanagari"],
+                    ["literal", ["Noto Sans Devanagari Regular v1"]],
+                    ["literal", ["News Gothic Std Medium"]]
+                  ]
+                },
+                "\n",
+                {},
+                ["coalesce", ["get", "pgf:name3"], ["get", "name3"]],
+                {
+                  "text-font": [
+                    "case",
+                    ["==", ["get", "script3"], "Devanagari"],
+                    ["literal", ["Noto Sans Devanagari Regular v1"]],
+                    ["literal", ["News Gothic Std Medium"]]
+                  ]
+                }
+              ],
+              [
+                "format",
+                [
+                  "coalesce",
+                  ["get", "name:en"],
+                  ["get", "pgf:name3"],
+                  ["get", "name3"]
+                ],
+                {},
+                "\n",
+                {},
+                ["coalesce", ["get", "pgf:name"], ["get", "name"]],
+                {
+                  "text-font": [
+                    "case",
+                    ["==", ["get", "script"], "Devanagari"],
+                    ["literal", ["Noto Sans Devanagari Regular v1"]],
+                    ["literal", ["News Gothic Std Medium"]]
+                  ]
+                },
+                "\n",
+                {},
+                ["coalesce", ["get", "pgf:name2"], ["get", "name2"]],
+                {
+                  "text-font": [
+                    "case",
+                    ["==", ["get", "script2"], "Devanagari"],
+                    ["literal", ["Noto Sans Devanagari Regular v1"]],
+                    ["literal", ["News Gothic Std Medium"]]
+                  ]
+                }
+              ]
+            ]
+          ]
+        ],
+        "text-size": ["interpolate", ["linear"], ["zoom"], 3, 12, 18, 16],
+        "text-letter-spacing": 0,
+        "text-max-width": 9,
+        "text-transform": "none",
+        "symbol-z-order": "auto"
       },
       "paint": {
-        "text-color": "#728dd4",
-        "text-halo-color": "#80deea",
-        "text-halo-width": 1
+        "text-halo-width": 0.9,
+        "text-color": "rgba(43, 49, 41, 1)",
+        "text-halo-color": "hsl(41, 76%, 95%)",
+        "text-halo-blur": 0.1
       }
     },
     {
@@ -1724,7 +2126,7 @@
       "layout": {
         "symbol-sort-key": ["get", "min_zoom"],
         "symbol-placement": "line",
-        "text-font": ["Noto Sans Regular"],
+        "text-font": ["Oswald Light"],
         "text-field": [
           "case",
           [
@@ -1765,7 +2167,7 @@
                     "case",
                     ["==", ["get", "script"], "Devanagari"],
                     ["literal", ["Noto Sans Devanagari Regular v1"]],
-                    ["literal", ["Noto Sans Regular"]]
+                    ["literal", ["News Gothic Std Medium"]]
                   ]
                 }
               ],
@@ -1803,7 +2205,7 @@
                   "case",
                   ["==", ["get", "script"], "Devanagari"],
                   ["literal", ["Noto Sans Devanagari Regular v1"]],
-                  ["literal", ["Noto Sans Regular"]]
+                  ["literal", ["News Gothic Std Medium"]]
                 ]
               },
               "\n",
@@ -1814,7 +2216,7 @@
                   "case",
                   ["==", ["get", "script2"], "Devanagari"],
                   ["literal", ["Noto Sans Devanagari Regular v1"]],
-                  ["literal", ["Noto Sans Regular"]]
+                  ["literal", ["News Gothic Std Medium"]]
                 ]
               }
             ],
@@ -1838,7 +2240,7 @@
                     "case",
                     ["==", ["get", "script2"], "Devanagari"],
                     ["literal", ["Noto Sans Devanagari Regular v1"]],
-                    ["literal", ["Noto Sans Regular"]]
+                    ["literal", ["News Gothic Std Medium"]]
                   ]
                 }
               ],
@@ -1859,7 +2261,7 @@
                     "case",
                     ["==", ["get", "script"], "Devanagari"],
                     ["literal", ["Noto Sans Devanagari Regular v1"]],
-                    ["literal", ["Noto Sans Regular"]]
+                    ["literal", ["News Gothic Std Medium"]]
                   ]
                 }
               ]
@@ -1880,7 +2282,7 @@
                   "case",
                   ["==", ["get", "script"], "Devanagari"],
                   ["literal", ["Noto Sans Devanagari Regular v1"]],
-                  ["literal", ["Noto Sans Regular"]]
+                  ["literal", ["News Gothic Std Medium"]]
                 ]
               },
               "\n",
@@ -1891,7 +2293,7 @@
                   "case",
                   ["==", ["get", "script2"], "Devanagari"],
                   ["literal", ["Noto Sans Devanagari Regular v1"]],
-                  ["literal", ["Noto Sans Regular"]]
+                  ["literal", ["News Gothic Std Medium"]]
                 ]
               },
               "\n",
@@ -1902,7 +2304,7 @@
                   "case",
                   ["==", ["get", "script3"], "Devanagari"],
                   ["literal", ["Noto Sans Devanagari Regular v1"]],
-                  ["literal", ["Noto Sans Regular"]]
+                  ["literal", ["News Gothic Std Medium"]]
                 ]
               }
             ],
@@ -1926,7 +2328,7 @@
                     "case",
                     ["==", ["get", "script2"], "Devanagari"],
                     ["literal", ["Noto Sans Devanagari Regular v1"]],
-                    ["literal", ["Noto Sans Regular"]]
+                    ["literal", ["News Gothic Std Medium"]]
                   ]
                 },
                 "\n",
@@ -1937,7 +2339,7 @@
                     "case",
                     ["==", ["get", "script3"], "Devanagari"],
                     ["literal", ["Noto Sans Devanagari Regular v1"]],
-                    ["literal", ["Noto Sans Regular"]]
+                    ["literal", ["News Gothic Std Medium"]]
                   ]
                 }
               ],
@@ -1959,7 +2361,7 @@
                     "case",
                     ["==", ["get", "script"], "Devanagari"],
                     ["literal", ["Noto Sans Devanagari Regular v1"]],
-                    ["literal", ["Noto Sans Regular"]]
+                    ["literal", ["News Gothic Std Medium"]]
                   ]
                 },
                 "\n",
@@ -1970,7 +2372,7 @@
                     "case",
                     ["==", ["get", "script3"], "Devanagari"],
                     ["literal", ["Noto Sans Devanagari Regular v1"]],
-                    ["literal", ["Noto Sans Regular"]]
+                    ["literal", ["News Gothic Std Medium"]]
                   ]
                 }
               ],
@@ -1991,7 +2393,7 @@
                     "case",
                     ["==", ["get", "script"], "Devanagari"],
                     ["literal", ["Noto Sans Devanagari Regular v1"]],
-                    ["literal", ["Noto Sans Regular"]]
+                    ["literal", ["News Gothic Std Medium"]]
                   ]
                 },
                 "\n",
@@ -2002,19 +2404,21 @@
                     "case",
                     ["==", ["get", "script2"], "Devanagari"],
                     ["literal", ["Noto Sans Devanagari Regular v1"]],
-                    ["literal", ["Noto Sans Regular"]]
+                    ["literal", ["News Gothic Std Medium"]]
                   ]
                 }
               ]
             ]
           ]
         ],
-        "text-size": 12
+        "text-transform": "uppercase",
+        "text-letter-spacing": 0.2,
+        "text-size": 9
       },
       "paint": {
-        "text-color": "#91888b",
+        "text-color": "#0b1804",
         "text-halo-color": "#ffffff",
-        "text-halo-width": 1
+        "text-halo-width": 0
       }
     },
     {
@@ -2024,7 +2428,7 @@
       "source-layer": "water",
       "filter": ["in", "kind", "sea", "ocean", "bay", "strait", "fjord"],
       "layout": {
-        "text-font": ["Noto Sans Italic"],
+        "text-font": ["News Gothic Std Oblique"],
         "text-field": [
           "case",
           [
@@ -2065,7 +2469,7 @@
                     "case",
                     ["==", ["get", "script"], "Devanagari"],
                     ["literal", ["Noto Sans Devanagari Regular v1"]],
-                    ["literal", ["Noto Sans Regular"]]
+                    ["literal", ["News Gothic Std Medium"]]
                   ]
                 }
               ],
@@ -2103,7 +2507,7 @@
                   "case",
                   ["==", ["get", "script"], "Devanagari"],
                   ["literal", ["Noto Sans Devanagari Regular v1"]],
-                  ["literal", ["Noto Sans Regular"]]
+                  ["literal", ["News Gothic Std Medium"]]
                 ]
               },
               "\n",
@@ -2114,7 +2518,7 @@
                   "case",
                   ["==", ["get", "script2"], "Devanagari"],
                   ["literal", ["Noto Sans Devanagari Regular v1"]],
-                  ["literal", ["Noto Sans Regular"]]
+                  ["literal", ["News Gothic Std Medium"]]
                 ]
               }
             ],
@@ -2138,7 +2542,7 @@
                     "case",
                     ["==", ["get", "script2"], "Devanagari"],
                     ["literal", ["Noto Sans Devanagari Regular v1"]],
-                    ["literal", ["Noto Sans Regular"]]
+                    ["literal", ["News Gothic Std Medium"]]
                   ]
                 }
               ],
@@ -2159,7 +2563,7 @@
                     "case",
                     ["==", ["get", "script"], "Devanagari"],
                     ["literal", ["Noto Sans Devanagari Regular v1"]],
-                    ["literal", ["Noto Sans Regular"]]
+                    ["literal", ["News Gothic Std Medium"]]
                   ]
                 }
               ]
@@ -2180,7 +2584,7 @@
                   "case",
                   ["==", ["get", "script"], "Devanagari"],
                   ["literal", ["Noto Sans Devanagari Regular v1"]],
-                  ["literal", ["Noto Sans Regular"]]
+                  ["literal", ["News Gothic Std Medium"]]
                 ]
               },
               "\n",
@@ -2191,7 +2595,7 @@
                   "case",
                   ["==", ["get", "script2"], "Devanagari"],
                   ["literal", ["Noto Sans Devanagari Regular v1"]],
-                  ["literal", ["Noto Sans Regular"]]
+                  ["literal", ["News Gothic Std Medium"]]
                 ]
               },
               "\n",
@@ -2202,7 +2606,7 @@
                   "case",
                   ["==", ["get", "script3"], "Devanagari"],
                   ["literal", ["Noto Sans Devanagari Regular v1"]],
-                  ["literal", ["Noto Sans Regular"]]
+                  ["literal", ["News Gothic Std Medium"]]
                 ]
               }
             ],
@@ -2226,7 +2630,7 @@
                     "case",
                     ["==", ["get", "script2"], "Devanagari"],
                     ["literal", ["Noto Sans Devanagari Regular v1"]],
-                    ["literal", ["Noto Sans Regular"]]
+                    ["literal", ["News Gothic Std Medium"]]
                   ]
                 },
                 "\n",
@@ -2237,7 +2641,7 @@
                     "case",
                     ["==", ["get", "script3"], "Devanagari"],
                     ["literal", ["Noto Sans Devanagari Regular v1"]],
-                    ["literal", ["Noto Sans Regular"]]
+                    ["literal", ["News Gothic Std Medium"]]
                   ]
                 }
               ],
@@ -2259,7 +2663,7 @@
                     "case",
                     ["==", ["get", "script"], "Devanagari"],
                     ["literal", ["Noto Sans Devanagari Regular v1"]],
-                    ["literal", ["Noto Sans Regular"]]
+                    ["literal", ["News Gothic Std Medium"]]
                   ]
                 },
                 "\n",
@@ -2270,7 +2674,7 @@
                     "case",
                     ["==", ["get", "script3"], "Devanagari"],
                     ["literal", ["Noto Sans Devanagari Regular v1"]],
-                    ["literal", ["Noto Sans Regular"]]
+                    ["literal", ["News Gothic Std Medium"]]
                   ]
                 }
               ],
@@ -2291,7 +2695,7 @@
                     "case",
                     ["==", ["get", "script"], "Devanagari"],
                     ["literal", ["Noto Sans Devanagari Regular v1"]],
-                    ["literal", ["Noto Sans Regular"]]
+                    ["literal", ["News Gothic Std Medium"]]
                   ]
                 },
                 "\n",
@@ -2302,7 +2706,7 @@
                     "case",
                     ["==", ["get", "script2"], "Devanagari"],
                     ["literal", ["Noto Sans Devanagari Regular v1"]],
-                    ["literal", ["Noto Sans Regular"]]
+                    ["literal", ["News Gothic Std Medium"]]
                   ]
                 }
               ]
@@ -2314,11 +2718,7 @@
         "text-max-width": 9,
         "text-transform": "uppercase"
       },
-      "paint": {
-        "text-color": "#728dd4",
-        "text-halo-width": 1,
-        "text-halo-color": "#80deea"
-      }
+      "paint": {"text-halo-width": 1, "text-color": "rgba(43, 49, 41, 1)"}
     },
     {
       "id": "earth_label_islands",
@@ -2327,7 +2727,7 @@
       "source-layer": "earth",
       "filter": ["in", "kind", "island"],
       "layout": {
-        "text-font": ["Noto Sans Italic"],
+        "text-font": ["News Gothic Std Medium"],
         "text-field": [
           "case",
           [
@@ -2368,7 +2768,7 @@
                     "case",
                     ["==", ["get", "script"], "Devanagari"],
                     ["literal", ["Noto Sans Devanagari Regular v1"]],
-                    ["literal", ["Noto Sans Regular"]]
+                    ["literal", ["News Gothic Std Medium"]]
                   ]
                 }
               ],
@@ -2406,7 +2806,7 @@
                   "case",
                   ["==", ["get", "script"], "Devanagari"],
                   ["literal", ["Noto Sans Devanagari Regular v1"]],
-                  ["literal", ["Noto Sans Regular"]]
+                  ["literal", ["News Gothic Std Medium"]]
                 ]
               },
               "\n",
@@ -2417,7 +2817,7 @@
                   "case",
                   ["==", ["get", "script2"], "Devanagari"],
                   ["literal", ["Noto Sans Devanagari Regular v1"]],
-                  ["literal", ["Noto Sans Regular"]]
+                  ["literal", ["News Gothic Std Medium"]]
                 ]
               }
             ],
@@ -2441,7 +2841,7 @@
                     "case",
                     ["==", ["get", "script2"], "Devanagari"],
                     ["literal", ["Noto Sans Devanagari Regular v1"]],
-                    ["literal", ["Noto Sans Regular"]]
+                    ["literal", ["News Gothic Std Medium"]]
                   ]
                 }
               ],
@@ -2462,7 +2862,7 @@
                     "case",
                     ["==", ["get", "script"], "Devanagari"],
                     ["literal", ["Noto Sans Devanagari Regular v1"]],
-                    ["literal", ["Noto Sans Regular"]]
+                    ["literal", ["News Gothic Std Medium"]]
                   ]
                 }
               ]
@@ -2483,7 +2883,7 @@
                   "case",
                   ["==", ["get", "script"], "Devanagari"],
                   ["literal", ["Noto Sans Devanagari Regular v1"]],
-                  ["literal", ["Noto Sans Regular"]]
+                  ["literal", ["News Gothic Std Medium"]]
                 ]
               },
               "\n",
@@ -2494,7 +2894,7 @@
                   "case",
                   ["==", ["get", "script2"], "Devanagari"],
                   ["literal", ["Noto Sans Devanagari Regular v1"]],
-                  ["literal", ["Noto Sans Regular"]]
+                  ["literal", ["News Gothic Std Medium"]]
                 ]
               },
               "\n",
@@ -2505,7 +2905,7 @@
                   "case",
                   ["==", ["get", "script3"], "Devanagari"],
                   ["literal", ["Noto Sans Devanagari Regular v1"]],
-                  ["literal", ["Noto Sans Regular"]]
+                  ["literal", ["News Gothic Std Medium"]]
                 ]
               }
             ],
@@ -2529,7 +2929,7 @@
                     "case",
                     ["==", ["get", "script2"], "Devanagari"],
                     ["literal", ["Noto Sans Devanagari Regular v1"]],
-                    ["literal", ["Noto Sans Regular"]]
+                    ["literal", ["News Gothic Std Medium"]]
                   ]
                 },
                 "\n",
@@ -2540,7 +2940,7 @@
                     "case",
                     ["==", ["get", "script3"], "Devanagari"],
                     ["literal", ["Noto Sans Devanagari Regular v1"]],
-                    ["literal", ["Noto Sans Regular"]]
+                    ["literal", ["News Gothic Std Medium"]]
                   ]
                 }
               ],
@@ -2562,7 +2962,7 @@
                     "case",
                     ["==", ["get", "script"], "Devanagari"],
                     ["literal", ["Noto Sans Devanagari Regular v1"]],
-                    ["literal", ["Noto Sans Regular"]]
+                    ["literal", ["News Gothic Std Medium"]]
                   ]
                 },
                 "\n",
@@ -2573,7 +2973,7 @@
                     "case",
                     ["==", ["get", "script3"], "Devanagari"],
                     ["literal", ["Noto Sans Devanagari Regular v1"]],
-                    ["literal", ["Noto Sans Regular"]]
+                    ["literal", ["News Gothic Std Medium"]]
                   ]
                 }
               ],
@@ -2594,7 +2994,7 @@
                     "case",
                     ["==", ["get", "script"], "Devanagari"],
                     ["literal", ["Noto Sans Devanagari Regular v1"]],
-                    ["literal", ["Noto Sans Regular"]]
+                    ["literal", ["News Gothic Std Medium"]]
                   ]
                 },
                 "\n",
@@ -2605,21 +3005,31 @@
                     "case",
                     ["==", ["get", "script2"], "Devanagari"],
                     ["literal", ["Noto Sans Devanagari Regular v1"]],
-                    ["literal", ["Noto Sans Regular"]]
+                    ["literal", ["News Gothic Std Medium"]]
                   ]
                 }
               ]
             ]
           ]
         ],
-        "text-size": 10,
+        "text-size": [
+          "interpolate",
+          ["exponential", 1],
+          ["zoom"],
+          10,
+          11,
+          18,
+          16
+        ],
         "text-letter-spacing": 0.1,
-        "text-max-width": 8
+        "text-max-width": 8,
+        "visibility": "visible"
       },
       "paint": {
-        "text-color": "#8f8f8f",
-        "text-halo-color": "#e0e0e0",
-        "text-halo-width": 1
+        "text-color": "#2f2927",
+        "text-halo-color": "#fcf6e9",
+        "text-halo-width": 1,
+        "text-halo-blur": 1
       }
     },
     {
@@ -2629,7 +3039,7 @@
       "source-layer": "water",
       "filter": ["in", "kind", "lake", "water"],
       "layout": {
-        "text-font": ["Noto Sans Italic"],
+        "text-font": ["Spectral SC Light"],
         "text-field": [
           "case",
           [
@@ -2670,7 +3080,7 @@
                     "case",
                     ["==", ["get", "script"], "Devanagari"],
                     ["literal", ["Noto Sans Devanagari Regular v1"]],
-                    ["literal", ["Noto Sans Regular"]]
+                    ["literal", ["News Gothic Std Medium"]]
                   ]
                 }
               ],
@@ -2708,7 +3118,7 @@
                   "case",
                   ["==", ["get", "script"], "Devanagari"],
                   ["literal", ["Noto Sans Devanagari Regular v1"]],
-                  ["literal", ["Noto Sans Regular"]]
+                  ["literal", ["News Gothic Std Medium"]]
                 ]
               },
               "\n",
@@ -2719,7 +3129,7 @@
                   "case",
                   ["==", ["get", "script2"], "Devanagari"],
                   ["literal", ["Noto Sans Devanagari Regular v1"]],
-                  ["literal", ["Noto Sans Regular"]]
+                  ["literal", ["News Gothic Std Medium"]]
                 ]
               }
             ],
@@ -2743,7 +3153,7 @@
                     "case",
                     ["==", ["get", "script2"], "Devanagari"],
                     ["literal", ["Noto Sans Devanagari Regular v1"]],
-                    ["literal", ["Noto Sans Regular"]]
+                    ["literal", ["News Gothic Std Medium"]]
                   ]
                 }
               ],
@@ -2764,7 +3174,7 @@
                     "case",
                     ["==", ["get", "script"], "Devanagari"],
                     ["literal", ["Noto Sans Devanagari Regular v1"]],
-                    ["literal", ["Noto Sans Regular"]]
+                    ["literal", ["News Gothic Std Medium"]]
                   ]
                 }
               ]
@@ -2785,7 +3195,7 @@
                   "case",
                   ["==", ["get", "script"], "Devanagari"],
                   ["literal", ["Noto Sans Devanagari Regular v1"]],
-                  ["literal", ["Noto Sans Regular"]]
+                  ["literal", ["News Gothic Std Medium"]]
                 ]
               },
               "\n",
@@ -2796,7 +3206,7 @@
                   "case",
                   ["==", ["get", "script2"], "Devanagari"],
                   ["literal", ["Noto Sans Devanagari Regular v1"]],
-                  ["literal", ["Noto Sans Regular"]]
+                  ["literal", ["News Gothic Std Medium"]]
                 ]
               },
               "\n",
@@ -2807,7 +3217,7 @@
                   "case",
                   ["==", ["get", "script3"], "Devanagari"],
                   ["literal", ["Noto Sans Devanagari Regular v1"]],
-                  ["literal", ["Noto Sans Regular"]]
+                  ["literal", ["News Gothic Std Medium"]]
                 ]
               }
             ],
@@ -2831,7 +3241,7 @@
                     "case",
                     ["==", ["get", "script2"], "Devanagari"],
                     ["literal", ["Noto Sans Devanagari Regular v1"]],
-                    ["literal", ["Noto Sans Regular"]]
+                    ["literal", ["News Gothic Std Medium"]]
                   ]
                 },
                 "\n",
@@ -2842,7 +3252,7 @@
                     "case",
                     ["==", ["get", "script3"], "Devanagari"],
                     ["literal", ["Noto Sans Devanagari Regular v1"]],
-                    ["literal", ["Noto Sans Regular"]]
+                    ["literal", ["News Gothic Std Medium"]]
                   ]
                 }
               ],
@@ -2864,7 +3274,7 @@
                     "case",
                     ["==", ["get", "script"], "Devanagari"],
                     ["literal", ["Noto Sans Devanagari Regular v1"]],
-                    ["literal", ["Noto Sans Regular"]]
+                    ["literal", ["News Gothic Std Medium"]]
                   ]
                 },
                 "\n",
@@ -2875,7 +3285,7 @@
                     "case",
                     ["==", ["get", "script3"], "Devanagari"],
                     ["literal", ["Noto Sans Devanagari Regular v1"]],
-                    ["literal", ["Noto Sans Regular"]]
+                    ["literal", ["News Gothic Std Medium"]]
                   ]
                 }
               ],
@@ -2896,7 +3306,7 @@
                     "case",
                     ["==", ["get", "script"], "Devanagari"],
                     ["literal", ["Noto Sans Devanagari Regular v1"]],
-                    ["literal", ["Noto Sans Regular"]]
+                    ["literal", ["News Gothic Std Medium"]]
                   ]
                 },
                 "\n",
@@ -2907,7 +3317,7 @@
                     "case",
                     ["==", ["get", "script2"], "Devanagari"],
                     ["literal", ["Noto Sans Devanagari Regular v1"]],
-                    ["literal", ["Noto Sans Regular"]]
+                    ["literal", ["News Gothic Std Medium"]]
                   ]
                 }
               ]
@@ -2916,35 +3326,29 @@
         ],
         "text-size": [
           "interpolate",
-          ["linear"],
+          ["exponential", 1],
           ["zoom"],
-          3,
-          10,
-          6,
-          12,
-          10,
-          12
+          13,
+          14,
+          18,
+          18
         ],
         "text-letter-spacing": 0.1,
         "text-max-width": 9
       },
-      "paint": {
-        "text-color": "#728dd4",
-        "text-halo-color": "#80deea",
-        "text-halo-width": 1
-      }
+      "paint": {"text-color": "#0b1804", "text-halo-width": 1}
     },
     {
       "id": "roads_labels_major",
       "type": "symbol",
       "source": "protomaps",
       "source-layer": "roads",
-      "minzoom": 11,
+      "minzoom": 12,
       "filter": ["in", "kind", "highway", "major_road"],
       "layout": {
         "symbol-sort-key": ["get", "min_zoom"],
         "symbol-placement": "line",
-        "text-font": ["Noto Sans Regular"],
+        "text-font": ["Oswald Light"],
         "text-field": [
           "case",
           [
@@ -2985,7 +3389,7 @@
                     "case",
                     ["==", ["get", "script"], "Devanagari"],
                     ["literal", ["Noto Sans Devanagari Regular v1"]],
-                    ["literal", ["Noto Sans Regular"]]
+                    ["literal", ["News Gothic Std Medium"]]
                   ]
                 }
               ],
@@ -3023,7 +3427,7 @@
                   "case",
                   ["==", ["get", "script"], "Devanagari"],
                   ["literal", ["Noto Sans Devanagari Regular v1"]],
-                  ["literal", ["Noto Sans Regular"]]
+                  ["literal", ["News Gothic Std Medium"]]
                 ]
               },
               "\n",
@@ -3034,7 +3438,7 @@
                   "case",
                   ["==", ["get", "script2"], "Devanagari"],
                   ["literal", ["Noto Sans Devanagari Regular v1"]],
-                  ["literal", ["Noto Sans Regular"]]
+                  ["literal", ["News Gothic Std Medium"]]
                 ]
               }
             ],
@@ -3058,7 +3462,7 @@
                     "case",
                     ["==", ["get", "script2"], "Devanagari"],
                     ["literal", ["Noto Sans Devanagari Regular v1"]],
-                    ["literal", ["Noto Sans Regular"]]
+                    ["literal", ["News Gothic Std Medium"]]
                   ]
                 }
               ],
@@ -3079,7 +3483,7 @@
                     "case",
                     ["==", ["get", "script"], "Devanagari"],
                     ["literal", ["Noto Sans Devanagari Regular v1"]],
-                    ["literal", ["Noto Sans Regular"]]
+                    ["literal", ["News Gothic Std Medium"]]
                   ]
                 }
               ]
@@ -3100,7 +3504,7 @@
                   "case",
                   ["==", ["get", "script"], "Devanagari"],
                   ["literal", ["Noto Sans Devanagari Regular v1"]],
-                  ["literal", ["Noto Sans Regular"]]
+                  ["literal", ["News Gothic Std Medium"]]
                 ]
               },
               "\n",
@@ -3111,7 +3515,7 @@
                   "case",
                   ["==", ["get", "script2"], "Devanagari"],
                   ["literal", ["Noto Sans Devanagari Regular v1"]],
-                  ["literal", ["Noto Sans Regular"]]
+                  ["literal", ["News Gothic Std Medium"]]
                 ]
               },
               "\n",
@@ -3122,7 +3526,7 @@
                   "case",
                   ["==", ["get", "script3"], "Devanagari"],
                   ["literal", ["Noto Sans Devanagari Regular v1"]],
-                  ["literal", ["Noto Sans Regular"]]
+                  ["literal", ["News Gothic Std Medium"]]
                 ]
               }
             ],
@@ -3146,7 +3550,7 @@
                     "case",
                     ["==", ["get", "script2"], "Devanagari"],
                     ["literal", ["Noto Sans Devanagari Regular v1"]],
-                    ["literal", ["Noto Sans Regular"]]
+                    ["literal", ["News Gothic Std Medium"]]
                   ]
                 },
                 "\n",
@@ -3157,7 +3561,7 @@
                     "case",
                     ["==", ["get", "script3"], "Devanagari"],
                     ["literal", ["Noto Sans Devanagari Regular v1"]],
-                    ["literal", ["Noto Sans Regular"]]
+                    ["literal", ["News Gothic Std Medium"]]
                   ]
                 }
               ],
@@ -3179,7 +3583,7 @@
                     "case",
                     ["==", ["get", "script"], "Devanagari"],
                     ["literal", ["Noto Sans Devanagari Regular v1"]],
-                    ["literal", ["Noto Sans Regular"]]
+                    ["literal", ["News Gothic Std Medium"]]
                   ]
                 },
                 "\n",
@@ -3190,7 +3594,7 @@
                     "case",
                     ["==", ["get", "script3"], "Devanagari"],
                     ["literal", ["Noto Sans Devanagari Regular v1"]],
-                    ["literal", ["Noto Sans Regular"]]
+                    ["literal", ["News Gothic Std Medium"]]
                   ]
                 }
               ],
@@ -3211,7 +3615,7 @@
                     "case",
                     ["==", ["get", "script"], "Devanagari"],
                     ["literal", ["Noto Sans Devanagari Regular v1"]],
-                    ["literal", ["Noto Sans Regular"]]
+                    ["literal", ["News Gothic Std Medium"]]
                   ]
                 },
                 "\n",
@@ -3222,19 +3626,74 @@
                     "case",
                     ["==", ["get", "script2"], "Devanagari"],
                     ["literal", ["Noto Sans Devanagari Regular v1"]],
-                    ["literal", ["Noto Sans Regular"]]
+                    ["literal", ["News Gothic Std Medium"]]
                   ]
                 }
               ]
             ]
           ]
         ],
-        "text-size": 12
+        "text-size": [
+          "interpolate",
+          ["exponential", 1],
+          ["zoom"],
+          15,
+          [
+            "match",
+            ["get", "kind"],
+            "major_road",
+            10,
+            "primary",
+            10,
+            "secondary",
+            10,
+            "tertiary",
+            10,
+            "trunk",
+            10,
+            ["trunk_link", "primary_link", "secondary_link", "tertiary_link"],
+            8,
+            "pedestrian",
+            8,
+            "street",
+            8,
+            "street_limited",
+            8,
+            6
+          ],
+          20,
+          [
+            "match",
+            ["get", "class"],
+            "motorway",
+            16,
+            "primary",
+            16,
+            "secondary",
+            16,
+            "tertiary",
+            16,
+            "trunk",
+            16,
+            ["trunk_link", "primary_link", "secondary_link", "tertiary_link"],
+            14,
+            "pedestrian",
+            14,
+            "street",
+            14,
+            "street_limited",
+            14,
+            12
+          ]
+        ],
+        "visibility": "visible",
+        "text-transform": "uppercase",
+        "text-letter-spacing": 0.3
       },
       "paint": {
-        "text-color": "#938a8d",
+        "text-color": "#0b1804",
         "text-halo-color": "#ffffff",
-        "text-halo-width": 1
+        "text-halo-width": 0
       }
     },
     {
@@ -3282,7 +3741,7 @@
           "train_station",
           ["get", "kind"]
         ],
-        "text-font": ["Noto Sans Regular"],
+        "text-font": ["News Gothic Std Medium"],
         "text-justify": "auto",
         "text-field": [
           "case",
@@ -3324,7 +3783,7 @@
                     "case",
                     ["==", ["get", "script"], "Devanagari"],
                     ["literal", ["Noto Sans Devanagari Regular v1"]],
-                    ["literal", ["Noto Sans Regular"]]
+                    ["literal", ["News Gothic Std Medium"]]
                   ]
                 }
               ],
@@ -3362,7 +3821,7 @@
                   "case",
                   ["==", ["get", "script"], "Devanagari"],
                   ["literal", ["Noto Sans Devanagari Regular v1"]],
-                  ["literal", ["Noto Sans Regular"]]
+                  ["literal", ["News Gothic Std Medium"]]
                 ]
               },
               "\n",
@@ -3373,7 +3832,7 @@
                   "case",
                   ["==", ["get", "script2"], "Devanagari"],
                   ["literal", ["Noto Sans Devanagari Regular v1"]],
-                  ["literal", ["Noto Sans Regular"]]
+                  ["literal", ["News Gothic Std Medium"]]
                 ]
               }
             ],
@@ -3397,7 +3856,7 @@
                     "case",
                     ["==", ["get", "script2"], "Devanagari"],
                     ["literal", ["Noto Sans Devanagari Regular v1"]],
-                    ["literal", ["Noto Sans Regular"]]
+                    ["literal", ["News Gothic Std Medium"]]
                   ]
                 }
               ],
@@ -3418,7 +3877,7 @@
                     "case",
                     ["==", ["get", "script"], "Devanagari"],
                     ["literal", ["Noto Sans Devanagari Regular v1"]],
-                    ["literal", ["Noto Sans Regular"]]
+                    ["literal", ["News Gothic Std Medium"]]
                   ]
                 }
               ]
@@ -3439,7 +3898,7 @@
                   "case",
                   ["==", ["get", "script"], "Devanagari"],
                   ["literal", ["Noto Sans Devanagari Regular v1"]],
-                  ["literal", ["Noto Sans Regular"]]
+                  ["literal", ["News Gothic Std Medium"]]
                 ]
               },
               "\n",
@@ -3450,7 +3909,7 @@
                   "case",
                   ["==", ["get", "script2"], "Devanagari"],
                   ["literal", ["Noto Sans Devanagari Regular v1"]],
-                  ["literal", ["Noto Sans Regular"]]
+                  ["literal", ["News Gothic Std Medium"]]
                 ]
               },
               "\n",
@@ -3461,7 +3920,7 @@
                   "case",
                   ["==", ["get", "script3"], "Devanagari"],
                   ["literal", ["Noto Sans Devanagari Regular v1"]],
-                  ["literal", ["Noto Sans Regular"]]
+                  ["literal", ["News Gothic Std Medium"]]
                 ]
               }
             ],
@@ -3485,7 +3944,7 @@
                     "case",
                     ["==", ["get", "script2"], "Devanagari"],
                     ["literal", ["Noto Sans Devanagari Regular v1"]],
-                    ["literal", ["Noto Sans Regular"]]
+                    ["literal", ["News Gothic Std Medium"]]
                   ]
                 },
                 "\n",
@@ -3496,7 +3955,7 @@
                     "case",
                     ["==", ["get", "script3"], "Devanagari"],
                     ["literal", ["Noto Sans Devanagari Regular v1"]],
-                    ["literal", ["Noto Sans Regular"]]
+                    ["literal", ["News Gothic Std Medium"]]
                   ]
                 }
               ],
@@ -3518,7 +3977,7 @@
                     "case",
                     ["==", ["get", "script"], "Devanagari"],
                     ["literal", ["Noto Sans Devanagari Regular v1"]],
-                    ["literal", ["Noto Sans Regular"]]
+                    ["literal", ["News Gothic Std Medium"]]
                   ]
                 },
                 "\n",
@@ -3529,7 +3988,7 @@
                     "case",
                     ["==", ["get", "script3"], "Devanagari"],
                     ["literal", ["Noto Sans Devanagari Regular v1"]],
-                    ["literal", ["Noto Sans Regular"]]
+                    ["literal", ["News Gothic Std Medium"]]
                   ]
                 }
               ],
@@ -3550,7 +4009,7 @@
                     "case",
                     ["==", ["get", "script"], "Devanagari"],
                     ["literal", ["Noto Sans Devanagari Regular v1"]],
-                    ["literal", ["Noto Sans Regular"]]
+                    ["literal", ["News Gothic Std Medium"]]
                   ]
                 },
                 "\n",
@@ -3561,7 +4020,7 @@
                     "case",
                     ["==", ["get", "script2"], "Devanagari"],
                     ["literal", ["Noto Sans Devanagari Regular v1"]],
-                    ["literal", ["Noto Sans Regular"]]
+                    ["literal", ["News Gothic Std Medium"]]
                   ]
                 }
               ]
@@ -3571,7 +4030,8 @@
         "text-size": ["interpolate", ["linear"], ["zoom"], 17, 10, 19, 16],
         "text-max-width": 8,
         "text-offset": [1.1, 0],
-        "text-variable-anchor": ["left", "right"]
+        "text-variable-anchor": ["left", "right"],
+        "visibility": "none"
       },
       "paint": {
         "text-color": [
@@ -3628,6 +4088,7 @@
       "type": "symbol",
       "source": "protomaps",
       "source-layer": "places",
+      "minzoom": 11,
       "filter": ["in", "kind", "neighbourhood", "macrohood"],
       "layout": {
         "symbol-sort-key": [
@@ -3676,7 +4137,7 @@
                     "case",
                     ["==", ["get", "script"], "Devanagari"],
                     ["literal", ["Noto Sans Devanagari Regular v1"]],
-                    ["literal", ["Noto Sans Regular"]]
+                    ["literal", ["News Gothic Std Medium"]]
                   ]
                 }
               ],
@@ -3714,7 +4175,7 @@
                   "case",
                   ["==", ["get", "script"], "Devanagari"],
                   ["literal", ["Noto Sans Devanagari Regular v1"]],
-                  ["literal", ["Noto Sans Regular"]]
+                  ["literal", ["News Gothic Std Medium"]]
                 ]
               },
               "\n",
@@ -3725,7 +4186,7 @@
                   "case",
                   ["==", ["get", "script2"], "Devanagari"],
                   ["literal", ["Noto Sans Devanagari Regular v1"]],
-                  ["literal", ["Noto Sans Regular"]]
+                  ["literal", ["News Gothic Std Medium"]]
                 ]
               }
             ],
@@ -3749,7 +4210,7 @@
                     "case",
                     ["==", ["get", "script2"], "Devanagari"],
                     ["literal", ["Noto Sans Devanagari Regular v1"]],
-                    ["literal", ["Noto Sans Regular"]]
+                    ["literal", ["News Gothic Std Medium"]]
                   ]
                 }
               ],
@@ -3770,7 +4231,7 @@
                     "case",
                     ["==", ["get", "script"], "Devanagari"],
                     ["literal", ["Noto Sans Devanagari Regular v1"]],
-                    ["literal", ["Noto Sans Regular"]]
+                    ["literal", ["News Gothic Std Medium"]]
                   ]
                 }
               ]
@@ -3791,7 +4252,7 @@
                   "case",
                   ["==", ["get", "script"], "Devanagari"],
                   ["literal", ["Noto Sans Devanagari Regular v1"]],
-                  ["literal", ["Noto Sans Regular"]]
+                  ["literal", ["News Gothic Std Medium"]]
                 ]
               },
               "\n",
@@ -3802,7 +4263,7 @@
                   "case",
                   ["==", ["get", "script2"], "Devanagari"],
                   ["literal", ["Noto Sans Devanagari Regular v1"]],
-                  ["literal", ["Noto Sans Regular"]]
+                  ["literal", ["News Gothic Std Medium"]]
                 ]
               },
               "\n",
@@ -3813,7 +4274,7 @@
                   "case",
                   ["==", ["get", "script3"], "Devanagari"],
                   ["literal", ["Noto Sans Devanagari Regular v1"]],
-                  ["literal", ["Noto Sans Regular"]]
+                  ["literal", ["News Gothic Std Medium"]]
                 ]
               }
             ],
@@ -3837,7 +4298,7 @@
                     "case",
                     ["==", ["get", "script2"], "Devanagari"],
                     ["literal", ["Noto Sans Devanagari Regular v1"]],
-                    ["literal", ["Noto Sans Regular"]]
+                    ["literal", ["News Gothic Std Medium"]]
                   ]
                 },
                 "\n",
@@ -3848,7 +4309,7 @@
                     "case",
                     ["==", ["get", "script3"], "Devanagari"],
                     ["literal", ["Noto Sans Devanagari Regular v1"]],
-                    ["literal", ["Noto Sans Regular"]]
+                    ["literal", ["News Gothic Std Medium"]]
                   ]
                 }
               ],
@@ -3870,7 +4331,7 @@
                     "case",
                     ["==", ["get", "script"], "Devanagari"],
                     ["literal", ["Noto Sans Devanagari Regular v1"]],
-                    ["literal", ["Noto Sans Regular"]]
+                    ["literal", ["News Gothic Std Medium"]]
                   ]
                 },
                 "\n",
@@ -3881,7 +4342,7 @@
                     "case",
                     ["==", ["get", "script3"], "Devanagari"],
                     ["literal", ["Noto Sans Devanagari Regular v1"]],
-                    ["literal", ["Noto Sans Regular"]]
+                    ["literal", ["News Gothic Std Medium"]]
                   ]
                 }
               ],
@@ -3902,7 +4363,7 @@
                     "case",
                     ["==", ["get", "script"], "Devanagari"],
                     ["literal", ["Noto Sans Devanagari Regular v1"]],
-                    ["literal", ["Noto Sans Regular"]]
+                    ["literal", ["News Gothic Std Medium"]]
                   ]
                 },
                 "\n",
@@ -3913,14 +4374,14 @@
                     "case",
                     ["==", ["get", "script2"], "Devanagari"],
                     ["literal", ["Noto Sans Devanagari Regular v1"]],
-                    ["literal", ["Noto Sans Regular"]]
+                    ["literal", ["News Gothic Std Medium"]]
                   ]
                 }
               ]
             ]
           ]
         ],
-        "text-font": ["Noto Sans Regular"],
+        "text-font": ["News Gothic Std Medium"],
         "text-max-width": 7,
         "text-letter-spacing": 0.1,
         "text-padding": [
@@ -3938,20 +4399,19 @@
         ],
         "text-size": [
           "interpolate",
-          ["exponential", 1.2],
+          ["exponential", 1],
           ["zoom"],
+          12,
           11,
-          8,
-          14,
-          14,
-          18,
-          24
+          16,
+          16
         ],
-        "text-transform": "uppercase"
+        "text-transform": "uppercase",
+        "visibility": "visible"
       },
       "paint": {
-        "text-color": "#8f8f8f",
-        "text-halo-color": "#e0e0e0",
+        "text-color": "#0b1804",
+        "text-halo-color": "#fcf6e9",
         "text-halo-width": 1
       }
     },
@@ -4008,7 +4468,7 @@
                       "case",
                       ["==", ["get", "script"], "Devanagari"],
                       ["literal", ["Noto Sans Devanagari Regular v1"]],
-                      ["literal", ["Noto Sans Regular"]]
+                      ["literal", ["News Gothic Std Medium"]]
                     ]
                   }
                 ],
@@ -4046,7 +4506,7 @@
                     "case",
                     ["==", ["get", "script"], "Devanagari"],
                     ["literal", ["Noto Sans Devanagari Regular v1"]],
-                    ["literal", ["Noto Sans Regular"]]
+                    ["literal", ["News Gothic Std Medium"]]
                   ]
                 },
                 "\n",
@@ -4057,7 +4517,7 @@
                     "case",
                     ["==", ["get", "script2"], "Devanagari"],
                     ["literal", ["Noto Sans Devanagari Regular v1"]],
-                    ["literal", ["Noto Sans Regular"]]
+                    ["literal", ["News Gothic Std Medium"]]
                   ]
                 }
               ],
@@ -4081,7 +4541,7 @@
                       "case",
                       ["==", ["get", "script2"], "Devanagari"],
                       ["literal", ["Noto Sans Devanagari Regular v1"]],
-                      ["literal", ["Noto Sans Regular"]]
+                      ["literal", ["News Gothic Std Medium"]]
                     ]
                   }
                 ],
@@ -4102,7 +4562,7 @@
                       "case",
                       ["==", ["get", "script"], "Devanagari"],
                       ["literal", ["Noto Sans Devanagari Regular v1"]],
-                      ["literal", ["Noto Sans Regular"]]
+                      ["literal", ["News Gothic Std Medium"]]
                     ]
                   }
                 ]
@@ -4128,7 +4588,7 @@
                     "case",
                     ["==", ["get", "script"], "Devanagari"],
                     ["literal", ["Noto Sans Devanagari Regular v1"]],
-                    ["literal", ["Noto Sans Regular"]]
+                    ["literal", ["News Gothic Std Medium"]]
                   ]
                 },
                 "\n",
@@ -4139,7 +4599,7 @@
                     "case",
                     ["==", ["get", "script2"], "Devanagari"],
                     ["literal", ["Noto Sans Devanagari Regular v1"]],
-                    ["literal", ["Noto Sans Regular"]]
+                    ["literal", ["News Gothic Std Medium"]]
                   ]
                 },
                 "\n",
@@ -4150,7 +4610,7 @@
                     "case",
                     ["==", ["get", "script3"], "Devanagari"],
                     ["literal", ["Noto Sans Devanagari Regular v1"]],
-                    ["literal", ["Noto Sans Regular"]]
+                    ["literal", ["News Gothic Std Medium"]]
                   ]
                 }
               ],
@@ -4174,7 +4634,7 @@
                       "case",
                       ["==", ["get", "script2"], "Devanagari"],
                       ["literal", ["Noto Sans Devanagari Regular v1"]],
-                      ["literal", ["Noto Sans Regular"]]
+                      ["literal", ["News Gothic Std Medium"]]
                     ]
                   },
                   "\n",
@@ -4185,7 +4645,7 @@
                       "case",
                       ["==", ["get", "script3"], "Devanagari"],
                       ["literal", ["Noto Sans Devanagari Regular v1"]],
-                      ["literal", ["Noto Sans Regular"]]
+                      ["literal", ["News Gothic Std Medium"]]
                     ]
                   }
                 ],
@@ -4207,7 +4667,7 @@
                       "case",
                       ["==", ["get", "script"], "Devanagari"],
                       ["literal", ["Noto Sans Devanagari Regular v1"]],
-                      ["literal", ["Noto Sans Regular"]]
+                      ["literal", ["News Gothic Std Medium"]]
                     ]
                   },
                   "\n",
@@ -4218,7 +4678,7 @@
                       "case",
                       ["==", ["get", "script3"], "Devanagari"],
                       ["literal", ["Noto Sans Devanagari Regular v1"]],
-                      ["literal", ["Noto Sans Regular"]]
+                      ["literal", ["News Gothic Std Medium"]]
                     ]
                   }
                 ],
@@ -4239,7 +4699,7 @@
                       "case",
                       ["==", ["get", "script"], "Devanagari"],
                       ["literal", ["Noto Sans Devanagari Regular v1"]],
-                      ["literal", ["Noto Sans Regular"]]
+                      ["literal", ["News Gothic Std Medium"]]
                     ]
                   },
                   "\n",
@@ -4250,7 +4710,7 @@
                       "case",
                       ["==", ["get", "script2"], "Devanagari"],
                       ["literal", ["Noto Sans Devanagari Regular v1"]],
-                      ["literal", ["Noto Sans Regular"]]
+                      ["literal", ["News Gothic Std Medium"]]
                     ]
                   }
                 ]
@@ -4258,7 +4718,7 @@
             ]
           ]
         ],
-        "text-font": ["Noto Sans Regular"],
+        "text-font": ["News Gothic Std Medium"],
         "text-size": ["interpolate", ["linear"], ["zoom"], 3, 11, 7, 16],
         "text-radial-offset": 0.2,
         "text-anchor": "center",
@@ -4275,7 +4735,13 @@
       "type": "symbol",
       "source": "protomaps",
       "source-layer": "places",
-      "filter": ["==", "kind", "locality"],
+      "minzoom": 7,
+      "filter": [
+        "all",
+        ["==", "kind", "locality"],
+        ["!=", "kind_detail", "city"],
+        ["!in", "name", "The Point"]
+      ],
       "layout": {
         "icon-image": [
           "step",
@@ -4325,7 +4791,7 @@
                     "case",
                     ["==", ["get", "script"], "Devanagari"],
                     ["literal", ["Noto Sans Devanagari Regular v1"]],
-                    ["literal", ["Noto Sans Regular"]]
+                    ["literal", ["News Gothic Std Medium"]]
                   ]
                 }
               ],
@@ -4363,7 +4829,7 @@
                   "case",
                   ["==", ["get", "script"], "Devanagari"],
                   ["literal", ["Noto Sans Devanagari Regular v1"]],
-                  ["literal", ["Noto Sans Regular"]]
+                  ["literal", ["News Gothic Std Medium"]]
                 ]
               },
               "\n",
@@ -4374,7 +4840,7 @@
                   "case",
                   ["==", ["get", "script2"], "Devanagari"],
                   ["literal", ["Noto Sans Devanagari Regular v1"]],
-                  ["literal", ["Noto Sans Regular"]]
+                  ["literal", ["News Gothic Std Medium"]]
                 ]
               }
             ],
@@ -4398,7 +4864,7 @@
                     "case",
                     ["==", ["get", "script2"], "Devanagari"],
                     ["literal", ["Noto Sans Devanagari Regular v1"]],
-                    ["literal", ["Noto Sans Regular"]]
+                    ["literal", ["News Gothic Std Medium"]]
                   ]
                 }
               ],
@@ -4419,7 +4885,7 @@
                     "case",
                     ["==", ["get", "script"], "Devanagari"],
                     ["literal", ["Noto Sans Devanagari Regular v1"]],
-                    ["literal", ["Noto Sans Regular"]]
+                    ["literal", ["News Gothic Std Medium"]]
                   ]
                 }
               ]
@@ -4440,7 +4906,7 @@
                   "case",
                   ["==", ["get", "script"], "Devanagari"],
                   ["literal", ["Noto Sans Devanagari Regular v1"]],
-                  ["literal", ["Noto Sans Regular"]]
+                  ["literal", ["News Gothic Std Medium"]]
                 ]
               },
               "\n",
@@ -4451,7 +4917,7 @@
                   "case",
                   ["==", ["get", "script2"], "Devanagari"],
                   ["literal", ["Noto Sans Devanagari Regular v1"]],
-                  ["literal", ["Noto Sans Regular"]]
+                  ["literal", ["News Gothic Std Medium"]]
                 ]
               },
               "\n",
@@ -4462,7 +4928,7 @@
                   "case",
                   ["==", ["get", "script3"], "Devanagari"],
                   ["literal", ["Noto Sans Devanagari Regular v1"]],
-                  ["literal", ["Noto Sans Regular"]]
+                  ["literal", ["News Gothic Std Medium"]]
                 ]
               }
             ],
@@ -4486,7 +4952,7 @@
                     "case",
                     ["==", ["get", "script2"], "Devanagari"],
                     ["literal", ["Noto Sans Devanagari Regular v1"]],
-                    ["literal", ["Noto Sans Regular"]]
+                    ["literal", ["News Gothic Std Medium"]]
                   ]
                 },
                 "\n",
@@ -4497,7 +4963,7 @@
                     "case",
                     ["==", ["get", "script3"], "Devanagari"],
                     ["literal", ["Noto Sans Devanagari Regular v1"]],
-                    ["literal", ["Noto Sans Regular"]]
+                    ["literal", ["News Gothic Std Medium"]]
                   ]
                 }
               ],
@@ -4519,7 +4985,7 @@
                     "case",
                     ["==", ["get", "script"], "Devanagari"],
                     ["literal", ["Noto Sans Devanagari Regular v1"]],
-                    ["literal", ["Noto Sans Regular"]]
+                    ["literal", ["News Gothic Std Medium"]]
                   ]
                 },
                 "\n",
@@ -4530,7 +4996,7 @@
                     "case",
                     ["==", ["get", "script3"], "Devanagari"],
                     ["literal", ["Noto Sans Devanagari Regular v1"]],
-                    ["literal", ["Noto Sans Regular"]]
+                    ["literal", ["News Gothic Std Medium"]]
                   ]
                 }
               ],
@@ -4551,7 +5017,7 @@
                     "case",
                     ["==", ["get", "script"], "Devanagari"],
                     ["literal", ["Noto Sans Devanagari Regular v1"]],
-                    ["literal", ["Noto Sans Regular"]]
+                    ["literal", ["News Gothic Std Medium"]]
                   ]
                 },
                 "\n",
@@ -4562,7 +5028,7 @@
                     "case",
                     ["==", ["get", "script2"], "Devanagari"],
                     ["literal", ["Noto Sans Devanagari Regular v1"]],
-                    ["literal", ["Noto Sans Regular"]]
+                    ["literal", ["News Gothic Std Medium"]]
                   ]
                 }
               ]
@@ -4570,10 +5036,17 @@
           ]
         ],
         "text-font": [
-          "case",
-          ["<=", ["get", "min_zoom"], 5],
-          ["literal", ["Noto Sans Medium"]],
-          ["literal", ["Noto Sans Regular"]]
+          "step",
+          ["zoom"],
+          ["literal", ["News Gothic Std Medium"]],
+          12,
+          [
+            "match",
+            ["get", "kind_detail"],
+            "town",
+            ["literal", ["News Gothic Std Bold"]],
+            ["literal", ["News Gothic Std Medium"]]
+          ]
         ],
         "symbol-sort-key": [
           "case",
@@ -4594,62 +5067,12 @@
         ],
         "text-size": [
           "interpolate",
-          ["linear"],
+          ["exponential", 1],
           ["zoom"],
-          2,
-          [
-            "case",
-            ["<", ["get", "population_rank"], 13],
-            8,
-            [">=", ["get", "population_rank"], 13],
-            13,
-            0
-          ],
-          4,
-          [
-            "case",
-            ["<", ["get", "population_rank"], 13],
-            10,
-            [">=", ["get", "population_rank"], 13],
-            15,
-            0
-          ],
-          6,
-          [
-            "case",
-            ["<", ["get", "population_rank"], 12],
-            11,
-            [">=", ["get", "population_rank"], 12],
-            17,
-            0
-          ],
-          8,
-          [
-            "case",
-            ["<", ["get", "population_rank"], 11],
-            11,
-            [">=", ["get", "population_rank"], 11],
-            18,
-            0
-          ],
-          10,
-          [
-            "case",
-            ["<", ["get", "population_rank"], 9],
-            12,
-            [">=", ["get", "population_rank"], 9],
-            20,
-            0
-          ],
+          7,
+          12,
           15,
-          [
-            "case",
-            ["<", ["get", "population_rank"], 8],
-            12,
-            [">=", ["get", "population_rank"], 8],
-            22,
-            0
-          ]
+          ["match", ["get", "kind_detail"], "town", 20, "village", 18, 16]
         ],
         "icon-padding": [
           "interpolate",
@@ -4674,12 +5097,388 @@
           8,
           ["literal", ["center"]]
         ],
-        "text-radial-offset": 0.3
+        "text-radial-offset": 0.3,
+        "visibility": "visible"
       },
       "paint": {
-        "text-color": "#5c5c5c",
-        "text-halo-color": "#e0e0e0",
-        "text-halo-width": 1
+        "text-color": "#0b1804",
+        "text-halo-color": "#f8f7cf",
+        "text-halo-width": 1.25
+      }
+    },
+    {
+      "id": "places_locality-city",
+      "type": "symbol",
+      "source": "protomaps",
+      "source-layer": "places",
+      "minzoom": 7,
+      "filter": [
+        "all",
+        ["==", "kind", "locality"],
+        ["==", "kind_detail", "city"]
+      ],
+      "layout": {
+        "icon-image": [
+          "step",
+          ["zoom"],
+          ["case", ["==", ["get", "capital"], "yes"], "capital", "townspot"],
+          8,
+          ""
+        ],
+        "icon-size": 0.7,
+        "text-field": [
+          "case",
+          [
+            "all",
+            ["any", ["has", "name"], ["has", "pgf:name"]],
+            ["!", ["any", ["has", "name2"], ["has", "pgf:name2"]]],
+            ["!", ["any", ["has", "name3"], ["has", "pgf:name3"]]]
+          ],
+          [
+            "case",
+            ["has", "script"],
+            [
+              "case",
+              [
+                "any",
+                ["is-supported-script", ["get", "name"]],
+                ["has", "pgf:name"]
+              ],
+              [
+                "format",
+                ["coalesce", ["get", "name:en"], ["get", "name:en"]],
+                {},
+                "\n",
+                {},
+                [
+                  "case",
+                  [
+                    "all",
+                    ["!", ["has", "name:en"]],
+                    ["has", "name:en"],
+                    ["!", ["has", "script"]]
+                  ],
+                  "",
+                  ["coalesce", ["get", "pgf:name"], ["get", "name"]]
+                ],
+                {
+                  "text-font": [
+                    "case",
+                    ["==", ["get", "script"], "Devanagari"],
+                    ["literal", ["Noto Sans Devanagari Regular v1"]],
+                    ["literal", ["News Gothic Std Medium"]]
+                  ]
+                }
+              ],
+              ["get", "name:en"]
+            ],
+            [
+              "format",
+              [
+                "coalesce",
+                ["get", "name:en"],
+                ["get", "pgf:name"],
+                ["get", "name"]
+              ],
+              {}
+            ]
+          ],
+          [
+            "all",
+            ["any", ["has", "name"], ["has", "pgf:name"]],
+            ["any", ["has", "name2"], ["has", "pgf:name2"]],
+            ["!", ["any", ["has", "name3"], ["has", "pgf:name3"]]]
+          ],
+          [
+            "case",
+            ["all", ["has", "script"], ["has", "script2"]],
+            [
+              "format",
+              ["get", "name:en"],
+              {},
+              "\n",
+              {},
+              ["coalesce", ["get", "pgf:name"], ["get", "name"]],
+              {
+                "text-font": [
+                  "case",
+                  ["==", ["get", "script"], "Devanagari"],
+                  ["literal", ["Noto Sans Devanagari Regular v1"]],
+                  ["literal", ["News Gothic Std Medium"]]
+                ]
+              },
+              "\n",
+              {},
+              ["coalesce", ["get", "pgf:name2"], ["get", "name2"]],
+              {
+                "text-font": [
+                  "case",
+                  ["==", ["get", "script2"], "Devanagari"],
+                  ["literal", ["Noto Sans Devanagari Regular v1"]],
+                  ["literal", ["News Gothic Std Medium"]]
+                ]
+              }
+            ],
+            [
+              "case",
+              ["has", "script2"],
+              [
+                "format",
+                [
+                  "coalesce",
+                  ["get", "name:en"],
+                  ["get", "pgf:name"],
+                  ["get", "name"]
+                ],
+                {},
+                "\n",
+                {},
+                ["coalesce", ["get", "pgf:name2"], ["get", "name2"]],
+                {
+                  "text-font": [
+                    "case",
+                    ["==", ["get", "script2"], "Devanagari"],
+                    ["literal", ["Noto Sans Devanagari Regular v1"]],
+                    ["literal", ["News Gothic Std Medium"]]
+                  ]
+                }
+              ],
+              [
+                "format",
+                [
+                  "coalesce",
+                  ["get", "name:en"],
+                  ["get", "pgf:name2"],
+                  ["get", "name2"]
+                ],
+                {},
+                "\n",
+                {},
+                ["coalesce", ["get", "pgf:name"], ["get", "name"]],
+                {
+                  "text-font": [
+                    "case",
+                    ["==", ["get", "script"], "Devanagari"],
+                    ["literal", ["Noto Sans Devanagari Regular v1"]],
+                    ["literal", ["News Gothic Std Medium"]]
+                  ]
+                }
+              ]
+            ]
+          ],
+          [
+            "case",
+            ["all", ["has", "script"], ["has", "script2"], ["has", "script3"]],
+            [
+              "format",
+              ["get", "name:en"],
+              {},
+              "\n",
+              {},
+              ["coalesce", ["get", "pgf:name"], ["get", "name"]],
+              {
+                "text-font": [
+                  "case",
+                  ["==", ["get", "script"], "Devanagari"],
+                  ["literal", ["Noto Sans Devanagari Regular v1"]],
+                  ["literal", ["News Gothic Std Medium"]]
+                ]
+              },
+              "\n",
+              {},
+              ["coalesce", ["get", "pgf:name2"], ["get", "name2"]],
+              {
+                "text-font": [
+                  "case",
+                  ["==", ["get", "script2"], "Devanagari"],
+                  ["literal", ["Noto Sans Devanagari Regular v1"]],
+                  ["literal", ["News Gothic Std Medium"]]
+                ]
+              },
+              "\n",
+              {},
+              ["coalesce", ["get", "pgf:name3"], ["get", "name3"]],
+              {
+                "text-font": [
+                  "case",
+                  ["==", ["get", "script3"], "Devanagari"],
+                  ["literal", ["Noto Sans Devanagari Regular v1"]],
+                  ["literal", ["News Gothic Std Medium"]]
+                ]
+              }
+            ],
+            [
+              "case",
+              ["!", ["has", "script"]],
+              [
+                "format",
+                [
+                  "coalesce",
+                  ["get", "name:en"],
+                  ["get", "pgf:name"],
+                  ["get", "name"]
+                ],
+                {},
+                "\n",
+                {},
+                ["coalesce", ["get", "pgf:name2"], ["get", "name2"]],
+                {
+                  "text-font": [
+                    "case",
+                    ["==", ["get", "script2"], "Devanagari"],
+                    ["literal", ["Noto Sans Devanagari Regular v1"]],
+                    ["literal", ["News Gothic Std Medium"]]
+                  ]
+                },
+                "\n",
+                {},
+                ["coalesce", ["get", "pgf:name3"], ["get", "name3"]],
+                {
+                  "text-font": [
+                    "case",
+                    ["==", ["get", "script3"], "Devanagari"],
+                    ["literal", ["Noto Sans Devanagari Regular v1"]],
+                    ["literal", ["News Gothic Std Medium"]]
+                  ]
+                }
+              ],
+              ["!", ["has", "script2"]],
+              [
+                "format",
+                [
+                  "coalesce",
+                  ["get", "name:en"],
+                  ["get", "pgf:name2"],
+                  ["get", "name2"]
+                ],
+                {},
+                "\n",
+                {},
+                ["coalesce", ["get", "pgf:name"], ["get", "name"]],
+                {
+                  "text-font": [
+                    "case",
+                    ["==", ["get", "script"], "Devanagari"],
+                    ["literal", ["Noto Sans Devanagari Regular v1"]],
+                    ["literal", ["News Gothic Std Medium"]]
+                  ]
+                },
+                "\n",
+                {},
+                ["coalesce", ["get", "pgf:name3"], ["get", "name3"]],
+                {
+                  "text-font": [
+                    "case",
+                    ["==", ["get", "script3"], "Devanagari"],
+                    ["literal", ["Noto Sans Devanagari Regular v1"]],
+                    ["literal", ["News Gothic Std Medium"]]
+                  ]
+                }
+              ],
+              [
+                "format",
+                [
+                  "coalesce",
+                  ["get", "name:en"],
+                  ["get", "pgf:name3"],
+                  ["get", "name3"]
+                ],
+                {},
+                "\n",
+                {},
+                ["coalesce", ["get", "pgf:name"], ["get", "name"]],
+                {
+                  "text-font": [
+                    "case",
+                    ["==", ["get", "script"], "Devanagari"],
+                    ["literal", ["Noto Sans Devanagari Regular v1"]],
+                    ["literal", ["News Gothic Std Medium"]]
+                  ]
+                },
+                "\n",
+                {},
+                ["coalesce", ["get", "pgf:name2"], ["get", "name2"]],
+                {
+                  "text-font": [
+                    "case",
+                    ["==", ["get", "script2"], "Devanagari"],
+                    ["literal", ["Noto Sans Devanagari Regular v1"]],
+                    ["literal", ["News Gothic Std Medium"]]
+                  ]
+                }
+              ]
+            ]
+          ]
+        ],
+        "text-font": [
+          "step",
+          ["zoom"],
+          ["literal", ["News Gothic Std Medium"]],
+          12,
+          [
+            "match",
+            ["get", "kind_detail"],
+            "city",
+            ["literal", ["News Gothic Std Bold"]],
+            ["literal", ["News Gothic Std Medium"]]
+          ]
+        ],
+        "symbol-sort-key": [
+          "case",
+          ["has", "sort_key"],
+          ["get", "sort_key"],
+          ["get", "min_zoom"]
+        ],
+        "text-padding": [
+          "interpolate",
+          ["linear"],
+          ["zoom"],
+          5,
+          3,
+          8,
+          7,
+          12,
+          11
+        ],
+        "text-size": [
+          "interpolate",
+          ["exponential", 1],
+          ["zoom"],
+          7,
+          12,
+          15,
+          ["match", ["get", "kind_detail"], "city", 22, "village", 18, 16]
+        ],
+        "icon-padding": [
+          "interpolate",
+          ["linear"],
+          ["zoom"],
+          0,
+          0,
+          8,
+          4,
+          10,
+          8,
+          12,
+          6,
+          22,
+          2
+        ],
+        "text-justify": "auto",
+        "text-variable-anchor": [
+          "step",
+          ["zoom"],
+          ["literal", ["bottom", "left", "right", "top"]],
+          8,
+          ["literal", ["center"]]
+        ],
+        "text-radial-offset": 0.3,
+        "visibility": "visible"
+      },
+      "paint": {
+        "text-color": "#0b1804",
+        "text-halo-color": "#f8f7cf",
+        "text-halo-width": 1.25
       }
     },
     {
@@ -4700,7 +5499,7 @@
           ["coalesce", ["get", "name:en"], ["get", "name:en"]],
           {}
         ],
-        "text-font": ["Noto Sans Medium"],
+        "text-font": ["News Gothic Std Bold"],
         "text-size": [
           "interpolate",
           ["linear"],
@@ -4761,7 +5560,7 @@
       "type": "symbol",
       "source": "photos-1940s",
       "source-layer": "photos-1940s",
-      "minzoom": 14,
+      "minzoom": 10,
       "layout": {
         "text-optional": true,
         "text-line-height": 1.1,
@@ -4770,14 +5569,14 @@
           ["exponential", 1],
           ["zoom"],
           0,
-          10,
+          9,
           14,
           12,
           17,
           16
         ],
         "symbol-sort-key": ["match", ["get", "storyLabel"], "", 1, 0],
-        "icon-image": ["step", ["zoom"], "", 14, "custom:dot"],
+        "icon-image": ["step", ["zoom"], "", 11, "custom:dot"],
         "text-font": ["News Gothic Std Bold"],
         "icon-allow-overlap": true,
         "text-justify": "right",
@@ -4796,7 +5595,8 @@
         "text-anchor": "right",
         "text-field": ["step", ["zoom"], "", 13, ["get", "storyLabel"]],
         "text-max-width": 8,
-        "icon-ignore-placement": true
+        "icon-ignore-placement": true,
+        "visibility": "visible"
       },
       "paint": {
         "text-halo-color": "hsla(41, 76%, 95%, 0.6)",
@@ -4807,14 +5607,14 @@
           "interpolate",
           ["linear"],
           ["zoom"],
-          11,
+          10,
           0,
           13,
           0.19,
           14,
           1
         ],
-        "text-opacity": ["interpolate", ["linear"], ["zoom"], 11, 0.22, 14, 1]
+        "text-opacity": ["interpolate", ["linear"], ["zoom"], 10, 1, 14, 1]
       }
     },
     {
@@ -4822,7 +5622,7 @@
       "type": "circle",
       "source": "photos-1940s",
       "source-layer": "photos-1940s",
-      "layout": { "visibility": "none" },
+      "layout": {"visibility": "none"},
       "paint": {
         "circle-radius": [
           "interpolate",
@@ -4847,7 +5647,7 @@
       "source-layer": "MapPLUTO",
       "minzoom": 17,
       "layout": {
-        "text-font": ["Arial Unicode MS Regular"],
+        "text-font": ["News Gothic Std Oblique"],
         "text-field": ["concat", "Lot ", ["to-string", ["get", "Lot"]]],
         "text-allow-overlap": true,
         "text-ignore-placement": true,
@@ -4878,15 +5678,5 @@
       }
     }
   ],
-  "sprite": [
-    {
-      "id": "default",
-      "url": "https://protomaps.github.io/basemaps-assets/sprites/v4/light"
-    },
-    {
-      "id": "custom",
-      "url": "https://maptiles.1940s.nyc/assets/sprites/custom"
-    }
-  ],
-  "glyphs": "https://maptiles.1940s.nyc/assets/fonts/{fontstack}/{range}.pbf"
+  "id": "1mzaxzj"
 }
