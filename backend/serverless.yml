@@ -33,7 +33,6 @@ provider:
     JWT_SECRET: ${ssm:/${self:service}-${sls:stage}-jwt-secret}
     MODERATORS_TO_EMAIL: ${ssm:/${self:service}-${sls:stage}-moderators-to-email}
     MERCH_REVIEWER_EMAILS: ${ssm:/${self:service}-${sls:stage}-merch-reviewer-emails}
-    MAPBOX_SK: ${ssm:/${self:service}-${sls:stage}-mapbox-sk}
     OPENAI_SK: ${ssm:/${self:service}-${sls:stage}-openai-sk}
     RAPIDAPI_API_KEY: ${ssm:/${self:service}-${sls:stage}-rapidapi-api-key}
     PRINTFUL_SK: ${ssm:/${self:service}-${sls:stage}-printful-sk}
@@ -90,17 +89,11 @@ functions:
     handler: checkMerchQueue.handler
     events:
       - schedule: cron(30 11 * * ? *)
-  syncMap:
-    enabled: '"${sls:stage}" == "production"'
-    handler: syncMap.handler
-    events:
-      - schedule: cron(0 12 * * ? *)
-    timeout: 900
   syncMapSelfHosted:
     enabled: '"${sls:stage}" == "production" || "${sls:stage}" == "staging"'
     handler: syncMapSelfHosted.handler
     events:
-      - schedule: cron(10 12 * * ? *)
+      - schedule: cron(0 12 * * ? *)
     timeout: 900
     memorySize: 4096
     layers:

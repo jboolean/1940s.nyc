@@ -13,19 +13,15 @@ export default function ToteBag(): JSX.Element {
     if (!container) return;
 
     const attributionEl = container.querySelector(
-      '.mapboxgl-ctrl-attrib-inner,.maplibregl-ctrl-attrib-inner'
+      '.maplibregl-ctrl-attrib-inner'
     );
     if (!attributionEl) return;
 
     const observer = new MutationObserver(() => {
       const text = (attributionEl as HTMLElement).innerText;
-      const improveText =
-        attributionEl.querySelector(
-          '.mapbox-improve-map,.maplibregl-improve-map'
-        )?.textContent || '';
 
       if (text) {
-        setAttributionText(text.replace(improveText, ''));
+        setAttributionText(text);
       }
     });
 
