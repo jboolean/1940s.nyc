@@ -1,9 +1,5 @@
 import React from 'react';
-import { useFeatureFlag } from 'screens/App/shared/stores/FeatureFlagsStore';
-import FeatureFlag from 'screens/App/shared/types/FeatureFlag';
 
-// Import both implementations
-import MapBoxMap from './MapBoxMap';
 import MapLibreMap from './MapLibreMap';
 
 import LoginForm from 'shared/components/LoginForm';
@@ -23,7 +19,6 @@ interface Props {
 
 // Simple component that switches between implementations
 const MainMap = React.forwardRef<MapInterface, Props>((props, ref) => {
-  const useMapLibre = useFeatureFlag(FeatureFlag.USE_MAPLIBRE);
   const { isLoggedInToNonAnonymousAccount, isLoadingMe } = useLoginStore();
 
   // Only show map if user is logged in to a non-anonymous account
@@ -58,11 +53,7 @@ const MainMap = React.forwardRef<MapInterface, Props>((props, ref) => {
     );
   }
 
-  if (useMapLibre) {
-    return <MapLibreMap ref={ref} {...props} />;
-  } else {
-    return <MapBoxMap ref={ref} {...props} />;
-  }
+  return <MapLibreMap ref={ref} {...props} />;
 });
 
 MainMap.displayName = 'MainMap';

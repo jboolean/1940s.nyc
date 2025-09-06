@@ -4,8 +4,6 @@ import { useHistory, useLocation, useRouteMatch } from 'react-router-dom';
 
 import classnames from 'classnames';
 import * as maplibregl from 'maplibre-gl';
-import 'maplibre-gl/dist/maplibre-gl.css';
-import { Protocol as PmTilesProtocol } from 'pmtiles';
 
 import { MapInterface, MapProps } from './MapInterface';
 import * as overlays from './overlays';
@@ -18,9 +16,6 @@ import stylesheet from './MainMap.less';
 import mapStyleUrl from 'screens/App/shared/mapStyles/fourties.protomaps.style.json';
 
 const PHOTO_LAYER = 'photos-1940s';
-
-const pmtilesProtocol = new PmTilesProtocol();
-maplibregl.addProtocol('pmtiles', pmtilesProtocol.tile);
 
 type PropsWithRouter = MapProps & RouteComponentProps<{ identifier?: string }>;
 

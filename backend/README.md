@@ -30,13 +30,13 @@ npm start
 
 ## Environments
 
-There are three backend environments (stages), two database environments, unlimited frontend environments, and one Mapbox map.
+There are three backend environments (stages), two database environments, unlimited frontend environments, and one Maplibre map.
 
 On the backend, there's production, staging, and your local development environment. Production uses the `fourtiesnyc` database, while other environments use `fourtiesnyc_staging`. This means your local server uses a shared database with staging. This is not ideal and came about because originally the app had only static photo data; it should be improved.
 
 On the frontend, there are ephemeral environments created for each pull request, these all share `staging` as the backend.
 
-There is one Mapbox map that is shared. This means you may see story labels on the map that are not in the staging database and can't be read.
+There is one Maplibre map that is shared. This means you may see story labels on the map that are not in the staging database and can't be read.
 
 ## Deployment
 
@@ -138,13 +138,13 @@ There's currently no sign-up form for the mailing list. Addresses are just added
 
 ### Map sync
 
-Every night, a cron job refreshes the materialized views, regenerates a set of geojson, pushes it to Mapbox, and triggers Mapbox's regeneration of the map tiles. Note that regenerating map tiles costs money, which is why it's not done continuously.
+Every night, a cron job refreshes the materialized views, regenerates a set of geojson, and generates PMTiles.
 
 This important process supports geocode corrections and user story labels.
 
 ## Third party services
 
-- Mapbox - For the map
+- Maplibre - For the map using self-hosted PMTiles
 - AWS SSM - For secrets
 - Postmark - For transactional and campaign emails
 - Netlify Identity - For admin users

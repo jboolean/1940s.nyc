@@ -12,7 +12,6 @@ import {
   StoryEmailTemplateData,
 } from '../email/templates/StoryUserEmailTemplateData';
 import StoryUserRemovedTemplate from '../email/templates/StoryUserRemovedTemplate';
-import forgeStaticMapUrl from '../utils/forgeStaticMapUrl';
 import required from '../utils/required';
 import { createStoryToken } from './StoryTokenService';
 
@@ -71,17 +70,6 @@ function forgeImageThumbnailUrl(photo: Story['photo']): string {
   return `https://photos.1940s.nyc/420-jpg/${photo.identifier}.jpg`;
 }
 
-function forgeMapImageUrl(
-  photo: Story['photo'],
-  lngLat: Story['lngLat'],
-  retina = false
-): string | null {
-  if (!lngLat) {
-    return null;
-  }
-  return forgeStaticMapUrl(photo.identifier, lngLat, 315, 315, 16, retina);
-}
-
 function forgeStoryTemplateContext(story: Story): StoryEmailTemplateData {
   return {
     storytellerName: required(story.storytellerName, 'storytellerName'),
@@ -89,8 +77,8 @@ function forgeStoryTemplateContext(story: Story): StoryEmailTemplateData {
     storyEditUrl: forgeStoryEditUrl(story),
     viewPhotoUrl: forgePhotoUrl(story.photo, story.lngLat),
     photoThumbnailUrl: forgeImageThumbnailUrl(story.photo),
-    mapImageUrl: forgeMapImageUrl(story.photo, story.lngLat, false),
-    mapImageUrlRetina: forgeMapImageUrl(story.photo, story.lngLat, true),
+    mapImageUrl: null,
+    mapImageUrlRetina: null,
   };
 }
 
