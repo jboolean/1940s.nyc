@@ -1,13 +1,13 @@
-import { createRoot } from 'react-dom/client';
-import React from 'react';
-import Modal from 'react-modal';
 import * as Sentry from '@sentry/react';
 import { BrowserTracing } from '@sentry/tracing';
 import netlifyIdentity from 'netlify-identity-widget';
+import React from 'react';
+import { createRoot } from 'react-dom/client';
+import Modal from 'react-modal';
 
-import 'normalize.css';
 import 'core-js/stable';
-import 'utils/initMapboxgl';
+import 'normalize.css';
+import 'utils/initMaplibre';
 // import 'modernizr';
 
 import App from './screens/App';

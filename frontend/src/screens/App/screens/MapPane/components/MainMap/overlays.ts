@@ -73,11 +73,8 @@ const MANHATTAN = [
   -74.04772962763064, 40.68291694544512, -73.90665099539478, 40.87903804730722,
 ] as const;
 
-// Generic map interface that works with both MapBox and MapLibre
-type GenericMap = mapboxgl.Map | maplibregl.Map;
-
 export const installLayers = (
-  map: GenericMap,
+  map: maplibregl.Map,
   photoLayer: string,
   {
     fadeOverlays = true,
@@ -165,7 +162,7 @@ export const installLayers = (
 };
 
 export const setOverlay = (
-  map: GenericMap,
+  map: maplibregl.Map,
   overlayId: OverlayId | null | OverlayId[]
 ): void => {
   // If overlayId is not an array, convert it to an array

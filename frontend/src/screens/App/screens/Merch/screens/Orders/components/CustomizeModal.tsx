@@ -1,7 +1,7 @@
 import React from 'react';
 
 import pick from 'lodash/pick';
-import mapboxgl from 'mapbox-gl';
+import * as maplibregl from 'maplibre-gl';
 import FourtiesModal from 'shared/components/Modal';
 import useOrdersStore from '../shared/stores/OrdersStore';
 
@@ -14,14 +14,12 @@ import { MerchCustomizationOptions } from 'shared/utils/merch/Order';
 import useElementId from 'shared/utils/useElementId';
 import stylesheet from './CustomizeModal.less';
 
+import mapStyleUrl from 'screens/App/shared/mapStyles/fourties.protomaps.style.json';
+
 const DEFAULT_LNG_LAT = {
   lng: -73.98196612358352,
   lat: 40.76808966119866,
 } as const;
-
-const MAPBOX_STYLE = __DEV__
-  ? 'mapbox://styles/julianboilen/ck5jrzrs11r1p1imia7qzjkm1/draft'
-  : 'mapbox://styles/julianboilen/ck5jrzrs11r1p1imia7qzjkm1';
 
 import OutlineCremeDarkImage from './assets/outline-creme-dark.png';
 import OutlineCremeGreenImage from './assets/outline-creme-green.png';
@@ -83,7 +81,7 @@ const CustomizeBack = (): JSX.Element => {
   } = useOrdersStore();
 
   const mapContainer = React.useRef<HTMLDivElement>(null);
-  const map = React.useRef<mapboxgl.Map | null>(null);
+  const map = React.useRef<maplibregl.Map | null>(null);
 
   const customizationOptions: MerchCustomizationOptions | undefined =
     customizing?.customizationOptions;
@@ -97,9 +95,9 @@ const CustomizeBack = (): JSX.Element => {
         customizationOptions?.lat ??
         DEFAULT_LNG_LAT.lat,
     ] as [number, number];
-    map.current = new mapboxgl.Map({
+    map.current = new maplibregl.Map({
       container: mapContainer.current,
-      style: MAPBOX_STYLE,
+      style: mapStyleUrl as unknown as string,
       center: startingPosition,
       maxBounds: [
         [-74.25908989999999, 40.4773991], // SW
@@ -107,10 +105,13 @@ const CustomizeBack = (): JSX.Element => {
       ],
       zoom: 17,
       hash: false,
+      attributionControl: {
+        compact: false,
+      },
     });
 
     map.current.on('style.load', () => {
-      map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
+      map.current.addControl(new maplibregl.NavigationControl(), 'top-right');
       installLayers(map.current, 'photos-1940s', {
         fadeOverlays: false,
       });
@@ -130,7 +131,7 @@ const CustomizeBack = (): JSX.Element => {
     });
 
     // Add marker for center position
-    const marker = new mapboxgl.Marker({
+    const marker = new maplibregl.Marker({
       draggable: false,
       color: '#87b6a8',
     })

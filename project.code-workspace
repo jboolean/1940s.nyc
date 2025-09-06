@@ -20,5 +20,10 @@
 			".build": true,
 			".serverless": true
 		},
+		"cSpell.words": [
+			"maplibre",
+			"maplibregl",
+			"pmtiles"
+		],
 	}
 }
