@@ -95,10 +95,11 @@ export const installLayers = (
       bounds: MANHATTAN,
     },
     {
-      url: 'https://mapwarper.net/mosaics/tile/1194/{z}/{x}/{y}.png',
+      url: 'https://maptiles.1940s.nyc/manhattan-atlas-1930/webp-lossy-hi/{z}/{x}/{y}.webp',
       targetId: 'atlas-1930',
       attribution: '[1930] ' + NYPL_ATTRIBUTION,
       bounds: MANHATTAN,
+      maxzoom: 20,
     },
     {
       url: 'https://nypl-tiles.1940s.nyc/1453/{z}/{x}/{y}.png',
@@ -130,6 +131,7 @@ export const installLayers = (
       ...(mapSpec.bounds
         ? { bounds: mapSpec.bounds as [number, number, number, number] }
         : {}),
+      ...(mapSpec.maxzoom ? { maxzoom: mapSpec.maxzoom } : {}),
     });
 
     map.addLayer(
