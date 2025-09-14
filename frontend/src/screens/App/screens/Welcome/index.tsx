@@ -52,7 +52,6 @@ export default function Welcome({
             <br />
             <strong>Zoom in! Every dot&nbsp;is&nbsp;a&nbsp;photo.</strong>
           </p>
-
           <hr />
           <p className={stylesheet.finePrint}>
             The photos on this site were retrieved from the NYC Department of

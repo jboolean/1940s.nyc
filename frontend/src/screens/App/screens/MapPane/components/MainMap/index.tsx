@@ -1,1 +1,1 @@
-export { default } from './MapLibreMap';
+export { default, OverlayId } from './MapLibreMap';
