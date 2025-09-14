@@ -3,16 +3,6 @@ import Announcment from './Announcement';
 
 const ANNOUNCEMENTS_REGISTRY: Announcment[] = [
   {
-    id: 'email-required',
-    expiresAt: new Date('2026-01-18'),
-    render: () => (
-      <React.Fragment>
-        Due to high usage, an email address is temporarily required to access
-        the map.
-      </React.Fragment>
-    ),
-  },
-  {
     id: 'zoom',
     expiresAt: new Date('2025-01-31'),
     render: () => (
