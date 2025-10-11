@@ -36,7 +36,7 @@ export default async function syncMap(): Promise<void> {
   console.log('Uploading PMTiles to S3...');
   const pmtilesStream = createReadStream(result.outputPath);
 
-  const key = `photos-1940s_${Date.now()}.pmtiles`;
+  const key = `photos-1940s_${new Date().toISOString()}.pmtiles`;
   
   await s3.send(
     new PutObjectCommand({
@@ -47,6 +47,10 @@ export default async function syncMap(): Promise<void> {
       CacheControl: 'max-age=86400',
     })
   );
+
+// Setup, this specifies a redirect from photos-1940s_latest.pmtiles to the actual latest file
+// Website mode isn't appropriate for this bucket due to permissioning, which is required to respect this header, 
+// so there's a Lambda@Edge that actually does the redirect based on the same website redirect header
 
    await s3.send(
     new PutObjectCommand({
