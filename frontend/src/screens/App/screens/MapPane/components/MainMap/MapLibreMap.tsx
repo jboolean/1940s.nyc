@@ -13,7 +13,7 @@ export { OverlayId } from './overlays';
 import { RouteComponentProps } from 'react-router';
 import stylesheet from './MainMap.less';
 
-import mapStyleUrl from 'screens/App/shared/mapStyles/fourties.protomaps.style.json';
+import { getStyle } from 'screens/App/shared/mapStyles/fourties.protomaps.style';
 
 const PHOTO_LAYER = 'photos-1940s';
 
@@ -26,10 +26,10 @@ class MapLibreMap
   private mapContainer: HTMLElement;
   private map: maplibregl.Map;
 
-  componentDidMount(): void {
+  async componentDidMount(): Promise<void> {
     const map: maplibregl.Map = new maplibregl.Map({
       container: this.mapContainer,
-      style: mapStyleUrl as unknown as string,
+      style: await getStyle(),
       center: [-73.99397, 40.7093],
       zoom: 13.69,
       maxBounds: [

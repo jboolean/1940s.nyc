@@ -48,21 +48,6 @@ export default async function syncMap(): Promise<void> {
     })
   );
 
-// Setup, this specifies a redirect from photos-1940s_latest.pmtiles to the actual latest file
-// Website mode isn't appropriate for this bucket due to permissioning, which is required to respect this header, 
-// so there's a Lambda@Edge that actually does the redirect based on the same website redirect header
-
-   await s3.send(
-    new PutObjectCommand({
-      Bucket: 'fourties-maps',
-      Key: `photos-1940s_latest.pmtiles`,
-      WebsiteRedirectLocation: `/${key}`,
-      Body: undefined,
-      ContentType: 'application/vnd.pmtiles',
-      CacheControl: 'no-cache'
-    })
-  );
-
   // Save a version file that points to the latest PMTiles file
   const versionFileContent = JSON.stringify({
     currentKey: key,
