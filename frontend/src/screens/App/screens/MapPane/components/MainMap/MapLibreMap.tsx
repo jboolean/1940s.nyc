@@ -13,7 +13,7 @@ export { OverlayId } from './overlays';
 import { RouteComponentProps } from 'react-router';
 import stylesheet from './MainMap.less';
 
-import mapStyleUrl from 'screens/App/shared/mapStyles/fourties.protomaps.style.json';
+import { getStyle } from 'screens/App/shared/mapStyles/fourties.protomaps.style';
 
 const PHOTO_LAYER = 'photos-1940s';
 
@@ -24,12 +24,12 @@ class MapLibreMap
   implements MapInterface
 {
   private mapContainer: HTMLElement;
-  private map: maplibregl.Map;
+  private map: maplibregl.Map | null = null;
 
-  componentDidMount(): void {
+  async componentDidMount(): Promise<void> {
     const map: maplibregl.Map = new maplibregl.Map({
       container: this.mapContainer,
-      style: mapStyleUrl as unknown as string,
+      style: await getStyle(),
       center: [-73.99397, 40.7093],
       zoom: 13.69,
       maxBounds: [
@@ -82,7 +82,7 @@ class MapLibreMap
 
   componentDidUpdate(prevProps: PropsWithRouter): void {
     // Update the conditional color expression to make the active dot a different color
-    if (!this.map.isStyleLoaded()) {
+    if (this.map && !this.map.isStyleLoaded()) {
       void this.map.once('style.load', () => this.syncUI());
     }
     if (
@@ -95,6 +95,7 @@ class MapLibreMap
   }
 
   syncUI(): void {
+    if (!this.map) return;
     this.map.setFilter(PHOTO_LAYER + '-active', [
       '==',
       ['get', 'photoIdentifier'],
@@ -112,10 +113,12 @@ class MapLibreMap
    * Call if container has resized
    */
   resize(): void {
+    if (!this.map) return;
     this.map.resize();
   }
 
   goTo(center: maplibregl.LngLatLike): void {
+    if (!this.map) return;
     this.map.easeTo({
       zoom: 17.5,
       center,

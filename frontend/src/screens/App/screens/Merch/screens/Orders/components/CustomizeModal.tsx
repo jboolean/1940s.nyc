@@ -14,7 +14,7 @@ import { MerchCustomizationOptions } from 'shared/utils/merch/Order';
 import useElementId from 'shared/utils/useElementId';
 import stylesheet from './CustomizeModal.less';
 
-import mapStyleUrl from 'screens/App/shared/mapStyles/fourties.protomaps.style.json';
+import { getStyle } from 'screens/App/shared/mapStyles/fourties.protomaps.style';
 
 const DEFAULT_LNG_LAT = {
   lng: -73.98196612358352,
@@ -95,52 +95,62 @@ const CustomizeBack = (): JSX.Element => {
         customizationOptions?.lat ??
         DEFAULT_LNG_LAT.lat,
     ] as [number, number];
-    map.current = new maplibregl.Map({
-      container: mapContainer.current,
-      style: mapStyleUrl as unknown as string,
-      center: startingPosition,
-      maxBounds: [
-        [-74.25908989999999, 40.4773991], // SW
-        [-73.70027209999999, 40.9175771], // NE
-      ],
-      zoom: 17,
-      hash: false,
-      attributionControl: {
-        compact: false,
-      },
-    });
 
-    map.current.on('style.load', () => {
-      map.current.addControl(new maplibregl.NavigationControl(), 'top-right');
-      installLayers(map.current, 'photos-1940s', {
-        fadeOverlays: false,
+    getStyle()
+      .then((style) => {
+        map.current = new maplibregl.Map({
+          container: mapContainer.current,
+          style: style,
+          center: startingPosition,
+          maxBounds: [
+            [-74.25908989999999, 40.4773991], // SW
+            [-73.70027209999999, 40.9175771], // NE
+          ],
+          zoom: 17,
+          hash: false,
+          attributionControl: {
+            compact: false,
+          },
+        });
+
+        map.current.on('style.load', () => {
+          map.current.addControl(
+            new maplibregl.NavigationControl(),
+            'top-right'
+          );
+          installLayers(map.current, 'photos-1940s', {
+            fadeOverlays: false,
+          });
+          setOverlay(map.current, 'default-map');
+        });
+
+        map.current.on('moveend', () => {
+          const center = map.current.getCenter();
+          setDraftCustomizationOptions({
+            ...STYLE_DEFAULTS,
+            ...draftCustomizationOptions,
+            lng: center.lng,
+            lat: center.lat,
+            variant: customizing.internalVariant,
+          });
+          setOverlay(map.current, 'default-map');
+        });
+
+        // Add marker for center position
+        const marker = new maplibregl.Marker({
+          draggable: false,
+          color: '#87b6a8',
+        })
+          .setLngLat(startingPosition)
+          .addTo(map.current);
+
+        map.current.on('move', () => {
+          marker.setLngLat(map.current.getCenter());
+        });
+      })
+      .catch((error) => {
+        console.error('Error loading map style:', error);
       });
-      setOverlay(map.current, 'default-map');
-    });
-
-    map.current.on('moveend', () => {
-      const center = map.current.getCenter();
-      setDraftCustomizationOptions({
-        ...STYLE_DEFAULTS,
-        ...draftCustomizationOptions,
-        lng: center.lng,
-        lat: center.lat,
-        variant: customizing.internalVariant,
-      });
-      setOverlay(map.current, 'default-map');
-    });
-
-    // Add marker for center position
-    const marker = new maplibregl.Marker({
-      draggable: false,
-      color: '#87b6a8',
-    })
-      .setLngLat(startingPosition)
-      .addTo(map.current);
-
-    map.current.on('move', () => {
-      marker.setLngLat(map.current.getCenter());
-    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
