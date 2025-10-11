@@ -14,7 +14,7 @@
     },
     "photos-1940s": {
       "type": "vector",
-      "url": "pmtiles://https://maptiles.1940s.nyc/photos-1940s.pmtiles"
+      "url": "pmtiles://https://maptiles.1940s.nyc/photos-1940s_latest.pmtiles"
     }
   },
   "sprite": [
