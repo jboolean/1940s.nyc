@@ -24,7 +24,7 @@ class MapLibreMap
   implements MapInterface
 {
   private mapContainer: HTMLElement;
-  private map: maplibregl.Map;
+  private map: maplibregl.Map | null = null;
 
   async componentDidMount(): Promise<void> {
     const map: maplibregl.Map = new maplibregl.Map({
@@ -82,7 +82,7 @@ class MapLibreMap
 
   componentDidUpdate(prevProps: PropsWithRouter): void {
     // Update the conditional color expression to make the active dot a different color
-    if (!this.map.isStyleLoaded()) {
+    if (this.map && !this.map.isStyleLoaded()) {
       void this.map.once('style.load', () => this.syncUI());
     }
     if (
@@ -95,6 +95,7 @@ class MapLibreMap
   }
 
   syncUI(): void {
+    if (!this.map) return;
     this.map.setFilter(PHOTO_LAYER + '-active', [
       '==',
       ['get', 'photoIdentifier'],
@@ -112,10 +113,12 @@ class MapLibreMap
    * Call if container has resized
    */
   resize(): void {
+    if (!this.map) return;
     this.map.resize();
   }
 
   goTo(center: maplibregl.LngLatLike): void {
+    if (!this.map) return;
     this.map.easeTo({
       zoom: 17.5,
       center,
