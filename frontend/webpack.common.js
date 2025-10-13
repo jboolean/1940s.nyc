@@ -77,18 +77,27 @@ module.exports = {
         ],
       },
       {
-        test: /\.(png|jpg|gif|svg|style\.json)$/,
+        test: /\.(png|jpg|gif|style\.json)$/,
         type: 'asset/resource',
       },
       {
         test: /\.svg$/,
-        issuer: /\.(j|t)sx$/,
-        exclude: /node_modules|.yalc/,
-        loader: 'svg-react-loader',
+        resourceQuery: /asset/,
+        type: 'asset/resource',
+      },
+      {
+        test: /\.svg$/,
+        issuer: /\.(j|t)sx?$/,
         resourceQuery: { not: [/asset/] },
-        options: {
-          classIdPrefix: '[name]-[contenthash:8]__',
-        },
+        use: [
+          {
+            loader: '@svgr/webpack',
+            options: {
+              exportType: 'default',
+              ref: true,
+            },
+          },
+        ],
       },
     ],
   },
