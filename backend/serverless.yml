@@ -38,10 +38,10 @@ provider:
     PRINTFUL_SK: ${ssm:/${self:service}-${sls:stage}-printful-sk}
 plugins:
   - serverless-plugin-conditional-functions
+  - serverless-plugin-datadog
   - serverless-webpack
   - serverless-domain-manager
   - serverless-offline
-
 layers:
   tippecanoe:
     package:
@@ -139,3 +139,8 @@ custom:
     basePath: ''
     stage: ${sls:stage}
     createRoute53Record: true
+  datadog:
+    site: datadoghq.com
+    apiKeySecretArn: arn:aws:secretsmanager:us-east-1:197411599260:secret:DdApiKeySecret-Bdpa3lQQgQcR-VAo2Tp
+    llbObsEnable: true
+    uploadGitMetadata: false
