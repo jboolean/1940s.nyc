@@ -38,8 +38,8 @@ provider:
     PRINTFUL_SK: ${ssm:/${self:service}-${sls:stage}-printful-sk}
 plugins:
   - serverless-plugin-conditional-functions
-  - serverless-plugin-datadog
   - serverless-webpack
+  - serverless-plugin-datadog
   - serverless-domain-manager
   - serverless-offline
 layers:
