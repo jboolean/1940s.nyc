@@ -24,6 +24,8 @@ Sentry.init({
   tracesSampleRate: 1.0,
 });
 
+import './datadog';
+
 const containerEl = document.getElementById('app-container');
 
 window.netlifyIdentity = netlifyIdentity;
