@@ -144,3 +144,4 @@ custom:
     apiKeySecretArn: arn:aws:secretsmanager:us-east-1:197411599260:secret:DdApiKeySecret-Bdpa3lQQgQcR-VAo2Tp
     llbObsEnable: true
     uploadGitMetadata: false
+    addLayers: true
