@@ -3,7 +3,7 @@ const webpack = require('webpack');
 const merge = require('webpack-merge');
 const common = require('./webpack.common.js');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const SentryWebpackPlugin = require("@sentry/webpack-plugin");
+const SentryWebpackPlugin = require('@sentry/webpack-plugin');
 
 const path = require('path');
 
@@ -22,6 +22,9 @@ module.exports = merge(common, {
       __API_BASE__: JSON.stringify(process.env.API_BASE),
       __STRIPE_PK__: JSON.stringify(process.env.STRIPE_PK),
       __RECAPTCHA_PK__: JSON.stringify(process.env.RECAPTCHA_PK),
+      __DEPLOY_ENV__: JSON.stringify(process.env.CONTEXT),
+      __GIT_SHA__: JSON.stringify(process.env.COMMIT_REF),
+      __BRANCH__: JSON.stringify(process.env.BRANCH),
     }),
     new HtmlWebpackPlugin({
       template: path.join(path.resolve(__dirname, 'src'), 'app.html'),
@@ -32,8 +35,8 @@ module.exports = merge(common, {
       },
     }),
     new SentryWebpackPlugin({
-      org: "julian-boilen",
-      project: "fourtiesnyc-frontend",
+      org: 'julian-boilen',
+      project: 'fourtiesnyc-frontend',
 
       // Specify the directory containing build artifacts
       include: path.resolve(__dirname, 'dist'),
