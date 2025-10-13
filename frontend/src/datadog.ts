@@ -44,9 +44,11 @@ datadogRum.init({
   clientToken: 'pub2b91b53e324deaa20ce2c3738fc4f9aa',
   site: 'datadoghq.com',
   service: 'fourtiesnyc',
-  env: __DEV__ ? 'dev' : 'prod',
+  env: __DEPLOY_ENV__ || 'dev',
+  version: __GIT_SHA__,
   // Explicitly enable manual view tracking for RRv5
   trackViewsManually: true,
   defaultPrivacyLevel: 'mask-user-input',
   // plugins: [reactPlugin({ router: false })], // Keep disabled until upgrading React Router due to deps conflict
 });
+datadogRum.addRumGlobalContext('branch', __BRANCH__);
