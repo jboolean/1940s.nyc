@@ -141,7 +141,7 @@ custom:
     createRoute53Record: true
   datadog:
     site: datadoghq.com
-    apiKeySecretArn: arn:aws:secretsmanager:us-east-1:197411599260:secret:DdApiKeySecret-Bdpa3lQQgQcR-VAo2Tp
-    llbObsEnable: true
+    apiKeySecretArn: arn:aws:secretsmanager:${aws:region}:${aws:accountId}:secret:DdApiKeySecret-Bdpa3lQQgQcR-VAo2Tp
+    llmObsEnabled: true
     uploadGitMetadata: false
     addLayers: true
