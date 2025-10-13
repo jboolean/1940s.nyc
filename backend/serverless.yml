@@ -144,3 +144,5 @@ custom:
     apiKeySecretArn: arn:aws:secretsmanager:${aws:region}:${aws:accountId}:secret:DdApiKeySecret-Bdpa3lQQgQcR-VAo2Tp
     uploadGitMetadata: false
     addLayers: true
+    exclude:
+      - renderMerchPrintfiles
