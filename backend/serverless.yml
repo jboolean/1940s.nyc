@@ -39,9 +39,9 @@ provider:
 plugins:
   - serverless-plugin-conditional-functions
   - serverless-webpack
+  - serverless-plugin-datadog
   - serverless-domain-manager
   - serverless-offline
-
 layers:
   tippecanoe:
     package:
@@ -139,3 +139,10 @@ custom:
     basePath: ''
     stage: ${sls:stage}
     createRoute53Record: true
+  datadog:
+    site: datadoghq.com
+    apiKeySecretArn: arn:aws:secretsmanager:${aws:region}:${aws:accountId}:secret:DdApiKeySecret-Bdpa3lQQgQcR-VAo2Tp
+    uploadGitMetadata: false
+    addLayers: true
+    exclude:
+      - renderMerchPrintfiles
