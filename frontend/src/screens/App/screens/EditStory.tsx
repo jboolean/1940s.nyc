@@ -1,5 +1,5 @@
 import React from 'react';
-import { Redirect, useLocation } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 
 import { useStoryDraftStore } from './SubmitStoryWizard';
 
@@ -23,7 +23,7 @@ export default function EditStory(): JSX.Element {
   }, [rehydrateForEditing, storyAuthToken]);
 
   if (draftStory && draftStory.photo) {
-    return <Redirect to={`/stories/photo/${draftStory.photo}`} />;
+    return <Navigate to={`/stories/photo/${draftStory.photo}`} replace />;
   }
   return <></>;
 }

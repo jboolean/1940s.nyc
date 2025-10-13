@@ -1,16 +1,14 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
 import React from 'react';
 
 import classnames from 'classnames';
 import { Feature, Point } from 'geojson';
 import noop from 'lodash/noop';
 import uniqueId from 'lodash/uniqueId';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+
 import { closest } from 'utils/photosApi';
 import { OverlayId } from './components/MainMap';
 import { MapInterface } from './components/MainMap/MapInterface';
-
-import { RouteComponentProps, withRouter } from 'react-router';
-import { Link } from 'react-router-dom';
 import stylesheet from './MapPane.less';
 import Geolocate from './components/Geolocate';
 import MainMap from './components/MainMap';
@@ -31,13 +29,10 @@ interface Props extends TipJarProps {
   className?: string;
 }
 
-interface State {
-  overlay: OverlayId | null;
-}
-
 interface TipJarProps {
   handleOpenTipJar: () => void;
 }
+
 function withTipJar<P extends TipJarProps, C extends React.ComponentType<P>>(
   Component: C & React.ComponentType<P>
 ): React.FunctionComponent<Omit<P, keyof TipJarProps>> {
@@ -45,161 +40,162 @@ function withTipJar<P extends TipJarProps, C extends React.ComponentType<P>>(
     props: PassProps
   ): JSX.Element {
     const { open } = useTipJarStore();
-    // @ts-ignore -- I give up
-    return <Component {...props} handleOpenTipJar={open} />;
+    const componentProps = {
+      ...(props as Omit<P, keyof TipJarProps>),
+      handleOpenTipJar: open,
+    } as P;
+    return <Component {...componentProps} />;
   }
   return WithTipJar;
 }
-class MapPane extends React.Component<Props & RouteComponentProps, State> {
-  map?: MapInterface;
-  private idPrefix: string;
-  historyUnlisten: () => void | null = null;
 
-  constructor(props: Props & RouteComponentProps) {
-    super(props);
-    this.state = {
-      overlay: 'default-map',
+function MapPane({
+  className,
+  handleOpenTipJar,
+}: Props & TipJarProps): JSX.Element {
+  const [overlay, setOverlay] = React.useState<OverlayId>('default-map');
+  const mapRef = React.useRef<MapInterface | null>(null);
+  const setMapRef = React.useCallback((instance: MapInterface | null) => {
+    mapRef.current = instance;
+  }, []);
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const idPrefix = React.useMemo(() => uniqueId('MapPane-'), []);
+
+  React.useEffect(() => {
+    const timeout = window.setTimeout(() => {
+      mapRef.current?.resize();
+    });
+
+    return () => {
+      window.clearTimeout(timeout);
     };
-    this.idPrefix = uniqueId('MapPane-');
+  }, [location.pathname, location.search, location.hash]);
 
-    this.handleOverlayChange = this.handleOverlayChange.bind(this);
-    this.handleSearchFeatureSelected =
-      this.handleSearchFeatureSelected.bind(this);
-    this.handleGeolocated = this.handleGeolocated.bind(this);
-    this.openPhoto = this.openPhoto.bind(this);
-  }
+  const handleOverlayChange = React.useCallback((nextOverlay: OverlayId) => {
+    setOverlay(nextOverlay);
+  }, []);
 
-  componentWillUnmount(): void {
-    if (this.historyUnlisten) this.historyUnlisten();
-  }
+  const openPhoto = React.useCallback(
+    (identifier: string) => {
+      navigate(
+        {
+          pathname: `/map/photo/${identifier}`,
+          hash: window.location.hash,
+        },
+        { replace: false }
+      );
+    },
+    [navigate]
+  );
 
-  componentDidMount(): void {
-    this.historyUnlisten = this.props.history.listen(() => {
-      setTimeout(() => {
-        if (this.map) this.map.resize();
-      });
-    });
-  }
+  const handleSearchFeatureSelected = React.useCallback(
+    (feature: Feature<Point>) => {
+      const [lng, lat] = feature.geometry.coordinates;
+      mapRef.current?.goTo({ lng, lat });
 
-  handleOverlayChange(overlay: OverlayId): void {
-    this.setState({
-      overlay,
-    });
-  }
+      closest({ lng, lat }).then(openPhoto, noop);
+    },
+    [openPhoto]
+  );
 
-  handleSearchFeatureSelected(feature: Feature<Point>): void {
-    const [lng, lat] = feature.geometry.coordinates;
-    this.map.goTo({ lng, lat });
+  const handleGeolocated = React.useCallback(
+    (position: { lat: number; lng: number }) => {
+      mapRef.current?.goTo(position);
+      closest(position).then(openPhoto, noop);
+    },
+    [openPhoto]
+  );
 
-    closest({ lng, lat }).then(this.openPhoto, noop);
-  }
+  return (
+    <div className={classnames(stylesheet.container, className)}>
+      <div className={stylesheet.links}>
+        <Link to="/stories" className={stylesheet.storiesLink}>
+          Stories
+        </Link>
+        <Link to="/outtakes" className={stylesheet.outtakesLink}>
+          Outtakes
+        </Link>
 
-  handleGeolocated(position: { lat: number; lng: number }): void {
-    this.map.goTo(position);
-    closest(position).then(this.openPhoto, noop);
-  }
-
-  openPhoto(identifier: string): void {
-    this.props.history.push({
-      pathname: '/map/photo/' + identifier,
-      hash: window.location.hash,
-    });
-  }
-
-  render(): React.ReactNode {
-    const { overlay } = this.state;
-    const { className } = this.props;
-
-    return (
-      <div className={classnames(stylesheet.container, className)}>
-        <div className={stylesheet.links}>
-          <Link to="/stories" className={stylesheet.storiesLink}>
-            Stories
-          </Link>
-          <Link to="/outtakes" className={stylesheet.outtakesLink}>
-            Outtakes
-          </Link>
-
-          <button
-            type="button"
-            className={stylesheet.tipMeButton}
-            data-test="tip-me-button"
-            onClick={() => {
-              recordEvent({
-                category: 'Map',
-                action: 'Click Leave Tip',
-              });
-              this.props.handleOpenTipJar();
-            }}
-          >
-            <SuggestedTip /> Tip?
-          </button>
-          <a
-            href="http://80s.nyc"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={stylesheet.eightiesLink}
-            onClick={() => {
-              recordEvent({
-                category: 'Map',
-                action: 'Clicks 80s.nyc',
-              });
-              alert('You you leaving 1940s.nyc for an unaffiliated site.');
-            }}
-          >
-            1980s <ExternalIcon />
-          </a>
-        </div>
-        <div className={stylesheet.topControls}>
-          <Search
-            onFeatureSelected={this.handleSearchFeatureSelected}
-            className={stylesheet.search}
-          />
-          <Geolocate onGeolocated={this.handleGeolocated} />
-        </div>
-        <div className={stylesheet.overlays}>
-          {(
-            [
-              { name: 'Street', value: 'default-map' },
-              { name: 'Arial', value: 'default-arial' },
-              // { name: 'Street (1937)', value: 'district' },
-              // { name: 'Buildings (1916)', value: 'atlas-1916' },
-              // { name: 'Buildings (1930)', value: 'atlas-1930' },
-              // { name: 'Buildings (1956)', value: 'atlas-1956' },
-              // { name: 'Arial (1924)', value: 'arial-1924' },
-              // { name: 'Arial (1951)', value: 'arial-1951' },
-            ] as { name: string; value: OverlayId }[]
-          ).map((option) => (
-            <React.Fragment key={option.value}>
-              <input
-                id={`${this.idPrefix}${option.value}`}
-                key={option.value || 'default'}
-                type="radio"
-                name="overlay"
-                value={option.value}
-                onChange={() => this.handleOverlayChange(option.value)}
-                className={classnames(stylesheet.overlayInput)}
-                checked={option.value === overlay}
-              />
-              <label
-                htmlFor={this.idPrefix + option.value}
-                className={classnames(stylesheet.overlayLabel)}
-              >
-                {option.name}
-              </label>
-            </React.Fragment>
-          ))}
-        </div>
-        <MainMap
-          // @ts-ignore
-          ref={(ref) => (this.map = ref)}
-          className={stylesheet.map}
-          panOnClick={false}
-          overlay={overlay}
-        />
+        <button
+          type="button"
+          className={stylesheet.tipMeButton}
+          data-test="tip-me-button"
+          onClick={() => {
+            recordEvent({
+              category: 'Map',
+              action: 'Click Leave Tip',
+            });
+            handleOpenTipJar();
+          }}
+        >
+          <SuggestedTip /> Tip?
+        </button>
+        <a
+          href="http://80s.nyc"
+          target="_blank"
+          rel="noopener noreferrer"
+          className={stylesheet.eightiesLink}
+          onClick={() => {
+            recordEvent({
+              category: 'Map',
+              action: 'Clicks 80s.nyc',
+            });
+            alert('You you leaving 1940s.nyc for an unaffiliated site.');
+          }}
+        >
+          1980s <ExternalIcon />
+        </a>
       </div>
-    );
-  }
+      <div className={stylesheet.topControls}>
+        <Search
+          onFeatureSelected={handleSearchFeatureSelected}
+          className={stylesheet.search}
+        />
+        <Geolocate onGeolocated={handleGeolocated} />
+      </div>
+      <div className={stylesheet.overlays}>
+        {(
+          [
+            { name: 'Street', value: 'default-map' },
+            { name: 'Arial', value: 'default-arial' },
+            // { name: 'Street (1937)', value: 'district' },
+            // { name: 'Buildings (1916)', value: 'atlas-1916' },
+            // { name: 'Buildings (1930)', value: 'atlas-1930' },
+            // { name: 'Buildings (1956)', value: 'atlas-1956' },
+            // { name: 'Arial (1924)', value: 'arial-1924' },
+            // { name: 'Arial (1951)', value: 'arial-1951' },
+          ] as { name: string; value: OverlayId }[]
+        ).map((option) => (
+          <React.Fragment key={option.value}>
+            <input
+              id={`${idPrefix}${option.value}`}
+              key={option.value || 'default'}
+              type="radio"
+              name="overlay"
+              value={option.value}
+              onChange={() => handleOverlayChange(option.value)}
+              className={classnames(stylesheet.overlayInput)}
+              checked={option.value === overlay}
+            />
+            <label
+              htmlFor={idPrefix + option.value}
+              className={classnames(stylesheet.overlayLabel)}
+            >
+              {option.name}
+            </label>
+          </React.Fragment>
+        ))}
+      </div>
+      <MainMap
+        ref={setMapRef}
+        className={stylesheet.map}
+        panOnClick={false}
+        overlay={overlay}
+      />
+    </div>
+  );
 }
 
-export default withTipJar(withRouter(MapPane));
+export default withTipJar(MapPane);

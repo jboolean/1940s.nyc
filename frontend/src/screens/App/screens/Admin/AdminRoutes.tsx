@@ -1,19 +1,19 @@
 import React from 'react';
 
-import { Route, Switch, useRouteMatch } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 import LoginPage from './screens/LoginPage';
 import ReviewMerch from './screens/ReviewMerch';
 import ReviewStories from './screens/ReviewStories';
 import PrivateRoute from './shared/components/PrivateRoute';
 
 export default function AdminRoutes(): JSX.Element {
-  const { path } = useRouteMatch();
-
   return (
-    <Switch>
-      <Route path={`${path}/login`} component={LoginPage} />
-      <PrivateRoute path={`${path}/review-stories`} component={ReviewStories} />
-      <PrivateRoute path={`${path}/review-merch`} component={ReviewMerch} />
-    </Switch>
+    <Routes>
+      <Route path="login" element={<LoginPage />} />
+      <Route element={<PrivateRoute />}>
+        <Route path="review-stories" element={<ReviewStories />} />
+        <Route path="review-merch" element={<ReviewMerch />} />
+      </Route>
+    </Routes>
   );
 }

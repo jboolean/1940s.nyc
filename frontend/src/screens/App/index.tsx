@@ -1,6 +1,14 @@
 import React from 'react';
 
-import { Redirect, Route, Router, Switch } from 'react-router-dom';
+import {
+  Navigate,
+  Outlet,
+  Route,
+  Routes,
+  matchPath,
+  unstable_HistoryRouter as HistoryRouter,
+  useLocation,
+} from 'react-router-dom';
 import history from 'utils/history';
 import AnnouncementBanner from './screens/AnnouncementBanner';
 import MapPane from './screens/MapPane';
@@ -55,6 +63,7 @@ function Modals(): JSX.Element {
   );
 
   const openTipJar = useTipJarStore((state) => state.open);
+  const location = useLocation();
 
   React.useEffect(() => {
     if (openTipJarOnLoad) {
@@ -62,10 +71,14 @@ function Modals(): JSX.Element {
     }
   }, [openTipJar]);
 
+  const isMapOrStories =
+    location.pathname.startsWith('/map') ||
+    location.pathname.startsWith('/stories');
+
   return (
     <>
-      <Route path={['/map', '/stories']}>
-        {IS_SHUTDOWN ? (
+      {isMapOrStories ? (
+        IS_SHUTDOWN ? (
           <Shutdown isOpen={true} />
         ) : (
           <Welcome
@@ -74,8 +87,8 @@ function Modals(): JSX.Element {
               setWelcomeOpen(false);
             }}
           />
-        )}
-      </Route>
+        )
+      ) : null}
 
       <ThankYou
         isOpen={isThankYouOpen}
@@ -98,17 +111,14 @@ function Modals(): JSX.Element {
 }
 
 function MainContentLayout({
-  children,
 }: {
-  children: React.ReactNode;
+  children?: React.ReactNode;
 }): JSX.Element {
   return (
     <div className={stylesheet.outermostContainer}>
       <AnnouncementBanner />
       <Modals />
-      <div className={stylesheet.mainContentWrapper}>
-        <div className={stylesheet.mainContentContainer}>{children}</div>
-      </div>
+      <div className={stylesheet.mainContentWrapper}>{children}</div>
     </div>
   );
 }
@@ -127,54 +137,68 @@ function ContextWrappers({
   return <OptimizeExperimentsProvider>{children}</OptimizeExperimentsProvider>;
 }
 
+function MainContentRoutes(): JSX.Element {
+  const location = useLocation();
+
+  const viewerMatch =
+    matchPath('/:section/photo/:identifier', location.pathname) ||
+    null;
+
+  return (
+    <MainContentLayout>
+      <div className={stylesheet.mainContentContainer}>
+        {viewerMatch ? <ViewerPane className={stylesheet.viewer} /> : null}
+        <Outlet />
+      </div>
+    </MainContentLayout>
+  );
+}
+
 export default function App(): JSX.Element {
   return (
     <ContextWrappers>
-      <Router history={history}>
-        <Switch>
-          {/* Routes with main layout (image viewer, announcements, modals) */}
-          <Route path={['/map', '/outtakes', '/stories']}>
-            <MainContentLayout>
-              <Route path="/*/photo/:identifier">
-                <ViewerPane className={stylesheet.viewer} />
-              </Route>
-              <Switch>
-                <Route
-                  path={['/map/photo/:identifier', '/map']}
-                  render={() => <MapPane className={stylesheet.mapContainer} />}
-                />
-                <Route path={['/outtakes/photo/:identifier', '/outtakes']}>
-                  <Outtakes className={stylesheet.outtakesContainer} />
-                </Route>
-                <Route path="/stories/edit">
-                  <EditStory />
-                </Route>
-                <Route path={['/stories/photo/:identifier', '/stories']}>
-                  <AllStories className={stylesheet.outtakesContainer} />
-                </Route>
-              </Switch>
-            </MainContentLayout>
+      <HistoryRouter history={history}>
+        <Routes>
+          <Route element={<MainContentRoutes />}>
+            <Route path="map">
+              <Route
+                index
+                element={<MapPane className={stylesheet.mapContainer} />}
+              />
+              <Route
+                path="photo/:identifier"
+                element={<MapPane className={stylesheet.mapContainer} />}
+              />
+            </Route>
+            <Route path="outtakes">
+              <Route
+                index
+                element={<Outtakes className={stylesheet.outtakesContainer} />}
+              />
+              <Route
+                path="photo/:identifier"
+                element={<Outtakes className={stylesheet.outtakesContainer} />}
+              />
+            </Route>
+            <Route path="stories">
+              <Route
+                index
+                element={<AllStories className={stylesheet.outtakesContainer} />}
+              />
+              <Route
+                path="photo/:identifier"
+                element={<AllStories className={stylesheet.outtakesContainer} />}
+              />
+              <Route path="edit" element={<EditStory />} />
+            </Route>
           </Route>
-          <Route>
-            {/* Routes without main layout */}
-            <Switch>
-              <Route path="/orders">
-                <Orders />
-              </Route>
-              <Route path="/labs">
-                <FeatureFlags />
-              </Route>
-              <Route path="/admin">
-                <AdminRoutes />
-              </Route>
-              <Route path="/render-merch/tote-bag">
-                <ToteBag />
-              </Route>
-              <Redirect to="/map" />
-            </Switch>
-          </Route>
-        </Switch>
-      </Router>
+          <Route path="orders" element={<Orders />} />
+          <Route path="labs" element={<FeatureFlags />} />
+          <Route path="admin/*" element={<AdminRoutes />} />
+          <Route path="render-merch/tote-bag" element={<ToteBag />} />
+          <Route path="*" element={<Navigate to="/map" replace />} />
+        </Routes>
+      </HistoryRouter>
     </ContextWrappers>
   );
 }
