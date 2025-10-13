@@ -142,7 +142,5 @@ custom:
   datadog:
     site: datadoghq.com
     apiKeySecretArn: arn:aws:secretsmanager:${aws:region}:${aws:accountId}:secret:DdApiKeySecret-Bdpa3lQQgQcR-VAo2Tp
-    llmObsEnabled: true
-    llmObsMlApp: fourtiesnyc
     uploadGitMetadata: false
     addLayers: true
