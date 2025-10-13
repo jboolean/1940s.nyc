@@ -24,6 +24,7 @@
         "resolveJsonModule": true,
         "strictNullChecks": false,
         "strictBindCallApply": true,
+        "skipLibCheck": true,
     },
     "include": [
         "src"
