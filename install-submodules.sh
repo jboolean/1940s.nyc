@@ -1,13 +1,16 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
+set -euo pipefail
 
 APPS=(
   "frontend"
-  "backend",
+  "backend"
   "edge"
 )
 
-for APP in "${APPS[@]}"; do
- cd $(git rev-parse --show-toplevel)/$APP
- echo "Installing \"$APP\""
- npm install
+repo_root=$(git rev-parse --show-toplevel)
+for app in "${APPS[@]}"; do
+  pushd "$repo_root/$app" > /dev/null
+  echo "Installing \"$app\""
+  npm ci
+  popd > /dev/null
 done
