@@ -10,6 +10,8 @@ on:
         required: true
       AWS_SECRET_ACCESS_KEY:
         required: true
+      DATADOG_API_KEY:
+        required: true
     
 defaults:
   run:
@@ -36,11 +38,13 @@ jobs:
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID}}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY}}
+          DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
           STAGE: ${{ inputs.stage }}
         run: npm run deploy
       - name: Register Printful webhooks
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID}}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY}}
+          DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
           STAGE: ${{ inputs.stage }}
         run: npx serverless invoke -f registerPrintfulWebhooks --stage ${{ inputs.stage }}

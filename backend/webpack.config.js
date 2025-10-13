@@ -40,6 +40,8 @@ module.exports = {
     '@sparticuz/chromium',
     'aws-sdk',
     /^@aws-sdk\//,
+    'dd-trace',
+    'datadog-lambda-js',
   ],
   module: {
     rules: [
