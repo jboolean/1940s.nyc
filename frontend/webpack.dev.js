@@ -24,6 +24,9 @@ module.exports = merge(common, {
         'pk_test_51HHaB6FCLBtNZLVl2eku10yXOnLMuYmiXDmK2iMo562DrZePotrkn49Acj7AINohiWzuUrgIp4OUDPRkbuvolmPo00x1AHBQLy'
       ),
       __RECAPTCHA_PK__: JSON.stringify(RECAPTCHA_SITE_KEY_DEV),
+      __DEPLOY_ENV__: JSON.stringify('dev'),
+      __GIT_SHA__: JSON.stringify('dev'),
+      __BRANCH__: JSON.stringify('dev'),
     }),
     new HtmlWebpackPlugin({
       template: path.join(path.resolve(__dirname, 'src'), 'app.html'),
