@@ -8,6 +8,9 @@ const SentryWebpackPlugin = require("@sentry/webpack-plugin");
 const path = require('path');
 
 // Webpack configuration
+const sentryDisabledValues = new Set(['1', 'true', 'yes']);
+const isSentryDisabled = sentryDisabledValues.has(String(process.env.DISABLE_SENTRY || '').toLowerCase());
+
 module.exports = merge(common, {
   mode: 'production',
   output: {},
@@ -31,7 +34,7 @@ module.exports = merge(common, {
         recaptchaSiteKey: process.env.RECAPTCHA_PK,
       },
     }),
-    new SentryWebpackPlugin({
+    !isSentryDisabled && new SentryWebpackPlugin({
       org: "julian-boilen",
       project: "fourtiesnyc-frontend",
 
@@ -45,5 +48,5 @@ module.exports = merge(common, {
       // Optionally uncomment the line below to override automatic release name detection
       // release: process.env.RELEASE,
     }),
-  ],
+  ].filter(Boolean),
 });
