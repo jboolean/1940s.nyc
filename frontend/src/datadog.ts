@@ -51,4 +51,4 @@ datadogRum.init({
   defaultPrivacyLevel: 'mask-user-input',
   // plugins: [reactPlugin({ router: false })], // Keep disabled until upgrading React Router due to deps conflict
 });
-datadogRum.addRumGlobalContext('branch', __BRANCH__);
+datadogRum.setGlobalContextProperty('branch', __BRANCH__);
