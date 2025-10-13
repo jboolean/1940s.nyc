@@ -11,8 +11,10 @@ With `nvm` installed, run `nvm use`
 When building for the first time or if dependencies have changed, run
 
 ```
-npm install
+npm ci
 ```
+
+This installs dependencies exactly as pinned in `package-lock.json`. Use `npm install` only when updating dependencies.
 
 To develop,
 

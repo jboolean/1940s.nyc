@@ -1,3 +1,5 @@
+import type { ComponentPropsWithoutRef, ForwardRefExoticComponent, RefAttributes } from 'react';
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 declare module '*.css' {
   interface ClassNames {
@@ -16,8 +18,10 @@ declare module '*.less' {
 }
 
 declare module '*.svg' {
-  const content: any;
-  export default content;
+  const component: ForwardRefExoticComponent<
+    ComponentPropsWithoutRef<'svg'> & RefAttributes<SVGSVGElement>
+  >;
+  export default component;
 }
 
 declare module '*.svg?asset' {
