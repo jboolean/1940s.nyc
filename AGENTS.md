@@ -4,3 +4,4 @@
 - Do not upgrade or downgrade the lockfile version.
 - Always test your changes. On the frontend run `npm run build`. Be sure to disable sentry.
 - Lint takes some time. Wait for it.
+- Regenerate lockfiles with the appropriate package manager instead of editing them manually, especially after rebases.
