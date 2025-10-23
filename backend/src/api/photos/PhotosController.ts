@@ -195,6 +195,16 @@ export class PhotosController extends Controller {
     @Path() identifier: string,
     @Request() req: express.Request
   ): Promise<void> {
+    // Ensure this is a valid photo identifier so they can't get arbitrary s3 objects
+    const photoRepo = getRepository(Photo);
+    const photoExists = await photoRepo.exists({
+      where: { identifier: identifier },
+    });
+
+    if (!photoExists) {
+      throw new NotFound();
+    }
+
     const command = new GetObjectCommand({
       Bucket: 'fourties-photos',
       Key: `jpg/${identifier}.jpg`,
