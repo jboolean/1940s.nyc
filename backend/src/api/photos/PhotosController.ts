@@ -1,3 +1,5 @@
+import { GetObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import {
   Controller,
   Get,
@@ -19,6 +21,8 @@ import getLngLatForIdentifier from '../../repositories/getLngLatForIdentifier';
 import { getPaginated } from '../../repositories/paginationUtils';
 import { PhotoApiModel } from './PhotoApiModel';
 import photoToApi from './photoToApi';
+
+const s3 = new S3Client();
 
 const PHOTO_PURCHASE_FORM_URL =
   'https://dorisorders.nyc.gov/dorisorders/ui/order-reproductions';
@@ -184,5 +188,21 @@ export class PhotosController extends Controller {
       querystring.stringify({ ...formParams, ...UTM_TAGS_FOR_DORIS });
 
     req.res?.redirect(formUrl);
+  }
+
+  @Get('/{identifier}/download')
+  public async download(
+    @Path() identifier: string,
+    @Request() req: express.Request
+  ): Promise<void> {
+    const command = new GetObjectCommand({
+      Bucket: 'fourties-photos',
+      Key: `jpg/${identifier}.jpg`,
+      ResponseContentDisposition: `attachment`,
+    });
+
+    const signedUrl = await getSignedUrl(s3, command, { expiresIn: 60 });
+
+    return req.res?.redirect(302, signedUrl);
   }
 }

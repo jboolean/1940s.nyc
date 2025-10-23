@@ -65,6 +65,7 @@
     "webpack-node-externals": "^3.0.0"
   },
   "dependencies": {
+    "@aws-sdk/s3-request-presigner": "^3.914.0",
     "@hey-api/client-axios": "^0.6.1",
     "@sentry/integrations": "^7.36.0",
     "@sentry/node": "^7.36.0",

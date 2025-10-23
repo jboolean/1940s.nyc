@@ -47,6 +47,20 @@ export default function ImageButtons(): JSX.Element {
       >
         Know This Place?
       </Button>
+      <ButtonStyledLink
+        buttonTheme="viewer"
+        buttonStyle="secondary"
+        href={`${API_BASE}/photos/${photoIdentifier}/download`}
+        onClick={() => {
+          recordEvent({
+            category: 'Image Viewer',
+            action: 'Clicks Download',
+          });
+          return true;
+        }}
+      >
+        Download
+      </ButtonStyledLink>
       <Button
         buttonTheme="viewer"
         buttonStyle="secondary"
