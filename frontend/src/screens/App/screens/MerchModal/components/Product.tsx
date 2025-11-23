@@ -33,7 +33,8 @@ export default function Product({
               This custom-made bag features &ldquo;1940s.nyc&rdquo; on the front
               in your choice of light, dark, red, or green; and a map of any NYC
               area of your choice on the back. After ordering, you&rsquo;ll
-              receive an email with a link to customize your bag.
+              receive an email with a link to customize your{' '}
+              {quantity > 1 ? 'bags' : 'bag'}.
             </>
           }
           imageSrcHover={TotBagImageBack}
