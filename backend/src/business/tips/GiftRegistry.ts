@@ -31,6 +31,7 @@ const TOTE_BAG_SHIPPING_PRICE = isProduction()
 
 const TOTE_BAG_SHIPPING_COUNTRIES = ['US'];
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const TOTE_BAG_DEFAULTS = {
   gift: Gift.TOTE_BAG,
   stripePrice: TOTE_BAG_PRICE,
@@ -39,18 +40,7 @@ const TOTE_BAG_DEFAULTS = {
   shippingCountries: TOTE_BAG_SHIPPING_COUNTRIES,
 } as const;
 
-const GIFT_REGISTRY: GiftRegistryItem[] = [
-  {
-    minimumAmount: 700,
-    frequency: TipFrequency.MONTHLY,
-    ...TOTE_BAG_DEFAULTS,
-  },
-  {
-    minimumAmount: 700 * 7,
-    frequency: TipFrequency.ONCE,
-    ...TOTE_BAG_DEFAULTS,
-  },
-];
+const GIFT_REGISTRY: GiftRegistryItem[] = [];
 
 // Validate registry has has unique gift and frequency
 const giftFrequencySet = new Set();
