@@ -22,11 +22,11 @@ const TOTE_BAG_PRICE = isProduction()
   : 'price_1QqH41FCLBtNZLVldOb9KMa3';
 
 const TOTE_BAG_SHIPPING_RATE = isProduction()
-  ? 'shr_1QtGHBFCLBtNZLVl84P2gynP'
+  ? 'shr_1SWhRLFCLBtNZLVlvrC9UTEd'
   : 'shr_1QssVnFCLBtNZLVlK1TZpXet';
 
 const TOTE_BAG_SHIPPING_PRICE = isProduction()
-  ? 'price_1R69yOFCLBtNZLVlD6wzaeug'
+  ? 'price_1SWhS6FCLBtNZLVlD5yEAHiU'
   : 'price_1QwrXUFCLBtNZLVlsXEdxRYh';
 
 const TOTE_BAG_SHIPPING_COUNTRIES = ['US'];

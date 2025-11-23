@@ -1,0 +1,95 @@
+@import '../../../../shared/styles/colors.less';
+@import '../../../../shared/styles/viewport.less';
+
+.merchModal {
+  text-align: center;
+
+  h1 {
+    text-align: center;
+  }
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  height: 100%;
+}
+
+.productsArea {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow-y: auto;
+  width: 100%;
+}
+
+.finePrint {
+  font-size: 12px;
+  margin-top: 1rem;
+  text-align: center;
+}
+
+.buttonRow {
+  display: flex;
+  justify-content: center;
+}
+
+.products {
+  margin: 1rem 0;
+  text-align: left;
+  max-width: 40rem;
+  width: 100%;
+}
+
+.productOption {
+  display: grid;
+  grid-template-columns: 4rem 7rem 1fr;
+  grid-template-rows: auto;
+  grid-template-areas:
+    'quantity image copy'
+    'quantity image copy';
+
+  text-align: left;
+
+  margin-bottom: 1rem;
+
+  .productImage {
+    grid-area: image;
+    display: block;
+    width: 100%;
+    filter: drop-shadow(0 2px 2px fade(@font-color-dark, 10%));
+  }
+
+  .productName {
+    font-weight: bold;
+  }
+
+  .productDescription {
+    margin-top: 0.5rem;
+  }
+
+  .productCopy {
+    grid-area: copy;
+  }
+
+  .quantityInput {
+    grid-area: quantity;
+    width: 3rem;
+    margin-right: 1rem;
+    align-self: center;
+  }
+}
+
+@media screen and (max-width: @modal-width-max),
+  screen and (max-height: @modal-height-max) {
+  .merchModal h1 {
+    text-align: left;
+  }
+
+  .content {
+    text-align: left;
+  }
+}
