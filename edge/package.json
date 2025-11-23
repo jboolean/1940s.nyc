@@ -3,11 +3,10 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "dependencies": {},
   "devDependencies": {
     "@silvermine/serverless-plugin-cloudfront-lambda-edge": "^2.2.3",
     "@types/aws-lambda": "^8.10.141",
-    "serverless": "^3.39.0",
+    "serverless": "npm:osls@^3.59.3",
     "serverless-lambda-edge-pre-existing-cloudfront": "^1.2.0",
     "serverless-plugin-typescript": "^2.1.5"
   },

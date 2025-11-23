@@ -2,9 +2,9 @@ service: fourtiesnyc
 package:
   individually: false
   patterns:
-    - 'certs/**'
-    - '!chromium/**'
-    - '!tippecanoe-layer.zip'
+    - "certs/**"
+    - "!chromium/**"
+    - "!tippecanoe-layer.zip"
 
 provider:
   name: aws
@@ -15,7 +15,7 @@ provider:
     role:
       statements:
         - Effect: Allow
-          Action: 
+          Action:
             - s3:*
           Resource: "*"
   environment:
@@ -53,7 +53,7 @@ functions:
   app:
     handler: appHandler.handler
     timeout: 20
-    events: 
+    events:
       - http:
           path: /{proxy+}
           method: ANY
@@ -123,7 +123,7 @@ functions:
     # Invoked manually
 custom:
   webpack:
-    webpackConfig: 'webpack.config.js'
+    webpackConfig: "webpack.config.js"
   bucket: fourties-photos
   domain:
     production: api.1940s.nyc
@@ -136,7 +136,7 @@ custom:
   customDomain:
     enabled: ${self:custom.domainEnabled.${sls:stage}}
     domainName: ${self:custom.domain.${sls:stage}}
-    basePath: ''
+    basePath: ""
     stage: ${sls:stage}
     createRoute53Record: true
   datadog:
