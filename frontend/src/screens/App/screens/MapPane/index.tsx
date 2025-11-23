@@ -33,6 +33,7 @@ interface Props extends TipJarProps {
 
 interface State {
   overlay: OverlayId | null;
+  additionalActionsVisible: boolean;
 }
 
 interface TipJarProps {
@@ -59,6 +60,7 @@ class MapPane extends React.Component<Props & RouteComponentProps, State> {
     super(props);
     this.state = {
       overlay: 'default-map',
+      additionalActionsVisible: false,
     };
     this.idPrefix = uniqueId('MapPane-');
 
@@ -112,17 +114,19 @@ class MapPane extends React.Component<Props & RouteComponentProps, State> {
 
     return (
       <div className={classnames(stylesheet.container, className)}>
-        <div className={stylesheet.links}>
-          <Link to="/stories" className={stylesheet.storiesLink}>
+        <div
+          className={classnames(stylesheet.actions, {
+            [stylesheet.additionalActionsVisible]:
+              this.state.additionalActionsVisible,
+          })}
+        >
+          <Link to="/stories" className={stylesheet.action}>
             Stories
-          </Link>
-          <Link to="/outtakes" className={stylesheet.outtakesLink}>
-            Outtakes
           </Link>
 
           <button
             type="button"
-            className={stylesheet.tipMeButton}
+            className={stylesheet.action}
             data-test="tip-me-button"
             onClick={() => {
               recordEvent({
@@ -134,21 +138,41 @@ class MapPane extends React.Component<Props & RouteComponentProps, State> {
           >
             <SuggestedTip /> Tip?
           </button>
-          <a
-            href="http://80s.nyc"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={stylesheet.eightiesLink}
+
+          <button
+            type="button"
+            className={classnames(
+              stylesheet.action,
+              stylesheet.additionalActionsToggle
+            )}
             onClick={() => {
-              recordEvent({
-                category: 'Map',
-                action: 'Clicks 80s.nyc',
-              });
-              alert('You you leaving 1940s.nyc for an unaffiliated site.');
+              this.setState((state) => ({
+                additionalActionsVisible: !state.additionalActionsVisible,
+              }));
             }}
           >
-            1980s <ExternalIcon />
-          </a>
+            More…
+          </button>
+          <div className={stylesheet.additionalActions}>
+            <Link to="/outtakes" className={stylesheet.action}>
+              Outtakes
+            </Link>
+            <a
+              href="http://80s.nyc"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={stylesheet.action}
+              onClick={() => {
+                recordEvent({
+                  category: 'Map',
+                  action: 'Clicks 80s.nyc',
+                });
+                alert('You you leaving 1940s.nyc for an unaffiliated site.');
+              }}
+            >
+              1980s <ExternalIcon />
+            </a>
+          </div>
         </div>
         <div className={stylesheet.topControls}>
           <Search
