@@ -1,8 +1,8 @@
 import React from 'react';
 import { MerchInternalVariant } from 'shared/utils/merch/Order';
 
-import TotBagImageBack from '../../assets/tote-bag-small-back.png';
-import TotBagImageFront from '../../assets/tote-bag-small-default.png';
+import TotBagImageBack from '../assets/tote-bag-small-back.png';
+import TotBagImageFront from '../assets/tote-bag-small-default.png';
 import ProductOption from './ProductOption';
 
 interface ProductProps {

@@ -5,7 +5,7 @@ import { NumericFormat } from 'react-number-format';
 import TextInput from 'shared/components/TextInput';
 import { MerchInternalVariant } from 'shared/utils/merch/Order';
 
-import stylesheet from '../../MerchModal.less';
+import stylesheet from '../MerchModal.less';
 
 export interface ProductOptionProps {
   title: React.ReactNode;
