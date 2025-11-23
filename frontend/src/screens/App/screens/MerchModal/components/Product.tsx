@@ -2,7 +2,7 @@ import React from 'react';
 import { MerchInternalVariant } from 'shared/utils/merch/Order';
 
 import TotBagImageBack from '../../assets/tote-bag-small-back.png';
-import TotBagImageDefault from '../../assets/tote-bag-small-default.png';
+import TotBagImageFront from '../../assets/tote-bag-small-default.png';
 import ProductOption from './ProductOption';
 
 interface ProductProps {
@@ -37,8 +37,8 @@ export default function Product({
               {quantity > 1 ? 'bags' : 'bag'}.
             </>
           }
-          imageSrcHover={TotBagImageBack}
-          imageSrcDefault={TotBagImageDefault}
+          imageSrcHover={TotBagImageFront}
+          imageSrcDefault={TotBagImageBack}
           quantity={quantity}
           onQuantityChange={onQuantityChange}
         />

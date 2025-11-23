@@ -22,16 +22,14 @@ export default function ProductOption({
   title,
   priceAmount,
   description,
-  imageSrcHover: imageSrcBack,
+  imageSrcHover,
   imageSrcDefault,
   quantity,
   onQuantityChange,
 }: ProductOptionProps): JSX.Element {
   const priceDollars = priceAmount / 100;
   const [isHovered, setIsHovered] = React.useState(false);
-  const imageSrc = isHovered
-    ? imageSrcDefault
-    : imageSrcBack ?? imageSrcDefault;
+  const imageSrc = isHovered ? imageSrcHover : imageSrcDefault;
 
   return (
     <div className={classnames(stylesheet.productOption)}>
