@@ -66,7 +66,7 @@
   }
 }
 
-.links {
+.actions {
   display: flex;
   flex-direction: column;
   right: 22px;
@@ -75,22 +75,34 @@
   text-align: center;
 }
 
-.storiesLink,
-.outtakesLink,
-.eightiesLink,
-.tipMeButton {
+.actions > * {
+  z-index: 1;
+  box-sizing: border-box;
+}
+
+.action {
   color: @font-color-dark;
   display: block;
   border: none;
   composes: floating from '../../../../shared/styles/ui.less';
-  z-index: 1;
-  box-sizing: border-box;
   height: 2rem;
   padding: 0.5rem 1rem;
   text-decoration: none;
-  margin-bottom: 0.5rem;
   cursor: pointer;
   outline: 0;
+  box-sizing: border-box;
+  min-width: calc(61px + 2rem);
+  margin-bottom: 0.5rem;
+}
+.additionalActions {
+  display: none;
+}
+.actions.additionalActionsVisible .additionalActions {
+  display: block;
+}
+
+.additionalActionsVisible .additionalActionsToggle {
+  outline: 1px solid @font-color-dark;
 }
 
 .externalIcon {
@@ -113,7 +125,7 @@
     bottom: 44px;
   }
 
-  .links {
+  .actions {
     top: initial;
     right: initial;
     bottom: 44px;
