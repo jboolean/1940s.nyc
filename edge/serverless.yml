@@ -6,7 +6,7 @@ plugins:
 
 provider:
   name: aws
-  runtime: nodejs20.x
+  runtime: nodejs24.x
   stage: production
   region: us-east-1
 
@@ -20,5 +20,5 @@ functions:
         distributionId: E27U2N3WTCAYNV
         eventType: origin-response
         includeBody: false
-        pathPattern: '*'
+        pathPattern: "*"
         stage: production
