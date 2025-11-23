@@ -1,4 +1,5 @@
 import { MerchInternalVariant } from 'shared/utils/merch/Order';
+import recordEvent from 'shared/utils/recordEvent';
 import create from 'zustand';
 import { immer } from 'zustand/middleware/immer';
 import useLoginStore from '../../../../../shared/stores/LoginStore';
@@ -109,6 +110,19 @@ const useMerchCheckoutStore = create(
           });
           return;
         }
+
+        const totalAmountMinorUnits = items.reduce((total, item) => {
+          const product = availableProducts.find(
+            (p) => p.variant === item.variant
+          );
+          return total + (product?.priceAmount ?? 0) * item.quantity;
+        }, 0);
+
+        recordEvent({
+          category: 'Merch',
+          action: 'Click Checkout',
+          value: totalAmountMinorUnits,
+        });
 
         const successUrl = `${window.location.protocol}//${window.location.host}${window.location.pathname}?noWelcome=&tipSuccess=${window.location.hash}`;
         const cancelUrl = `${window.location.protocol}//${window.location.host}${window.location.pathname}?noWelcome=&openMerch=${window.location.hash}`;
