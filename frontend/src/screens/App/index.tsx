@@ -25,6 +25,7 @@ import CreditPurchaseModal, {
 import EditStory from './screens/EditStory';
 import FeatureFlags from './screens/FeatureFlags';
 import Orders from './screens/Merch/screens/Orders';
+import MerchModal, { openMerchModal } from './screens/MerchModal';
 import SubmitStoryWizard from './screens/SubmitStoryWizard';
 import TipJar, { useTipJarStore } from './screens/TipJar';
 
@@ -35,11 +36,13 @@ const searchParams = new URLSearchParams(window.location.search);
 const thankYouInitial = searchParams.has('tipSuccess');
 const creditSuccessInitial = searchParams.has('creditPurchaseSuccess');
 const openTipJarOnLoad = searchParams.has('openTipJar');
+const openMerchOnLoad = searchParams.has('openMerch');
 const noWelcome = searchParams.has('noWelcome');
 const noTipJar = searchParams.has('noTipJar');
 
 if (noWelcome) searchParams.delete('noWelcome');
 if (noTipJar) searchParams.delete('noTipJar');
+if (openMerchOnLoad) searchParams.delete('openMerch');
 history.replace({
   pathname: history.location.pathname,
   hash: history.location.hash,
@@ -51,7 +54,7 @@ function Modals(): JSX.Element {
   const [isCreditPurchaseSuccessOpen, setCreditPurchaseSuccessOpen] =
     React.useState(creditSuccessInitial);
   const [isWelcomeOpen, setWelcomeOpen] = React.useState(
-    !isThankYouOpen && !openTipJarOnLoad && !noWelcome
+    !isThankYouOpen && !openTipJarOnLoad && !openMerchOnLoad && !noWelcome
   );
 
   const openTipJar = useTipJarStore((state) => state.open);
@@ -61,6 +64,12 @@ function Modals(): JSX.Element {
       openTipJar();
     }
   }, [openTipJar]);
+
+  React.useEffect(() => {
+    if (openMerchOnLoad) {
+      openMerchModal();
+    }
+  }, []);
 
   return (
     <>
@@ -92,6 +101,7 @@ function Modals(): JSX.Element {
           setCreditPurchaseSuccessOpen(false);
         }}
       />
+      <MerchModal />
       {noTipJar ? null : <TipJar />}
     </>
   );

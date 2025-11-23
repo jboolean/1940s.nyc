@@ -17,10 +17,10 @@ const recurringForFrequency: Record<
   },
 };
 
-const RECURRING_PRODUCT_ID = isProduction()
+const TIP_RECURRING_PRODUCT_ID = isProduction()
   ? 'prod_S9HJnU8utlvPTX'
   : 'prod_RqWpsbQnybLsmU';
-const ONE_TIME_PRODUCT_ID = isProduction()
+const TIP_ONE_TIME_PRODUCT_ID = isProduction()
   ? 'prod_S9HKYT98DRZT6J'
   : 'prod_RqWxloaBN1Gqnd';
 
@@ -63,8 +63,8 @@ export async function createTipCheckoutSession({
           price_data: {
             currency: 'USD',
             product: isSubscription
-              ? RECURRING_PRODUCT_ID
-              : ONE_TIME_PRODUCT_ID,
+              ? TIP_RECURRING_PRODUCT_ID
+              : TIP_ONE_TIME_PRODUCT_ID,
             unit_amount: amount,
             recurring: recurringForFrequency[frequency],
           },

@@ -27,6 +27,7 @@ interface GiftApiResponse {
   minimumAmount: number;
   frequency: TipFrequency;
 }
+
 @Route('tips')
 export class TipsController {
   @Security('user-token')

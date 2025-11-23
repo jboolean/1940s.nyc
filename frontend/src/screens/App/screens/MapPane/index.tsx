@@ -19,6 +19,7 @@ import Search from './components/Search';
 import { NumericFormat } from 'react-number-format';
 import ExternalIcon from 'shared/components/ExternalIcon';
 import recordEvent from 'shared/utils/recordEvent';
+import { openMerchModal } from '../MerchModal';
 import { useTipJarStore } from '../TipJar';
 import useAmountPresets from '../TipJar/useAmountPresets';
 
@@ -137,6 +138,20 @@ class MapPane extends React.Component<Props & RouteComponentProps, State> {
             }}
           >
             <SuggestedTip /> Tip?
+          </button>
+
+          <button
+            type="button"
+            className={stylesheet.action}
+            onClick={() => {
+              recordEvent({
+                category: 'Map',
+                action: 'Click Merch',
+              });
+              openMerchModal();
+            }}
+          >
+            Shop!
           </button>
 
           <button
