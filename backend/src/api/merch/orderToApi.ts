@@ -1,4 +1,3 @@
-import { getPrintfileUrl } from '../../business/merch/PrintfulItemBuildService';
 import MerchOrder from '../../entities/MerchOrder';
 import MerchOrderItem from '../../entities/MerchOrderItem';
 import { MerchOrderApiModel, MerchOrderItemApiModel } from './OrderApiModel';
@@ -9,7 +8,6 @@ export function orderItemToApi(item: MerchOrderItem): MerchOrderItemApiModel {
     internalVariant: item.internalVariant,
     customizationOptions: item.customizationOptions ?? undefined,
     state: item.state,
-    printfileUrl: getPrintfileUrl(item.id),
   };
 }
 
