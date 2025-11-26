@@ -1,6 +1,6 @@
 import React from 'react';
 import Button from 'shared/components/Button';
-import { API_BASE } from 'shared/utils/apiConstants';
+import TextButton from 'shared/components/TextButton';
 import { MerchItemState, Order, OrderItem } from 'shared/utils/merch/Order';
 import stylesheet from './ReviewMerch.less';
 import useReviewMerchStore from './stores/ReviewMerchStore';
@@ -31,6 +31,8 @@ function OrderMetadataView({ order }: { order: Order }): JSX.Element {
 }
 
 function OrderItemView({ item }: { item: OrderItem }): JSX.Element {
+  const reviewMerchStore = useReviewMerchStore();
+
   return (
     <div className={stylesheet.item}>
       <div>Item #{item.id}</div>
@@ -40,17 +42,15 @@ function OrderItemView({ item }: { item: OrderItem }): JSX.Element {
         MerchItemState.READY_FOR_FULFILLMENT,
         MerchItemState.ADDED_TO_ORDER,
       ].includes(item.state) && (
-          <div>
-            <a
-              href={`${API_BASE}/merch/items/${item.id}/printfile`}
-              target="_blank"
-              rel="noreferrer"
-              className={stylesheet.printfileLink}
-            >
-              View Printfile
-            </a>
-          </div>
-        )}
+        <div>
+          <TextButton
+            onClick={() => reviewMerchStore.viewPrintfile(item.id)}
+            className={stylesheet.printfileLink}
+          >
+            View Printfile
+          </TextButton>
+        </div>
+      )}
       {item.customizationOptions && (
         <div className={stylesheet.customization}>
           <strong>Customization:</strong>

@@ -36,3 +36,10 @@ export async function getOrdersNeedingAttention(): Promise<Order[]> {
   const response = await api.get<Order[]>('/merch/orders/needs-attention');
   return response.data;
 }
+
+export async function getPrintfileUrl(itemId: number): Promise<string> {
+  const response = await api.get<{ url: string }>(
+    `/merch/items/${itemId}/printfile-url`
+  );
+  return response.data.url;
+}

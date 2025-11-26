@@ -81,6 +81,16 @@ export class MerchController extends Controller {
   }
 
   @Security('netlify', ['moderator'])
+  @Get('items/{itemId}/printfile-url')
+  public async getPrintfileUrl(
+    @Path('itemId') itemId: number
+  ): Promise<{ url: string }> {
+    const printfileUrl = await getPrintfileUrl(itemId);
+
+    return { url: printfileUrl };
+  }
+
+  @Security('netlify', ['moderator'])
   @Get('items/{itemId}/printfile')
   public async getPrintfile(
     @Path('itemId') itemId: number,

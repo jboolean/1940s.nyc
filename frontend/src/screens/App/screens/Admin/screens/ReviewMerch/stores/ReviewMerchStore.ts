@@ -2,6 +2,7 @@ import { MerchOrderState, Order } from 'shared/utils/merch/Order';
 import {
   getOrdersForReview,
   getOrdersNeedingAttention,
+  getPrintfileUrl,
   updateOrderState,
 } from 'shared/utils/merch/merchApi';
 import create from 'zustand';
@@ -17,6 +18,7 @@ interface Actions {
   cancelOrder(orderId: number): void;
   loadOrders(): void;
   loadOrdersNeedingAttention(): void;
+  viewPrintfile(itemId: number): void;
 }
 
 const useReviewMerchStore = create(
@@ -49,6 +51,10 @@ const useReviewMerchStore = create(
       set((state) => {
         state.orders = state.orders.filter((order) => order.id !== orderId);
       });
+    },
+    viewPrintfile: async (itemId: number) => {
+      const url = await getPrintfileUrl(itemId);
+      window.open(url, '_blank', 'noopener,noreferrer');
     },
   }))
 );
