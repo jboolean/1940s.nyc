@@ -40,17 +40,17 @@ function OrderItemView({ item }: { item: OrderItem }): JSX.Element {
         MerchItemState.READY_FOR_FULFILLMENT,
         MerchItemState.ADDED_TO_ORDER,
       ].includes(item.state) && (
-        <div>
-          <a
-            href={`${API_BASE}/merch/items/${item.id}/printfile`}
-            target="_blank"
-            rel="noreferrer"
-            className={stylesheet.printfileLink}
-          >
-            View Printfile
-          </a>
-        </div>
-      )}
+          <div>
+            <a
+              href={`${API_BASE}/merch/items/${item.id}/printfile`}
+              target="_blank"
+              rel="noreferrer"
+              className={stylesheet.printfileLink}
+            >
+              View Printfile
+            </a>
+          </div>
+        )}
       {item.customizationOptions && (
         <div className={stylesheet.customization}>
           <strong>Customization:</strong>
