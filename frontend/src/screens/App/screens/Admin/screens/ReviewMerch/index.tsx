@@ -1,5 +1,6 @@
 import React from 'react';
 import Button from 'shared/components/Button';
+import { API_BASE } from 'shared/utils/apiConstants';
 import { Order, OrderItem } from 'shared/utils/merch/Order';
 import stylesheet from './ReviewMerch.less';
 import useReviewMerchStore from './stores/ReviewMerchStore';
@@ -38,7 +39,7 @@ function OrderItemView({ item }: { item: OrderItem }): JSX.Element {
       {item.printfileUrl && (
         <div>
           <a
-            href={item.printfileUrl}
+            href={`${API_BASE}/merch/items/${item.id}/printfile`}
             target="_blank"
             rel="noreferrer"
             className={stylesheet.printfileLink}

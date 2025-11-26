@@ -9,7 +9,6 @@ export interface MerchOrderItemApiModel {
   internalVariant: MerchInternalVariant;
   customizationOptions?: MerchCustomizationOptions;
   state: MerchItemState;
-  printfileUrl?: string;
 }
 
 export interface MerchOrderApiModel {

@@ -1,6 +1,6 @@
 import MerchInternalVariant from '../../enum/MerchInternalVariant';
 import absurd from '../utils/absurd';
-import isProduction from '../utils/isProduction';
+import { getPrintfileUrl } from '../utils/printfileUtils';
 import { CatalogItem as PrintfulCatalogItem } from '../utils/printfulApi';
 
 const INTERNAL_VARIANT_TO_PRINTFUL_VARIANT: Record<
@@ -10,21 +10,10 @@ const INTERNAL_VARIANT_TO_PRINTFUL_VARIANT: Record<
   [MerchInternalVariant.TOTE_BAG_SMALL]: 4533, // Product 84
 };
 
-export function getPrintfileKey(customMerchItemId: number): string {
-  const destinationDirectory = isProduction() ? 'printfiles' : 'printfiles-dev';
-  return `merch/${destinationDirectory}/${customMerchItemId}.png`;
-}
-
-export function getPrintfileUrl(customMerchItemId: number): string {
-  const destinationKey = getPrintfileKey(customMerchItemId);
-
-  return `https://photos.1940s.nyc/${destinationKey}`;
-}
-
-export function makePrintfulItem(
+export async function makePrintfulItem(
   customMerchItemId: number,
   internalVariant: MerchInternalVariant
-): PrintfulCatalogItem {
+): Promise<PrintfulCatalogItem> {
   const printfulVariantId =
     INTERNAL_VARIANT_TO_PRINTFUL_VARIANT[internalVariant];
   switch (internalVariant) {
@@ -41,7 +30,7 @@ export function makePrintfulItem(
             layers: [
               {
                 type: 'file',
-                url: getPrintfileUrl(customMerchItemId),
+                url: await getPrintfileUrl(customMerchItemId),
               },
             ],
           },

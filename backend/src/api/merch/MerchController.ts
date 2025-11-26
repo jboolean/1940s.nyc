@@ -15,6 +15,7 @@ import { BadRequest, NotFound } from 'http-errors';
 import { getRepository } from 'typeorm';
 import * as MerchOrderService from '../../business/merch/MerchOrderService';
 import absurd from '../../business/utils/absurd';
+import { getPrintfileUrl } from '../../business/utils/printfileUtils';
 import MerchCustomizationOptions from '../../entities/MerchCustomizationOptions';
 import MerchOrder from '../../entities/MerchOrder';
 import MerchOrderItem from '../../entities/MerchOrderItem';
@@ -77,6 +78,17 @@ export class MerchController extends Controller {
 
     item.state = MerchItemState.CUSTOMIZED;
     await merchItemRepository.save(item);
+  }
+
+  @Security('netlify', ['moderator'])
+  @Get('items/{itemId}/printfile')
+  public async getPrintfile(
+    @Path('itemId') itemId: number,
+    @Request() req: express.Request
+  ): Promise<void> {
+    const printfileUrl = await getPrintfileUrl(itemId);
+
+    return req.res?.redirect(302, printfileUrl);
   }
 
   @Security('netlify', ['moderator'])

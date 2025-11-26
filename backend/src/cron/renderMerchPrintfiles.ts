@@ -1,14 +1,10 @@
-import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
-
 import { getRepository } from 'typeorm';
-import { getPrintfileKey } from '../business/merch/PrintfulItemBuildService';
 import renderToteBag from '../business/merch/renderToteBag';
 import absurd from '../business/utils/absurd';
+import { uploadPrintfile } from '../business/utils/printfileUtils';
 import MerchOrderItem from '../entities/MerchOrderItem';
 import MerchInternalVariant from '../enum/MerchInternalVariant';
 import MerchItemState from '../enum/MerchItemState';
-
-const s3 = new S3Client();
 
 const LIMIT = 5;
 
@@ -51,16 +47,7 @@ export default async function renderMerch(): Promise<void> {
         absurd(variant);
     }
 
-    const destinationKey = getPrintfileKey(item.id);
-
-    await s3.send(
-      new PutObjectCommand({
-        Bucket: 'fourties-photos',
-        Key: destinationKey,
-        Body: buffer,
-        ContentType: 'image/png',
-      })
-    );
+    await uploadPrintfile(item.id, buffer);
 
     await repository.update(item.id, {
       state: MerchItemState.READY_FOR_FULFILLMENT,
