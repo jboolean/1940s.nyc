@@ -12,22 +12,45 @@ export default function ToteBag(): JSX.Element {
     const container = containerRef.current;
     if (!container) return;
 
-    const attributionEl = container.querySelector(
-      '.maplibregl-ctrl-attrib-inner'
-    );
-    if (!attributionEl) return;
+    let attributionObserver: MutationObserver | null = null;
 
-    const observer = new MutationObserver(() => {
-      const text = (attributionEl as HTMLElement).innerText;
+    const setupAttributionObserver = (attributionEl: Element): void => {
+      attributionObserver = new MutationObserver(() => {
+        const text = (attributionEl as HTMLElement).innerText;
+        if (text) {
+          setAttributionText(text);
+        }
+      });
+      attributionObserver.observe(attributionEl, { childList: true });
+    };
 
-      if (text) {
-        setAttributionText(text);
+    const containerObserver = new MutationObserver(() => {
+      const attributionEl = container.querySelector(
+        '.maplibregl-ctrl-attrib-inner'
+      );
+      if (attributionEl) {
+        setupAttributionObserver(attributionEl);
+        containerObserver.disconnect();
       }
     });
 
-    observer.observe(attributionEl, { childList: true });
+    containerObserver.observe(container, {
+      childList: true,
+      subtree: true,
+    });
 
-    return () => observer.disconnect();
+    const attributionEl = container.querySelector(
+      '.maplibregl-ctrl-attrib-inner'
+    );
+    if (attributionEl) {
+      setupAttributionObserver(attributionEl);
+      containerObserver.disconnect();
+    }
+
+    return () => {
+      containerObserver.disconnect();
+      attributionObserver?.disconnect();
+    };
   }, [containerRef]);
 
   return (
