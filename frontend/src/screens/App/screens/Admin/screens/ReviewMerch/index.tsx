@@ -1,7 +1,7 @@
 import React from 'react';
 import Button from 'shared/components/Button';
 import { API_BASE } from 'shared/utils/apiConstants';
-import { Order, OrderItem } from 'shared/utils/merch/Order';
+import { MerchItemState, Order, OrderItem } from 'shared/utils/merch/Order';
 import stylesheet from './ReviewMerch.less';
 import useReviewMerchStore from './stores/ReviewMerchStore';
 
@@ -36,7 +36,10 @@ function OrderItemView({ item }: { item: OrderItem }): JSX.Element {
       <div>Item #{item.id}</div>
       <div>Variant: {item.internalVariant}</div>
       <div>State: {item.state}</div>
-      {item.printfileUrl && (
+      {[
+        MerchItemState.READY_FOR_FULFILLMENT,
+        MerchItemState.ADDED_TO_ORDER,
+      ].includes(item.state) && (
         <div>
           <a
             href={`${API_BASE}/merch/items/${item.id}/printfile`}

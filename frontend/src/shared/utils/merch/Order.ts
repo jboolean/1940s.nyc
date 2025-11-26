@@ -45,7 +45,6 @@ export interface OrderItem {
   internalVariant: MerchInternalVariant;
   customizationOptions?: MerchCustomizationOptions;
   state: MerchItemState;
-  printfileUrl?: string;
 }
 
 export interface Order {
