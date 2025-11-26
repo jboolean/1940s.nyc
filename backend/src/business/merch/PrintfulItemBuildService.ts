@@ -30,7 +30,7 @@ export async function makePrintfulItem(
             layers: [
               {
                 type: 'file',
-                url: await getPrintfileUrl(customMerchItemId),
+                url: await getPrintfileUrl(customMerchItemId, false),
               },
             ],
           },

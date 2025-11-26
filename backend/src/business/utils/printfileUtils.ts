@@ -30,7 +30,8 @@ export async function uploadPrintfile(
 }
 
 export async function getPrintfileUrl(
-  customMerchItemId: number
+  customMerchItemId: number,
+  signedUrl = true
 ): Promise<string> {
   const destinationKey = getPrintfileKey(customMerchItemId);
 
@@ -39,7 +40,9 @@ export async function getPrintfileUrl(
     Key: destinationKey,
   });
 
-  const signedUrl = await getSignedUrl(s3, command, { expiresIn: 120 });
+  if (signedUrl) {
+    return await getSignedUrl(s3, command, { expiresIn: 120 });
+  }
 
-  return signedUrl;
+  return `https://photos.1940s.nyc/${destinationKey}`;
 }
