@@ -12,7 +12,7 @@ import {
 } from '@tsoa/runtime';
 import * as express from 'express';
 import { BadRequest, NotFound } from 'http-errors';
-import { getRepository } from 'typeorm';
+import { AppDataSource } from '../../createConnection';
 import * as MerchOrderService from '../../business/merch/MerchOrderService';
 import absurd from '../../business/utils/absurd';
 import { getPrintfileUrl } from '../../business/utils/printfileUtils';
@@ -31,7 +31,7 @@ export class MerchController extends Controller {
     id: number,
     userId: number
   ): Promise<MerchOrderItem> {
-    const merchItemRepository = getRepository(MerchOrderItem);
+    const merchItemRepository = AppDataSource.getRepository(MerchOrderItem);
     const item = await merchItemRepository
       .createQueryBuilder('item')
       .innerJoinAndSelect('item.order', 'order')
@@ -59,7 +59,7 @@ export class MerchController extends Controller {
     }
 
     item.customizationOptions = customizationOptions;
-    await getRepository(MerchOrderItem).save(item);
+    await AppDataSource.getRepository(MerchOrderItem).save(item);
   }
 
   @Post('items/{itemId}/finalize-customizations')
@@ -69,7 +69,7 @@ export class MerchController extends Controller {
     @Request() req: express.Request
   ): Promise<void> {
     const userId = await getUserFromRequestOrCreateAndSetCookie(req);
-    const merchItemRepository = getRepository(MerchOrderItem);
+    const merchItemRepository = AppDataSource.getRepository(MerchOrderItem);
     const item = await this.getAccessibleMerchItem(itemId, userId);
 
     if (item.state !== MerchItemState.PURCHASED) {
@@ -108,7 +108,7 @@ export class MerchController extends Controller {
     @Body() updates: { state: MerchOrderState }
   ): Promise<MerchOrderApiModel> {
     const { state: newState } = updates;
-    const orderRepository = getRepository(MerchOrder);
+    const orderRepository = AppDataSource.getRepository(MerchOrder);
     let order = await orderRepository.findOneByOrFail({ id: orderId });
 
     switch (newState) {
@@ -151,7 +151,7 @@ export class MerchController extends Controller {
     @Request() req: express.Request
   ): Promise<MerchOrderApiModel[]> {
     const userId = await getUserFromRequestOrCreateAndSetCookie(req);
-    const orders = await getRepository(MerchOrder)
+    const orders = await AppDataSource.getRepository(MerchOrder)
       .createQueryBuilder('order')
       .innerJoinAndSelect('order.items', 'items')
       .innerJoinAndSelect('order.user', 'user')

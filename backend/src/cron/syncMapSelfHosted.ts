@@ -1,6 +1,6 @@
 import { DeleteObjectCommand, ListObjectsV2Command, PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { createReadStream } from 'fs';
-import { getRepository } from 'typeorm';
+import { AppDataSource } from '../createConnection';
 import GeojsonEncoder from '../business/geodata/GeojsonEncoder';
 import tippecanoe from '../business/utils/tippecanoe';
 import EffectiveAddress from '../entities/EffectiveAddress';
@@ -10,12 +10,12 @@ const s3 = new S3Client();
 
 export default async function syncMap(): Promise<void> {
   console.log('Refreshing effective addresses...');
-  await getRepository(EffectiveAddress).query(
+  await AppDataSource.getRepository(EffectiveAddress).query(
     'REFRESH MATERIALIZED VIEW effective_addresses_view WITH DATA'
   );
 
   console.log('Refreshing effective geocodes...');
-  await getRepository(EffectiveGeocode).query(
+  await AppDataSource.getRepository(EffectiveGeocode).query(
     'REFRESH MATERIALIZED VIEW effective_geocodes_view WITH DATA'
   );
 

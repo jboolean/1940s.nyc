@@ -1,5 +1,5 @@
 import { BadRequest } from 'http-errors';
-import { getConnection, getRepository } from 'typeorm';
+import { AppDataSource } from '../../createConnection';
 import MerchOrder from '../../entities/MerchOrder';
 import MerchOrderItem from '../../entities/MerchOrderItem';
 import ShippingAddress from '../../entities/ShippingAddress';
@@ -39,7 +39,7 @@ export async function createMerchOrder(
   shippingAddress: ShippingAddress,
   itemTypes: MerchInternalVariant[]
 ): Promise<MerchOrder> {
-  return getConnection().transaction(async (transactionalEntityManager) => {
+  return AppDataSource.transaction(async (transactionalEntityManager) => {
     const orderRepository =
       transactionalEntityManager.getRepository(MerchOrder);
     let order = new MerchOrder();
@@ -97,7 +97,7 @@ export async function createOrderItems(
   order: MerchOrder,
   itemTypes: MerchInternalVariant[]
 ): Promise<MerchOrderItem[]> {
-  const itemRepository = getRepository(MerchOrderItem);
+  const itemRepository = AppDataSource.getRepository(MerchOrderItem);
   const items = itemTypes.map((type) => {
     const item = new MerchOrderItem();
     item.order = order;
@@ -110,7 +110,7 @@ export async function createOrderItems(
 export async function submitOrderForFulfillment(
   orderId: number
 ): Promise<void> {
-  const orderRepository = getRepository(MerchOrder);
+  const orderRepository = AppDataSource.getRepository(MerchOrder);
   const order = await orderRepository.findOneByOrFail({ id: orderId });
 
   switch (order.provider) {
@@ -128,7 +128,7 @@ export async function submitOrderForFulfillment(
 }
 
 export async function cancelOrder(orderId: number): Promise<void> {
-  const orderRepository = getRepository(MerchOrder);
+  const orderRepository = AppDataSource.getRepository(MerchOrder);
   const order = await orderRepository.findOneByOrFail({ id: orderId });
 
   if (
@@ -152,7 +152,7 @@ export async function onPrinterStatusChanged(
   providerOrderId: number,
   newFulfillmentState: MerchOrderFulfillmentState
 ): Promise<void> {
-  const orderRepository = getRepository(MerchOrder);
+  const orderRepository = AppDataSource.getRepository(MerchOrder);
   const order = await orderRepository.findOneBy({
     provider,
     providerOrderId,
@@ -195,7 +195,7 @@ export async function onShipmentSent(
   providerOrderId: number,
   trackingUrl: string
 ): Promise<void> {
-  const orderRepository = getRepository(MerchOrder);
+  const orderRepository = AppDataSource.getRepository(MerchOrder);
   let order = await orderRepository.findOneBy({
     provider,
     providerOrderId,
@@ -226,7 +226,7 @@ export async function onShipmentSent(
 }
 
 export async function getOrdersForReview(): Promise<MerchOrder[]> {
-  return getRepository(MerchOrder)
+  return AppDataSource.getRepository(MerchOrder)
     .createQueryBuilder('order')
     .innerJoinAndSelect('order.items', 'items')
     .innerJoinAndSelect('order.user', 'user')
@@ -236,7 +236,7 @@ export async function getOrdersForReview(): Promise<MerchOrder[]> {
 }
 
 export async function getOrdersWithExceptions(): Promise<MerchOrder[]> {
-  return await getRepository(MerchOrder)
+  return await AppDataSource.getRepository(MerchOrder)
     .createQueryBuilder('order')
     .innerJoinAndSelect('order.items', 'items')
     .innerJoinAndSelect('order.user', 'user')

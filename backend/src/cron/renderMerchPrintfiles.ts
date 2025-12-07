@@ -1,4 +1,4 @@
-import { getRepository } from 'typeorm';
+import { AppDataSource } from '../createConnection';
 import renderToteBag from '../business/merch/renderToteBag';
 import absurd from '../business/utils/absurd';
 import { uploadPrintfile } from '../business/utils/printfileUtils';
@@ -9,7 +9,7 @@ import MerchItemState from '../enum/MerchItemState';
 const LIMIT = 5;
 
 export default async function renderMerch(): Promise<void> {
-  const repository = getRepository(MerchOrderItem);
+  const repository = AppDataSource.getRepository(MerchOrderItem);
   const itemsToRender = await repository
     .createQueryBuilder('custom_merch_items')
     .where({

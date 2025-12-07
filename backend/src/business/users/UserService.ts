@@ -1,6 +1,6 @@
 import { randomUUID } from 'crypto';
 import jwt from 'jsonwebtoken';
-import { getRepository } from 'typeorm';
+import { AppDataSource } from '../../createConnection';
 import User from '../../entities/User';
 import LoginOutcome from '../../enum/LoginOutcome';
 import stripe from '../../third-party/stripe';
@@ -62,7 +62,7 @@ export function getUserIdFromToken(
 }
 
 export function getUser(userId: number): Promise<User> {
-  const userRepository = getRepository(User);
+  const userRepository = AppDataSource.getRepository(User);
   return userRepository.findOneByOrFail({ id: userId });
 }
 
@@ -87,7 +87,7 @@ export async function attachStripeCustomerAndDetermineUserId(
 ): Promise<number> {
   if (email) email = normalizeEmail(email);
 
-  const userRepository = getRepository(User);
+  const userRepository = AppDataSource.getRepository(User);
   let user: User | null = null;
   if (requestUserId) {
     user = await userRepository.findOneBy({ id: requestUserId });
@@ -115,7 +115,7 @@ export async function attachStripeCustomerAndDetermineUserId(
 export async function getUserByStripeCustomerId(
   stripeCustomerId: string
 ): Promise<User | null> {
-  const userRepository = getRepository(User);
+  const userRepository = AppDataSource.getRepository(User);
   return userRepository.findOneBy({ stripeCustomerId });
 }
 
@@ -123,12 +123,12 @@ export async function updateSupportSubscription(
   userId: number,
   stripeSupportSubscriptionId: string | null
 ): Promise<void> {
-  const userRepository = getRepository(User);
+  const userRepository = AppDataSource.getRepository(User);
   await userRepository.update(userId, { stripeSupportSubscriptionId });
 }
 
 export async function markEmailVerified(userId: number): Promise<void> {
-  const userRepository = getRepository(User);
+  const userRepository = AppDataSource.getRepository(User);
   await userRepository.update(userId, { isEmailVerified: true });
 }
 
@@ -136,7 +136,7 @@ export async function createUser(
   ipAddress: string,
   email?: string
 ): Promise<{ token: string; userId: number }> {
-  const userRepository = getRepository(User);
+  const userRepository = AppDataSource.getRepository(User);
 
   let user = new User();
   user.ipAddress = ipAddress;
@@ -227,7 +227,7 @@ export async function processLoginRequest(
   requireVerifiedEmail = false,
   newEmailBehavior: 'update' | 'reject' | 'create' = 'update'
 ): Promise<LoginOutcome> {
-  const userRepository = getRepository(User);
+  const userRepository = AppDataSource.getRepository(User);
 
   const currentUser = await userRepository.findOneByOrFail({
     id: authenticatedUserId,

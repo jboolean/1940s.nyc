@@ -12,7 +12,8 @@ import {
 import * as express from 'express';
 import { BadRequest, NotFound } from 'http-errors';
 import querystring from 'querystring';
-import { getRepository, In } from 'typeorm';
+import { In } from 'typeorm';
+import { AppDataSource } from '../../createConnection';
 import Paginated from '../../business/pagination/Paginated';
 import mapPaginated from '../../business/utils/mapPaginated';
 import Photo from '../../entities/Photo';
@@ -44,7 +45,7 @@ export class PhotosController extends Controller {
     @Query() lat?: string | number,
     @Query() withSameLngLatByIdentifier?: string
   ): Promise<PhotoApiModel[]> {
-    const photoRepo = getRepository(Photo);
+    const photoRepo = AppDataSource.getRepository(Photo);
 
     if (withSameLngLatByIdentifier) {
       const lngLatForFromIdentifierResult = await getLngLatForIdentifier(
@@ -87,7 +88,7 @@ export class PhotosController extends Controller {
     @Query() lat: string | number,
     @Query() collection?: '1940' | '1980'
   ): Promise<PhotoApiModel> {
-    const photoRepo = getRepository(Photo);
+    const photoRepo = AppDataSource.getRepository(Photo);
 
     const result: { identifier: string; distance: number }[] =
       await photoRepo.query(
@@ -114,7 +115,7 @@ export class PhotosController extends Controller {
     @Query('pageToken') pageToken?: string,
     @Query('pageSize') pageSize = 100
   ): Promise<Paginated<{ identifier: string }>> {
-    const photoRepo = getRepository(Photo);
+    const photoRepo = AppDataSource.getRepository(Photo);
 
     const qb = photoRepo
       .createQueryBuilder('photo')
@@ -144,7 +145,7 @@ export class PhotosController extends Controller {
   public async getByIdentifier(
     @Path() identifier: string
   ): Promise<PhotoApiModel> {
-    const photoRepo = getRepository(Photo);
+    const photoRepo = AppDataSource.getRepository(Photo);
 
     const photo = await photoRepo.findOne({
       where: { identifier },
@@ -163,7 +164,7 @@ export class PhotosController extends Controller {
     @Path() identifier: string,
     @Request() req: express.Request
   ): Promise<void> {
-    const photoRepo = getRepository(Photo);
+    const photoRepo = AppDataSource.getRepository(Photo);
 
     const photo = await photoRepo.findOneBy({
       identifier: identifier,
@@ -196,7 +197,7 @@ export class PhotosController extends Controller {
     @Request() req: express.Request
   ): Promise<void> {
     // Ensure this is a valid photo identifier so they can't get arbitrary s3 objects
-    const photoRepo = getRepository(Photo);
+    const photoRepo = AppDataSource.getRepository(Photo);
     const photoExists = await photoRepo.exists({
       where: { identifier: identifier },
     });

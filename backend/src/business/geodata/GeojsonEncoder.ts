@@ -2,7 +2,7 @@ import { Feature } from 'geojson';
 import gp from 'geojson-precision';
 import JSONStream from 'jsonstream';
 import { Transform } from 'stream';
-import { getRepository } from 'typeorm';
+import { AppDataSource } from '../../createConnection';
 import EffectiveGeocode from '../../entities/EffectiveGeocode';
 import StoryState from '../../enum/StoryState';
 
@@ -34,7 +34,7 @@ export default class GeojsonEncoder {
   ): Promise<NodeJS.ReadableStream> {
     return (
       (
-        await getRepository(EffectiveGeocode)
+        await AppDataSource.getRepository(EffectiveGeocode)
           .createQueryBuilder('record')
           // ensure only one result per photo (even if there are multiple stories)
           // This lets us use the photo identifier as a unique identifier for the feature.
