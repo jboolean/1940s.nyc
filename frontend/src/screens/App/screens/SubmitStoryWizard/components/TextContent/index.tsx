@@ -1,7 +1,7 @@
-import React, { ChangeEventHandler } from 'react';
+import React from 'react';
 import { StoryState } from 'screens/App/shared/types/Story';
 import Button from 'shared/components/Button';
-import TextArea from 'shared/components/TextArea';
+import TipTapEditor from 'shared/components/TipTapEditor';
 import IntroGraph from '../IntroGraph';
 
 import stylesheet from './TextContent.less';
@@ -41,31 +41,17 @@ export default function TextContent({
   storyState: StoryState;
   onUnpublish: () => void;
 }): JSX.Element {
-  const handleTextContentChange: ChangeEventHandler<HTMLTextAreaElement> = (
-    event
-  ) => {
-    onTextContentChange(event.target.value);
-  };
-
-  const textInputRef = React.useRef<HTMLTextAreaElement>(null);
-
-  React.useEffect(() => {
-    if (textInputRef.current) {
-      textInputRef.current.focus();
-    }
-  }, []);
-
   return (
     <div className={stylesheet.content}>
       <h1>Add your story</h1>
       {isAudioStorytellingEnabled ? null : <IntroGraph />}
-      <TextArea
+      <TipTapEditor
         className={stylesheet.writingArea}
         placeholder="Share as little or much as you&rsquo;d like about this photo, the surrounding area, and your connection to it"
-        aria-label='"Story content'
-        value={textContent ?? ''}
-        onChange={handleTextContentChange}
-        ref={textInputRef}
+        aria-label="Story content"
+        content={textContent ?? ''}
+        editable={true}
+        onChange={onTextContentChange}
       />
       <div>
         {storyState === StoryState.PUBLISHED ||

@@ -1,0 +1,20 @@
+@import '../../styles/colors.less';
+
+.tiptap {
+  outline: none;
+  min-height: 100px;
+
+  font-size: 100%;
+  background-color: transparent;
+  border-left: 1px solid @font-color-dark;
+  padding-left: 1em;
+
+  p:global(.is-empty):first-child::before {
+    color: lighten(@font-color-dark, 10%);
+    content: attr(data-placeholder);
+    float: left;
+    height: 0;
+    pointer-events: none;
+    font-style: italic;
+  }
+}
