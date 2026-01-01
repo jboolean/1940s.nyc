@@ -1,97 +1,27 @@
-import React, { useState } from 'react';
-import api from 'shared/utils/api';
+import React from 'react';
 import Button from 'shared/components/Button';
 import TextInput from 'shared/components/TextInput';
 import Modal from 'shared/components/Modal';
 import stylesheet from './NewsletterModal.less';
-
-interface NewsletterModalState {
-  isOpen: boolean;
-}
-
-const initialState: NewsletterModalState = {
-  isOpen: false,
-};
-
-let state = initialState;
-const listeners: Array<() => void> = [];
-
-function notifyListeners(): void {
-  listeners.forEach((listener) => listener());
-}
-
-export function openNewsletterModal(): void {
-  state = { isOpen: true };
-  notifyListeners();
-}
-
-function closeNewsletterModal(): void {
-  state = { isOpen: false };
-  notifyListeners();
-}
-
-export function useNewsletterModalStore(): NewsletterModalState {
-  const [, forceUpdate] = useState({});
-
-  React.useEffect(() => {
-    const listener = (): void => forceUpdate({});
-    listeners.push(listener);
-    return (): void => {
-      const index = listeners.indexOf(listener);
-      if (index > -1) {
-        listeners.splice(index, 1);
-      }
-    };
-  }, []);
-
-  return state;
-}
+import useNewsletterModalStore from './stores/NewsletterModalStore';
 
 export default function NewsletterModal(): JSX.Element {
-  const { isOpen } = useNewsletterModalStore();
-  const [email, setEmail] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const {
+    isOpen,
+    email,
+    isSubmitting,
+    isSuccess,
+    errorMessage,
+    close,
+    setEmail,
+    handleSubmit,
+    reset,
+  } = useNewsletterModalStore();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!email || !/\S+@\S+\.\S+/.test(email)) {
-      setError('Please enter a valid email address');
-      return;
-    }
-
-    setIsSubmitting(true);
-    setError(null);
-
-    try {
-      await api.post('/email-campaigns/mailing-list', {
-        address: email,
-        source: 'map-actions',
-      });
-      
-      setIsSuccess(true);
-      setEmail('');
-      
-      // Close modal after success message
-      setTimeout(() => {
-        setIsSuccess(false);
-        closeNewsletterModal();
-      }, 2000);
-    } catch (err) {
-      setError('Failed to subscribe. Please try again.');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleClose = () => {
+  const handleClose = (): void => {
     if (!isSubmitting) {
-      setEmail('');
-      setError(null);
-      setIsSuccess(false);
-      closeNewsletterModal();
+      reset();
+      close();
     }
   };
 
@@ -102,12 +32,13 @@ export default function NewsletterModal(): JSX.Element {
         {isSuccess ? (
           <div className={stylesheet.success}>
             <p>✓ Thanks for subscribing!</p>
-            <p>You'll receive updates about new photos and features.</p>
+            <p>You&apos;ll receive updates about new photos and features.</p>
           </div>
         ) : (
           <>
             <p>
-              Get notifications about new photos, features, and stories from 1940s NYC.
+              Get notifications about new photos, features, and stories from
+              1940s NYC.
             </p>
             <form onSubmit={handleSubmit} className={stylesheet.form}>
               <TextInput
@@ -127,12 +58,14 @@ export default function NewsletterModal(): JSX.Element {
                 </Button>
               </div>
             </form>
-            {error && (
-              <p className={stylesheet.error}>{error}</p>
-            )}
+            {errorMessage && <p className={stylesheet.error}>{errorMessage}</p>}
           </>
         )}
       </div>
     </Modal>
   );
+}
+
+export function openNewsletterModal(): void {
+  useNewsletterModalStore.getState().open();
 }
