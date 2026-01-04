@@ -1,5 +1,6 @@
 import React from 'react';
 import { Story } from 'screens/App/shared/types/Story';
+import TipTapEditor from 'shared/components/TipTapEditor';
 
 import stylesheet from './Story.less';
 
@@ -11,7 +12,11 @@ export default function Story({ story }: { story: Story }): JSX.Element {
         {story.storytellerSubtitle}
       </div>
 
-      <p className={stylesheet.textContent}>{story.textContent}</p>
+      <TipTapEditor
+        className={stylesheet.textContent}
+        editable={false}
+        content={story.textContent}
+      />
     </div>
   );
 }
