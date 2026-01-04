@@ -1,14 +1,15 @@
-import { Brackets, getRepository, In, IsNull, Repository } from 'typeorm';
+import { Brackets, In, IsNull, Repository } from 'typeorm';
 import Paginated from '../business/pagination/Paginated';
 import PaginationInput from '../business/pagination/PaginationInput';
 import Story from '../entities/Story';
 import StoryState from '../enum/StoryState';
 import getLngLatForIdentifier from './getLngLatForIdentifier';
 import { getPaginated } from './paginationUtils';
+import { AppDataSource } from '../createConnection';
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type -- better type is inferred
 const StoryRepository = () =>
-  getRepository(Story).extend({
+  AppDataSource.getRepository(Story).extend({
     async findPublishedForPhotoIdentifier(
       this: Repository<Story>,
       identifier: string,

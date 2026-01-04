@@ -1,5 +1,6 @@
 import { toLower } from 'lodash';
-import { getConnection, getRepository, LessThan } from 'typeorm';
+import { LessThan } from 'typeorm';
+import { AppDataSource } from '../../createConnection';
 import CampaignSend from '../../entities/CampaignSend';
 import MailingListMember from '../../entities/MailingListMember';
 import CampaignSendStatus from '../../enum/CampaignSendStatus';
@@ -20,8 +21,7 @@ class EmailCampaignService {
       throw new Error('Cannot schedule email campaign in the past');
     }
 
-    const connection = getConnection();
-    await connection.query(
+    await AppDataSource.query(
       `
       INSERT INTO campaign_sends (address, template, livemode, send_on, status)
       SELECT address, $1, $2, $3, $4 FROM mailing_list_members
@@ -36,7 +36,7 @@ class EmailCampaignService {
     source: string | null
   ): Promise<void> {
     const normalizeEmail = toLower(address);
-    await getRepository(MailingListMember)
+    await AppDataSource.getRepository(MailingListMember)
       .createQueryBuilder()
       .insert()
       .values({
@@ -48,7 +48,7 @@ class EmailCampaignService {
   }
 
   async sendPendingEmails(livemode: boolean): Promise<void> {
-    const toSend = await getConnection().transaction(
+    const toSend = await AppDataSource.transaction(
       async (transactionalEntityManager) => {
         const toSend = await transactionalEntityManager
           .getRepository(CampaignSend)
@@ -100,7 +100,7 @@ class EmailCampaignService {
       send.result = result;
     }
 
-    await getRepository(CampaignSend).save(toSend);
+    await AppDataSource.getRepository(CampaignSend).save(toSend);
   }
 }
 

@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import path from 'path';
 import 'reflect-metadata';
-import { Connection, createConnection, getConnectionManager } from 'typeorm';
+import { DataSource } from 'typeorm';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 
 // Import all entities directly for webpack compatibility
@@ -21,6 +21,8 @@ import Photo from './entities/Photo';
 import Story from './entities/Story';
 import User from './entities/User';
 
+// DB connection related env vars
+const { DB_HOST, DB_PORT, DB_USERNAME, DB_PASSWORD, DB_DATABASE } = process.env;
 // Force entity class metadata to be evaluated
 const ENTITIES = [
   AddressCorrection,
@@ -51,47 +53,33 @@ function validateEntityMetadata(): void {
   }
 }
 
-export default function createConnectionIfNotExists(): Promise<Connection> {
+export const AppDataSource = new DataSource({
+  type: 'postgres',
+  host: DB_HOST,
+  port: Number(DB_PORT),
+  username: DB_USERNAME,
+  password: DB_PASSWORD,
+  database: DB_DATABASE,
+  ssl: {
+    rejectUnauthorized: true,
+    ca: fs
+      .readFileSync(path.join(process.cwd(), 'certs/us-east-1-bundle.pem'))
+      .toString(),
+  },
+  synchronize: false,
+  logging: !!process.env.IS_OFFLINE,
+  entities: ENTITIES,
+  namingStrategy: new SnakeNamingStrategy(),
+});
+
+export default async function createConnectionIfNotExists(): Promise<DataSource> {
   // Validate metadata in development/debug mode
   if (process.env.IS_OFFLINE || process.env.NODE_ENV !== 'production') {
     validateEntityMetadata();
   }
-
-  const connectionManager = getConnectionManager();
-  if (connectionManager.has('default')) {
-    const connection = connectionManager.get('default');
-    if (!connection.isConnected) {
-      return connection.connect();
-    }
-    return Promise.resolve(connection);
+  if (!AppDataSource.isInitialized) {
+    await AppDataSource.initialize();
   }
 
-  const sslCert = fs.readFileSync(
-    path.join(process.cwd(), 'certs/us-east-1-bundle.pem')
-  );
-
-  const {
-    DB_HOST: host,
-    DB_PORT: port,
-    DB_USERNAME: username,
-    DB_PASSWORD: password,
-    DB_DATABASE: database,
-  } = process.env;
-
-  return createConnection({
-    type: 'postgres',
-    host,
-    port: Number(port),
-    username,
-    password,
-    database,
-    ssl: {
-      rejectUnauthorized: true,
-      ca: sslCert.toString(),
-    },
-    synchronize: false,
-    logging: !!process.env.IS_OFFLINE,
-    entities: ENTITIES,
-    namingStrategy: new SnakeNamingStrategy(),
-  });
+  return AppDataSource;
 }

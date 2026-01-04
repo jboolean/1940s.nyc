@@ -1,4 +1,4 @@
-import { getRepository } from 'typeorm';
+import { AppDataSource } from '../../createConnection';
 import Story from '../../entities/Story';
 import User from '../../entities/User';
 import StoryState from '../../enum/StoryState';
@@ -22,7 +22,7 @@ function getStoryOrThrow(
 
 async function onStorySubmitted(storyId: Story['id']): Promise<void> {
   const story = await getStoryOrThrow(storyId, StoryState.SUBMITTED);
-  const userRepository = getRepository(User);
+  const userRepository = AppDataSource.getRepository(User);
 
   const hasSubmittedBefore = story.hasEverSubmitted;
 

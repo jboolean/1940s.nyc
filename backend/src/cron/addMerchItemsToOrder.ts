@@ -1,4 +1,4 @@
-import { getRepository } from 'typeorm';
+import { AppDataSource } from '../createConnection';
 import * as PrintfulService from '../business/merch/PrintfulService';
 import MerchOrder from '../entities/MerchOrder';
 import MerchOrderItem from '../entities/MerchOrderItem';
@@ -8,8 +8,8 @@ import MerchOrderState from '../enum/MerchOrderState';
 const LIMIT = 5;
 
 export default async function addMerchItemsToOrder(): Promise<void> {
-  const itemRepository = getRepository(MerchOrderItem);
-  const orderRepository = getRepository(MerchOrder);
+  const itemRepository = AppDataSource.getRepository(MerchOrderItem);
+  const orderRepository = AppDataSource.getRepository(MerchOrder);
   const items = await itemRepository
     .createQueryBuilder('custom_merch_items')
     .leftJoinAndSelect('custom_merch_items.order', 'order')

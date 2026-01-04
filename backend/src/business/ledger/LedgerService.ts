@@ -1,5 +1,6 @@
 import { TooManyRequests } from 'http-errors';
-import { getConnection, MoreThan, Repository } from 'typeorm';
+import { MoreThan, Repository } from 'typeorm';
+import { AppDataSource } from '../../createConnection';
 import LedgerEntry from '../../entities/LedgerEntry';
 import LedgerEntryType from '../../enum/LedgerEntryType';
 
@@ -15,7 +16,7 @@ export async function getBalance(
   ledgerRepository?: Repository<LedgerEntry>
 ): Promise<number> {
   if (!ledgerRepository) {
-    ledgerRepository = getConnection().getRepository(LedgerEntry);
+    ledgerRepository = AppDataSource.getRepository(LedgerEntry);
   }
   const { balance } = (await ledgerRepository
     .createQueryBuilder('entry')
@@ -34,7 +35,7 @@ async function hasEnoughBalance(
   ledgerRepository?: Repository<LedgerEntry>
 ): Promise<boolean> {
   if (!ledgerRepository) {
-    ledgerRepository = getConnection().getRepository(LedgerEntry);
+    ledgerRepository = AppDataSource.getRepository(LedgerEntry);
   }
   const balance = await getBalance(userId, ledgerRepository);
 
@@ -77,7 +78,7 @@ export async function withMeteredUsage<R>(
   photoIdentifier: string,
   wrapped: () => Promise<R>
 ): Promise<R> {
-  return getConnection().transaction(async (transactionalEntityManager) => {
+  return AppDataSource.transaction(async (transactionalEntityManager) => {
     const ledgerRepository =
       transactionalEntityManager.getRepository(LedgerEntry);
 
@@ -113,7 +114,7 @@ export async function grantCredits(
   amountCents: number,
   giveAmnesty = true
 ): Promise<void> {
-  const ledgerRepository = getConnection().getRepository(LedgerEntry);
+  const ledgerRepository = AppDataSource.getRepository(LedgerEntry);
 
   const balance = await getBalance(userId, ledgerRepository);
   const amnesty = balance < 0 ? -balance : 0;

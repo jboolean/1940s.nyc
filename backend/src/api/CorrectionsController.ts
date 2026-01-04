@@ -1,7 +1,7 @@
 import { Body, Post, Request, Route, Security } from '@tsoa/runtime';
 import * as express from 'express';
 import { Forbidden } from 'http-errors';
-import { getRepository } from 'typeorm';
+import { AppDataSource } from '../createConnection';
 import * as UserService from '../business/users/UserService';
 import AddressCorrection from '../entities/AddressCorrection';
 import GeocodeCorrection from '../entities/GeocodeCorrection';
@@ -49,7 +49,8 @@ export class CorrectionsController {
 
     const userId = await getUserIdFromRequestForCorrection(req);
 
-    const correctionsRepository = getRepository(GeocodeCorrection);
+    const correctionsRepository =
+      AppDataSource.getRepository(GeocodeCorrection);
 
     const corrections = photos.map((photo) => {
       const correction = new GeocodeCorrection();
@@ -72,7 +73,8 @@ export class CorrectionsController {
 
     const userId = await getUserIdFromRequestForCorrection(req);
 
-    const correctionsRepository = getRepository(AddressCorrection);
+    const correctionsRepository =
+      AppDataSource.getRepository(AddressCorrection);
 
     const corrections = photos.map((photo) => {
       const correction = new AddressCorrection();
