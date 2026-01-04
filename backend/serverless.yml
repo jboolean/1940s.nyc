@@ -11,6 +11,8 @@ provider:
   runtime: nodejs20.x
   stage: production
   region: us-east-1
+  tags:
+    Project: fourtiesnyc
   iam:
     role:
       statements:
