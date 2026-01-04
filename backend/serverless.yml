@@ -18,6 +18,10 @@ provider:
           Action:
             - s3:*
           Resource: "*"
+        - Effect: Allow
+          Action:
+            - secretsmanager:GetSecretValue
+          Resource: ${self:custom.datadog.apiKeySecretArn}
   environment:
     STAGE: ${sls:stage}
     DB_HOST: ${ssm:/${self:service}-${sls:stage}-db-host}
