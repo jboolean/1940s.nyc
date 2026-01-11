@@ -15,7 +15,6 @@ export default function NewsletterModal(): JSX.Element {
     close,
     setEmail,
     handleSubmit,
-    reset,
   } = useNewsletterModalStore();
 
   const handleClose = (): void => {
