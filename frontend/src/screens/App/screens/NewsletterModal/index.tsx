@@ -20,7 +20,6 @@ export default function NewsletterModal(): JSX.Element {
 
   const handleClose = (): void => {
     if (!isSubmitting) {
-      reset();
       close();
     }
   };
