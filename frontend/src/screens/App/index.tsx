@@ -26,6 +26,7 @@ import EditStory from './screens/EditStory';
 import FeatureFlags from './screens/FeatureFlags';
 import Orders from './screens/Merch/screens/Orders';
 import MerchModal, { openMerchModal } from './screens/MerchModal';
+import NewsletterModal from './screens/NewsletterModal';
 import SubmitStoryWizard from './screens/SubmitStoryWizard';
 import TipJar, { useTipJarStore } from './screens/TipJar';
 
@@ -102,6 +103,7 @@ function Modals(): JSX.Element {
         }}
       />
       <MerchModal />
+      <NewsletterModal />
       {noTipJar ? null : <TipJar />}
     </>
   );
