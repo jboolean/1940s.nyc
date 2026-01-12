@@ -157,20 +157,6 @@ class MapPane extends React.Component<Props & RouteComponentProps, State> {
 
           <button
             type="button"
-            className={stylesheet.action}
-            onClick={() => {
-              recordEvent({
-                category: 'Map',
-                action: 'Click Newsletter',
-              });
-              openNewsletterModal();
-            }}
-          >
-            Newsletter
-          </button>
-
-          <button
-            type="button"
             className={classnames(
               stylesheet.action,
               stylesheet.additionalActionsToggle
@@ -184,6 +170,19 @@ class MapPane extends React.Component<Props & RouteComponentProps, State> {
             More…
           </button>
           <div className={stylesheet.additionalActions}>
+            <button
+              type="button"
+              className={stylesheet.action}
+              onClick={() => {
+                recordEvent({
+                  category: 'Map',
+                  action: 'Click Newsletter',
+                });
+                openNewsletterModal();
+              }}
+            >
+              Newsletter
+            </button>
             <Link to="/outtakes" className={stylesheet.action}>
               Outtakes
             </Link>
