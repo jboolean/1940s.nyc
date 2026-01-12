@@ -30,13 +30,16 @@ export default function NewsletterModal(): JSX.Element {
         {isSuccess ? (
           <div className={stylesheet.success}>
             <p>✓ Thanks for subscribing!</p>
-            <p>You&apos;ll receive updates about new photos and features.</p>
+            <p>
+              You&apos;ll be the first to know about new ways to explore old New
+              York.
+            </p>
           </div>
         ) : (
           <>
             <p>
-              Get notifications about new photos, features, and stories from
-              1940s NYC.
+              Sign up to be notified about new features and other updates to{' '}
+              <i>1940s.nyc</i>. I send a newsletter about twice a year.
             </p>
             <form onSubmit={handleSubmit} className={stylesheet.form}>
               <TextInput
