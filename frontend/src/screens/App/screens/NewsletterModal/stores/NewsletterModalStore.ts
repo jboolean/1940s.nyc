@@ -69,7 +69,7 @@ const useNewsletterModalStore = create(
       try {
         await api.post('/email-campaigns/mailing-list', {
           address: email,
-          source: 'map-actions',
+          source: 'signup-form',
         });
 
         set((draft) => {
