@@ -1,7 +1,20 @@
 import React from 'react';
+import Markdown from 'react-markdown';
 import { Story } from 'screens/App/shared/types/Story';
 
 import stylesheet from './Story.less';
+import autoLink from 'shared/utils/autoLink';
+
+function NewTabLink({
+  children,
+  ...props
+}: React.PropsWithChildren): JSX.Element {
+  return (
+    <a {...props} rel="noopener noreferrer" target="_blank">
+      {children}
+    </a>
+  );
+}
 
 export default function Story({ story }: { story: Story }): JSX.Element {
   return (
@@ -11,7 +24,16 @@ export default function Story({ story }: { story: Story }): JSX.Element {
         {story.storytellerSubtitle}
       </div>
 
-      <p className={stylesheet.textContent}>{story.textContent}</p>
+      <Markdown
+        allowedElements={['strong', 'em', 'ul', 'ol', 'li', 'a', 'p']}
+        unwrapDisallowed={true}
+        // override the component used for anchor tags to always redirect to a new tab
+        components={{
+          a: NewTabLink,
+        }}
+      >
+        {autoLink(story.textContent || '')}
+      </Markdown>
     </div>
   );
 }
