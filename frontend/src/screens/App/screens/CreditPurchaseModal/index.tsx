@@ -42,7 +42,7 @@ export default function CreditPurchaseModal(): JSX.Element {
         className: stylesheet.image,
       }}
     >
-      <div>
+      <div data-testid="credit-purchase-modal">
         <h1>Continue exploring in color</h1>
 
         <div>

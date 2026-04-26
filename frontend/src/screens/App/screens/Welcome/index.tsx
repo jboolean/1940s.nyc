@@ -39,9 +39,11 @@ export default function Welcome({
         className: stylesheet.image,
       }}
     >
-      <div className={stylesheet.right}>
+      <div className={stylesheet.right} data-testid="welcome-modal">
         <div className={stylesheet.text}>
-          <h1>Street View of 1940s&nbsp;New&nbsp;York</h1>
+          <h1 data-testid="welcome-heading">
+            Street View of 1940s&nbsp;New&nbsp;York
+          </h1>
           <p>
             Between 1939 and 1941, the Works Progress Administration
             collaborated with the New York City Tax Department to collect
@@ -60,7 +62,11 @@ export default function Welcome({
             )}
             onClick={handleClose}
           >
-            <Button buttonStyle="primary" className={stylesheet.explore}>
+            <Button
+              buttonStyle="primary"
+              className={stylesheet.explore}
+              data-testid="start-exploring"
+            >
               Start Exploring
             </Button>
           </div>
@@ -120,7 +126,11 @@ export default function Welcome({
           )}
           onClick={handleClose}
         >
-          <Button buttonStyle="primary" className={stylesheet.explore}>
+          <Button
+            buttonStyle="primary"
+            className={stylesheet.explore}
+            data-testid="start-exploring"
+          >
             Start Exploring
           </Button>
         </div>

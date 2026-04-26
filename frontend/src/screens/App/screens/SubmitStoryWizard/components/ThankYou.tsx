@@ -7,7 +7,7 @@ export default function ThankYou({
   onCloseClicked: () => void;
 }): JSX.Element {
   return (
-    <div>
+    <div data-testid="story-thank-you">
       <h1>Thank you for sharing</h1>
       <p>
         I love hearing everyone&rsquo;s stories, and I&rsquo;ll publish yours on

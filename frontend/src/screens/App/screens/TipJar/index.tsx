@@ -174,7 +174,7 @@ export default function TipJar(): JSX.Element {
   return (
     <Modal size="x-large" isOpen={isOpen} onRequestClose={handleRequestClose}>
       <LoginToManageModal />
-      <div className={stylesheet.content}>
+      <div className={stylesheet.content} data-testid="tip-jar-modal">
         <div className={stylesheet.introCopy}>
           <h1>{title}</h1>
           {body}{' '}
@@ -217,6 +217,7 @@ export default function TipJar(): JSX.Element {
             {amountPresets.map((presetAmount) => (
               <Button
                 buttonStyle="secondary"
+                data-testid="tip-jar-preset-button"
                 disabled={!frequency}
                 key={presetAmount}
                 onClick={() => setAmountDollars(presetAmount)}
@@ -304,6 +305,7 @@ export default function TipJar(): JSX.Element {
               buttonStyle="primary"
               onClick={handleSubmit}
               disabled={!amountDollars || isSubmitting}
+              data-testid="tip-submit-button"
             >
               {frequency === TipFrequency.ONCE
                 ? 'Leave Tip'

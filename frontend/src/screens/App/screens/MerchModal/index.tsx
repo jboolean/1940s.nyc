@@ -46,7 +46,7 @@ export default function MerchModal(): JSX.Element {
       isCloseButtonVisible={true}
       className={stylesheet.merchModal}
     >
-      <div className={stylesheet.content}>
+      <div className={stylesheet.content} data-testid="merch-modal">
         <h1>Shop merch</h1>
         <div className={stylesheet.productsArea}>
           {availableProducts && availableProducts.length > 0 && (
@@ -80,6 +80,7 @@ export default function MerchModal(): JSX.Element {
             buttonStyle="primary"
             onClick={() => handleCheckout()}
             disabled={isCheckoutDisabled}
+            data-testid="merch-checkout-button"
           >
             Continue to Checkout
           </Button>

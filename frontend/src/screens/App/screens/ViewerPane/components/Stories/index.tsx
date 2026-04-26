@@ -22,7 +22,7 @@ export default function Stories({ photoIdentifier }: Props): JSX.Element {
   }, [photoIdentifier]);
 
   return (
-    <div title="Stories">
+    <div title="Stories" data-testid="stories-on-photo">
       {stories.map((story) => (
         <Story key={story.id} story={story} />
       ))}

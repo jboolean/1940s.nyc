@@ -80,7 +80,7 @@ export default function Outtakes({
   }>();
 
   return (
-    <div className={classnames(stylesheet.container, className)}>
+    <div data-testid="outtakes-page" className={classnames(stylesheet.container, className)}>
       <div className={stylesheet.top}>
         <h1>Outtakes</h1>
         <Link to="/map" className={stylesheet.backToMap}>
@@ -101,6 +101,7 @@ export default function Outtakes({
             return (
               <img
                 key={identifier}
+                data-testid="outtake-photo"
                 height={`100%`}
                 width={`100%`}
                 src={`${PHOTO_BASE}/420-jpg/${identifier}.jpg`}
