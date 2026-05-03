@@ -1,0 +1,47 @@
+name: Playwright E2E Tests
+
+on:
+  pull_request:
+    paths:
+      - "frontend/**"
+
+defaults:
+  run:
+    shell: bash
+    working-directory: frontend
+
+jobs:
+  e2e:
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Wait for Netlify Preview Deploy
+        uses: jakepartusch/wait-for-netlify-action@v1.4
+        id: wait-for-netlify
+        with:
+          site_name: '1940s-nyc'
+          max_timeout: 300
+        env:
+          NETLIFY_TOKEN: ${{ secrets.NETLIFY_TOKEN }}
+
+      - name: Run Playwright tests against preview deploy
+        run: npx playwright test
+        env:
+          CI: 'true'
+          BASE_URL: ${{ steps.wait-for-netlify.outputs.url }}
