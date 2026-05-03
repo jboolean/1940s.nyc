@@ -61,3 +61,6 @@ GitHub.sublime-settings
 
 node_modules
 dist/
+
+.claude
+test-results
