@@ -15,6 +15,7 @@ jobs:
         uses: dependabot/fetch-metadata@v2
         with:
           github-token: "${{ secrets.GITHUB_TOKEN }}"
+      # Auto-merge patch updates to direct deps, and minor updates to indirect deps
       - name: Check if eligible for auto-merge
         id: check
         if: >
