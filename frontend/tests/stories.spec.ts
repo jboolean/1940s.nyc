@@ -31,7 +31,7 @@ const MOCK_STORIES_RESPONSE = {
 };
 
 test('stories list → click story card → back to map with lat/lng hash', async ({ page }) => {
-  await page.route('http://dev.1940s.nyc:3000/stories**', async (route) => {
+  await page.route('**/stories**', async (route) => {
     await route.fulfill({ json: MOCK_STORIES_RESPONSE });
   });
 
