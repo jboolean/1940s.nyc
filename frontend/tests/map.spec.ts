@@ -4,7 +4,7 @@ import { DEFAULT_PHOTO_HASH, url } from './helpers';
 test('click a dot opens photo viewer without moving map', async ({ page }) => {
   await page.goto(url('/map', { noWelcome: true, noTipJar: true, hash: DEFAULT_PHOTO_HASH }));
   await expect(page.locator('[data-testid="map"]')).toBeAttached();
-  // Wait for the photo layer to load and find a photo near center
+  // Wait for the map style to load and find a photo near center
   const identifier = await page.waitForFunction(() => {
     const map = (window as any).__testMapInstance;
     if (!map || !map.loaded?.()) return null;
