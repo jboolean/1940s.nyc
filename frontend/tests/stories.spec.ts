@@ -32,6 +32,10 @@ const MOCK_STORIES_RESPONSE = {
 
 test('stories list → click story card → back to map with lat/lng hash', async ({ page }) => {
   await page.route('**/stories**', async (route) => {
+    // Don't intercept navigation to the /stories page itself, only XHR/fetch API calls
+    if (route.request().resourceType() === 'document') {
+      return route.continue();
+    }
     await route.fulfill({ json: MOCK_STORIES_RESPONSE });
   });
 

@@ -65,10 +65,8 @@ class MapLibreMap
       map.getCanvas().style.cursor = '';
     });
 
-    if (process.env.NODE_ENV !== 'production') {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
-      (window as unknown as Record<string, unknown>).__testMapInstance = map;
-    }
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
+    (window as unknown as Record<string, unknown>).__testMapInstance = map;
 
     map.on('style.load', () => {
       overlays.installLayers(this.map, PHOTO_LAYER);
