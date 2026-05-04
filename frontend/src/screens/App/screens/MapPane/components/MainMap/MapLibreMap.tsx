@@ -65,6 +65,7 @@ class MapLibreMap
       map.getCanvas().style.cursor = '';
     });
 
+    // Expose map instance so Playwright E2E tests can query rendered features.
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
     (window as unknown as Record<string, unknown>).__testMapInstance = map;
 
