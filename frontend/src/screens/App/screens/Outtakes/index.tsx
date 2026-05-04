@@ -80,7 +80,10 @@ export default function Outtakes({
   }>();
 
   return (
-    <div data-testid="outtakes-page" className={classnames(stylesheet.container, className)}>
+    <div
+      data-testid="outtakes-page"
+      className={classnames(stylesheet.container, className)}
+    >
       <div className={stylesheet.top}>
         <h1>Outtakes</h1>
         <Link to="/map" className={stylesheet.backToMap}>

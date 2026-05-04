@@ -58,7 +58,11 @@ function Modals(): JSX.Element {
   const [isCreditPurchaseSuccessOpen, setCreditPurchaseSuccessOpen] =
     React.useState(creditSuccessInitial);
   const [isWelcomeOpen, setWelcomeOpen] = React.useState(
-    !isThankYouOpen && !openTipJarOnLoad && !openMerchOnLoad && !noWelcome && !openCreditPurchaseOnLoad
+    !isThankYouOpen &&
+      !openTipJarOnLoad &&
+      !openMerchOnLoad &&
+      !noWelcome &&
+      !openCreditPurchaseOnLoad
   );
 
   const openTipJar = useTipJarStore((state) => state.open);

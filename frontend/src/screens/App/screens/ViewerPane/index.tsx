@@ -129,7 +129,10 @@ export default function ViewerPane({
       onPanningStart={() => setIsPanning(true)}
       onPanningStop={() => setIsPanning(false)}
     >
-      <div className={classnames(stylesheet.container, className)} data-testid="viewer-pane">
+      <div
+        className={classnames(stylesheet.container, className)}
+        data-testid="viewer-pane"
+      >
         <TransformComponent
           wrapperClass={classnames(stylesheet.transformWrapper, {
             [stylesheet.zoomable]: canHover,

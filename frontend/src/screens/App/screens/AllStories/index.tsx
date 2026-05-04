@@ -81,7 +81,10 @@ export default function Outtakes({
   }>();
 
   return (
-    <div data-testid="stories-page" className={classnames(stylesheet.container, className)}>
+    <div
+      data-testid="stories-page"
+      className={classnames(stylesheet.container, className)}
+    >
       <div className={stylesheet.top}>
         <h1>All Stories</h1>
         <p>

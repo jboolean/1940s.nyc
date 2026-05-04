@@ -11,7 +11,11 @@ export default function Intro({
     <div>
       <h1>Add your story</h1>
       <IntroGraph />
-      <Button buttonStyle="primary" data-testid="story-write-button" onClick={onBeginTextStory}>
+      <Button
+        buttonStyle="primary"
+        data-testid="story-write-button"
+        onClick={onBeginTextStory}
+      >
         Write
       </Button>
     </div>
