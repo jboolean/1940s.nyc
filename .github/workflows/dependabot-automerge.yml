@@ -15,21 +15,14 @@ jobs:
         uses: dependabot/fetch-metadata@v2
         with:
           github-token: "${{ secrets.GITHUB_TOKEN }}"
-      - name: Check if eligible for auto-merge
-        id: check
-        if: >
-          steps.metadata.outputs.update-type == 'version-update:semver-patch' ||
-          (steps.metadata.outputs.dependency-type == 'indirect' &&
-           steps.metadata.outputs.update-type == 'version-update:semver-minor')
-        run: echo "eligible=true" >> $GITHUB_OUTPUT
       - name: Approve PR
-        if: steps.check.outputs.eligible == 'true'
         uses: juliangruber/approve-pull-request-action@v2
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           number: ${{ github.event.pull_request.number }}
       - name: Enable auto-merge
-        if: steps.check.outputs.eligible == 'true'
+        if: >
+          steps.metadata.outputs.update-type != 'version-update:semver-major'
         run: gh pr merge --auto --merge "$PR_URL"
         env:
           PR_URL: ${{github.event.pull_request.html_url}}
