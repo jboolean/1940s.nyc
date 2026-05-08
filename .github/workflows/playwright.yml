@@ -12,7 +12,7 @@ defaults:
 
 jobs:
   e2e:
-    timeout-minutes: 30
+    timeout-minutes: 15
     runs-on: ubuntu-latest
 
     steps:
@@ -31,17 +31,8 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium
 
-      - name: Wait for Netlify Preview Deploy
-        uses: jakepartusch/wait-for-netlify-action@v1.4
-        id: wait-for-netlify
-        with:
-          site_name: '1940s-nyc'
-          max_timeout: 300
-        env:
-          NETLIFY_TOKEN: ${{ secrets.NETLIFY_TOKEN }}
-
-      - name: Run Playwright tests against preview deploy
+      - name: Run Playwright tests
         run: npx playwright test
         env:
           CI: 'true'
-          BASE_URL: ${{ steps.wait-for-netlify.outputs.url }}
+          API_BASE: 'https://api.staging.1940s.nyc'
