@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "postinstall": "patch-package",
     "start": "npm run generate-printful-api && npm run routes && serverless offline start --stage dev --host dev.1940s.nyc --noPrependStageInUrl",
     "debug": "export SLS_DEBUG=* && node --inspect ./node_modules/.bin/serverless offline --stage dev --host dev.1940s.nyc --noPrependStageInUrl",
     "routes": "tsoa routes",
@@ -53,6 +54,8 @@
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.2.1",
     "lint-staged": "^14.0.1",
+    "patch-package": "^8.0.1",
+    "postinstall-postinstall": "^2.1.0",
     "prettier": "^2.8.1",
     "serverless": "npm:osls@^3.59.3",
     "serverless-domain-manager": "^7.3.8",
