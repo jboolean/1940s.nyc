@@ -19,7 +19,7 @@ module.exports = merge(common, {
     new ReactRefreshPlugin(),
     new webpack.DefinePlugin({
       __DEV__: true,
-      __API_BASE__: JSON.stringify('http://dev.1940s.nyc:3000'),
+      __API_BASE__: JSON.stringify(process.env.API_BASE || 'http://dev.1940s.nyc:3000'),
       __STRIPE_PK__: JSON.stringify(
         'pk_test_51HHaB6FCLBtNZLVl2eku10yXOnLMuYmiXDmK2iMo562DrZePotrkn49Acj7AINohiWzuUrgIp4OUDPRkbuvolmPo00x1AHBQLy'
       ),
