@@ -25,6 +25,7 @@ export default function ColorizeButton({
 
   return colorizationEnabled ? (
     <Button
+      data-testid="colorize-button"
       className={classNames(stylesheet.colorizeButton, {
         [stylesheet.loading]: isLoading,
         [stylesheet.enabled]: enabled,

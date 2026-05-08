@@ -60,6 +60,7 @@ export default function TextContent({
       <h1>Add your story</h1>
       {isAudioStorytellingEnabled ? null : <IntroGraph />}
       <TextArea
+        data-testid="story-text-area"
         className={stylesheet.writingArea}
         placeholder="Share as little or much as you&rsquo;d like about this photo, the surrounding area, and your connection to it"
         aria-label='"Story content'
@@ -80,6 +81,7 @@ export default function TextContent({
         ) : null}
         <Button
           buttonStyle="primary"
+          data-testid="story-continue-button"
           onClick={onSubmit}
           disabled={isSubmitting || !isValidToSave}
         >

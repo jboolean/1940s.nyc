@@ -81,7 +81,10 @@ export default function Outtakes({
   }>();
 
   return (
-    <div className={classnames(stylesheet.container, className)}>
+    <div
+      data-testid="stories-page"
+      className={classnames(stylesheet.container, className)}
+    >
       <div className={stylesheet.top}>
         <h1>All Stories</h1>
         <p>
@@ -89,6 +92,7 @@ export default function Outtakes({
           <i>Know This Place?</i> on any photo.
         </p>
         <Link
+          data-testid="back-to-map"
           to={{ pathname: '/map', hash: history.location.hash }}
           className={stylesheet.backToMap}
         >
@@ -120,6 +124,7 @@ export default function Outtakes({
                   className={stylesheet.storyLink}
                 >
                   <div
+                    data-testid="story-card"
                     className={classnames(stylesheet.storyCard, {
                       [stylesheet.selected]: identifier === selectedIdentifier,
                     })}

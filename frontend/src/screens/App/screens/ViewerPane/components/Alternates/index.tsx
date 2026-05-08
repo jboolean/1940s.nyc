@@ -39,6 +39,7 @@ export default function Alternates({
       <div
         className={classnames(stylesheet.container, className)}
         title="Alternate photos at this location"
+        data-testid="alternates"
       >
         <div className={classnames(stylesheet.filmstrip)}>
           {alternatePhotos.map(({ identifier, collection }) => (
@@ -47,6 +48,7 @@ export default function Alternates({
               key={identifier}
               className={stylesheet.link}
               aria-label={`Alternate photo of this location from ${COLLECTION_DISPLAY_NAMES[collection]} collection`}
+              data-testid="alternate-photo"
             >
               <span className={stylesheet.collectionTag}>
                 {COLLECTION_DISPLAY_NAMES[collection]}

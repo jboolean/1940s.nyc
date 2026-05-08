@@ -21,6 +21,7 @@ import AdminRoutes from './screens/Admin/AdminRoutes';
 import Corrections from './screens/Corrections';
 import CreditPurchaseModal, {
   CreditPurchaseSuccessMessage,
+  openCreditPurchaseModal,
 } from './screens/CreditPurchaseModal';
 import EditStory from './screens/EditStory';
 import FeatureFlags from './screens/FeatureFlags';
@@ -40,10 +41,12 @@ const openTipJarOnLoad = searchParams.has('openTipJar');
 const openMerchOnLoad = searchParams.has('openMerch');
 const noWelcome = searchParams.has('noWelcome');
 const noTipJar = searchParams.has('noTipJar');
+const openCreditPurchaseOnLoad = searchParams.has('openCreditPurchase');
 
 if (noWelcome) searchParams.delete('noWelcome');
 if (noTipJar) searchParams.delete('noTipJar');
 if (openMerchOnLoad) searchParams.delete('openMerch');
+if (openCreditPurchaseOnLoad) searchParams.delete('openCreditPurchase');
 history.replace({
   pathname: history.location.pathname,
   hash: history.location.hash,
@@ -55,7 +58,11 @@ function Modals(): JSX.Element {
   const [isCreditPurchaseSuccessOpen, setCreditPurchaseSuccessOpen] =
     React.useState(creditSuccessInitial);
   const [isWelcomeOpen, setWelcomeOpen] = React.useState(
-    !isThankYouOpen && !openTipJarOnLoad && !openMerchOnLoad && !noWelcome
+    !isThankYouOpen &&
+      !openTipJarOnLoad &&
+      !openMerchOnLoad &&
+      !noWelcome &&
+      !openCreditPurchaseOnLoad
   );
 
   const openTipJar = useTipJarStore((state) => state.open);
@@ -69,6 +76,12 @@ function Modals(): JSX.Element {
   React.useEffect(() => {
     if (openMerchOnLoad) {
       openMerchModal();
+    }
+  }, []);
+
+  React.useEffect(() => {
+    if (openCreditPurchaseOnLoad) {
+      openCreditPurchaseModal();
     }
   }, []);
 
