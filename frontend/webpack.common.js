@@ -84,11 +84,17 @@ module.exports = {
         test: /\.svg$/,
         issuer: /\.(j|t)sx$/,
         exclude: /node_modules|.yalc/,
-        loader: 'svg-react-loader',
         resourceQuery: { not: [/asset/] },
-        options: {
-          classIdPrefix: '[name]-[contenthash:8]__',
-        },
+        use: [
+          {
+            loader: '@svgr/webpack',
+            options: {
+              svgoConfig: {
+                plugins: [{ name: 'prefixIds' }],
+              },
+            },
+          },
+        ],
       },
     ],
   },

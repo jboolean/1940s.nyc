@@ -116,7 +116,7 @@
     "prettier": "^2.7.1",
     "react-refresh": "^0.14.0",
     "simple-zustand-devtools": "^1.1.0",
-    "svg-react-loader": "^0.4.6",
+    "@svgr/webpack": "^8.0.0",
     "ts-loader": "^9.5.1",
     "typescript": "^4.8.4",
     "webpack": "^5.106.2",
