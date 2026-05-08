@@ -1,7 +1,8 @@
 import { test, expect } from '@playwright/test';
+import { url } from './helpers';
 
 test('welcome screen displays and can be dismissed', async ({ page }) => {
-  await page.goto('/');
+  await page.goto(url('/', { noTipJar: true }));
 
   const modal = page.locator('[data-testid="welcome-modal"]');
   await expect(modal).toBeVisible();

@@ -36,6 +36,10 @@ test('stories list → click story card → back to map with lat/lng hash', asyn
     if (route.request().resourceType() === 'document') {
       return route.continue();
     }
+    // Only mock GET requests to avoid interfering with story submission tests
+    if (route.request().method() !== 'GET') {
+      return route.fallback();
+    }
     await route.fulfill({ json: MOCK_STORIES_RESPONSE });
   });
 
