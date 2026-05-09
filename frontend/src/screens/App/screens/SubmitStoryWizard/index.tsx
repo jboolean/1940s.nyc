@@ -89,7 +89,7 @@ export default function SubmitStoryWizard(): JSX.Element {
       size="large"
       isCloseButtonVisible={true}
     >
-      <div data-testid="submit-story-modal">
+      <div data-testid="submit-story-modal" style={{ height: '100%' }}>
         <StoryWizardContent />
       </div>
     </FourtiesModal>

@@ -8,7 +8,7 @@ import {
   url,
 } from './helpers';
 
-test('hover to see alternates; click one changes photo ID but preserves hash', async ({ page }) => {
+test('hover to see alternates; click one changes photo ID but preserves hash and keeps viewer open', async ({ page }) => {
   await page.goto(
     url(`/map/photo/${DEFAULT_PHOTO}`, {
       noWelcome: true,
@@ -34,6 +34,9 @@ test('hover to see alternates; click one changes photo ID but preserves hash', a
   );
   expect(page.url()).not.toContain(DEFAULT_PHOTO);
   expect(new URL(page.url()).hash).toBe(hashBefore);
+  // Viewer must stay open and URL must remain under /map/photo/
+  expect(page.url()).toContain('/map/photo/');
+  await expect(viewer.pane()).toBeVisible();
 });
 
 test('stories shown on hover', async ({ page }) => {
