@@ -179,7 +179,7 @@ function ContextWrappers({
 export default function App(): JSX.Element {
   return (
     <ContextWrappers>
-      <BrowserRouter>
+      <BrowserRouter future={{ v7_startTransition: true }}>
         <DatadogRouteTracker />
         <Routes>
           {/* Routes with main layout (image viewer, announcements, modals) */}
