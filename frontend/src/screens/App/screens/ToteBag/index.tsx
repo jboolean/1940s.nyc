@@ -5,7 +5,7 @@ import classNames from 'classnames';
 import BagBack from './components/Back';
 import BagFront, { Color } from './components/Front';
 
-import { useLocation } from 'react-router';
+import { useLocation } from 'react-router-dom';
 import stylesheet from './ToteBag.less';
 
 export default function ToteBag(): JSX.Element {

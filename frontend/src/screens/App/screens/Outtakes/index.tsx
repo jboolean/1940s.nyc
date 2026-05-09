@@ -4,7 +4,8 @@ import classnames from 'classnames';
 
 import { getOuttakeSummaries, PhotoSummary } from 'shared/utils/photosApi';
 
-import { Link, useHistory, useParams } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useMatch } from 'react-router-dom';
 import Grid from 'shared/components/Grid';
 import Paginated from 'shared/types/Paginated';
 import { PHOTO_BASE } from 'shared/utils/apiConstants';
@@ -74,10 +75,9 @@ export default function Outtakes({
     [photoSummaries, loadNextPage]
   );
 
-  const history = useHistory();
-  const { identifier: selectedIdentifier } = useParams<{
-    identifier?: string;
-  }>();
+  const navigate = useNavigate();
+  const outtakesPhotoMatch = useMatch('/outtakes/photo/:identifier');
+  const selectedIdentifier = outtakesPhotoMatch?.params.identifier;
 
   return (
     <div
@@ -117,7 +117,7 @@ export default function Outtakes({
                 }}
                 onClick={() => {
                   // visibleImageIRef.current = i;
-                  history.push('/outtakes/photo/' + identifier);
+                  navigate('/outtakes/photo/' + identifier);
                 }}
               />
             );

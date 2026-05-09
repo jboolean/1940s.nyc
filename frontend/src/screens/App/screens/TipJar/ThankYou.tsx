@@ -1,14 +1,14 @@
 import Modal from 'components/Modal';
 import qs from 'qs';
 import React from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import recordEvent from 'shared/utils/recordEvent';
 
 export default function ThankYou({
   isOpen,
   onRequestClose,
 }: Pick<ReactModal.Props, 'isOpen' | 'onRequestClose'>): JSX.Element {
-  const history = useHistory();
+  const navigate = useNavigate();
   const { tipAmount } = qs.parse(window.location.search);
   const hasRecordedRef = React.useRef(false);
 
@@ -23,12 +23,12 @@ export default function ThankYou({
     window.localStorage.setItem('hasTipped', 'true');
 
     // Remove query from url
-    history.replace({
-      pathname: history.location.pathname,
-      hash: history.location.hash,
-    });
+    navigate(
+      { pathname: window.location.pathname, hash: window.location.hash },
+      { replace: true }
+    );
     hasRecordedRef.current = true;
-  }, [tipAmount, isOpen, history]);
+  }, [tipAmount, isOpen, navigate]);
 
   return (
     <Modal size="small" isOpen={isOpen} onRequestClose={onRequestClose}>
