@@ -2,7 +2,14 @@ import { test, expect } from '@playwright/test';
 import { DEFAULT_PHOTO_HASH, url } from './helpers';
 
 test('click a dot opens photo viewer without moving map', async ({ page }) => {
+  const errors: string[] = [];
+  page.on('console', msg => { if (msg.type() === 'error') errors.push(msg.text()); });
+  page.on('pageerror', err => errors.push(err.message));
   await page.goto(url('/map', { noWelcome: true, noTipJar: true, hash: DEFAULT_PHOTO_HASH }));
+  const html = await page.content();
+  console.log('Page HTML (first 2000 chars):', html.substring(0, 2000));
+  console.log('Page URL:', page.url());
+  console.log('Console errors:', JSON.stringify(errors));
   await expect(page.locator('[data-testid="map"]')).toBeAttached();
   // Wait for the map style to load and find a photo near center
   const identifier = await page.waitForFunction(() => {
@@ -30,7 +37,14 @@ test('click a dot opens photo viewer without moving map', async ({ page }) => {
 });
 
 test('search navigates map to location', async ({ page }) => {
+  const errors: string[] = [];
+  page.on('console', msg => { if (msg.type() === 'error') errors.push(msg.text()); });
+  page.on('pageerror', err => errors.push(err.message));
   await page.goto(url('/map', { noWelcome: true, noTipJar: true }));
+  const html = await page.content();
+  console.log('Page HTML (first 2000 chars):', html.substring(0, 2000));
+  console.log('Page URL:', page.url());
+  console.log('Console errors:', JSON.stringify(errors));
   await expect(page.locator('[data-testid="map"]')).toBeAttached();
   const hashBefore = new URL(page.url()).hash;
   await page.locator('[data-testid="search-input"]').fill('8 Clarkson St');
