@@ -2,8 +2,8 @@ import React from 'react';
 
 import classnames from 'classnames';
 
-import { Link } from 'react-router-dom';
-import { useLocation, useMatch } from 'react-router-dom';
+import { Link } from 'react-router';
+import { useLocation, useMatch } from 'react-router';
 import { Story } from 'screens/App/shared/types/Story';
 import Grid from 'shared/components/Grid';
 import StoryView from 'shared/components/Story';
