@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { Redirect, Route, Router, Switch } from 'react-router-dom';
+import { CompatRouter } from 'react-router-dom-v5-compat';
 import history from 'utils/history';
 import AnnouncementBanner from './screens/AnnouncementBanner';
 import MapPane from './screens/MapPane';
@@ -156,49 +157,53 @@ export default function App(): JSX.Element {
   return (
     <ContextWrappers>
       <Router history={history}>
-        <Switch>
-          {/* Routes with main layout (image viewer, announcements, modals) */}
-          <Route path={['/map', '/outtakes', '/stories']}>
-            <MainContentLayout>
-              <Route path="/*/photo/:identifier">
-                <ViewerPane className={stylesheet.viewer} />
-              </Route>
+        <CompatRouter>
+          <Switch>
+            {/* Routes with main layout (image viewer, announcements, modals) */}
+            <Route path={['/map', '/outtakes', '/stories']}>
+              <MainContentLayout>
+                <Route path="/*/photo/:identifier">
+                  <ViewerPane className={stylesheet.viewer} />
+                </Route>
+                <Switch>
+                  <Route
+                    path={['/map/photo/:identifier', '/map']}
+                    render={() => (
+                      <MapPane className={stylesheet.mapContainer} />
+                    )}
+                  />
+                  <Route path={['/outtakes/photo/:identifier', '/outtakes']}>
+                    <Outtakes className={stylesheet.outtakesContainer} />
+                  </Route>
+                  <Route path="/stories/edit">
+                    <EditStory />
+                  </Route>
+                  <Route path={['/stories/photo/:identifier', '/stories']}>
+                    <AllStories className={stylesheet.outtakesContainer} />
+                  </Route>
+                </Switch>
+              </MainContentLayout>
+            </Route>
+            <Route>
+              {/* Routes without main layout */}
               <Switch>
-                <Route
-                  path={['/map/photo/:identifier', '/map']}
-                  render={() => <MapPane className={stylesheet.mapContainer} />}
-                />
-                <Route path={['/outtakes/photo/:identifier', '/outtakes']}>
-                  <Outtakes className={stylesheet.outtakesContainer} />
+                <Route path="/orders">
+                  <Orders />
                 </Route>
-                <Route path="/stories/edit">
-                  <EditStory />
+                <Route path="/labs">
+                  <FeatureFlags />
                 </Route>
-                <Route path={['/stories/photo/:identifier', '/stories']}>
-                  <AllStories className={stylesheet.outtakesContainer} />
+                <Route path="/admin">
+                  <AdminRoutes />
                 </Route>
+                <Route path="/render-merch/tote-bag">
+                  <ToteBag />
+                </Route>
+                <Redirect to="/map" />
               </Switch>
-            </MainContentLayout>
-          </Route>
-          <Route>
-            {/* Routes without main layout */}
-            <Switch>
-              <Route path="/orders">
-                <Orders />
-              </Route>
-              <Route path="/labs">
-                <FeatureFlags />
-              </Route>
-              <Route path="/admin">
-                <AdminRoutes />
-              </Route>
-              <Route path="/render-merch/tote-bag">
-                <ToteBag />
-              </Route>
-              <Redirect to="/map" />
-            </Switch>
-          </Route>
-        </Switch>
+            </Route>
+          </Switch>
+        </CompatRouter>
       </Router>
     </ContextWrappers>
   );
