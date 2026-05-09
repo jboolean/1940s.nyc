@@ -5,7 +5,20 @@ test('click a dot opens photo viewer without moving map', async ({ page }) => {
   const errors: string[] = [];
   page.on('console', msg => { if (msg.type() === 'error') errors.push(msg.text()); });
   page.on('pageerror', err => errors.push(err.message));
+
+  // Check bundle loading
+  const bundleResponse = await page.goto('http://dev.1940s.nyc:8080/app.bundle.js', { timeout: 10000 });
+  if (bundleResponse) {
+    console.log('Bundle response status:', bundleResponse.status());
+    const bundleText = await bundleResponse.text();
+    console.log('Bundle length:', bundleText.length);
+    console.log('Bundle starts with:', bundleText.substring(0, 200));
+  } else {
+    console.log('Bundle response: null');
+  }
+
   await page.goto(url('/map', { noWelcome: true, noTipJar: true, hash: DEFAULT_PHOTO_HASH }));
+  await page.waitForTimeout(3000);
   const html = await page.content();
   console.log('Page HTML (first 3000 chars):', html.substring(0, 3000));
   console.log('Page URL:', page.url());
@@ -45,7 +58,20 @@ test('search navigates map to location', async ({ page }) => {
   const errors: string[] = [];
   page.on('console', msg => { if (msg.type() === 'error') errors.push(msg.text()); });
   page.on('pageerror', err => errors.push(err.message));
+
+  // Check bundle loading
+  const bundleResponse = await page.goto('http://dev.1940s.nyc:8080/app.bundle.js', { timeout: 10000 });
+  if (bundleResponse) {
+    console.log('Bundle response status:', bundleResponse.status());
+    const bundleText = await bundleResponse.text();
+    console.log('Bundle length:', bundleText.length);
+    console.log('Bundle starts with:', bundleText.substring(0, 200));
+  } else {
+    console.log('Bundle response: null');
+  }
+
   await page.goto(url('/map', { noWelcome: true, noTipJar: true }));
+  await page.waitForTimeout(3000);
   const html = await page.content();
   console.log('Page HTML (first 3000 chars):', html.substring(0, 3000));
   console.log('Page URL:', page.url());
