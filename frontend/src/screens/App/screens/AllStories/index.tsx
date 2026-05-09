@@ -2,8 +2,8 @@ import React from 'react';
 
 import classnames from 'classnames';
 
-import { Link, useParams } from 'react-router-dom-v5-compat';
-import { useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom-v5-compat';
+import { useLocation, useMatch } from 'react-router-dom';
 import { Story } from 'screens/App/shared/types/Story';
 import Grid from 'shared/components/Grid';
 import StoryView from 'shared/components/Story';
@@ -77,9 +77,8 @@ export default function Outtakes({
   );
 
   const location = useLocation();
-  const { identifier: selectedIdentifier } = useParams<{
-    identifier?: string;
-  }>();
+  const storiesPhotoMatch = useMatch('/stories/photo/:identifier');
+  const selectedIdentifier = storiesPhotoMatch?.params.identifier;
 
   return (
     <div

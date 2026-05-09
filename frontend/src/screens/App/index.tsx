@@ -205,16 +205,7 @@ export default function App(): JSX.Element {
                       element={<ViewerPane className={stylesheet.viewer} />}
                     />
                   </Routes>
-                  <Routes>
-                    <Route
-                      path="photo/:identifier"
-                      element={<MapPane className={stylesheet.mapContainer} />}
-                    />
-                    <Route
-                      path="*"
-                      element={<MapPane className={stylesheet.mapContainer} />}
-                    />
-                  </Routes>
+                  <MapPane className={stylesheet.mapContainer} />
                 </MainContentLayout>
               }
             />
