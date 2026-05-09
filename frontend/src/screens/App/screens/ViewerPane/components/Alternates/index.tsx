@@ -1,6 +1,6 @@
 import classnames from 'classnames';
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router-dom-v5-compat';
 import { CSSTransition } from 'react-transition-group';
 import { PHOTO_BASE } from 'shared/utils/apiConstants';
 import { getAlternatePhotos, Photo } from 'shared/utils/photosApi';

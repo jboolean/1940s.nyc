@@ -1,8 +1,7 @@
 import React from 'react';
-import { useHistory, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import Button from 'shared/components/Button';
 import useAuthStore from 'shared/stores/AuthStore';
-import { LocationDescriptor } from 'history';
 
 export default function LoginPage(): JSX.Element {
   const login = useAuthStore((state) => state.login);
@@ -10,15 +9,16 @@ export default function LoginPage(): JSX.Element {
   const isAutheticated = useAuthStore((state) => state.isAutheticated);
   const returnToRoute = useAuthStore((state) => state.returnToRoute);
 
-  const location = useLocation<{ from?: string }>();
-  const history = useHistory();
+  const location = useLocation();
+  const navigate = useNavigate();
 
-  const from: LocationDescriptor = location.state?.from || returnToRoute || '/';
+  const from: string =
+    (location.state as { from?: string } | null)?.from || returnToRoute || '/';
 
   // If authenticated, redirect to the page they were trying to access
   React.useEffect(() => {
     if (isAutheticated) {
-      history.replace(from);
+      navigate(from, { replace: true });
     } else {
       //automatically trigger login modal
       login(from);
@@ -27,7 +27,7 @@ export default function LoginPage(): JSX.Element {
     return () => {
       close();
     };
-  }, [isAutheticated, history, from, login, close]);
+  }, [isAutheticated, navigate, from, login, close]);
 
   return (
     <div>

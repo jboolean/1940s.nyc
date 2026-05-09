@@ -2,7 +2,8 @@ import React from 'react';
 
 import classnames from 'classnames';
 
-import { Link, useHistory, useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom-v5-compat';
+import { useLocation } from 'react-router-dom';
 import { Story } from 'screens/App/shared/types/Story';
 import Grid from 'shared/components/Grid';
 import StoryView from 'shared/components/Story';
@@ -75,7 +76,7 @@ export default function Outtakes({
     [stories, loadNextPage]
   );
 
-  const history = useHistory();
+  const location = useLocation();
   const { identifier: selectedIdentifier } = useParams<{
     identifier?: string;
   }>();
@@ -93,7 +94,7 @@ export default function Outtakes({
         </p>
         <Link
           data-testid="back-to-map"
-          to={{ pathname: '/map', hash: history.location.hash }}
+          to={{ pathname: '/map', hash: location.hash }}
           className={stylesheet.backToMap}
         >
           Back to map

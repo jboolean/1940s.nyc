@@ -1,8 +1,8 @@
 import React from 'react';
 
-import { Redirect, Route, Router, Switch } from 'react-router-dom';
-import { CompatRouter } from 'react-router-dom-v5-compat';
-import history from 'utils/history';
+import { datadogRum } from '@datadog/browser-rum';
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import { CompatRouter, useLocation } from 'react-router-dom-v5-compat';
 import AnnouncementBanner from './screens/AnnouncementBanner';
 import MapPane from './screens/MapPane';
 import Shutdown from './screens/Shutdown';
@@ -48,11 +48,25 @@ if (noWelcome) searchParams.delete('noWelcome');
 if (noTipJar) searchParams.delete('noTipJar');
 if (openMerchOnLoad) searchParams.delete('openMerch');
 if (openCreditPurchaseOnLoad) searchParams.delete('openCreditPurchase');
-history.replace({
-  pathname: history.location.pathname,
-  hash: history.location.hash,
-  search: searchParams.toString(),
-});
+const currentUrl = new URL(window.location.href);
+currentUrl.search = searchParams.toString();
+window.history.replaceState(
+  null,
+  '',
+  currentUrl.pathname +
+    (currentUrl.search ? currentUrl.search : '') +
+    currentUrl.hash
+);
+
+function DatadogRouteTracker(): null {
+  const location = useLocation();
+  React.useEffect(() => {
+    datadogRum.startView({
+      name: location.pathname + location.search + location.hash,
+    });
+  }, [location.pathname, location.search, location.hash]);
+  return null;
+}
 
 function Modals(): JSX.Element {
   const [isThankYouOpen, setThankYouOpen] = React.useState(thankYouInitial);
@@ -88,18 +102,38 @@ function Modals(): JSX.Element {
 
   return (
     <>
-      <Route path={['/map', '/stories']}>
-        {IS_SHUTDOWN ? (
-          <Shutdown isOpen={true} />
-        ) : (
-          <Welcome
-            isOpen={isWelcomeOpen}
-            onRequestClose={() => {
-              setWelcomeOpen(false);
-            }}
-          />
-        )}
-      </Route>
+      <Routes>
+        <Route
+          path="/map/*"
+          element={
+            IS_SHUTDOWN ? (
+              <Shutdown isOpen={true} />
+            ) : (
+              <Welcome
+                isOpen={isWelcomeOpen}
+                onRequestClose={() => {
+                  setWelcomeOpen(false);
+                }}
+              />
+            )
+          }
+        />
+        <Route
+          path="/stories/*"
+          element={
+            IS_SHUTDOWN ? (
+              <Shutdown isOpen={true} />
+            ) : (
+              <Welcome
+                isOpen={isWelcomeOpen}
+                onRequestClose={() => {
+                  setWelcomeOpen(false);
+                }}
+              />
+            )
+          }
+        />
+      </Routes>
 
       <ThankYou
         isOpen={isThankYouOpen}
@@ -156,55 +190,79 @@ function ContextWrappers({
 export default function App(): JSX.Element {
   return (
     <ContextWrappers>
-      <Router history={history}>
+      <BrowserRouter>
         <CompatRouter>
-          <Switch>
+          <DatadogRouteTracker />
+          <Routes>
             {/* Routes with main layout (image viewer, announcements, modals) */}
-            <Route path={['/map', '/outtakes', '/stories']}>
-              <MainContentLayout>
-                <Route path="/*/photo/:identifier">
-                  <ViewerPane className={stylesheet.viewer} />
-                </Route>
-                <Switch>
-                  <Route
-                    path={['/map/photo/:identifier', '/map']}
-                    render={() => (
-                      <MapPane className={stylesheet.mapContainer} />
-                    )}
-                  />
-                  <Route path={['/outtakes/photo/:identifier', '/outtakes']}>
-                    <Outtakes className={stylesheet.outtakesContainer} />
-                  </Route>
-                  <Route path="/stories/edit">
-                    <EditStory />
-                  </Route>
-                  <Route path={['/stories/photo/:identifier', '/stories']}>
-                    <AllStories className={stylesheet.outtakesContainer} />
-                  </Route>
-                </Switch>
-              </MainContentLayout>
-            </Route>
-            <Route>
-              {/* Routes without main layout */}
-              <Switch>
-                <Route path="/orders">
-                  <Orders />
-                </Route>
-                <Route path="/labs">
-                  <FeatureFlags />
-                </Route>
-                <Route path="/admin">
-                  <AdminRoutes />
-                </Route>
-                <Route path="/render-merch/tote-bag">
-                  <ToteBag />
-                </Route>
-                <Redirect to="/map" />
-              </Switch>
-            </Route>
-          </Switch>
+            <Route
+              path="/map/*"
+              element={
+                <MainContentLayout>
+                  <Routes>
+                    <Route
+                      path="photo/:identifier"
+                      element={<ViewerPane className={stylesheet.viewer} />}
+                    />
+                  </Routes>
+                  <Routes>
+                    <Route
+                      path="photo/:identifier"
+                      element={<MapPane className={stylesheet.mapContainer} />}
+                    />
+                    <Route
+                      path="*"
+                      element={<MapPane className={stylesheet.mapContainer} />}
+                    />
+                  </Routes>
+                </MainContentLayout>
+              }
+            />
+            <Route
+              path="/outtakes/*"
+              element={
+                <MainContentLayout>
+                  <Routes>
+                    <Route
+                      path="photo/:identifier"
+                      element={<ViewerPane className={stylesheet.viewer} />}
+                    />
+                  </Routes>
+                  <Outtakes className={stylesheet.outtakesContainer} />
+                </MainContentLayout>
+              }
+            />
+            <Route
+              path="/stories/*"
+              element={
+                <MainContentLayout>
+                  <Routes>
+                    <Route
+                      path="photo/:identifier"
+                      element={<ViewerPane className={stylesheet.viewer} />}
+                    />
+                  </Routes>
+                  <Routes>
+                    <Route path="edit" element={<EditStory />} />
+                    <Route
+                      path="*"
+                      element={
+                        <AllStories className={stylesheet.outtakesContainer} />
+                      }
+                    />
+                  </Routes>
+                </MainContentLayout>
+              }
+            />
+            {/* Routes without main layout */}
+            <Route path="/orders" element={<Orders />} />
+            <Route path="/labs" element={<FeatureFlags />} />
+            <Route path="/admin/*" element={<AdminRoutes />} />
+            <Route path="/render-merch/tote-bag" element={<ToteBag />} />
+            <Route path="*" element={<Navigate to="/map" />} />
+          </Routes>
         </CompatRouter>
-      </Router>
+      </BrowserRouter>
     </ContextWrappers>
   );
 }
