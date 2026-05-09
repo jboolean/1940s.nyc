@@ -9,8 +9,8 @@ import { closest } from 'utils/photosApi';
 import { OverlayId } from './components/MainMap';
 import { MapInterface } from './components/MainMap/MapInterface';
 
-import { Link } from 'react-router-dom';
-import { useNavigate, NavigateFunction } from 'react-router-dom';
+import { Link } from 'react-router';
+import { useNavigate, NavigateFunction } from 'react-router';
 import stylesheet from './MapPane.less';
 import Geolocate from './components/Geolocate';
 import MainMap from './components/MainMap';
@@ -104,7 +104,7 @@ class MapPane extends React.Component<PropsWithNavigate, State> {
   }
 
   openPhoto(identifier: string): void {
-    this.props.navigate({
+    void this.props.navigate({
       pathname: '/map/photo/' + identifier,
       hash: window.location.hash,
     });

@@ -4,8 +4,8 @@ import classnames from 'classnames';
 
 import { getOuttakeSummaries, PhotoSummary } from 'shared/utils/photosApi';
 
-import { Link, useNavigate } from 'react-router-dom';
-import { useMatch } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router';
+import { useMatch } from 'react-router';
 import Grid from 'shared/components/Grid';
 import Paginated from 'shared/types/Paginated';
 import { PHOTO_BASE } from 'shared/utils/apiConstants';
@@ -117,7 +117,7 @@ export default function Outtakes({
                 }}
                 onClick={() => {
                   // visibleImageIRef.current = i;
-                  navigate('/outtakes/photo/' + identifier);
+                  void navigate('/outtakes/photo/' + identifier);
                 }}
               />
             );

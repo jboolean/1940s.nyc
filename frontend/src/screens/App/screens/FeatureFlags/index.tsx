@@ -2,7 +2,7 @@ import React from 'react';
 
 import FeatureFlag from 'screens/App/shared/types/FeatureFlag';
 import useFeatureFlagsStore from 'screens/App/shared/stores/FeatureFlagsStore';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import { lowerCase, upperFirst } from 'lodash';
 
 export default function FeatureFlags(): JSX.Element {

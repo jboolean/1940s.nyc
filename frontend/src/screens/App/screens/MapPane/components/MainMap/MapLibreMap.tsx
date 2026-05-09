@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { NavigateFunction, useMatch, useNavigate } from 'react-router-dom';
+import { NavigateFunction, useMatch, useNavigate } from 'react-router';
 
 import classnames from 'classnames';
 import * as maplibregl from 'maplibre-gl';
@@ -51,7 +51,7 @@ class MapLibreMap
       if (!e || !e.features) return;
       const feature = e.features[0];
       const identifier = feature.properties?.photoIdentifier as string;
-      this.props.navigate({
+      void this.props.navigate({
         pathname: '/map/photo/' + identifier,
         hash: window.location.hash,
       });

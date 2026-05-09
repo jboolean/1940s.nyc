@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Route, Routes } from 'react-router-dom';
+import { Route, Routes } from 'react-router';
 import LoginPage from './screens/LoginPage';
 import ReviewMerch from './screens/ReviewMerch';
 import ReviewStories from './screens/ReviewStories';

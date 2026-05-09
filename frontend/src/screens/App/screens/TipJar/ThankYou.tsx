@@ -1,7 +1,7 @@
 import Modal from 'components/Modal';
 import qs from 'qs';
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import recordEvent from 'shared/utils/recordEvent';
 
 export default function ThankYou({
@@ -23,7 +23,7 @@ export default function ThankYou({
     window.localStorage.setItem('hasTipped', 'true');
 
     // Remove query from url
-    navigate(
+    void navigate(
       { pathname: window.location.pathname, hash: window.location.hash },
       { replace: true }
     );

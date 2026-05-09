@@ -8,7 +8,7 @@ import {
   Routes,
   useLocation,
   useMatch,
-} from 'react-router-dom';
+} from 'react-router';
 import AnnouncementBanner from './screens/AnnouncementBanner';
 import MapPane from './screens/MapPane';
 import Shutdown from './screens/Shutdown';
@@ -179,9 +179,7 @@ function ContextWrappers({
 export default function App(): JSX.Element {
   return (
     <ContextWrappers>
-      <BrowserRouter
-        future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
-      >
+      <BrowserRouter>
         <DatadogRouteTracker />
         <Routes>
           {/* Routes with main layout (image viewer, announcements, modals) */}
