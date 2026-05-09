@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom-v5-compat';
 import { API_BASE } from 'utils/apiConstants';
 
 import Button, { ButtonStyledLink } from 'shared/components/Button';

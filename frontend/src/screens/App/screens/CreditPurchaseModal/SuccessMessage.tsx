@@ -1,13 +1,13 @@
 import Modal from 'components/Modal';
 import React from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom-v5-compat';
 import recordEvent from 'shared/utils/recordEvent';
 
 export default function ThankYou({
   isOpen,
   onRequestClose,
 }: Pick<ReactModal.Props, 'isOpen' | 'onRequestClose'>): JSX.Element {
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const queryParamsRef = React.useRef(
     new URLSearchParams(window.location.search)
@@ -16,11 +16,11 @@ export default function ThankYou({
 
   React.useEffect(() => {
     // Remove query from url
-    history.replace({
-      pathname: history.location.pathname,
-      hash: history.location.hash,
-    });
-  }, [history]);
+    navigate(
+      { pathname: window.location.pathname, hash: window.location.hash },
+      { replace: true }
+    );
+  }, [navigate]);
 
   React.useEffect(() => {
     if (!isOpen) return;
