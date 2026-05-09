@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { NavigateFunction, useNavigate, useParams } from 'react-router-dom';
+import { NavigateFunction, useMatch, useNavigate } from 'react-router-dom';
 
 import classnames from 'classnames';
 import * as maplibregl from 'maplibre-gl';
@@ -153,7 +153,8 @@ function withRouterRef(
     props,
     ref
   ) {
-    const { identifier } = useParams<{ identifier?: string }>();
+    const match = useMatch('/map/photo/:identifier');
+    const identifier = match?.params.identifier;
     const navigate = useNavigate();
 
     const componentRef = React.useRef<MapLibreMap>(null);
