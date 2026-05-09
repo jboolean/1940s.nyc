@@ -1,6 +1,6 @@
 import Modal from 'components/Modal';
 import React from 'react';
-import { useNavigate } from 'react-router-dom-v5-compat';
+import { useNavigate } from 'react-router-dom';
 import recordEvent from 'shared/utils/recordEvent';
 
 export default function ThankYou({
