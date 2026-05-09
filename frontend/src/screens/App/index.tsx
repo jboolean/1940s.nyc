@@ -179,64 +179,72 @@ function ContextWrappers({
 export default function App(): JSX.Element {
   return (
     <ContextWrappers>
-      <BrowserRouter>
+      <BrowserRouter future={{ v7_relativeSplatPath: true }}>
         <DatadogRouteTracker />
         <Routes>
           {/* Routes with main layout (image viewer, announcements, modals) */}
-          <Route
-            path="/map/*"
-            element={
-              <MainContentLayout>
-                <Routes>
-                  <Route
-                    path="photo/:identifier"
-                    element={<ViewerPane className={stylesheet.viewer} />}
-                  />
-                </Routes>
-                <MapPane className={stylesheet.mapContainer} />
-              </MainContentLayout>
-            }
-          />
-          <Route
-            path="/outtakes/*"
-            element={
-              <MainContentLayout>
-                <Routes>
-                  <Route
-                    path="photo/:identifier"
-                    element={<ViewerPane className={stylesheet.viewer} />}
-                  />
-                </Routes>
-                <Outtakes className={stylesheet.outtakesContainer} />
-              </MainContentLayout>
-            }
-          />
-          <Route
-            path="/stories/*"
-            element={
-              <MainContentLayout>
-                <Routes>
-                  <Route
-                    path="photo/:identifier"
-                    element={<ViewerPane className={stylesheet.viewer} />}
-                  />
-                </Routes>
-                <Routes>
-                  <Route path="edit" element={<EditStory />} />
-                  <Route
-                    path="*"
-                    element={
-                      <AllStories className={stylesheet.outtakesContainer} />
-                    }
-                  />
-                </Routes>
-              </MainContentLayout>
-            }
-          />
+          <Route path="/map">
+            <Route
+              path="*"
+              element={
+                <MainContentLayout>
+                  <Routes>
+                    <Route
+                      path="photo/:identifier"
+                      element={<ViewerPane className={stylesheet.viewer} />}
+                    />
+                  </Routes>
+                  <MapPane className={stylesheet.mapContainer} />
+                </MainContentLayout>
+              }
+            />
+          </Route>
+          <Route path="/outtakes">
+            <Route
+              path="*"
+              element={
+                <MainContentLayout>
+                  <Routes>
+                    <Route
+                      path="photo/:identifier"
+                      element={<ViewerPane className={stylesheet.viewer} />}
+                    />
+                  </Routes>
+                  <Outtakes className={stylesheet.outtakesContainer} />
+                </MainContentLayout>
+              }
+            />
+          </Route>
+          <Route path="/stories">
+            <Route
+              path="*"
+              element={
+                <MainContentLayout>
+                  <Routes>
+                    <Route
+                      path="photo/:identifier"
+                      element={<ViewerPane className={stylesheet.viewer} />}
+                    />
+                  </Routes>
+                  <Routes>
+                    <Route path="edit" element={<EditStory />} />
+                    <Route
+                      path="*"
+                      element={
+                        <AllStories className={stylesheet.outtakesContainer} />
+                      }
+                    />
+                  </Routes>
+                </MainContentLayout>
+              }
+            />
+          </Route>
           {/* Routes without main layout */}
           <Route path="/orders" element={<Orders />} />
           <Route path="/labs" element={<FeatureFlags />} />
-          <Route path="/admin/*" element={<AdminRoutes />} />
+          <Route path="/admin">
+            <Route path="*" element={<AdminRoutes />} />
+          </Route>
           <Route path="/render-merch/tote-bag" element={<ToteBag />} />
           <Route path="*" element={<Navigate to="/map" />} />
         </Routes>
