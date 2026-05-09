@@ -1,8 +1,14 @@
 import React from 'react';
 
 import { datadogRum } from '@datadog/browser-rum';
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
-import { CompatRouter, useLocation } from 'react-router-dom-v5-compat';
+import {
+  BrowserRouter,
+  Navigate,
+  Route,
+  Routes,
+  useLocation,
+  useMatch,
+} from 'react-router-dom';
 import AnnouncementBanner from './screens/AnnouncementBanner';
 import MapPane from './screens/MapPane';
 import Shutdown from './screens/Shutdown';
@@ -80,6 +86,10 @@ function Modals(): JSX.Element {
       !openCreditPurchaseOnLoad
   );
 
+  const onMap = useMatch('/map/*');
+  const onStories = useMatch('/stories/*');
+  const onMapOrStories = onMap !== null || onStories !== null;
+
   const openTipJar = useTipJarStore((state) => state.open);
 
   React.useEffect(() => {
@@ -102,38 +112,17 @@ function Modals(): JSX.Element {
 
   return (
     <>
-      <Routes>
-        <Route
-          path="/map/*"
-          element={
-            IS_SHUTDOWN ? (
-              <Shutdown isOpen={true} />
-            ) : (
-              <Welcome
-                isOpen={isWelcomeOpen}
-                onRequestClose={() => {
-                  setWelcomeOpen(false);
-                }}
-              />
-            )
-          }
-        />
-        <Route
-          path="/stories/*"
-          element={
-            IS_SHUTDOWN ? (
-              <Shutdown isOpen={true} />
-            ) : (
-              <Welcome
-                isOpen={isWelcomeOpen}
-                onRequestClose={() => {
-                  setWelcomeOpen(false);
-                }}
-              />
-            )
-          }
-        />
-      </Routes>
+      {onMapOrStories &&
+        (IS_SHUTDOWN ? (
+          <Shutdown isOpen={true} />
+        ) : (
+          <Welcome
+            isOpen={isWelcomeOpen}
+            onRequestClose={() => {
+              setWelcomeOpen(false);
+            }}
+          />
+        ))}
 
       <ThankYou
         isOpen={isThankYouOpen}
@@ -191,68 +180,66 @@ export default function App(): JSX.Element {
   return (
     <ContextWrappers>
       <BrowserRouter>
-        <CompatRouter>
-          <DatadogRouteTracker />
-          <Routes>
-            {/* Routes with main layout (image viewer, announcements, modals) */}
-            <Route
-              path="/map/*"
-              element={
-                <MainContentLayout>
-                  <Routes>
-                    <Route
-                      path="photo/:identifier"
-                      element={<ViewerPane className={stylesheet.viewer} />}
-                    />
-                  </Routes>
-                  <MapPane className={stylesheet.mapContainer} />
-                </MainContentLayout>
-              }
-            />
-            <Route
-              path="/outtakes/*"
-              element={
-                <MainContentLayout>
-                  <Routes>
-                    <Route
-                      path="photo/:identifier"
-                      element={<ViewerPane className={stylesheet.viewer} />}
-                    />
-                  </Routes>
-                  <Outtakes className={stylesheet.outtakesContainer} />
-                </MainContentLayout>
-              }
-            />
-            <Route
-              path="/stories/*"
-              element={
-                <MainContentLayout>
-                  <Routes>
-                    <Route
-                      path="photo/:identifier"
-                      element={<ViewerPane className={stylesheet.viewer} />}
-                    />
-                  </Routes>
-                  <Routes>
-                    <Route path="edit" element={<EditStory />} />
-                    <Route
-                      path="*"
-                      element={
-                        <AllStories className={stylesheet.outtakesContainer} />
-                      }
-                    />
-                  </Routes>
-                </MainContentLayout>
-              }
-            />
-            {/* Routes without main layout */}
-            <Route path="/orders" element={<Orders />} />
-            <Route path="/labs" element={<FeatureFlags />} />
-            <Route path="/admin/*" element={<AdminRoutes />} />
-            <Route path="/render-merch/tote-bag" element={<ToteBag />} />
-            <Route path="*" element={<Navigate to="/map" />} />
-          </Routes>
-        </CompatRouter>
+        <DatadogRouteTracker />
+        <Routes>
+          {/* Routes with main layout (image viewer, announcements, modals) */}
+          <Route
+            path="/map/*"
+            element={
+              <MainContentLayout>
+                <Routes>
+                  <Route
+                    path="photo/:identifier"
+                    element={<ViewerPane className={stylesheet.viewer} />}
+                  />
+                </Routes>
+                <MapPane className={stylesheet.mapContainer} />
+              </MainContentLayout>
+            }
+          />
+          <Route
+            path="/outtakes/*"
+            element={
+              <MainContentLayout>
+                <Routes>
+                  <Route
+                    path="photo/:identifier"
+                    element={<ViewerPane className={stylesheet.viewer} />}
+                  />
+                </Routes>
+                <Outtakes className={stylesheet.outtakesContainer} />
+              </MainContentLayout>
+            }
+          />
+          <Route
+            path="/stories/*"
+            element={
+              <MainContentLayout>
+                <Routes>
+                  <Route
+                    path="photo/:identifier"
+                    element={<ViewerPane className={stylesheet.viewer} />}
+                  />
+                </Routes>
+                <Routes>
+                  <Route path="edit" element={<EditStory />} />
+                  <Route
+                    path="*"
+                    element={
+                      <AllStories className={stylesheet.outtakesContainer} />
+                    }
+                  />
+                </Routes>
+              </MainContentLayout>
+            }
+          />
+          {/* Routes without main layout */}
+          <Route path="/orders" element={<Orders />} />
+          <Route path="/labs" element={<FeatureFlags />} />
+          <Route path="/admin/*" element={<AdminRoutes />} />
+          <Route path="/render-merch/tote-bag" element={<ToteBag />} />
+          <Route path="*" element={<Navigate to="/map" />} />
+        </Routes>
       </BrowserRouter>
     </ContextWrappers>
   );

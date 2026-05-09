@@ -9,7 +9,7 @@ import {
   TransformComponent,
   TransformWrapper,
 } from '@jboolean/react-zoom-pan-pinch';
-import { useNavigate, useParams } from 'react-router-dom-v5-compat';
+import { useNavigate, useParams } from 'react-router-dom';
 import Alternates from './components/Alternates';
 import ImageButtons from './components/ImageButtons';
 import * as ImageStack from './components/ImageStack';

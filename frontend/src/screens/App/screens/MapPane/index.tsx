@@ -9,7 +9,7 @@ import { closest } from 'utils/photosApi';
 import { OverlayId } from './components/MainMap';
 import { MapInterface } from './components/MainMap/MapInterface';
 
-import { Link } from 'react-router-dom-v5-compat';
+import { Link } from 'react-router-dom';
 import { useNavigate, NavigateFunction } from 'react-router-dom';
 import stylesheet from './MapPane.less';
 import Geolocate from './components/Geolocate';
