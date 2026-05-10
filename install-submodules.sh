@@ -1,13 +1,11 @@
 #!/usr/bin/env sh
 
-APPS=(
-  "frontend"
-  "backend",
-  "edge"
-)
+set -e
 
-for APP in "${APPS[@]}"; do
- cd $(git rev-parse --show-toplevel)/$APP
- echo "Installing \"$APP\""
- npm install
+ROOT_DIR="$(git rev-parse --show-toplevel)"
+
+for APP in frontend backend edge; do
+  cd "$ROOT_DIR/$APP"
+  echo "Installing \"$APP\""
+  npm install
 done
