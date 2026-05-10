@@ -284,7 +284,7 @@ export async function processLoginRequest(
         return LoginOutcome.SentLinkToVerifyEmail;
       }
 
-      return LoginOutcome.CreatedNewAccount as LoginOutcome;
+      return LoginOutcome.CreatedNewAccount;
     } else if (newEmailBehavior === 'update' || currentUser.isAnonymous) {
       // Either account is anonymous or the current user is changing their email
       // Stays logged in, but updates account info
