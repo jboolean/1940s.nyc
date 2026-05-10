@@ -4,7 +4,8 @@ import classnames from 'classnames';
 
 import { getOuttakeSummaries, PhotoSummary } from 'shared/utils/photosApi';
 
-import { Link, useHistory, useParams } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router';
+import { useMatch } from 'react-router';
 import Grid from 'shared/components/Grid';
 import Paginated from 'shared/types/Paginated';
 import { PHOTO_BASE } from 'shared/utils/apiConstants';
@@ -74,13 +75,15 @@ export default function Outtakes({
     [photoSummaries, loadNextPage]
   );
 
-  const history = useHistory();
-  const { identifier: selectedIdentifier } = useParams<{
-    identifier?: string;
-  }>();
+  const navigate = useNavigate();
+  const outtakesPhotoMatch = useMatch('/outtakes/photo/:identifier');
+  const selectedIdentifier = outtakesPhotoMatch?.params.identifier;
 
   return (
-    <div className={classnames(stylesheet.container, className)}>
+    <div
+      data-testid="outtakes-page"
+      className={classnames(stylesheet.container, className)}
+    >
       <div className={stylesheet.top}>
         <h1>Outtakes</h1>
         <Link to="/map" className={stylesheet.backToMap}>
@@ -101,6 +104,7 @@ export default function Outtakes({
             return (
               <img
                 key={identifier}
+                data-testid="outtake-photo"
                 height={`100%`}
                 width={`100%`}
                 src={`${PHOTO_BASE}/420-jpg/${identifier}.jpg`}
@@ -113,7 +117,7 @@ export default function Outtakes({
                 }}
                 onClick={() => {
                   // visibleImageIRef.current = i;
-                  history.push('/outtakes/photo/' + identifier);
+                  void navigate('/outtakes/photo/' + identifier);
                 }}
               />
             );

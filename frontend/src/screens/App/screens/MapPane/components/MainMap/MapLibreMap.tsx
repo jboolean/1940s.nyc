@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { useHistory, useLocation, useRouteMatch } from 'react-router-dom';
+import { NavigateFunction, useMatch, useNavigate } from 'react-router';
 
 import classnames from 'classnames';
 import * as maplibregl from 'maplibre-gl';
@@ -10,14 +10,16 @@ import * as overlays from './overlays';
 
 export { OverlayId } from './overlays';
 
-import { RouteComponentProps } from 'react-router';
 import stylesheet from './MainMap.less';
 
 import { getStyle } from 'screens/App/shared/mapStyles/fourties.protomaps.style';
 
 const PHOTO_LAYER = 'photos-1940s';
 
-type PropsWithRouter = MapProps & RouteComponentProps<{ identifier?: string }>;
+interface PropsWithRouter extends MapProps {
+  navigate: NavigateFunction;
+  identifier?: string;
+}
 
 class MapLibreMap
   extends React.PureComponent<PropsWithRouter>
@@ -49,7 +51,7 @@ class MapLibreMap
       if (!e || !e.features) return;
       const feature = e.features[0];
       const identifier = feature.properties?.photoIdentifier as string;
-      this.props.history.push({
+      void this.props.navigate({
         pathname: '/map/photo/' + identifier,
         hash: window.location.hash,
       });
@@ -64,6 +66,10 @@ class MapLibreMap
     map.on('mouseleave', PHOTO_LAYER, () => {
       map.getCanvas().style.cursor = '';
     });
+
+    // Expose map instance so Playwright E2E tests can query rendered features.
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
+    (window as unknown as Record<string, unknown>).__testMapInstance = map;
 
     map.on('style.load', () => {
       overlays.installLayers(this.map, PHOTO_LAYER);
@@ -86,8 +92,7 @@ class MapLibreMap
       void this.map.once('style.load', () => this.syncUI());
     }
     if (
-      prevProps.match.params.identifier !==
-        this.props.match.params.identifier ||
+      prevProps.identifier !== this.props.identifier ||
       prevProps.overlay !== this.props.overlay
     ) {
       this.syncUI();
@@ -99,7 +104,7 @@ class MapLibreMap
     this.map.setFilter(PHOTO_LAYER + '-active', [
       '==',
       ['get', 'photoIdentifier'],
-      this.props.match.params.identifier || null,
+      this.props.identifier || null,
     ]);
 
     overlays.setOverlay(this.map, this.props.overlay);
@@ -132,6 +137,7 @@ class MapLibreMap
       <div
         className={classnames(stylesheet.map, propsClassName)}
         ref={(el) => (this.mapContainer = el)}
+        data-testid="map"
       />
     );
   }
@@ -147,9 +153,9 @@ function withRouterRef(
     props,
     ref
   ) {
-    const match = useRouteMatch();
-    const location = useLocation();
-    const history = useHistory();
+    const match = useMatch('/map/photo/:identifier');
+    const identifier = match?.params.identifier;
+    const navigate = useNavigate();
 
     const componentRef = React.useRef<MapLibreMap>(null);
 
@@ -173,9 +179,8 @@ function withRouterRef(
     return (
       <Component
         ref={componentRef}
-        match={match}
-        location={location}
-        history={history}
+        identifier={identifier}
+        navigate={navigate}
         {...props}
       />
     );

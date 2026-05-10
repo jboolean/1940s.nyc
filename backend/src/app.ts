@@ -84,6 +84,7 @@ app.use('/postmark-webhooks', PostmarkWebhooksResource);
 app.use('/printful-webhooks', PrintfulWebhooksResource);
 
 // Tsoa
+// eslint-disable-next-line @typescript-eslint/no-unsafe-call
 RegisterRoutes(app);
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars

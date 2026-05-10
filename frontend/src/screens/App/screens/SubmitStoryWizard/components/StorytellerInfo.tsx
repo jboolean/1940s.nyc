@@ -41,6 +41,7 @@ export default function StorytellerInfo({
             <TextInput
               id={id}
               type="text"
+              data-testid="story-name-input"
               value={storytellerName}
               onChange={({ target: { value } }) => {
                 onStorytellerNameChange(value);
@@ -54,6 +55,7 @@ export default function StorytellerInfo({
           renderInput={({ id }) => (
             <TextInput
               id={id}
+              data-testid="story-subtitle-input"
               value={storytellerSubtitle}
               onChange={({ target: { value } }) => {
                 onStorytellerSubtitleChange(value);
@@ -70,6 +72,7 @@ export default function StorytellerInfo({
             <TextInput
               id={id}
               type="email"
+              data-testid="story-email-input"
               value={storytellerEmail}
               onChange={({ target: { value } }) => {
                 onStorytellerEmailChange(value);
@@ -118,6 +121,7 @@ export default function StorytellerInfo({
 
         <Button
           buttonStyle="primary"
+          data-testid="story-submit-button"
           onClick={onSubmit}
           disabled={isSubmitting || !isStoryValidToSubmit}
         >

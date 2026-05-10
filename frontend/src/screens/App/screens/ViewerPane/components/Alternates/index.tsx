@@ -1,6 +1,6 @@
 import classnames from 'classnames';
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router';
 import { CSSTransition } from 'react-transition-group';
 import { PHOTO_BASE } from 'shared/utils/apiConstants';
 import { getAlternatePhotos, Photo } from 'shared/utils/photosApi';
@@ -18,6 +18,7 @@ export default function Alternates({
   className?: string;
   originalIdentifier: string;
 }): JSX.Element | null {
+  const location = useLocation();
   const [alternatePhotos, setAlternatePhotos] = React.useState<Photo[]>([]);
 
   React.useEffect(() => {
@@ -39,14 +40,16 @@ export default function Alternates({
       <div
         className={classnames(stylesheet.container, className)}
         title="Alternate photos at this location"
+        data-testid="alternates"
       >
         <div className={classnames(stylesheet.filmstrip)}>
           {alternatePhotos.map(({ identifier, collection }) => (
             <Link
-              to={identifier}
+              to={{ pathname: `../photo/${identifier}`, hash: location.hash }}
               key={identifier}
               className={stylesheet.link}
               aria-label={`Alternate photo of this location from ${COLLECTION_DISPLAY_NAMES[collection]} collection`}
+              data-testid="alternate-photo"
             >
               <span className={stylesheet.collectionTag}>
                 {COLLECTION_DISPLAY_NAMES[collection]}

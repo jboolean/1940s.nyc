@@ -1,7 +1,14 @@
 import React from 'react';
 
-import { Redirect, Route, Router, Switch } from 'react-router-dom';
-import history from 'utils/history';
+import { datadogRum } from '@datadog/browser-rum';
+import {
+  BrowserRouter,
+  Navigate,
+  Route,
+  Routes,
+  useLocation,
+  useMatch,
+} from 'react-router';
 import AnnouncementBanner from './screens/AnnouncementBanner';
 import MapPane from './screens/MapPane';
 import Shutdown from './screens/Shutdown';
@@ -21,6 +28,7 @@ import AdminRoutes from './screens/Admin/AdminRoutes';
 import Corrections from './screens/Corrections';
 import CreditPurchaseModal, {
   CreditPurchaseSuccessMessage,
+  openCreditPurchaseModal,
 } from './screens/CreditPurchaseModal';
 import EditStory from './screens/EditStory';
 import FeatureFlags from './screens/FeatureFlags';
@@ -40,23 +48,47 @@ const openTipJarOnLoad = searchParams.has('openTipJar');
 const openMerchOnLoad = searchParams.has('openMerch');
 const noWelcome = searchParams.has('noWelcome');
 const noTipJar = searchParams.has('noTipJar');
+const openCreditPurchaseOnLoad = searchParams.has('openCreditPurchase');
 
 if (noWelcome) searchParams.delete('noWelcome');
 if (noTipJar) searchParams.delete('noTipJar');
 if (openMerchOnLoad) searchParams.delete('openMerch');
-history.replace({
-  pathname: history.location.pathname,
-  hash: history.location.hash,
-  search: searchParams.toString(),
-});
+if (openCreditPurchaseOnLoad) searchParams.delete('openCreditPurchase');
+const currentUrl = new URL(window.location.href);
+currentUrl.search = searchParams.toString();
+window.history.replaceState(
+  null,
+  '',
+  currentUrl.pathname +
+    (currentUrl.search ? currentUrl.search : '') +
+    currentUrl.hash
+);
+
+function DatadogRouteTracker(): null {
+  const location = useLocation();
+  React.useEffect(() => {
+    datadogRum.startView({
+      name: location.pathname + location.search + location.hash,
+    });
+  }, [location.pathname, location.search, location.hash]);
+  return null;
+}
 
 function Modals(): JSX.Element {
   const [isThankYouOpen, setThankYouOpen] = React.useState(thankYouInitial);
   const [isCreditPurchaseSuccessOpen, setCreditPurchaseSuccessOpen] =
     React.useState(creditSuccessInitial);
   const [isWelcomeOpen, setWelcomeOpen] = React.useState(
-    !isThankYouOpen && !openTipJarOnLoad && !openMerchOnLoad && !noWelcome
+    !isThankYouOpen &&
+      !openTipJarOnLoad &&
+      !openMerchOnLoad &&
+      !noWelcome &&
+      !openCreditPurchaseOnLoad
   );
+
+  const onMap = useMatch('/map/*');
+  const onStories = useMatch('/stories/*');
+  const onMapOrStories = onMap !== null || onStories !== null;
 
   const openTipJar = useTipJarStore((state) => state.open);
 
@@ -72,10 +104,16 @@ function Modals(): JSX.Element {
     }
   }, []);
 
+  React.useEffect(() => {
+    if (openCreditPurchaseOnLoad) {
+      openCreditPurchaseModal();
+    }
+  }, []);
+
   return (
     <>
-      <Route path={['/map', '/stories']}>
-        {IS_SHUTDOWN ? (
+      {onMapOrStories &&
+        (IS_SHUTDOWN ? (
           <Shutdown isOpen={true} />
         ) : (
           <Welcome
@@ -84,8 +122,7 @@ function Modals(): JSX.Element {
               setWelcomeOpen(false);
             }}
           />
-        )}
-      </Route>
+        ))}
 
       <ThankYou
         isOpen={isThankYouOpen}
@@ -142,51 +179,68 @@ function ContextWrappers({
 export default function App(): JSX.Element {
   return (
     <ContextWrappers>
-      <Router history={history}>
-        <Switch>
+      <BrowserRouter>
+        <DatadogRouteTracker />
+        <Routes>
           {/* Routes with main layout (image viewer, announcements, modals) */}
-          <Route path={['/map', '/outtakes', '/stories']}>
-            <MainContentLayout>
-              <Route path="/*/photo/:identifier">
-                <ViewerPane className={stylesheet.viewer} />
-              </Route>
-              <Switch>
-                <Route
-                  path={['/map/photo/:identifier', '/map']}
-                  render={() => <MapPane className={stylesheet.mapContainer} />}
-                />
-                <Route path={['/outtakes/photo/:identifier', '/outtakes']}>
-                  <Outtakes className={stylesheet.outtakesContainer} />
-                </Route>
-                <Route path="/stories/edit">
-                  <EditStory />
-                </Route>
-                <Route path={['/stories/photo/:identifier', '/stories']}>
-                  <AllStories className={stylesheet.outtakesContainer} />
-                </Route>
-              </Switch>
-            </MainContentLayout>
-          </Route>
-          <Route>
-            {/* Routes without main layout */}
-            <Switch>
-              <Route path="/orders">
-                <Orders />
-              </Route>
-              <Route path="/labs">
-                <FeatureFlags />
-              </Route>
-              <Route path="/admin">
-                <AdminRoutes />
-              </Route>
-              <Route path="/render-merch/tote-bag">
-                <ToteBag />
-              </Route>
-              <Redirect to="/map" />
-            </Switch>
-          </Route>
-        </Switch>
-      </Router>
+          <Route
+            path="/map/*"
+            element={
+              <MainContentLayout>
+                <Routes>
+                  <Route
+                    path="photo/:identifier"
+                    element={<ViewerPane className={stylesheet.viewer} />}
+                  />
+                </Routes>
+                <MapPane className={stylesheet.mapContainer} />
+              </MainContentLayout>
+            }
+          />
+          <Route
+            path="/outtakes/*"
+            element={
+              <MainContentLayout>
+                <Routes>
+                  <Route
+                    path="photo/:identifier"
+                    element={<ViewerPane className={stylesheet.viewer} />}
+                  />
+                </Routes>
+                <Outtakes className={stylesheet.outtakesContainer} />
+              </MainContentLayout>
+            }
+          />
+          <Route
+            path="/stories/*"
+            element={
+              <MainContentLayout>
+                <Routes>
+                  <Route
+                    path="photo/:identifier"
+                    element={<ViewerPane className={stylesheet.viewer} />}
+                  />
+                </Routes>
+                <Routes>
+                  <Route path="edit" element={<EditStory />} />
+                  <Route
+                    path="*"
+                    element={
+                      <AllStories className={stylesheet.outtakesContainer} />
+                    }
+                  />
+                </Routes>
+              </MainContentLayout>
+            }
+          />
+          {/* Routes without main layout */}
+          <Route path="/orders" element={<Orders />} />
+          <Route path="/labs" element={<FeatureFlags />} />
+          <Route path="/admin/*" element={<AdminRoutes />} />
+          <Route path="/render-merch/tote-bag" element={<ToteBag />} />
+          <Route path="*" element={<Navigate to="/map" />} />
+        </Routes>
+      </BrowserRouter>
     </ContextWrappers>
   );
 }

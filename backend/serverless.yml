@@ -8,7 +8,7 @@ package:
 
 provider:
   name: aws
-  runtime: nodejs20.x
+  runtime: nodejs24.x
   stage: production
   region: us-east-1
   tags:
@@ -24,6 +24,11 @@ provider:
           Action:
             - secretsmanager:GetSecretValue
           Resource: ${self:custom.datadog.apiKeySecretArn}
+  logs:
+    restApi:
+      accessLogging: true
+      format: '{"requestId":"$context.requestId","ip":"$context.identity.sourceIp","httpMethod":"$context.httpMethod","resourcePath":"$context.resourcePath","status":"$context.status","responseLength":"$context.responseLength","responseLatency":"$context.responseLatency","userAgent":"$context.identity.userAgent","requestTime":"$context.requestTime"}'
+      executionLogging: false
   environment:
     STAGE: ${sls:stage}
     DB_HOST: ${ssm:/${self:service}-${sls:stage}-db-host}

@@ -39,7 +39,7 @@ export async function expressAuthentication(
       }
 
       return user;
-    } catch (err) {
+    } catch {
       throw new Unauthorized('Invalid token');
     }
 

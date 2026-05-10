@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { useParams } from 'react-router-dom';
+import { useParams } from 'react-router';
 import { API_BASE } from 'utils/apiConstants';
 
 import Button, { ButtonStyledLink } from 'shared/components/Button';
@@ -26,6 +26,7 @@ export default function ImageButtons(): JSX.Element {
         buttonStyle="secondary"
         href={`${API_BASE}/photos/${photoIdentifier}/buy-prints`}
         target="_blank"
+        data-testid="order-print-button"
         onClick={() => {
           recordEvent({
             category: 'Image Viewer',
@@ -41,6 +42,7 @@ export default function ImageButtons(): JSX.Element {
       <Button
         buttonTheme="viewer"
         buttonStyle="secondary"
+        data-testid="know-this-place-button"
         onClick={() => {
           initializeStoryDraft(photoIdentifier);
         }}

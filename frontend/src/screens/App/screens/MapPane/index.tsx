@@ -9,8 +9,8 @@ import { closest } from 'utils/photosApi';
 import { OverlayId } from './components/MainMap';
 import { MapInterface } from './components/MainMap/MapInterface';
 
-import { RouteComponentProps, withRouter } from 'react-router';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
+import { useNavigate, NavigateFunction } from 'react-router';
 import stylesheet from './MapPane.less';
 import Geolocate from './components/Geolocate';
 import MainMap from './components/MainMap';
@@ -33,6 +33,10 @@ interface Props extends TipJarProps {
   className?: string;
 }
 
+interface PropsWithNavigate extends Props {
+  navigate: NavigateFunction;
+}
+
 interface State {
   overlay: OverlayId | null;
   additionalActionsVisible: boolean;
@@ -53,12 +57,12 @@ function withTipJar<P extends TipJarProps, C extends React.ComponentType<P>>(
   }
   return WithTipJar;
 }
-class MapPane extends React.Component<Props & RouteComponentProps, State> {
+class MapPane extends React.Component<PropsWithNavigate, State> {
   map?: MapInterface;
   private idPrefix: string;
-  historyUnlisten: () => void | null = null;
+  unlisten: (() => void) | null = null;
 
-  constructor(props: Props & RouteComponentProps) {
+  constructor(props: PropsWithNavigate) {
     super(props);
     this.state = {
       overlay: 'default-map',
@@ -74,15 +78,11 @@ class MapPane extends React.Component<Props & RouteComponentProps, State> {
   }
 
   componentWillUnmount(): void {
-    if (this.historyUnlisten) this.historyUnlisten();
+    // nothing to unlisten for navigate
   }
 
   componentDidMount(): void {
-    this.historyUnlisten = this.props.history.listen(() => {
-      setTimeout(() => {
-        if (this.map) this.map.resize();
-      });
-    });
+    // Map resize is now handled via ResizeObserver in MapLibreMap
   }
 
   handleOverlayChange(overlay: OverlayId): void {
@@ -104,7 +104,7 @@ class MapPane extends React.Component<Props & RouteComponentProps, State> {
   }
 
   openPhoto(identifier: string): void {
-    this.props.history.push({
+    void this.props.navigate({
       pathname: '/map/photo/' + identifier,
       hash: window.location.hash,
     });
@@ -255,4 +255,11 @@ class MapPane extends React.Component<Props & RouteComponentProps, State> {
   }
 }
 
-export default withTipJar(withRouter(MapPane));
+function MapPaneWithNavigate(
+  props: Omit<PropsWithNavigate, 'navigate'>
+): JSX.Element {
+  const navigate = useNavigate();
+  return <MapPane {...props} navigate={navigate} />;
+}
+
+export default withTipJar(MapPaneWithNavigate);

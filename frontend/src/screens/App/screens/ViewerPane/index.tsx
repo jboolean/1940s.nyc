@@ -9,7 +9,7 @@ import {
   TransformComponent,
   TransformWrapper,
 } from '@jboolean/react-zoom-pan-pinch';
-import { useHistory, useParams } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 import Alternates from './components/Alternates';
 import ImageButtons from './components/ImageButtons';
 import * as ImageStack from './components/ImageStack';
@@ -83,7 +83,7 @@ export default function ViewerPane({
   className: string;
 }): JSX.Element {
   const { identifier: photoIdentifier } = useParams<{ identifier?: string }>();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const overlayRef = React.useRef<HTMLDivElement>(null);
   const wrapperRef = React.useRef<ReactZoomPanPinchContentRef>(null);
@@ -129,7 +129,10 @@ export default function ViewerPane({
       onPanningStart={() => setIsPanning(true)}
       onPanningStop={() => setIsPanning(false)}
     >
-      <div className={classnames(stylesheet.container, className)}>
+      <div
+        className={classnames(stylesheet.container, className)}
+        data-testid="viewer-pane"
+      >
         <TransformComponent
           wrapperClass={classnames(stylesheet.transformWrapper, {
             [stylesheet.zoomable]: canHover,
@@ -146,7 +149,7 @@ export default function ViewerPane({
               <button
                 className={stylesheet.closeButton}
                 onClick={() =>
-                  history.push({ pathname: '..', hash: window.location.hash })
+                  navigate({ pathname: '..', hash: window.location.hash })
                 }
               >
                 Close

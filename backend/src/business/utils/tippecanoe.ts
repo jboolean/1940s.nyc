@@ -83,6 +83,7 @@ export default async function tippecanoe(
           args.push(cliArg);
         }
       } else {
+        // eslint-disable-next-line @typescript-eslint/no-base-to-string
         args.push(cliArg, value.toString());
       }
     }

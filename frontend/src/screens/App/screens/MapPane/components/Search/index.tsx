@@ -119,13 +119,17 @@ export default class Search extends React.Component<Props, State> {
           });
         }}
         renderSuggestion={renderSuggestion}
-        inputProps={{
-          placeholder: 'Search',
-          value,
-          onChange: this.handleChange,
-          onKeyDown: this.handleKeydown,
-        }}
-        focusInputOnSuggestionClick={false}
+        /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+        inputProps={
+          {
+            placeholder: 'Search',
+            value,
+            onChange: this.handleChange,
+            onKeyDown: this.handleKeydown,
+            'data-testid': 'search-input',
+          } as Autosuggest.InputProps<Feature<Point>>
+        }
+        /* eslint-enable @typescript-eslint/no-unsafe-assignment */
       />
     );
   }

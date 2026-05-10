@@ -1,3 +1,4 @@
 .yalc/
 .yalcignore
 yalc.lock
+test-results/
