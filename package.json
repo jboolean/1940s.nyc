@@ -19,7 +19,7 @@
   },
   "homepage": "https://github.com/jboolean/1940s.nyc#readme",
   "engines": {
-    "node": "^20"
+    "node": "^24"
   },
   "devDependencies": {
     "husky": "^9.1.7"
