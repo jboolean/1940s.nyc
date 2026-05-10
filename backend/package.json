@@ -53,7 +53,7 @@
     "eslint-config-jboolean": "^0.1.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.2.1",
-    "lint-staged": "^14.0.1",
+    "lint-staged": "^17.0.3",
     "patch-package": "^8.0.1",
     "postinstall-postinstall": "^2.1.0",
     "prettier": "^2.8.1",
