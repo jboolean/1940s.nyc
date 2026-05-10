@@ -84,7 +84,7 @@ const useNewsletterModalStore = create(
             draft.isOpen = false;
           });
         }, 2000);
-      } catch (err) {
+      } catch {
         set((draft) => {
           draft.errorMessage = 'Failed to subscribe. Please try again.';
         });

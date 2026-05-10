@@ -7,7 +7,7 @@ interface FieldSetProps extends React.InputHTMLAttributes<HTMLFieldSetElement> {
   className?: string;
 }
 
-interface LegendProps extends React.InputHTMLAttributes<HTMLLegendElement> {}
+type LegendProps = React.InputHTMLAttributes<HTMLLegendElement>;
 
 export function Legend({ className, ...props }: LegendProps): JSX.Element {
   return (

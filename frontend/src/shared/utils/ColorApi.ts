@@ -22,6 +22,7 @@ export async function redirectToCheckout(
   const { error } = await stripe.redirectToCheckout({ sessionId });
   if (error) {
     console.warn(error);
+    // eslint-disable-next-line @typescript-eslint/only-throw-error
     throw error;
   }
 }

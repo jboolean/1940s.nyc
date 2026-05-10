@@ -7,6 +7,7 @@ export const executeRecaptcha = (action: string): Promise<string> => {
         resolve(token);
       },
       (error) => {
+        // eslint-disable-next-line @typescript-eslint/prefer-promise-reject-errors
         reject(error);
       }
     );

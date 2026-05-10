@@ -19,6 +19,7 @@ interface State {
   draftCustomizationOptions: MerchCustomizationOptions | null;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 interface ComputedState {}
 
 interface Actions {
