@@ -4,7 +4,7 @@ import range from 'lodash/range';
 import throttle from 'lodash/throttle';
 import { FixedSizeList as List } from 'react-window';
 
-import AutoSizer, { Size } from 'react-virtualized-auto-sizer';
+import { AutoSizer, SizeProps } from 'react-virtualized-auto-sizer';
 import InfiniteLoader from 'react-window-infinite-loader';
 
 const calculateItemsPerRow = (
@@ -44,16 +44,23 @@ function Grid<T>({
   targetWidth,
   aspectRatio,
 
-  width: containerWidth,
-  height: containerHeight,
+  width: containerWidthMaybeUndefined,
+  height: containerHeightMaybeUndefined,
 
   visibleItemIRef: visibleImageIRef,
   listRef,
 
   loadMoreItems,
-}: GridProps<T> & Size & PrivateProps): JSX.Element {
-  const itemsPerRow = calculateItemsPerRow(targetWidth, containerWidth);
-  const itemHeight = (1 / aspectRatio) * (containerWidth / itemsPerRow);
+}: GridProps<T> & SizeProps & PrivateProps): JSX.Element | null {
+  const containerWidth = containerWidthMaybeUndefined ?? 0;
+  const containerHeight = containerHeightMaybeUndefined ?? 0;
+
+  const itemsPerRow = containerWidth
+    ? calculateItemsPerRow(targetWidth, containerWidth)
+    : 1;
+  const itemHeight = containerWidth
+    ? (1 / aspectRatio) * (containerWidth / itemsPerRow)
+    : 0;
 
   // If items are reorganized, scroll to last visible item rather than some flying off somewhere random
   React.useEffect(() => {
@@ -88,6 +95,10 @@ function Grid<T>({
     },
     [itemsPerRow, loadMoreItems, totalItems]
   );
+
+  if (!containerWidthMaybeUndefined || !containerHeightMaybeUndefined) {
+    return null;
+  }
 
   return (
     <InfiniteLoader
@@ -159,8 +170,8 @@ export default function AutoSizeGrid<T>({
   const listRef = React.useRef<List>();
 
   return (
-    <AutoSizer>
-      {(size) => (
+    <AutoSizer
+      renderProp={(size) => (
         <Grid
           {...gripProps}
           {...size}
@@ -168,6 +179,6 @@ export default function AutoSizeGrid<T>({
           listRef={listRef}
         />
       )}
-    </AutoSizer>
+    />
   );
 }
