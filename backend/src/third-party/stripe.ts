@@ -3,7 +3,7 @@ import Stripe from 'stripe';
 const { STRIPE_SK } = process.env;
 
 const stripe = new Stripe(STRIPE_SK || '', {
-  apiVersion: '2025-02-24.acacia',
+  apiVersion: '2026-04-22.dahlia',
 });
 
 export default stripe;

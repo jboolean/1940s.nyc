@@ -4,7 +4,7 @@ import stripe from '../third-party/stripe';
 
 import compact from 'lodash/compact';
 import groupBy from 'lodash/groupBy';
-import type Stripe from 'stripe';
+import type { Stripe } from 'stripe/cjs/stripe.core';
 import EmailCampaignService from '../business/email/EmailCampaignService';
 import * as LedgerService from '../business/ledger/LedgerService';
 import * as MerchOrderService from '../business/merch/MerchOrderService';
@@ -117,19 +117,25 @@ router.post<'/', unknown, unknown, Stripe.Event, unknown>(
         const merchLineItems = byProductType['merch'] ?? [];
         if (merchLineItems.length) {
           const shippingAddress = {
-            name: expandedSession.shipping_details?.name,
+            name: expandedSession.collected_information?.shipping_details?.name,
             line1:
-              expandedSession.shipping_details?.address?.line1 ?? undefined,
+              expandedSession.collected_information?.shipping_details?.address
+                ?.line1 ?? undefined,
             line2:
-              expandedSession.shipping_details?.address?.line2 ?? undefined,
-            city: expandedSession.shipping_details?.address?.city ?? undefined,
+              expandedSession.collected_information?.shipping_details?.address
+                ?.line2 ?? undefined,
+            city:
+              expandedSession.collected_information?.shipping_details?.address
+                ?.city ?? undefined,
             stateCode:
-              expandedSession.shipping_details?.address?.state ?? undefined,
+              expandedSession.collected_information?.shipping_details?.address
+                ?.state ?? undefined,
             postalCode:
-              expandedSession.shipping_details?.address?.postal_code ??
-              undefined,
+              expandedSession.collected_information?.shipping_details?.address
+                ?.postal_code ?? undefined,
             countryCode:
-              expandedSession.shipping_details?.address?.country ?? undefined,
+              expandedSession.collected_information?.shipping_details?.address
+                ?.country ?? undefined,
           };
 
           const itemTypes = compact(

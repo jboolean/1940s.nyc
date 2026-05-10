@@ -10,7 +10,7 @@ import {
 } from '@tsoa/runtime';
 import * as express from 'express';
 import { BadRequest } from 'http-errors';
-import Stripe from 'stripe';
+import type { Stripe } from 'stripe/cjs/stripe.core';
 import * as ColorService from '../business/color/ColorService';
 import * as UserService from '../business/users/UserService';
 import isProduction from '../business/utils/isProduction';

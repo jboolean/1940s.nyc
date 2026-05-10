@@ -1,5 +1,5 @@
 import { BadRequest } from 'http-errors';
-import type Stripe from 'stripe';
+import type { Checkout as StripeCheckout } from 'stripe/cjs/resources/Checkout/Sessions';
 import User from '../../entities/User';
 import TipFrequency from '../../enum/TipFrequency';
 import stripe from '../../third-party/stripe';
@@ -8,7 +8,7 @@ import * as GiftRegistry from './GiftRegistry';
 
 const recurringForFrequency: Record<
   TipFrequency,
-  Stripe.Checkout.SessionCreateParams.LineItem.PriceData['recurring']
+  StripeCheckout.SessionCreateParams.LineItem.PriceData['recurring']
 > = {
   [TipFrequency.ONCE]: undefined,
   [TipFrequency.MONTHLY]: {
