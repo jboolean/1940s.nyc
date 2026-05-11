@@ -1,3 +1,4 @@
+import tracer from 'dd-trace';
 import OpenAI from 'openai';
 import createStoryTitlePrompt from './createStoryTitlePrompt';
 
@@ -7,9 +8,14 @@ const openai = new OpenAI({
 });
 
 export async function suggestStoryTitle(storyContent: string): Promise<string> {
-  const response = await openai.chat.completions.create(
-    createStoryTitlePrompt(storyContent)
-  );
+  return tracer.llmobs.trace(
+    { kind: 'task', name: 'story-title-generation' },
+    async () => {
+      const response = await openai.chat.completions.create(
+        createStoryTitlePrompt(storyContent)
+      );
 
-  return response.choices[0].message.content?.trim() ?? '';
+      return response.choices[0].message.content?.trim() ?? '';
+    }
+  );
 }

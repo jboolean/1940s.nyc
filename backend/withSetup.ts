@@ -1,3 +1,4 @@
+import './src/tracer';
 import 'reflect-metadata';
 
 import 'source-map-support/register';
