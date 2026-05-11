@@ -1,3 +1,4 @@
+import './src/tracer';
 import generateStoryTitlesImpl from './src/cron/generateStoryTitles';
 
 import withSetup from './withSetup';

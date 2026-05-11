@@ -47,6 +47,7 @@ provider:
     OPENAI_SK: ${ssm:/${self:service}-${sls:stage}-openai-sk}
     RAPIDAPI_API_KEY: ${ssm:/${self:service}-${sls:stage}-rapidapi-api-key}
     PRINTFUL_SK: ${ssm:/${self:service}-${sls:stage}-printful-sk}
+    DD_LLMOBS_ML_APP: fourtiesnyc
 plugins:
   - serverless-plugin-conditional-functions
   - serverless-webpack
