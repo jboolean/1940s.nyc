@@ -96,7 +96,7 @@
     "babel-loader": "^9.1.0",
     "copy-webpack-plugin": "^14.0.0",
     "css-loader": "^6.7.1",
-    "eslint": "^8.26.0",
+    "eslint": "^10.4.0",
     "eslint-config-jboolean": "^1.0.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-import-resolver-webpack": "^0.13.7",
