@@ -120,20 +120,16 @@ router.post<'/', unknown, unknown, Stripe.Event, unknown>(
 
         const merchLineItems = byProductType['merch'] ?? [];
         if (merchLineItems.length) {
+          const shippingDetails =
+            expandedSession.collected_information?.shipping_details;
           const shippingAddress = {
-            name: expandedSession.shipping_details?.name,
-            line1:
-              expandedSession.shipping_details?.address?.line1 ?? undefined,
-            line2:
-              expandedSession.shipping_details?.address?.line2 ?? undefined,
-            city: expandedSession.shipping_details?.address?.city ?? undefined,
-            stateCode:
-              expandedSession.shipping_details?.address?.state ?? undefined,
-            postalCode:
-              expandedSession.shipping_details?.address?.postal_code ??
-              undefined,
-            countryCode:
-              expandedSession.shipping_details?.address?.country ?? undefined,
+            name: shippingDetails?.name,
+            line1: shippingDetails?.address.line1 ?? undefined,
+            line2: shippingDetails?.address.line2 ?? undefined,
+            city: shippingDetails?.address.city ?? undefined,
+            stateCode: shippingDetails?.address.state ?? undefined,
+            postalCode: shippingDetails?.address.postal_code ?? undefined,
+            countryCode: shippingDetails?.address.country ?? undefined,
           };
 
           const itemTypes = compact(
