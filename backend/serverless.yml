@@ -157,3 +157,10 @@ custom:
     addLayers: true
     exclude:
       - renderMerchPrintfiles
+resources:
+  Resources:
+    ApiGatewayAccessLogGroup:
+      Type: AWS::Logs::LogGroup
+      Properties:
+        LogGroupName: /aws/api-gateway/${self:service}-${sls:stage}
+        RetentionInDays: 30
