@@ -23,6 +23,14 @@ import User from './entities/User';
 
 // DB connection related env vars
 const { DB_HOST, DB_PORT, DB_USERNAME, DB_PASSWORD, DB_DATABASE } = process.env;
+
+// Lambda can create many execution environments in response to a traffic spike.
+// Keep each environment's pool small so the database connection count scales
+// with concurrent work rather than with the driver's default pool size.
+const DB_POOL_MAX = Number(process.env.DB_POOL_MAX ?? 1);
+const DB_IDLE_TIMEOUT_MILLIS = Number(
+  process.env.DB_IDLE_TIMEOUT_MILLIS ?? 10000
+);
 // Force entity class metadata to be evaluated
 const ENTITIES = [
   AddressCorrection,
@@ -70,6 +78,10 @@ export const AppDataSource = new DataSource({
   logging: !!process.env.IS_OFFLINE,
   entities: ENTITIES,
   namingStrategy: new SnakeNamingStrategy(),
+  extra: {
+    max: DB_POOL_MAX,
+    idleTimeoutMillis: DB_IDLE_TIMEOUT_MILLIS,
+  },
 });
 
 export default async function createConnectionIfNotExists(): Promise<DataSource> {

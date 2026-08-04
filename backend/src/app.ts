@@ -73,17 +73,28 @@ app.use(
   })
 );
 
-app.use(async (req, res, next) => {
+const initializeDatabase = async (
+  req: ExRequest,
+  res: ExResponse,
+  next: NextFunction
+) => {
   await createConnection();
   next();
-});
+};
 
+// These routes may use the database, but static/unknown API Gateway requests
+// should not create a TypeORM pool in a Lambda execution environment.
+app.use(
+  ['/geodata', '/stripe-webhooks', '/postmark-webhooks', '/printful-webhooks'],
+  initializeDatabase
+);
 app.use('/geodata', GeodataResource);
 app.use('/stripe-webhooks', StripeWebhooksResource);
 app.use('/postmark-webhooks', PostmarkWebhooksResource);
 app.use('/printful-webhooks', PrintfulWebhooksResource);
 
 // Tsoa
+app.use(initializeDatabase);
 // eslint-disable-next-line @typescript-eslint/no-unsafe-call
 RegisterRoutes(app);
 
