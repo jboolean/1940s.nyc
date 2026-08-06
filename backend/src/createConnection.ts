@@ -69,7 +69,7 @@ export const AppDataSource = new DataSource({
   synchronize: false,
   logging: !!process.env.IS_OFFLINE,
   // Lambda processes one invocation at a time per execution environment.
-  poolSize: 1,
+  poolSize: 3,
   entities: ENTITIES,
   namingStrategy: new SnakeNamingStrategy(),
 });
