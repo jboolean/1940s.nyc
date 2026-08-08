@@ -3,7 +3,6 @@ import ipfilter from 'express-ipfilter';
 import { Models } from 'postmark';
 import isProduction from '../business/utils/isProduction';
 import StoryRepository from '../repositories/StoryRepository';
-import ipFilterOptions from './ipFilterOptions';
 const router = express.Router();
 
 const POSTMARK_IPS = [
@@ -17,7 +16,10 @@ if (!isProduction()) {
   POSTMARK_IPS.push('127.0.0.1');
 }
 
-router.use('/', ipfilter.IpFilter(POSTMARK_IPS, ipFilterOptions));
+router.use(
+  '/',
+  ipfilter.IpFilter(POSTMARK_IPS, { mode: 'allow', trustProxy: 2 })
+);
 
 router.post<
   '/',

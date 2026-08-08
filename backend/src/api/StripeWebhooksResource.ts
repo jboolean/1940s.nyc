@@ -11,7 +11,6 @@ import * as MerchOrderService from '../business/merch/MerchOrderService';
 import * as UserService from '../business/users/UserService';
 import isProduction from '../business/utils/isProduction';
 import MerchInternalVariant from '../enum/MerchInternalVariant';
-import ipFilterOptions from './ipFilterOptions';
 const router = express.Router();
 
 type ProductMetadata = {
@@ -38,7 +37,11 @@ if (!isProduction()) {
   STRIPE_IPS.push('127.0.0.1');
 }
 
-router.use('/', ipfilter.IpFilter(STRIPE_IPS, ipFilterOptions));
+// ipfilter does not use express's `trust proxy`, so repeat the hop count here
+router.use(
+  '/',
+  ipfilter.IpFilter(STRIPE_IPS, { mode: 'allow', trustProxy: 2 })
+);
 
 router.post<'/', unknown, unknown, Stripe.Event, unknown>(
   '/',
