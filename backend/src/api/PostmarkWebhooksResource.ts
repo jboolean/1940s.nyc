@@ -16,7 +16,10 @@ if (!isProduction()) {
   POSTMARK_IPS.push('127.0.0.1');
 }
 
-router.use('/', ipfilter.IpFilter(POSTMARK_IPS, { mode: 'allow' }));
+router.use(
+  '/',
+  ipfilter.IpFilter(POSTMARK_IPS, { mode: 'allow', trustProxy: 2 })
+);
 
 router.post<
   '/',

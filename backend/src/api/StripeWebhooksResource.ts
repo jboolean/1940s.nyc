@@ -37,7 +37,11 @@ if (!isProduction()) {
   STRIPE_IPS.push('127.0.0.1');
 }
 
-router.use('/', ipfilter.IpFilter(STRIPE_IPS, { mode: 'allow' }));
+// ipfilter does not use express's `trust proxy`, so repeat the hop count here
+router.use(
+  '/',
+  ipfilter.IpFilter(STRIPE_IPS, { mode: 'allow', trustProxy: 2 })
+);
 
 router.post<'/', unknown, unknown, Stripe.Event, unknown>(
   '/',
