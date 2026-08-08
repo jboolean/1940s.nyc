@@ -11,6 +11,7 @@ import * as MerchOrderService from '../business/merch/MerchOrderService';
 import * as UserService from '../business/users/UserService';
 import isProduction from '../business/utils/isProduction';
 import MerchInternalVariant from '../enum/MerchInternalVariant';
+import ipFilterOptions from './ipFilterOptions';
 const router = express.Router();
 
 type ProductMetadata = {
@@ -37,7 +38,7 @@ if (!isProduction()) {
   STRIPE_IPS.push('127.0.0.1');
 }
 
-router.use('/', ipfilter.IpFilter(STRIPE_IPS, { mode: 'allow' }));
+router.use('/', ipfilter.IpFilter(STRIPE_IPS, ipFilterOptions));
 
 router.post<'/', unknown, unknown, Stripe.Event, unknown>(
   '/',
