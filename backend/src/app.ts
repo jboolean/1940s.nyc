@@ -25,8 +25,8 @@ import PostmarkWebhooksResource from './api/PostmarkWebhooksResource';
 import PrintfulWebhooksResource from './api/PrintfulWebhooksResource';
 import StripeWebhooksResource from './api/StripeWebhooksResource';
 
-// Trust Cloudflare and API Gateway, in that order, when reading X-Forwarded-For
-app.set('trust proxy', 2);
+// Cloudflare -> CloudFront (edge-optimized API Gateway) -> API Gateway
+app.set('trust proxy', 3);
 
 Sentry.init({
   dsn: 'https://5c9a98d156614bac899b541f69d9b7f3@o4504630310600704.ingest.sentry.io/4504630315974657',

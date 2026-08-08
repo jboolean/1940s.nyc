@@ -18,7 +18,7 @@ if (!isProduction()) {
 
 router.use(
   '/',
-  ipfilter.IpFilter(POSTMARK_IPS, { mode: 'allow', trustProxy: 2 })
+  ipfilter.IpFilter(POSTMARK_IPS, { mode: 'allow', trustProxy: 3 })
 );
 
 router.post<

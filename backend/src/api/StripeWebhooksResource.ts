@@ -40,7 +40,7 @@ if (!isProduction()) {
 // ipfilter does not use express's `trust proxy`, so repeat the hop count here
 router.use(
   '/',
-  ipfilter.IpFilter(STRIPE_IPS, { mode: 'allow', trustProxy: 2 })
+  ipfilter.IpFilter(STRIPE_IPS, { mode: 'allow', trustProxy: 3 })
 );
 
 router.post<'/', unknown, unknown, Stripe.Event, unknown>(
