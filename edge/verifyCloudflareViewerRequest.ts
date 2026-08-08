@@ -2,21 +2,11 @@ import { CloudFrontRequestHandler } from "aws-lambda";
 import { CLOUDFLARE_RANGES } from "./cloudflareIpRanges";
 import { createIpRangeMatcher } from "./ipRangeMatcher";
 
-/**
- * Rejects requests that did not come through Cloudflare, so nobody can bypass it
- * by hitting the CloudFront domain directly.
- *
- * Runs on viewer-request, not origin-request: origin-request is skipped on a
- * cache hit, so a direct requester would still be served cached objects.
- */
+// Rejects requests that did not come through Cloudflare. On viewer-request
+// rather than origin-request, which is skipped on cache hits.
 
-/**
- * "log-only" logs what it would have rejected and lets the request through.
- * Deploy in "log-only" and check the logs first — if this distribution is not
- * yet fronted by Cloudflare, "enforce" takes every photo offline immediately.
- *
- * Lambda@Edge has no environment variables, so changing this needs a redeploy.
- */
+// "enforce" 403s. Don't flip it until this distribution is actually behind
+// Cloudflare — Lambda@Edge has no env vars, so it needs a redeploy either way.
 const MODE: "enforce" | "log-only" = "log-only";
 
 const isCloudflareIp = createIpRangeMatcher(CLOUDFLARE_RANGES);
