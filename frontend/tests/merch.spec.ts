@@ -4,7 +4,7 @@ import { expectStripeRedirect, url } from './helpers';
 
 test('shop modal — checkout → Stripe', async ({ page }) => {
   await page.goto(url('/map', { noWelcome: true, noTipJar: true }));
-  await page.getByRole('button', { name: 'Shop!' }).click();
+  await page.locator('[data-testid="map-merch-button"]').click();
   const merch = new MerchModal(page);
   await expect(merch.modal()).toBeVisible();
   await merch.checkout();

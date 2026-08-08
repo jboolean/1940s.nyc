@@ -1,7 +1,31 @@
 import React from 'react';
+
+import TextButton from 'shared/components/TextButton';
+import recordEvent from 'shared/utils/recordEvent';
+import { openMerchModal } from '../MerchModal';
 import Announcment from './Announcement';
 
 const ANNOUNCEMENTS_REGISTRY: Announcment[] = [
+  {
+    id: 'tote-2026-08',
+    expiresAt: new Date('2026-08-29'),
+    render: () => (
+      <>
+        Custom tote bags with your neighborhood, now $25{' '}
+        <TextButton
+          onClick={() => {
+            recordEvent({
+              category: 'Announcement',
+              action: 'Click Merch',
+            });
+            openMerchModal();
+          }}
+        >
+          Shop now
+        </TextButton>
+      </>
+    ),
+  },
   {
     id: 'zoom',
     expiresAt: new Date('2025-01-31'),

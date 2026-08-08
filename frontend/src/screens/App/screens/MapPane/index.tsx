@@ -9,8 +9,7 @@ import { closest } from 'utils/photosApi';
 import { OverlayId } from './components/MainMap';
 import { MapInterface } from './components/MainMap/MapInterface';
 
-import { Link } from 'react-router';
-import { useNavigate, NavigateFunction } from 'react-router';
+import { Link, NavigateFunction, useNavigate } from 'react-router';
 import stylesheet from './MapPane.less';
 import Geolocate from './components/Geolocate';
 import MainMap from './components/MainMap';
@@ -144,6 +143,7 @@ class MapPane extends React.Component<PropsWithNavigate, State> {
           <button
             type="button"
             className={stylesheet.action}
+            data-testid="map-merch-button"
             onClick={() => {
               recordEvent({
                 category: 'Map',
@@ -152,7 +152,7 @@ class MapPane extends React.Component<PropsWithNavigate, State> {
               openMerchModal();
             }}
           >
-            Shop!
+            Tote 👜
           </button>
 
           <button
