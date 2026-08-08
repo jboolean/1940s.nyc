@@ -21,7 +21,6 @@ import {
   NextFunction,
 } from 'express';
 import { IpDeniedError } from 'express-ipfilter';
-import cloudflareIp from './api/cloudflareIp';
 import PostmarkWebhooksResource from './api/PostmarkWebhooksResource';
 import PrintfulWebhooksResource from './api/PrintfulWebhooksResource';
 import StripeWebhooksResource from './api/StripeWebhooksResource';
@@ -49,9 +48,6 @@ Sentry.init({
   tracesSampleRate: 1.0,
   environment: process.env.STAGE,
 });
-// Must come before anything that reads req.ip, including Sentry
-app.use(cloudflareIp());
-
 // RequestHandler creates a separate execution context using domains, so that every
 // transaction/span/breadcrumb is attached to its own Hub instance
 app.use(
