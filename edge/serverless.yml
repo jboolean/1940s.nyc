@@ -24,3 +24,14 @@ functions:
         includeBody: false
         pathPattern: "*"
         stage: production
+  verifyCloudflareViewerRequest:
+    handler: verifyCloudflareViewerRequest.handler
+    tags:
+      Project: fourtiesnyc
+    events:
+      - preExistingCloudFront:
+        distributionId: E27U2N3WTCAYNV
+        eventType: viewer-request
+        includeBody: false
+        pathPattern: "*"
+        stage: production

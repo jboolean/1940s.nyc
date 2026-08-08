@@ -1,0 +1,48 @@
+name: edge-pr
+on:
+  pull_request:
+    paths:
+      - "edge/**"
+  schedule:
+    # Catch Cloudflare publishing a new range when nobody is touching this code
+    - cron: "0 12 * * 1"
+  workflow_dispatch:
+defaults:
+  run:
+    shell: bash
+    working-directory: edge
+jobs:
+  cloudflareIps:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+      - run: npm ci
+      - name: Sync Cloudflare IP ranges
+        run: npm run sync-cloudflare-ips
+      - name: Check for drift
+        run: |
+          if ! git diff --exit-code -- cloudflareIpRanges.ts; then
+            echo "::error::Cloudflare's published IP ranges have changed. Run 'npm run sync-cloudflare-ips' in /edge, commit the result, and redeploy."
+            exit 1
+          fi
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+      - run: npm ci
+      - run: npm test
+  types:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+      - run: npm ci
+      - run: npm run types

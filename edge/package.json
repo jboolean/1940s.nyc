@@ -11,7 +11,9 @@
     "serverless-plugin-typescript": "^2.1.5"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node --test",
+    "types": "tsc --noEmit --strict --target es2022 --module preserve --moduleResolution bundler --types node,aws-lambda *.ts",
+    "sync-cloudflare-ips": "node scripts/syncCloudflareIpRanges.mjs"
   },
   "author": "Julian boilen",
   "license": "ISC"
