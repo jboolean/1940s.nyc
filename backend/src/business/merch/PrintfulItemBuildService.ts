@@ -10,10 +10,10 @@ const INTERNAL_VARIANT_TO_PRINTFUL_VARIANT: Record<
   [MerchInternalVariant.TOTE_BAG_SMALL]: 4533, // Product 84
 };
 
-export async function makePrintfulItem(
+export function makePrintfulItem(
   customMerchItemId: number,
   internalVariant: MerchInternalVariant
-): Promise<PrintfulCatalogItem> {
+): PrintfulCatalogItem {
   const printfulVariantId =
     INTERNAL_VARIANT_TO_PRINTFUL_VARIANT[internalVariant];
   switch (internalVariant) {
@@ -30,7 +30,7 @@ export async function makePrintfulItem(
             layers: [
               {
                 type: 'file',
-                url: await getPrintfileUrl(customMerchItemId, false),
+                url: getPrintfileUrl(customMerchItemId),
               },
             ],
           },
