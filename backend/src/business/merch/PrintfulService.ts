@@ -68,12 +68,29 @@ export async function addItemToOrder(item: MerchOrderItem): Promise<void> {
     });
   }
 
-  await createItemByOrderId({
+  const createdResp = await createItemByOrderId({
     path: {
       order_id: printfulOrderId,
     },
-    body: await makePrintfulItem(item.id, item.internalVariant),
+    body: makePrintfulItem(item.id, item.internalVariant),
   });
+
+  if (createdResp.error) {
+    throw new Error(
+      `Printful API returned error creating item ${
+        item.id
+      } in order ${printfulOrderId}: ${JSON.stringify(createdResp.error)}`
+    );
+  }
+
+  const createdItem = createdResp.data as unknown as {
+    placements?: Array<{ placement: string }>;
+  };
+  if (!createdItem?.placements?.length) {
+    throw new Error(
+      `Printful created item ${item.id} in order ${printfulOrderId} but the placement was empty/not set. This means the printfile image could not be fetched. Refusing to continue.`
+    );
+  }
 }
 
 export async function submitOrderForFulfillment(
