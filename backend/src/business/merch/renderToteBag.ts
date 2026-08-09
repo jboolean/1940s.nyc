@@ -60,9 +60,7 @@ export default async function renderToteBag({
   });
   const page = await browser.newPage();
   await page.setViewport({ width: 17 * 150, height: 33 * 150 });
-  // Surface errors from inside the rendered page - otherwise a JS error in
-  // the frontend fails silently until the waitForSelector timeout below,
-  // with no indication of the real cause.
+  // Surface in-page errors instead of failing silently.
   page.on('console', (msg) =>
     console.log(`[render-tote-bag page console] ${msg.text()}`)
   );
@@ -70,8 +68,7 @@ export default async function renderToteBag({
     console.error('[render-tote-bag page error]', err)
   );
 
-  // Reroute the page (and everything it loads - map tiles, sprites, fonts,
-  // etc.) around Cloudflare. See cloudflareOrigins.ts for why.
+  // Reroute everything the page loads around Cloudflare. See cloudflareOrigins.ts.
   await page.setRequestInterception(true);
   page.on('request', (req) => {
     const target = bypassCloudflare(req.url());
@@ -108,11 +105,26 @@ export default async function renderToteBag({
   // sleep 5 seconds for all map tiles to load
   await new Promise((resolve) => setTimeout(resolve, 5000));
 
+  // window.__testMapInstance is set by MapLibreMap for E2E tests; use it to
+  // confirm the map actually rendered something, not just that the container
+  // div exists.
+  const renderedFeatureCount = await page.evaluate(
+    () =>
+      (
+        window as unknown as {
+          __testMapInstance?: { queryRenderedFeatures: () => unknown[] };
+        }
+      ).__testMapInstance?.queryRenderedFeatures().length ?? 0
+  );
+  if (renderedFeatureCount === 0) {
+    await browser.close();
+    throw new Error('Map rendered no features - printfile would be blank');
+  }
+
   const element = await page.$('#render-content');
   if (!element) {
-    console.error('Element with class .tote-bag-content not found');
     await browser.close();
-    process.exit(1);
+    throw new Error('#render-content not found on the page');
   }
 
   const screenshotBuffer = await element.screenshot();
