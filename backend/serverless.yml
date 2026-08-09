@@ -68,6 +68,8 @@ functions:
       - http:
           path: /{proxy+}
           method: ANY
+    environment:
+      INTERNAL_FRONTEND_BASE_URL: ${self:custom.directFrontendOrigin}
   convertImage:
     enabled: '"${sls:stage}" == "production"'
     handler: convertImage.handler
@@ -139,11 +141,15 @@ functions:
       # Requests go straight to Netlify instead of the public, Cloudflare-fronted
       # domain: Cloudflare's Bot Fight Mode can't be exempted via rules on our
       # plan, and it blocks this headless-Chrome render pipeline outright.
-      FRONTEND_BASE_URL: ${ssm:/${self:service}-${sls:stage}-render-frontend-base-url}
+      FRONTEND_BASE_URL: ${self:custom.directFrontendOrigin}
   registerPrintfulWebhooks:
     handler: registerPrintfulWebhooks.handler
     # Invoked manually
 custom:
+  # Direct Netlify origin, bypassing our Cloudflare proxy. For server-to-server
+  # calls Lambda makes to our own frontend, where Cloudflare's Bot Fight Mode
+  # (can't be exempted via rules on our plan) blocks automated requests.
+  directFrontendOrigin: ${ssm:/${self:service}-${sls:stage}-render-frontend-base-url}
   webpack:
     webpackConfig: "webpack.config.js"
   bucket: fourties-photos
