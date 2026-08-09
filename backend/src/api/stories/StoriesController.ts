@@ -237,6 +237,13 @@ export class StoriesController extends Controller {
       stories = await StoryRepository().findPublished(paginationInput);
     }
 
+    // Published stories are the same for everyone and change rarely,
+    // so let browsers and shared caches hold onto them.
+    this.setHeader(
+      'Cache-Control',
+      'public, max-age=300, stale-while-revalidate=3600'
+    );
+
     return mapPaginated(stories, toPublicStoryResponse);
   }
 
