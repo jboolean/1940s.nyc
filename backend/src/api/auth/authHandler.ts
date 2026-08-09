@@ -41,10 +41,8 @@ export async function expressAuthentication(
 
       return user;
     } catch (err) {
-      // Log the real cause before collapsing it to a generic 401 - otherwise
-      // failures upstream (e.g. Netlify Identity itself down, or something
-      // between us and it returning a non-JSON response) are indistinguishable
-      // from an actually-invalid token.
+      // Log the real cause - otherwise it's indistinguishable from an
+      // actually-invalid token.
       if (axios.isAxiosError(err)) {
         console.error(
           'Netlify identity check failed',
