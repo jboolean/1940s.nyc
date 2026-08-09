@@ -1,7 +1,7 @@
 /// <reference lib="dom" />
 
-import chromium from '@sparticuz/chromium';
 import puppeteer from 'puppeteer-core';
+import type SparticuzChromium from '@sparticuz/chromium';
 
 const IS_LOCAL = !!process.env.IS_LOCAL;
 const FRONTEND_BASE_URL = process.env.FRONTEND_BASE_URL as string;
@@ -13,6 +13,18 @@ const LOCAL_CHROMIUM_EXECUTABLE_PATH =
 // Move center to account for tote bag bottom
 const LAT_OFFSET = -0.0007;
 const ZOOM = 17;
+
+// @sparticuz/chromium ships as an ES module. TypeScript's CommonJS output
+// rewrites `await import(...)` into a synchronous require(), which Node
+// refuses for a not-yet-loaded ES module. Calling import() indirectly (via
+// `new Function`) hides it from that rewrite, so this is Node's real,
+// asynchronous import() rather than a disguised require().
+// eslint-disable-next-line @typescript-eslint/no-implied-eval -- not eval; forces a genuine dynamic import(), see comment above
+const importChromium = new Function(
+  'return import("@sparticuz/chromium")'
+) as () => Promise<{
+  default: typeof SparticuzChromium;
+}>;
 
 export default async function renderToteBag({
   lat,
@@ -27,13 +39,22 @@ export default async function renderToteBag({
   foregroundColor?: string;
   backgroundColor?: string;
 }): Promise<Buffer> {
+  const chromium = IS_LOCAL ? null : (await importChromium()).default;
+
   const browser = await puppeteer.launch({
-    args: IS_LOCAL ? puppeteer.defaultArgs() : chromium.args,
-    defaultViewport: chromium.defaultViewport,
-    executablePath: IS_LOCAL
-      ? LOCAL_CHROMIUM_EXECUTABLE_PATH
-      : await chromium.executablePath(),
-    headless: chromium.headless as 'shell' | boolean,
+    args:
+      IS_LOCAL || !chromium
+        ? puppeteer.defaultArgs()
+        : puppeteer.defaultArgs({
+            args: chromium.args,
+            headless: 'shell',
+          }),
+    defaultViewport: { width: 17 * 150, height: 33 * 150 },
+    executablePath:
+      IS_LOCAL || !chromium
+        ? LOCAL_CHROMIUM_EXECUTABLE_PATH
+        : await chromium.executablePath(),
+    headless: 'shell',
     acceptInsecureCerts: IS_LOCAL,
   });
   const page = await browser.newPage();
