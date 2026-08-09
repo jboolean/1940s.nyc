@@ -2,6 +2,7 @@
 
 import puppeteer from 'puppeteer-core';
 import type SparticuzChromium from '@sparticuz/chromium';
+import { bypassCloudflare } from '../utils/cloudflareOrigins';
 
 const IS_LOCAL = !!process.env.IS_LOCAL;
 const FRONTEND_BASE_URL = process.env.FRONTEND_BASE_URL as string;
@@ -68,6 +69,16 @@ export default async function renderToteBag({
   page.on('pageerror', (err) =>
     console.error('[render-tote-bag page error]', err)
   );
+
+  // Reroute the page (and everything it loads - map tiles, sprites, fonts,
+  // etc.) around Cloudflare. See cloudflareOrigins.ts for why.
+  await page.setRequestInterception(true);
+  page.on('request', (req) => {
+    const target = bypassCloudflare(req.url());
+    void (target === req.url()
+      ? req.continue()
+      : req.continue({ url: target }));
+  });
 
   const urlParams = new URLSearchParams();
   urlParams.append('noWelcome', 'true');
