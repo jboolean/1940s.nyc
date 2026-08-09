@@ -83,7 +83,6 @@ export async function addItemToOrder(item: MerchOrderItem): Promise<void> {
     );
   }
 
-  // Created item is the whole response body, not nested under a second .data
   const createdItem = createdResp.data as unknown as {
     placements?: Array<{ placement: string }>;
   };

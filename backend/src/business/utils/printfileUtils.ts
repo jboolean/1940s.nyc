@@ -1,4 +1,9 @@
-import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import {
+  GetObjectCommand,
+  PutObjectCommand,
+  S3Client,
+} from '@aws-sdk/client-s3';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { bypassCloudflare } from './cloudflareOrigins';
 import isProduction from './isProduction';
 
@@ -26,8 +31,22 @@ export async function uploadPrintfile(
   );
 }
 
-export function getPrintfileUrl(customMerchItemId: number): string {
-  const destinationKey = getPrintfileKey(customMerchItemId);
+// Signed S3 URL for admin review.
+export async function getPrintfileUrl(
+  customMerchItemId: number
+): Promise<string> {
+  const command = new GetObjectCommand({
+    Bucket: 'fourties-photos',
+    Key: getPrintfileKey(customMerchItemId),
+  });
 
-  return bypassCloudflare(`https://photos.1940s.nyc/${destinationKey}`);
+  return await getSignedUrl(s3, command, { expiresIn: 120 });
+}
+
+// Direct CloudFront URL (bypassing Cloudflare) for Printful's server fetch,
+// which does a HEAD check before the GET (signed URLs can't support that).
+export function getPrintfileDirectUrl(customMerchItemId: number): string {
+  return bypassCloudflare(
+    `https://photos.1940s.nyc/${getPrintfileKey(customMerchItemId)}`
+  );
 }

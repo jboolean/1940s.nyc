@@ -1,6 +1,6 @@
 import MerchInternalVariant from '../../enum/MerchInternalVariant';
 import absurd from '../utils/absurd';
-import { getPrintfileUrl } from '../utils/printfileUtils';
+import { getPrintfileDirectUrl } from '../utils/printfileUtils';
 import { CatalogItem as PrintfulCatalogItem } from '../utils/printfulApi';
 
 const INTERNAL_VARIANT_TO_PRINTFUL_VARIANT: Record<
@@ -30,7 +30,7 @@ export function makePrintfulItem(
             layers: [
               {
                 type: 'file',
-                url: getPrintfileUrl(customMerchItemId),
+                url: getPrintfileDirectUrl(customMerchItemId),
               },
             ],
           },
