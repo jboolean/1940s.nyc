@@ -60,8 +60,8 @@ export default async function renderToteBag({
   const page = await browser.newPage();
   await page.setViewport({ width: 17 * 150, height: 33 * 150 });
   // Surface errors from inside the rendered page - otherwise a JS error in
-  // the frontend (e.g. a WebGL/map failure) fails silently until the
-  // waitForSelector timeout below, with no indication of the real cause.
+  // the frontend fails silently until the waitForSelector timeout below,
+  // with no indication of the real cause.
   page.on('console', (msg) =>
     console.log(`[render-tote-bag page console] ${msg.text()}`)
   );
