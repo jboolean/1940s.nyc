@@ -1,8 +1,7 @@
 import React from 'react';
 
-import Modal from 'react-modal';
 import noop from 'lodash/noop';
-import Mailchimp from './Mailchimp';
+import Modal from 'react-modal';
 
 import stylesheet from './shutdown.less';
 
@@ -20,49 +19,19 @@ export default function Shutdown({ isOpen }: Props): JSX.Element {
       shouldCloseOnOverlayClick={false}
       shouldCloseOnEsc={false}
     >
-      <h1>Street View of 1940s&nbsp;New&nbsp;York</h1>
-      <h2>Well that was fun…and expensive</h2>
+      <h1 data-testid="welcome-heading">
+        Street View of 1940s&nbsp;New&nbsp;York
+      </h1>
+      <h2>Project Archived</h2>
       <p>
-        Thank you to everyone who shared my project of mapping photos of 1940s
-        New York! Unfortunately, the costs for the map service I was using got
-        out of control. I plan to re-launch the site after I find a more
-        affordable mapping solution.
+        Thank you for everyone who enjoyed this project. I do not have the time
+        to continue to maintain it.
       </p>
       <p>
-        Please leave your email address so I can let you know when the site is
-        back up.
+        Tips and unused credits since February 2026 are eligible for refund.
+        Please email <a href="mailto:julian@1940s.nyc">julian@1940s.nyc</a>.
       </p>
-      <p>
-        I promise it{' '}
-        <a
-          href="https://www.timeout.com/newyork/news/find-out-what-your-nyc-building-looked-like-in-the-1940s-081420"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          was
-        </a>{' '}
-        <a
-          href="http://boingboing.net/2020/08/14/explore-nyc-in-the-1930s-and-1.html"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          cool
-        </a>{' '}
-        and will be back.
-      </p>
-
-      <Mailchimp />
       <hr />
-      <p className={stylesheet.finePrint}>
-        by{' '}
-        <a
-          href="http://julianboilen.com"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Julian Boilen
-        </a>
-      </p>
     </Modal>
   );
 }
