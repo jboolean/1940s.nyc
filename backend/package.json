@@ -51,7 +51,7 @@
     "dd-trace": "^5.71.0",
     "eslint": "^8.57.0",
     "eslint-config-jboolean": "^0.1.0",
-    "eslint-config-prettier": "^8.5.0",
+    "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^4.2.1",
     "lint-staged": "^17.0.3",
     "patch-package": "^8.0.1",
