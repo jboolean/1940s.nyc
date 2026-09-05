@@ -8,7 +8,7 @@ import Announcment from './Announcement';
 const ANNOUNCEMENTS_REGISTRY: Announcment[] = [
   {
     id: 'tote-2026-08',
-    expiresAt: new Date('2026-08-29'),
+    expiresAt: new Date('2026-12-01'),
     render: () => (
       <>
         Custom tote bags with your neighborhood, now $25{' '}
