@@ -28,7 +28,7 @@ const COLOR_CREDIT_PRODUCT_ID = isProduction()
   ? 'prod_OCXuxXcQOP3N4j'
   : 'prod_OCE62CeqBcpuxW';
 
-const MIN_QUANTITY = 20;
+const MIN_QUANTITY = 10;
 const MAX_QUANTITY = 2000;
 
 @Route('colorization')
