@@ -43,7 +43,7 @@ export default function CreditPurchaseModal(): JSX.Element {
       }}
     >
       <div data-testid="credit-purchase-modal">
-        <h1>Continue exploring in color</h1>
+        <h1>Explore in color</h1>
 
         <div>
           <p>
