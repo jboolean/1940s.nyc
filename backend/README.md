@@ -107,7 +107,7 @@ Automatic moderation was considered but most of the rejected stories are not spa
 
 For a seamless user experience and to reduce costs, a custom authentication system was built instead of using a third party service like Auth0.
 
-For any route tagged with `@Security('user-token')`, a user is created if one does not exist. The user is then considered logged in immediately without any information and is considered anonymous. Later, the user can provide, and optionally verify an email address. Specific features can check for verified email addresses if that level of security is needed. Corrections to geocodes, for example, require a verified email address. Colorization, however, can be done by anonymous users, allowing a limited "free trial" experience.
+For any route tagged with `@Security('user-token')`, a user is created if one does not exist. The user is then considered logged in immediately without any information and is considered anonymous. Later, the user can provide, and optionally verify an email address. Specific features can check for verified email addresses if that level of security is needed. Corrections to geocodes, for example, require a verified email address. Colorization, however, can be done by anonymous users, as long as they have a positive credit balance.
 
 **Log-in process**: The user supplies an email address: if an account exists the user is sent a magic link to log in, or the email is associated with the current possibly anonymous account they are logged in with. Magic links are JWT tokens.
 
@@ -115,7 +115,7 @@ Notably, **Stories** are not connected to Users because Stories were built first
 
 ### Credit ledgering
 
-Users can purchase "Color tokens" to colorize images. This is managed via the Ledger system, which is just a ledger of credits issued and images colorized. Users can go negative as we allow one free colorization per day as a trial.
+Users can purchase "Color tokens" to colorize images. This is managed via the Ledger system, which is just a ledger of credits issued and images colorized. Each colorization requires a positive balance; there is no free trial. Some users may still have a negative balance left over from before the free trial was removed, which `grantCredits` forgives via an amnesty when they next buy credits.
 
 `LedgerService.withMeteredUsage` is a wrapper to wrap code that requires and consumes credits.
 

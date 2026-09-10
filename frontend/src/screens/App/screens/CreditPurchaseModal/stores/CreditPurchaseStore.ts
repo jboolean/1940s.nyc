@@ -4,7 +4,7 @@ import create from 'zustand';
 import { immer } from 'zustand/middleware/immer';
 import useLoginStore from '../../../../../shared/stores/LoginStore';
 
-const PRESET_QUANTITIES = [50, 100, 200];
+const PRESET_QUANTITIES = [20, 50, 100, 200];
 
 interface State {
   isOpen: boolean;
@@ -27,7 +27,7 @@ const useCreditPurchaseModalStore = create(
   immer<State & Actions>((set, get) => ({
     isOpen: false,
     quantityOptions: PRESET_QUANTITIES,
-    selectedQuantity: PRESET_QUANTITIES[1],
+    selectedQuantity: 100,
     errorMessage: null,
     isCheckingOut: false,
     isFollowMagicLinkMessageVisible: false,

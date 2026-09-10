@@ -9,9 +9,9 @@ import { NumericFormat } from 'react-number-format';
 import PhotoAsideModal from '../PhotoAsideModal';
 import carouselImages from './carouselImages';
 
+import LoginForm from 'shared/components/LoginForm';
 import useLoginStore from '../../../../shared/stores/LoginStore';
 import stylesheet from './CreditPurchaseModal.less';
-import LoginForm from 'shared/components/LoginForm';
 
 export default function CreditPurchaseModal(): JSX.Element {
   const {
@@ -43,14 +43,13 @@ export default function CreditPurchaseModal(): JSX.Element {
       }}
     >
       <div data-testid="credit-purchase-modal">
-        <h1>Continue exploring in color</h1>
+        <h1>Explore in color</h1>
 
         <div>
           <p>
-            Enjoy one free colorized photo per day using the best AI
-            colorization model available. After that, a small fee is required to
-            cover the costs of the model. Purchase tokens to keep exploring in
-            color and support the site.
+            Colorize photos using the best AI colorization model available. A
+            small fee is required to cover the costs of the model. Purchase
+            tokens to explore in color and support the site.
           </p>
 
           <p className={stylesheet.finePrint}>
