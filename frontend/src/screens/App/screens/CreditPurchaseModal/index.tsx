@@ -47,10 +47,9 @@ export default function CreditPurchaseModal(): JSX.Element {
 
         <div>
           <p>
-            Enjoy one free colorized photo per day using the best AI
-            colorization model available. After that, a small fee is required to
-            cover the costs of the model. Purchase tokens to keep exploring in
-            color and support the site.
+            Colorize photos using the best AI colorization model available. A
+            small fee is required to cover the costs of the model. Purchase
+            tokens to keep exploring in color and support the site.
           </p>
 
           <p className={stylesheet.finePrint}>
