@@ -83,19 +83,14 @@ export async function addItemToOrder(item: MerchOrderItem): Promise<void> {
     );
   }
 
-  // createdResp.data is the envelope { data: Array<Item>, _links }, not the
-  // item itself - the created item is the first (only) element of data.data.
-  const createdItem = createdResp.data?.data[0] as unknown as {
+  // createdResp.data is { data: Item, _links }. The generated type claims
+  // `data` is an array (it shares a response schema with the list-items
+  // endpoint), but a create call actually returns the single created item
+  // as an object - confirmed against the real API response.
+  const createdItem = createdResp.data?.data as unknown as {
     placements?: Array<{ placement: string }>;
   };
   if (!createdItem?.placements?.length) {
-    // Temporary: log the raw response to see what Printful actually sent
-    // back when placements come up empty.
-    console.error(
-      'Empty placements - raw Printful response for item',
-      item.id,
-      JSON.stringify(createdResp.data)
-    );
     throw new Error(
       `Printful created item ${item.id} in order ${printfulOrderId} but the placement was empty/not set. This means the printfile image could not be fetched. Refusing to continue.`
     );
