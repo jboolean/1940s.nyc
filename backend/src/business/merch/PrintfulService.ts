@@ -83,7 +83,11 @@ export async function addItemToOrder(item: MerchOrderItem): Promise<void> {
     );
   }
 
-  const createdItem = createdResp.data as unknown as {
+  // createdResp.data is { data: Item, _links }. The generated type claims
+  // `data` is an array (it shares a response schema with the list-items
+  // endpoint), but a create call actually returns the single created item
+  // as an object - confirmed against the real API response.
+  const createdItem = createdResp.data?.data as unknown as {
     placements?: Array<{ placement: string }>;
   };
   if (!createdItem?.placements?.length) {
