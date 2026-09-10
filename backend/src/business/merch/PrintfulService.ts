@@ -83,7 +83,9 @@ export async function addItemToOrder(item: MerchOrderItem): Promise<void> {
     );
   }
 
-  const createdItem = createdResp.data as unknown as {
+  // createdResp.data is the envelope { data: Array<Item>, _links }, not the
+  // item itself - the created item is the first (only) element of data.data.
+  const createdItem = createdResp.data?.data[0] as unknown as {
     placements?: Array<{ placement: string }>;
   };
   if (!createdItem?.placements?.length) {
