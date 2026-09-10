@@ -9,9 +9,9 @@ import { NumericFormat } from 'react-number-format';
 import PhotoAsideModal from '../PhotoAsideModal';
 import carouselImages from './carouselImages';
 
+import LoginForm from 'shared/components/LoginForm';
 import useLoginStore from '../../../../shared/stores/LoginStore';
 import stylesheet from './CreditPurchaseModal.less';
-import LoginForm from 'shared/components/LoginForm';
 
 export default function CreditPurchaseModal(): JSX.Element {
   const {
@@ -49,7 +49,7 @@ export default function CreditPurchaseModal(): JSX.Element {
           <p>
             Colorize photos using the best AI colorization model available. A
             small fee is required to cover the costs of the model. Purchase
-            tokens to keep exploring in color and support the site.
+            tokens to explore in color and support the site.
           </p>
 
           <p className={stylesheet.finePrint}>
