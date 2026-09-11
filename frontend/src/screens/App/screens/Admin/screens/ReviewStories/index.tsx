@@ -101,6 +101,16 @@ export default function ReviewStories(): JSX.Element {
         </ul>
       </details>
 
+      {reviewStoriesStore.isLoading ? <p>Loading&hellip;</p> : null}
+
+      {reviewStoriesStore.error ? <p>Failed to load stories. </p> : null}
+
+      {!reviewStoriesStore.isLoading &&
+      !reviewStoriesStore.error &&
+      reviewStoriesStore.stories.length === 0 ? (
+        <p>No stories to review.</p>
+      ) : null}
+
       <div className={stylesheet.stories}>
         {reviewStoriesStore.stories.map((story) => (
           <React.Fragment key={story.id}>
