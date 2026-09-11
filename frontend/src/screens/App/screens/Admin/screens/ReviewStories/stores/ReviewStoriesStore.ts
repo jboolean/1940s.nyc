@@ -29,11 +29,13 @@ const useReviewStoriesStore = create(
         const stories = await getStoriesForReview();
         set((state) => {
           state.stories = stories;
-          state.isLoading = false;
         });
       } catch (e) {
         set((state) => {
           state.error = true;
+        });
+      } finally {
+        set((state) => {
           state.isLoading = false;
         });
       }
