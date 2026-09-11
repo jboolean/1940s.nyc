@@ -103,7 +103,9 @@ export default function ReviewStories(): JSX.Element {
 
       {reviewStoriesStore.isLoading ? <p>Loading&hellip;</p> : null}
 
-      {reviewStoriesStore.error ? <p>Failed to load stories. </p> : null}
+      {reviewStoriesStore.error ? (
+        <p>Failed to load stories. Please try refreshing the page.</p>
+      ) : null}
 
       {!reviewStoriesStore.isLoading &&
       !reviewStoriesStore.error &&
