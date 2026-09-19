@@ -8,6 +8,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { AiStoryModerationScore } from '../business/moderation/moderationRules';
 import PointColumnOptions from '../business/utils/PointColumnOptions';
 import LngLat from '../enum/LngLat';
 import StoryState from '../enum/StoryState';
@@ -102,4 +103,11 @@ export default class Story {
     nullable: true,
   })
   bounce: Models.Bounce | null;
+
+  @Column({
+    type: 'jsonb',
+    nullable: true,
+    name: 'ai_moderation_score',
+  })
+  aiModerationScore: AiStoryModerationScore | null;
 }

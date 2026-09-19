@@ -1,0 +1,3 @@
+# Contains real story text/names and cached samples -- never commit.
+results/
+.cache/

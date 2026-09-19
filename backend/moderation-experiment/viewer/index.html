@@ -1,0 +1,674 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Moderation Experiment Viewer</title>
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg: #f7f7f8;
+    --panel: #ffffff;
+    --border: #e2e2e6;
+    --text: #1a1a1e;
+    --muted: #6b6b74;
+    --danger: #b3261e;
+    --danger-bg: #fbe9e7;
+    --ok: #1e6b3a;
+    --ok-bg: #e6f4ea;
+    --accent: #3355dd;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #16161a;
+      --panel: #1f1f24;
+      --border: #33333a;
+      --text: #edeef0;
+      --muted: #9a9aa5;
+      --danger: #ff8a80;
+      --danger-bg: #3a1f1e;
+      --ok: #7fd9a0;
+      --ok-bg: #1c3324;
+      --accent: #7d93ff;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    padding: 16px;
+  }
+  h1 { font-size: 18px; margin: 0 0 4px; }
+  .sub { color: var(--muted); margin: 0 0 16px; font-size: 13px; }
+  .bar {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+  select, input[type="text"] {
+    background: var(--panel);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 13px;
+  }
+  label { display: flex; align-items: center; gap: 6px; font-size: 13px; }
+  .cards {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    min-width: 120px;
+  }
+  .card .label { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; }
+  .card .value { font-size: 20px; font-weight: 600; margin-top: 2px; }
+  .card.danger .value { color: var(--danger); }
+  .card.ok .value { color: var(--ok); }
+  table { width: 100%; border-collapse: collapse; background: var(--panel); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border); font-size: 13px; }
+  th { color: var(--muted); font-weight: 500; font-size: 11px; text-transform: uppercase; letter-spacing: 0.03em; }
+  tr.row { cursor: pointer; }
+  tr.row:hover { background: color-mix(in srgb, var(--accent) 8%, transparent); }
+  .badge { padding: 2px 8px; border-radius: 999px; font-size: 12px; font-weight: 600; }
+  .badge.approved { background: var(--ok-bg); color: var(--ok); }
+  .badge.rejected { background: var(--danger-bg); color: var(--danger); }
+  .mark { font-weight: 700; }
+  .mark.yes { color: var(--ok); }
+  .mark.no { color: var(--danger); }
+  .detail {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-top: none;
+  }
+  .detail td { padding: 12px 16px; }
+  .detail-grid { display: grid; grid-template-columns: 1fr 260px; gap: 20px; }
+  .story-text { white-space: pre-wrap; }
+  .rules { list-style: none; margin: 0; padding: 0; }
+  .rules li { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px dashed var(--border); font-size: 12px; }
+  .rules .p { font-variant-numeric: tabular-nums; }
+  .meta { color: var(--muted); font-size: 12px; margin-bottom: 8px; }
+  .empty { color: var(--muted); padding: 24px; text-align: center; }
+  .runPanel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin-bottom: 16px;
+  }
+  .runPanel h2 { font-size: 13px; margin: 0 0 10px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); }
+  .runForm { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .runForm input[type="number"] { width: 70px; }
+  .runForm input[type="text"] { width: 220px; }
+  button {
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 7px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  button:disabled { opacity: 0.5; cursor: not-allowed; }
+  .runStatus { font-size: 12px; color: var(--muted); margin-top: 8px; }
+  .runConsole {
+    display: none;
+    background: #0d0d10;
+    color: #d8d8dc;
+    font: 12px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
+    padding: 10px 12px;
+    border-radius: 6px;
+    margin-top: 10px;
+    max-height: 260px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+  }
+  .tabs { display: flex; gap: 6px; margin-bottom: 16px; }
+  .tabs button {
+    background: var(--panel);
+    color: var(--text);
+    border: 1px solid var(--border);
+    font-weight: 500;
+  }
+  .tabs button.active { background: var(--accent); color: white; border-color: var(--accent); }
+  .chartPanel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 20px 8px;
+    max-width: 900px;
+  }
+  .chartLegend { display: flex; gap: 18px; flex-wrap: wrap; font-size: 12px; color: var(--muted); margin-bottom: 8px; }
+  .chartLegend .swatch { width: 12px; height: 3px; display: inline-block; border-radius: 2px; margin-right: 5px; vertical-align: middle; }
+  .chartWrap { position: relative; }
+  .chartWrap svg { width: 100%; height: auto; display: block; overflow: visible; }
+  .chartTooltip {
+    position: absolute;
+    pointer-events: none;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 6px 9px;
+    font-size: 12px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+    opacity: 0;
+    min-width: 150px;
+  }
+  .chartTooltip.visible { opacity: 1; }
+  .chartTooltip .row { display: flex; justify-content: space-between; gap: 12px; }
+  .chartNote { font-size: 12.5px; color: var(--muted); margin: 14px 2px 4px; line-height: 1.5; }
+</style>
+</head>
+<body>
+  <h1>Moderation Experiment Viewer</h1>
+  <p class="sub">Local only. Story text and names below are real user submissions &mdash; never share this page or its data.</p>
+
+  <div class="runPanel">
+    <h2>Run a new experiment</h2>
+    <div class="runForm">
+      <select id="runModerator">
+        <option value="jev">jev</option>
+        <option value="llm">llm</option>
+      </select>
+      <label>Sample size <input type="number" id="runSampleSize" value="20" min="1" max="200" /></label>
+      <label><input type="checkbox" id="runNewSample" checked /> New sample</label>
+      <label><input type="checkbox" id="runHoldout" /> Holdout</label>
+      <input type="text" id="runModel" placeholder="model override (optional)" />
+      <button id="runButton">Run</button>
+    </div>
+    <div class="runStatus" id="runStatus"></div>
+    <pre class="runConsole" id="runConsole"></pre>
+  </div>
+
+  <select id="runSelect"></select>
+
+  <div class="tabs">
+    <button id="tabMismatches" class="active">Mismatches</button>
+    <button id="tabThreshold">Threshold chart</button>
+  </div>
+
+  <div id="mismatchesView">
+    <div class="bar">
+      <select id="mismatchFilter">
+        <option value="all">All</option>
+        <option value="falseReject">False reject</option>
+        <option value="falseApprove">False approve</option>
+      </select>
+      <select id="ruleFilter">
+        <option value="">All rules</option>
+      </select>
+      <input type="text" id="search" placeholder="Search text/title&hellip;" />
+    </div>
+
+    <div class="cards" id="cards"></div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Human</th>
+          <th>Model</th>
+          <th>Correct</th>
+          <th>Approve p</th>
+          <th>Top rule</th>
+          <th>Cost</th>
+          <th>Title / excerpt</th>
+        </tr>
+      </thead>
+      <tbody id="rows"></tbody>
+    </table>
+    <div id="emptyState" class="empty" style="display:none">No stories match the current filters.</div>
+  </div>
+
+  <div id="thresholdView" style="display:none">
+    <div class="chartPanel">
+      <div class="chartLegend">
+        <span><span class="swatch" style="background:var(--danger)"></span>False-approve rate (of rejected stories)</span>
+        <span><span class="swatch" style="background:var(--accent)"></span>% auto-approved (of all stories)</span>
+        <span><span class="swatch" style="background:var(--muted); border-top:1px dashed var(--muted); height:0;"></span>Overall accuracy</span>
+      </div>
+      <div class="chartWrap">
+        <svg id="thresholdSvg" viewBox="0 0 860 380" preserveAspectRatio="xMidYMid meet">
+          <g id="thresholdPlot"></g>
+        </svg>
+        <div class="chartTooltip" id="chartTooltip"></div>
+      </div>
+    </div>
+    <p class="chartNote" id="thresholdNote"></p>
+  </div>
+
+<script>
+let currentRun = null;
+let openId = null;
+let currentThreshold = null;
+
+fetch('/threshold').then((r) => r.json()).then((d) => { currentThreshold = d.threshold; renderThresholdChart(); });
+
+async function loadRunList(preferredFilename) {
+  const res = await fetch('/results');
+  const files = await res.json();
+  const select = document.getElementById('runSelect');
+  select.innerHTML = '';
+  if (files.length === 0) {
+    select.innerHTML = '<option value="">No runs yet -- run `npm run experiment` first</option>';
+    return;
+  }
+  for (const f of files) {
+    const opt = document.createElement('option');
+    opt.value = f;
+    opt.textContent = f;
+    select.appendChild(opt);
+  }
+  // Filenames sort alphabetically, not chronologically ("*-latest.json"
+  // does not reliably land first) -- prefer an exact filename the caller
+  // knows is correct (e.g. the run that was just triggered) over guessing.
+  const toSelect = preferredFilename && files.includes(preferredFilename) ? preferredFilename : files[0];
+  select.value = toSelect;
+  await loadRun(toSelect);
+}
+
+async function loadRun(filename) {
+  if (!filename) return;
+  const res = await fetch('/results/' + filename);
+  currentRun = await res.json();
+  openId = null;
+  populateRuleFilter();
+  render();
+  renderThresholdChart();
+}
+
+function populateRuleFilter() {
+  const select = document.getElementById('ruleFilter');
+  const keys = new Set();
+  for (const s of currentRun.stories) {
+    if (s.ruleProbabilities) Object.keys(s.ruleProbabilities).forEach((k) => keys.add(k));
+  }
+  const current = select.value;
+  select.innerHTML = '<option value="">All rules</option>';
+  for (const k of keys) {
+    const opt = document.createElement('option');
+    opt.value = k;
+    opt.textContent = k;
+    select.appendChild(opt);
+  }
+  select.value = current;
+}
+
+function topRule(ruleProbabilities) {
+  if (!ruleProbabilities) return '&mdash;';
+  const entries = Object.entries(ruleProbabilities);
+  const [rule, p] = entries.reduce((best, cur) => (cur[1] > best[1] ? cur : best));
+  return `${rule} (${p.toFixed(2)})`;
+}
+
+function formatCost(cost) {
+  if (cost === null || cost === undefined) return 'n/a';
+  return '$' + cost.toFixed(cost < 0.01 ? 6 : 2);
+}
+
+function renderCards() {
+  const s = currentRun.summary;
+  const cards = document.getElementById('cards');
+  cards.innerHTML = '';
+  const items = [
+    { label: 'Moderator', value: `${currentRun.moderator} (${currentRun.model})`, cls: '' },
+    { label: 'Accuracy', value: (s.accuracy * 100).toFixed(1) + '%', cls: '' },
+    { label: 'False approve', value: `${s.falseApprove}/${s.totalRejected} (${(s.falseApproveRate * 100).toFixed(1)}%)`, cls: s.falseApprove > 0 ? 'danger' : 'ok' },
+    { label: 'False reject', value: `${s.falseReject}/${s.totalApproved} (${(s.falseRejectRate * 100).toFixed(1)}%)`, cls: '' },
+    { label: 'Scored / errors', value: `${s.scored} / ${s.errors}`, cls: '' },
+    { label: 'Total cost', value: formatCost(s.totalCostUsd), cls: '' },
+    { label: 'Cost per story', value: formatCost(s.avgCostUsd), cls: '' },
+  ];
+  for (const item of items) {
+    const div = document.createElement('div');
+    div.className = 'card ' + item.cls;
+    div.innerHTML = `<div class="label">${item.label}</div><div class="value">${item.value}</div>`;
+    cards.appendChild(div);
+  }
+}
+
+function matchesFilters(story) {
+  const mismatchFilter = document.getElementById('mismatchFilter').value;
+  const ruleFilter = document.getElementById('ruleFilter').value;
+  const search = document.getElementById('search').value.trim().toLowerCase();
+
+  if (mismatchFilter === 'falseReject') {
+    if (story.error || story.humanLabel !== 'approved' || story.modelLabel !== 'rejected') return false;
+  } else if (mismatchFilter === 'falseApprove') {
+    if (story.error || story.humanLabel !== 'rejected' || story.modelLabel !== 'approved') return false;
+  }
+  if (ruleFilter && story.ruleProbabilities && story.ruleProbabilities[ruleFilter] < 0.5) return false;
+  if (search) {
+    const haystack = ((story.title || '') + ' ' + (story.textContent || '')).toLowerCase();
+    if (!haystack.includes(search)) return false;
+  }
+  return true;
+}
+
+function ruleRows(story) {
+  if (!story.ruleProbabilities) return '<p class="meta">No per-rule data (error or older run).</p>';
+  const entries = Object.entries(story.ruleProbabilities).sort((a, b) => b[1] - a[1]);
+  return '<ul class="rules">' + entries.map(([k, p]) => {
+    const cls = p >= 0.5 ? 'yes' : 'no';
+    return `<li><span>${k}</span><span class="p mark ${cls}">${p.toFixed(2)}</span></li>`;
+  }).join('') + '</ul>';
+}
+
+function render() {
+  renderCards();
+  const tbody = document.getElementById('rows');
+  tbody.innerHTML = '';
+  const empty = document.getElementById('emptyState');
+
+  const stories = currentRun.stories.filter(matchesFilters);
+  empty.style.display = stories.length === 0 ? 'block' : 'none';
+
+  for (const story of stories) {
+    const tr = document.createElement('tr');
+    tr.className = 'row';
+    const correctMark = story.error ? '&mdash;' : (story.correct ? '<span class="mark yes">&check;</span>' : '<span class="mark no">&cross;</span>');
+    tr.innerHTML = `
+      <td>${story.id}</td>
+      <td><span class="badge ${story.humanLabel}">${story.humanLabel}</span></td>
+      <td>${story.modelLabel ? `<span class="badge ${story.modelLabel}">${story.modelLabel}</span>` : (story.error ? 'error' : '&mdash;')}</td>
+      <td>${correctMark}</td>
+      <td>${story.approveProbability !== undefined ? story.approveProbability.toFixed(2) : '&mdash;'}</td>
+      <td>${topRule(story.ruleProbabilities)}</td>
+      <td>${story.costUsd != null ? formatCost(story.costUsd) : '&mdash;'}</td>
+      <td>${story.textContent !== undefined ? escapeHtml((story.title || story.textContent || '').slice(0, 70)) : '<span class="meta">(redacted &mdash; holdout)</span>'}</td>
+    `;
+    tr.addEventListener('click', () => {
+      openId = openId === story.id ? null : story.id;
+      render();
+    });
+    tbody.appendChild(tr);
+
+    if (openId === story.id) {
+      const detailTr = document.createElement('tr');
+      detailTr.className = 'detail';
+      const detailTd = document.createElement('td');
+      detailTd.colSpan = 6;
+      detailTd.innerHTML = `
+        <div class="detail-grid">
+          <div>
+            <div class="meta">Story #${story.id}${story.error ? ' &mdash; error: ' + escapeHtml(story.error) : ''}</div>
+            <div class="story-text">${story.textContent !== undefined ? escapeHtml(story.textContent) : '(story content is not shown for holdout runs)'}</div>
+          </div>
+          <div>${ruleRows(story)}</div>
+        </div>
+      `;
+      detailTr.appendChild(detailTd);
+      tbody.appendChild(detailTr);
+    }
+  }
+}
+
+function escapeHtml(s) {
+  return s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
+document.getElementById('runSelect').addEventListener('change', (e) => loadRun(e.target.value));
+document.getElementById('mismatchFilter').addEventListener('change', render);
+document.getElementById('ruleFilter').addEventListener('change', render);
+document.getElementById('search').addEventListener('input', render);
+
+async function startExperimentRun() {
+  const holdout = document.getElementById('runHoldout').checked;
+  if (holdout && !confirm('This evaluates the holdout set. Only do this once you believe the prompt is done -- repeatedly checking the holdout defeats its purpose. Continue?')) {
+    return;
+  }
+
+  const button = document.getElementById('runButton');
+  const status = document.getElementById('runStatus');
+  const consoleEl = document.getElementById('runConsole');
+  button.disabled = true;
+  status.textContent = 'Starting...';
+  consoleEl.style.display = 'none';
+  consoleEl.textContent = '';
+
+  const label = holdout ? 'holdout' : 'working';
+  const body = {
+    moderator: document.getElementById('runModerator').value,
+    sampleSize: Number(document.getElementById('runSampleSize').value),
+    newSample: document.getElementById('runNewSample').checked,
+    holdout,
+    model: document.getElementById('runModel').value.trim() || undefined,
+  };
+
+  let res;
+  try {
+    res = await fetch('/run', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+  } catch (e) {
+    status.textContent = 'Failed to reach the viewer server: ' + e;
+    button.disabled = false;
+    return;
+  }
+
+  if (res.status === 409) {
+    status.textContent = 'A run is already in progress.';
+    button.disabled = false;
+    return;
+  }
+  if (!res.ok) {
+    status.textContent = 'Failed to start run (HTTP ' + res.status + ').';
+    button.disabled = false;
+    return;
+  }
+
+  const { runId } = await res.json();
+  status.textContent = 'Running...';
+
+  let output = '';
+  const source = new EventSource('/run/' + runId + '/stream');
+  source.onmessage = (event) => {
+    const msg = JSON.parse(event.data);
+    if (msg.type === 'output') {
+      // Buffered but not shown -- if the run succeeds, the table below
+      // already carries this same information. Only surface it on failure,
+      // where there is no result file to show instead.
+      output += msg.text;
+    } else if (msg.type === 'done') {
+      button.disabled = false;
+      source.close();
+      if (msg.exitCode === 0) {
+        status.textContent = 'Done.';
+        loadRunList(label + '-latest.json');
+      } else {
+        status.textContent = `Exited with code ${msg.exitCode}. See output below.`;
+        consoleEl.textContent = output;
+        consoleEl.style.display = 'block';
+      }
+    }
+  };
+  source.onerror = () => {
+    status.textContent = 'Lost connection to the run stream.';
+    button.disabled = false;
+    if (output) {
+      consoleEl.textContent = output;
+      consoleEl.style.display = 'block';
+    }
+    source.close();
+  };
+}
+
+document.getElementById('runButton').addEventListener('click', startExperimentRun);
+
+// --- Threshold chart -------------------------------------------------
+// Sweeps REJECT_THRESHOLD against the currently loaded run and plots
+// false-approve rate and % auto-approved, so you can see the tradeoff
+// without a separate generation step -- it's the same data already
+// loaded for the mismatches table above.
+
+document.getElementById('tabMismatches').addEventListener('click', () => switchTab('mismatches'));
+document.getElementById('tabThreshold').addEventListener('click', () => switchTab('threshold'));
+
+function switchTab(tab) {
+  document.getElementById('mismatchesView').style.display = tab === 'mismatches' ? '' : 'none';
+  document.getElementById('thresholdView').style.display = tab === 'threshold' ? '' : 'none';
+  document.getElementById('tabMismatches').classList.toggle('active', tab === 'mismatches');
+  document.getElementById('tabThreshold').classList.toggle('active', tab === 'threshold');
+}
+
+function sweepThresholds(stories) {
+  const scored = stories.filter((s) => !s.error && s.ruleProbabilities);
+  const totalApproved = scored.filter((s) => s.humanLabel === 'approved').length;
+  const totalRejected = scored.filter((s) => s.humanLabel === 'rejected').length;
+  const rows = [];
+  for (let raw = 0.1; raw <= 0.925 + 1e-9; raw += 0.025) {
+    const threshold = Math.round(raw * 1000) / 1000;
+    let correct = 0, fa = 0, fr = 0, modelApproveCount = 0;
+    for (const s of scored) {
+      const maxP = Math.max(...Object.values(s.ruleProbabilities));
+      const modelApprove = maxP < threshold;
+      if (modelApprove) modelApproveCount++;
+      const humanApprove = s.humanLabel === 'approved';
+      if (modelApprove === humanApprove) correct++;
+      else if (humanApprove) fr++;
+      else fa++;
+    }
+    rows.push({
+      threshold,
+      accuracy: correct / scored.length,
+      falseApproveRate: totalRejected ? fa / totalRejected : 0,
+      falseRejectRate: totalApproved ? fr / totalApproved : 0,
+      pctAutoApproved: modelApproveCount / scored.length,
+      fa, fr,
+    });
+  }
+  return { rows, totalApproved, totalRejected, scoredCount: scored.length };
+}
+
+function renderThresholdChart() {
+  const plot = document.getElementById('thresholdPlot');
+  const note = document.getElementById('thresholdNote');
+  plot.innerHTML = '';
+  if (!currentRun || !currentRun.stories.some((s) => s.ruleProbabilities)) {
+    note.textContent = 'This run has no per-rule probabilities to sweep (redacted holdout run, or all errors).';
+    return;
+  }
+
+  const { rows, totalApproved, totalRejected, scoredCount } = sweepThresholds(currentRun.stories);
+  const approvedShare = totalApproved / scoredCount;
+  const shareWarning = (approvedShare > 0.97 || approvedShare < 0.5)
+    ? ` This run is ${(approvedShare * 100).toFixed(1)}% approved, which is unusually balanced or skewed for a real-world read -- use a --full or --natural run for an accurate auto-approve rate.`
+    : '';
+
+  const margin = { top: 14, right: 16, bottom: 34, left: 40 };
+  const width = 860, height = 380;
+  const plotW = width - margin.left - margin.right;
+  const plotH = height - margin.top - margin.bottom;
+  const xMin = rows[0].threshold, xMax = rows[rows.length - 1].threshold;
+  const x = (t) => margin.left + ((t - xMin) / (xMax - xMin)) * plotW;
+  const y = (pct) => margin.top + (1 - pct) * plotH;
+
+  const svgNS = 'http://www.w3.org/2000/svg';
+  function el(name, attrs) {
+    const e = document.createElementNS(svgNS, name);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    return e;
+  }
+
+  const style = getComputedStyle(document.body);
+  const colorAccent = style.getPropertyValue('--accent').trim();
+  const colorDanger = style.getPropertyValue('--danger').trim();
+  const colorMuted = style.getPropertyValue('--muted').trim();
+  const colorBorder = style.getPropertyValue('--border').trim();
+  const colorPanel = style.getPropertyValue('--panel').trim();
+  const colorText = style.getPropertyValue('--text').trim();
+
+  for (let p = 0; p <= 100; p += 20) {
+    const yy = y(p / 100);
+    plot.appendChild(el('line', { x1: margin.left, x2: width - margin.right, y1: yy, y2: yy, stroke: colorBorder, 'stroke-width': 1 }));
+    const lbl = el('text', { x: margin.left - 8, y: yy + 3.5, 'text-anchor': 'end', 'font-size': 10.5, fill: colorMuted });
+    lbl.textContent = p + '%';
+    plot.appendChild(lbl);
+  }
+  [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9].forEach((t) => {
+    if (t < xMin || t > xMax) return;
+    const xx = x(t);
+    const lbl = el('text', { x: xx, y: height - margin.bottom + 18, 'text-anchor': 'middle', 'font-size': 10.5, fill: colorMuted });
+    lbl.textContent = t.toFixed(1);
+    plot.appendChild(lbl);
+  });
+  const axisTitle = el('text', { x: margin.left + plotW / 2, y: height - 2, 'text-anchor': 'middle', 'font-size': 11, fill: colorMuted });
+  axisTitle.textContent = 'Reject threshold';
+  plot.appendChild(axisTitle);
+
+  function path(points) {
+    return points.map((p, i) => (i === 0 ? 'M' : 'L') + p[0].toFixed(2) + ',' + p[1].toFixed(2)).join(' ');
+  }
+  const approvePts = rows.map((r) => [x(r.threshold), y(r.pctAutoApproved)]);
+  const faPts = rows.map((r) => [x(r.threshold), y(r.falseApproveRate)]);
+  const accPts = rows.map((r) => [x(r.threshold), y(r.accuracy)]);
+
+  plot.appendChild(el('path', { d: path(accPts), fill: 'none', stroke: colorMuted, 'stroke-width': 1.5, 'stroke-dasharray': '3 3' }));
+  plot.appendChild(el('path', { d: path(approvePts), fill: 'none', stroke: colorAccent, 'stroke-width': 2, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }));
+  plot.appendChild(el('path', { d: path(faPts), fill: 'none', stroke: colorDanger, 'stroke-width': 2, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }));
+  approvePts.forEach((p) => plot.appendChild(el('circle', { cx: p[0], cy: p[1], r: 3, fill: colorAccent, stroke: colorPanel, 'stroke-width': 1.5 })));
+  faPts.forEach((p) => plot.appendChild(el('circle', { cx: p[0], cy: p[1], r: 3, fill: colorDanger, stroke: colorPanel, 'stroke-width': 1.5 })));
+
+  if (currentThreshold !== null) {
+    const curX = x(currentThreshold);
+    plot.appendChild(el('line', { x1: curX, x2: curX, y1: margin.top, y2: height - margin.bottom, stroke: colorText, 'stroke-width': 1.5, 'stroke-dasharray': '4 3', opacity: 0.5 }));
+    const curLabel = el('text', { x: curX + 6, y: margin.top + 12, 'font-size': 11, 'font-weight': 600, fill: colorText });
+    curLabel.textContent = 'current: ' + currentThreshold;
+    plot.appendChild(curLabel);
+  }
+
+  const crosshair = el('line', { y1: margin.top, y2: height - margin.bottom, stroke: colorMuted, 'stroke-width': 1, opacity: 0 });
+  plot.appendChild(crosshair);
+
+  const tooltip = document.getElementById('chartTooltip');
+  const chartWrap = document.querySelector('.chartWrap');
+  const hitWidth = plotW / (rows.length - 1);
+  rows.forEach((r) => {
+    const cx = x(r.threshold);
+    const hit = el('rect', { x: cx - hitWidth / 2, y: margin.top, width: hitWidth, height: plotH, fill: 'transparent' });
+    hit.addEventListener('mouseenter', () => {
+      crosshair.setAttribute('x1', cx);
+      crosshair.setAttribute('x2', cx);
+      crosshair.setAttribute('opacity', 1);
+      tooltip.innerHTML =
+        `<div style="font-weight:650;margin-bottom:4px">threshold ${r.threshold.toFixed(3)}</div>` +
+        `<div class="row"><span>False-approve rate</span><span>${(r.falseApproveRate * 100).toFixed(1)}%</span></div>` +
+        `<div class="row"><span>Auto-approved</span><span>${(r.pctAutoApproved * 100).toFixed(1)}%</span></div>` +
+        `<div class="row"><span>Accuracy</span><span>${(r.accuracy * 100).toFixed(1)}%</span></div>` +
+        `<div class="row"><span>False approves</span><span>${r.fa}</span></div>` +
+        `<div class="row"><span>False rejects</span><span>${r.fr}</span></div>`;
+      tooltip.classList.add('visible');
+      const wrapRect = chartWrap.getBoundingClientRect();
+      const scale = wrapRect.width / width;
+      let left = cx * scale + 10;
+      if (left + 160 > wrapRect.width) left = cx * scale - 170;
+      tooltip.style.left = left + 'px';
+      tooltip.style.top = (margin.top * scale) + 'px';
+    });
+    hit.addEventListener('mouseleave', () => {
+      tooltip.classList.remove('visible');
+      crosshair.setAttribute('opacity', 0);
+    });
+    plot.appendChild(hit);
+  });
+
+  note.textContent =
+    `Computed from this run's ${scoredCount} scored stories (${totalApproved} approved / ${totalRejected} rejected).${shareWarning}`;
+}
+
+loadRunList();
+</script>
+</body>
+</html>
