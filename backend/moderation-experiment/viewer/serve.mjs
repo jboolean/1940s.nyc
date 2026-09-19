@@ -116,6 +116,14 @@ const server = createServer(async (req, res) => {
       return;
     }
 
+    if (url.pathname === '/threshold') {
+      const rulesSrc = await readFile(path.join(EXPERIMENT_DIR, 'rules.ts'), 'utf-8');
+      const match = rulesSrc.match(/REJECT_THRESHOLD\s*=\s*([0-9.]+)/);
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ threshold: match ? Number(match[1]) : null }));
+      return;
+    }
+
     if (url.pathname === '/results') {
       const files = (await readdir(RESULTS_DIR).catch(() => []))
         .filter((f) => SAFE_FILENAME.test(f))

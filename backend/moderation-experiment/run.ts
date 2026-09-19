@@ -402,20 +402,14 @@ async function main(): Promise<void> {
   } else {
     label = 'working';
     if (args.full) {
-      // The whole working pool, unbalanced -- reflects the real-world
-      // approve/reject mix (most submissions are approved), unlike
-      // drawSample's balanced perClass draw used for iterating on rules.ts.
-      // Useful for checking overall real-world-weighted accuracy without
-      // touching the holdout set.
+      // Whole pool at its real (unbalanced) class mix, unlike drawSample's
+      // balanced draw -- checks real-world accuracy without touching holdout.
       sample = pools.working;
       console.log(
         `Evaluating the FULL working pool (${sample.length} stories, natural class balance).`
       );
     } else if (args.natural) {
-      // Cheap stand-in for --full: same natural class ratio, bounded to
-      // --sample-size total stories, so real-world-weighted accuracy can be
-      // checked on every rules.ts iteration without the cost/time of
-      // scoring the entire pool.
+      // Cheap stand-in for --full: same ratio, capped at --sample-size.
       sample = drawNaturalSample(pools.working, args.sampleSize);
       console.log(
         `Drew a natural-ratio sample (${sample.length} stories, real-world approve/reject mix).`

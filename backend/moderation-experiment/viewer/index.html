@@ -133,6 +133,40 @@
     overflow-y: auto;
     white-space: pre-wrap;
   }
+  .tabs { display: flex; gap: 6px; margin-bottom: 16px; }
+  .tabs button {
+    background: var(--panel);
+    color: var(--text);
+    border: 1px solid var(--border);
+    font-weight: 500;
+  }
+  .tabs button.active { background: var(--accent); color: white; border-color: var(--accent); }
+  .chartPanel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 20px 8px;
+    max-width: 900px;
+  }
+  .chartLegend { display: flex; gap: 18px; flex-wrap: wrap; font-size: 12px; color: var(--muted); margin-bottom: 8px; }
+  .chartLegend .swatch { width: 12px; height: 3px; display: inline-block; border-radius: 2px; margin-right: 5px; vertical-align: middle; }
+  .chartWrap { position: relative; }
+  .chartWrap svg { width: 100%; height: auto; display: block; overflow: visible; }
+  .chartTooltip {
+    position: absolute;
+    pointer-events: none;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 6px 9px;
+    font-size: 12px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+    opacity: 0;
+    min-width: 150px;
+  }
+  .chartTooltip.visible { opacity: 1; }
+  .chartTooltip .row { display: flex; justify-content: space-between; gap: 12px; }
+  .chartNote { font-size: 12.5px; color: var(--muted); margin: 14px 2px 4px; line-height: 1.5; }
 </style>
 </head>
 <body>
@@ -156,41 +190,69 @@
     <pre class="runConsole" id="runConsole"></pre>
   </div>
 
-  <div class="bar">
-    <select id="runSelect"></select>
-    <select id="mismatchFilter">
-      <option value="all">All</option>
-      <option value="falseReject">False reject</option>
-      <option value="falseApprove">False approve</option>
-    </select>
-    <select id="ruleFilter">
-      <option value="">All rules</option>
-    </select>
-    <input type="text" id="search" placeholder="Search text/title&hellip;" />
+  <select id="runSelect"></select>
+
+  <div class="tabs">
+    <button id="tabMismatches" class="active">Mismatches</button>
+    <button id="tabThreshold">Threshold chart</button>
   </div>
 
-  <div class="cards" id="cards"></div>
+  <div id="mismatchesView">
+    <div class="bar">
+      <select id="mismatchFilter">
+        <option value="all">All</option>
+        <option value="falseReject">False reject</option>
+        <option value="falseApprove">False approve</option>
+      </select>
+      <select id="ruleFilter">
+        <option value="">All rules</option>
+      </select>
+      <input type="text" id="search" placeholder="Search text/title&hellip;" />
+    </div>
 
-  <table>
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Human</th>
-        <th>Model</th>
-        <th>Correct</th>
-        <th>Approve p</th>
-        <th>Top rule</th>
-        <th>Cost</th>
-        <th>Title / excerpt</th>
-      </tr>
-    </thead>
-    <tbody id="rows"></tbody>
-  </table>
-  <div id="emptyState" class="empty" style="display:none">No stories match the current filters.</div>
+    <div class="cards" id="cards"></div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Human</th>
+          <th>Model</th>
+          <th>Correct</th>
+          <th>Approve p</th>
+          <th>Top rule</th>
+          <th>Cost</th>
+          <th>Title / excerpt</th>
+        </tr>
+      </thead>
+      <tbody id="rows"></tbody>
+    </table>
+    <div id="emptyState" class="empty" style="display:none">No stories match the current filters.</div>
+  </div>
+
+  <div id="thresholdView" style="display:none">
+    <div class="chartPanel">
+      <div class="chartLegend">
+        <span><span class="swatch" style="background:var(--danger)"></span>False-approve rate (of rejected stories)</span>
+        <span><span class="swatch" style="background:var(--accent)"></span>% auto-approved (of all stories)</span>
+        <span><span class="swatch" style="background:var(--muted); border-top:1px dashed var(--muted); height:0;"></span>Overall accuracy</span>
+      </div>
+      <div class="chartWrap">
+        <svg id="thresholdSvg" viewBox="0 0 860 380" preserveAspectRatio="xMidYMid meet">
+          <g id="thresholdPlot"></g>
+        </svg>
+        <div class="chartTooltip" id="chartTooltip"></div>
+      </div>
+    </div>
+    <p class="chartNote" id="thresholdNote"></p>
+  </div>
 
 <script>
 let currentRun = null;
 let openId = null;
+let currentThreshold = null;
+
+fetch('/threshold').then((r) => r.json()).then((d) => { currentThreshold = d.threshold; renderThresholdChart(); });
 
 async function loadRunList(preferredFilename) {
   const res = await fetch('/results');
@@ -222,6 +284,7 @@ async function loadRun(filename) {
   openId = null;
   populateRuleFilter();
   render();
+  renderThresholdChart();
 }
 
 function populateRuleFilter() {
@@ -443,6 +506,167 @@ async function startExperimentRun() {
 }
 
 document.getElementById('runButton').addEventListener('click', startExperimentRun);
+
+// --- Threshold chart -------------------------------------------------
+// Sweeps REJECT_THRESHOLD against the currently loaded run and plots
+// false-approve rate and % auto-approved, so you can see the tradeoff
+// without a separate generation step -- it's the same data already
+// loaded for the mismatches table above.
+
+document.getElementById('tabMismatches').addEventListener('click', () => switchTab('mismatches'));
+document.getElementById('tabThreshold').addEventListener('click', () => switchTab('threshold'));
+
+function switchTab(tab) {
+  document.getElementById('mismatchesView').style.display = tab === 'mismatches' ? '' : 'none';
+  document.getElementById('thresholdView').style.display = tab === 'threshold' ? '' : 'none';
+  document.getElementById('tabMismatches').classList.toggle('active', tab === 'mismatches');
+  document.getElementById('tabThreshold').classList.toggle('active', tab === 'threshold');
+}
+
+function sweepThresholds(stories) {
+  const scored = stories.filter((s) => !s.error && s.ruleProbabilities);
+  const totalApproved = scored.filter((s) => s.humanLabel === 'approved').length;
+  const totalRejected = scored.filter((s) => s.humanLabel === 'rejected').length;
+  const rows = [];
+  for (let raw = 0.1; raw <= 0.925 + 1e-9; raw += 0.025) {
+    const threshold = Math.round(raw * 1000) / 1000;
+    let correct = 0, fa = 0, fr = 0, modelApproveCount = 0;
+    for (const s of scored) {
+      const maxP = Math.max(...Object.values(s.ruleProbabilities));
+      const modelApprove = maxP < threshold;
+      if (modelApprove) modelApproveCount++;
+      const humanApprove = s.humanLabel === 'approved';
+      if (modelApprove === humanApprove) correct++;
+      else if (humanApprove) fr++;
+      else fa++;
+    }
+    rows.push({
+      threshold,
+      accuracy: correct / scored.length,
+      falseApproveRate: totalRejected ? fa / totalRejected : 0,
+      falseRejectRate: totalApproved ? fr / totalApproved : 0,
+      pctAutoApproved: modelApproveCount / scored.length,
+      fa, fr,
+    });
+  }
+  return { rows, totalApproved, totalRejected, scoredCount: scored.length };
+}
+
+function renderThresholdChart() {
+  const plot = document.getElementById('thresholdPlot');
+  const note = document.getElementById('thresholdNote');
+  plot.innerHTML = '';
+  if (!currentRun || !currentRun.stories.some((s) => s.ruleProbabilities)) {
+    note.textContent = 'This run has no per-rule probabilities to sweep (redacted holdout run, or all errors).';
+    return;
+  }
+
+  const { rows, totalApproved, totalRejected, scoredCount } = sweepThresholds(currentRun.stories);
+  const approvedShare = totalApproved / scoredCount;
+  const shareWarning = (approvedShare > 0.97 || approvedShare < 0.5)
+    ? ` This run is ${(approvedShare * 100).toFixed(1)}% approved, which is unusually balanced or skewed for a real-world read -- use a --full or --natural run for an accurate auto-approve rate.`
+    : '';
+
+  const margin = { top: 14, right: 16, bottom: 34, left: 40 };
+  const width = 860, height = 380;
+  const plotW = width - margin.left - margin.right;
+  const plotH = height - margin.top - margin.bottom;
+  const xMin = rows[0].threshold, xMax = rows[rows.length - 1].threshold;
+  const x = (t) => margin.left + ((t - xMin) / (xMax - xMin)) * plotW;
+  const y = (pct) => margin.top + (1 - pct) * plotH;
+
+  const svgNS = 'http://www.w3.org/2000/svg';
+  function el(name, attrs) {
+    const e = document.createElementNS(svgNS, name);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    return e;
+  }
+
+  const style = getComputedStyle(document.body);
+  const colorAccent = style.getPropertyValue('--accent').trim();
+  const colorDanger = style.getPropertyValue('--danger').trim();
+  const colorMuted = style.getPropertyValue('--muted').trim();
+  const colorBorder = style.getPropertyValue('--border').trim();
+  const colorPanel = style.getPropertyValue('--panel').trim();
+  const colorText = style.getPropertyValue('--text').trim();
+
+  for (let p = 0; p <= 100; p += 20) {
+    const yy = y(p / 100);
+    plot.appendChild(el('line', { x1: margin.left, x2: width - margin.right, y1: yy, y2: yy, stroke: colorBorder, 'stroke-width': 1 }));
+    const lbl = el('text', { x: margin.left - 8, y: yy + 3.5, 'text-anchor': 'end', 'font-size': 10.5, fill: colorMuted });
+    lbl.textContent = p + '%';
+    plot.appendChild(lbl);
+  }
+  [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9].forEach((t) => {
+    if (t < xMin || t > xMax) return;
+    const xx = x(t);
+    const lbl = el('text', { x: xx, y: height - margin.bottom + 18, 'text-anchor': 'middle', 'font-size': 10.5, fill: colorMuted });
+    lbl.textContent = t.toFixed(1);
+    plot.appendChild(lbl);
+  });
+  const axisTitle = el('text', { x: margin.left + plotW / 2, y: height - 2, 'text-anchor': 'middle', 'font-size': 11, fill: colorMuted });
+  axisTitle.textContent = 'Reject threshold';
+  plot.appendChild(axisTitle);
+
+  function path(points) {
+    return points.map((p, i) => (i === 0 ? 'M' : 'L') + p[0].toFixed(2) + ',' + p[1].toFixed(2)).join(' ');
+  }
+  const approvePts = rows.map((r) => [x(r.threshold), y(r.pctAutoApproved)]);
+  const faPts = rows.map((r) => [x(r.threshold), y(r.falseApproveRate)]);
+  const accPts = rows.map((r) => [x(r.threshold), y(r.accuracy)]);
+
+  plot.appendChild(el('path', { d: path(accPts), fill: 'none', stroke: colorMuted, 'stroke-width': 1.5, 'stroke-dasharray': '3 3' }));
+  plot.appendChild(el('path', { d: path(approvePts), fill: 'none', stroke: colorAccent, 'stroke-width': 2, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }));
+  plot.appendChild(el('path', { d: path(faPts), fill: 'none', stroke: colorDanger, 'stroke-width': 2, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }));
+  approvePts.forEach((p) => plot.appendChild(el('circle', { cx: p[0], cy: p[1], r: 3, fill: colorAccent, stroke: colorPanel, 'stroke-width': 1.5 })));
+  faPts.forEach((p) => plot.appendChild(el('circle', { cx: p[0], cy: p[1], r: 3, fill: colorDanger, stroke: colorPanel, 'stroke-width': 1.5 })));
+
+  if (currentThreshold !== null) {
+    const curX = x(currentThreshold);
+    plot.appendChild(el('line', { x1: curX, x2: curX, y1: margin.top, y2: height - margin.bottom, stroke: colorText, 'stroke-width': 1.5, 'stroke-dasharray': '4 3', opacity: 0.5 }));
+    const curLabel = el('text', { x: curX + 6, y: margin.top + 12, 'font-size': 11, 'font-weight': 600, fill: colorText });
+    curLabel.textContent = 'current: ' + currentThreshold;
+    plot.appendChild(curLabel);
+  }
+
+  const crosshair = el('line', { y1: margin.top, y2: height - margin.bottom, stroke: colorMuted, 'stroke-width': 1, opacity: 0 });
+  plot.appendChild(crosshair);
+
+  const tooltip = document.getElementById('chartTooltip');
+  const chartWrap = document.querySelector('.chartWrap');
+  const hitWidth = plotW / (rows.length - 1);
+  rows.forEach((r) => {
+    const cx = x(r.threshold);
+    const hit = el('rect', { x: cx - hitWidth / 2, y: margin.top, width: hitWidth, height: plotH, fill: 'transparent' });
+    hit.addEventListener('mouseenter', () => {
+      crosshair.setAttribute('x1', cx);
+      crosshair.setAttribute('x2', cx);
+      crosshair.setAttribute('opacity', 1);
+      tooltip.innerHTML =
+        `<div style="font-weight:650;margin-bottom:4px">threshold ${r.threshold.toFixed(3)}</div>` +
+        `<div class="row"><span>False-approve rate</span><span>${(r.falseApproveRate * 100).toFixed(1)}%</span></div>` +
+        `<div class="row"><span>Auto-approved</span><span>${(r.pctAutoApproved * 100).toFixed(1)}%</span></div>` +
+        `<div class="row"><span>Accuracy</span><span>${(r.accuracy * 100).toFixed(1)}%</span></div>` +
+        `<div class="row"><span>False approves</span><span>${r.fa}</span></div>` +
+        `<div class="row"><span>False rejects</span><span>${r.fr}</span></div>`;
+      tooltip.classList.add('visible');
+      const wrapRect = chartWrap.getBoundingClientRect();
+      const scale = wrapRect.width / width;
+      let left = cx * scale + 10;
+      if (left + 160 > wrapRect.width) left = cx * scale - 170;
+      tooltip.style.left = left + 'px';
+      tooltip.style.top = (margin.top * scale) + 'px';
+    });
+    hit.addEventListener('mouseleave', () => {
+      tooltip.classList.remove('visible');
+      crosshair.setAttribute('opacity', 0);
+    });
+    plot.appendChild(hit);
+  });
+
+  note.textContent =
+    `Computed from this run's ${scoredCount} scored stories (${totalApproved} approved / ${totalRejected} rejected).${shareWarning}`;
+}
 
 loadRunList();
 </script>

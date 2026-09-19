@@ -62,13 +62,7 @@ export interface EligiblePools {
   holdout: SampledStory[];
 }
 
-/**
- * Keeps only stories reviewed in the last `months` months. Moderation
- * standards drift over time (e.g. bare "I live here" claims used to be
- * approved more often than they are now) -- restricting to recent stories
- * gives a read on current policy instead of a blend of old and new
- * standards.
- */
+/** Keeps only stories reviewed in the last `months` months, since moderation standards drift over time. */
 export function filterRecent(
   pool: SampledStory[],
   months: number
@@ -108,12 +102,7 @@ export function drawSample(
   return sampleSize(sample, sample.length);
 }
 
-/**
- * Draws a sample of roughly `total` stories preserving the pool's natural
- * (unbalanced) approve/reject ratio -- a cheap stand-in for a `--full` run
- * that still reflects real-world-weighted accuracy, without scoring the
- * entire pool every time rules.ts changes.
- */
+/** Draws `total` stories at the pool's natural approve/reject ratio -- a cheap stand-in for `--full`. */
 export function drawNaturalSample(
   pool: SampledStory[],
   total: number
