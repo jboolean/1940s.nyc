@@ -4,7 +4,9 @@ import User from '../../entities/User';
 import StoryState from '../../enum/StoryState';
 import StoryRepository from '../../repositories/StoryRepository';
 import { evaluateStory } from '../moderation/AiStoryModerationService';
+import { combine } from '../moderation/moderationRules';
 import {
+  sendAutoPublishedEmail,
   sendPublishedEmail,
   sendSubmittedAgainEmail,
   sendSubmittedEmail,
@@ -25,28 +27,25 @@ async function onStorySubmitted(storyId: Story['id']): Promise<void> {
   const story = await getStoryOrThrow(storyId, StoryState.SUBMITTED);
   const userRepository = AppDataSource.getRepository(User);
 
-  const hasSubmittedBefore = story.hasEverSubmitted;
-
-  try {
-    if (hasSubmittedBefore) {
+  if (story.hasEverSubmitted) {
+    try {
       await sendSubmittedAgainEmail(story);
-      return;
+    } catch (e) {
+      console.error('Error sending story submitted email', e);
     }
-    await sendSubmittedEmail(story);
-  } catch (e) {
-    console.error('Error sending story submitted email', e);
+    return;
   }
 
   await StoryRepository().update(story.id, {
     hasEverSubmitted: true,
   });
 
+  let isUserBanned = false;
   try {
-    // If user with this email is banned, reject the story
     const maybeUser = await userRepository.findOneBy({
       email: story.storytellerEmail ?? '',
     });
-    const isUserBanned = maybeUser?.isBanned ?? false;
+    isUserBanned = maybeUser?.isBanned ?? false;
     if (isUserBanned) {
       await StoryRepository().update(story.id, {
         state: StoryState.REJECTED,
@@ -57,10 +56,28 @@ async function onStorySubmitted(storyId: Story['id']): Promise<void> {
     console.error('Error auto-reviewing story', e);
   }
 
+  let isAutoPublished = false;
   try {
-    await evaluateStory(story);
+    const { ruleProbabilities } = await evaluateStory(story);
+    if (!isUserBanned && combine(ruleProbabilities).approve) {
+      await StoryRepository().update(story.id, {
+        state: StoryState.PUBLISHED,
+        lastReviewer: 'system',
+      });
+      isAutoPublished = true;
+    }
   } catch (e) {
     console.error('Error evaluating story with AI moderation', e);
+  }
+
+  try {
+    if (isAutoPublished) {
+      await sendAutoPublishedEmail(story);
+    } else {
+      await sendSubmittedEmail(story);
+    }
+  } catch (e) {
+    console.error('Error sending story submitted email', e);
   }
 }
 
