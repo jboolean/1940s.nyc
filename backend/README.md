@@ -149,5 +149,5 @@ This important process supports geocode corrections and user story labels.
 - Postmark - For transactional and campaign emails
 - Netlify Identity - For admin users
 - Stripe - For payments
-- OpenAI - For story title generation
+- OpenRouter - For story title generation
 - Palette - For colorization

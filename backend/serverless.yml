@@ -46,7 +46,7 @@ provider:
     JWT_SECRET: ${ssm:/${self:service}-${sls:stage}-jwt-secret}
     MODERATORS_TO_EMAIL: ${ssm:/${self:service}-${sls:stage}-moderators-to-email}
     MERCH_REVIEWER_EMAILS: ${ssm:/${self:service}-${sls:stage}-merch-reviewer-emails}
-    OPENAI_SK: ${ssm:/${self:service}-${sls:stage}-openai-sk}
+    OPENROUTER_SK: ${ssm:/${self:service}-${sls:stage}-openrouter-sk}
     RAPIDAPI_API_KEY: ${ssm:/${self:service}-${sls:stage}-rapidapi-api-key}
     PRINTFUL_SK: ${ssm:/${self:service}-${sls:stage}-printful-sk}
 plugins:

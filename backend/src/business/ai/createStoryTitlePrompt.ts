@@ -4,7 +4,7 @@ export default function createStoryTitlePrompt(
   storyContent: string
 ): OpenAI.ChatCompletionCreateParamsNonStreaming {
   return {
-    model: 'gpt-4',
+    model: 'openai/gpt-4',
     messages: [
       {
         role: 'system',
