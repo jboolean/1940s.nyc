@@ -6,9 +6,9 @@ export type AiModerationFlag =
   | 'offensive'
   | 'trolling';
 
-export const REJECT_THRESHOLD = 0.375;
+export const MIN_REJECT_PROBABILITY = 0.375;
 
-export const FLAG_THRESHOLD = 0.5;
+export const MIN_FLAG_PROBABILITY = 0.5;
 
 export interface RuleDefinition {
   instructions: string;
@@ -82,7 +82,7 @@ export function combine(ruleProbabilities: Record<AiModerationFlag, number>): {
     ...RULE_KEYS.map((k) => ruleProbabilities[k])
   );
   return {
-    approve: rejectProbability < REJECT_THRESHOLD,
+    approve: rejectProbability < MIN_REJECT_PROBABILITY,
     approveProbability: 1 - rejectProbability,
   };
 }
@@ -90,7 +90,9 @@ export function combine(ruleProbabilities: Record<AiModerationFlag, number>): {
 export function getExceededAiModerationFlags(
   ruleProbabilities: Record<AiModerationFlag, number>
 ): AiModerationFlag[] {
-  return RULE_KEYS.filter((key) => ruleProbabilities[key] >= FLAG_THRESHOLD);
+  return RULE_KEYS.filter(
+    (key) => ruleProbabilities[key] >= MIN_FLAG_PROBABILITY
+  );
 }
 
 export function buildNoulQuestions(): Record<
