@@ -13,6 +13,10 @@ import {
   sendUserRemovedEmail,
 } from './StoryUserEmailService';
 
+// Matches the "% Human" flag shown in the admin review screen
+// (frontend/.../ReviewStories/index.tsx).
+const MIN_RECAPTCHA_SCORE_TO_AUTO_PUBLISH = 0.7;
+
 function getStoryOrThrow(
   storyId: Story['id'],
   state: StoryState
@@ -59,7 +63,11 @@ async function onStorySubmitted(storyId: Story['id']): Promise<void> {
   let isAutoPublished = false;
   try {
     const { ruleProbabilities } = await evaluateStory(story);
-    if (!isUserBanned && combine(ruleProbabilities).approve) {
+    if (
+      !isUserBanned &&
+      story.recaptchaScore >= MIN_RECAPTCHA_SCORE_TO_AUTO_PUBLISH &&
+      combine(ruleProbabilities).approve
+    ) {
       await StoryRepository().update(story.id, {
         state: StoryState.PUBLISHED,
         lastReviewer: 'system',
