@@ -1,0 +1,83 @@
+import { createHash } from 'crypto';
+import compact from 'lodash/compact';
+import partition from 'lodash/partition';
+import sampleSize from 'lodash/sampleSize';
+import { In } from 'typeorm';
+import createConnectionIfNotExists, {
+  AppDataSource,
+} from '../src/createConnection';
+import Story from '../src/entities/Story';
+import StoryState from '../src/enum/StoryState';
+import { HumanLabel, SampledStory } from './types';
+
+// Fixed so the holdout split is stable/reproducible across runs and across
+// time (new stories fall deterministically into working or holdout based on
+// id alone) without needing to persist any state.
+const HOLDOUT_SALT = 'fourtiesnyc-moderation-holdout-v1';
+const HOLDOUT_PERCENT = 20;
+
+function isHoldout(storyId: number): boolean {
+  const hash = createHash('sha256')
+    .update(`${HOLDOUT_SALT}:${storyId}`)
+    .digest();
+  const bucket = hash.readUInt32BE(0) % 100;
+  return bucket < HOLDOUT_PERCENT;
+}
+
+function toHumanLabel(state: StoryState): HumanLabel | null {
+  if (state === StoryState.PUBLISHED) return 'approved';
+  if (state === StoryState.REJECTED) return 'rejected';
+  return null;
+}
+
+function toSampledStory(story: Story): SampledStory | null {
+  const humanLabel = toHumanLabel(story.state);
+  if (!humanLabel || !story.textContent) return null;
+
+  return {
+    id: story.id,
+    humanLabel,
+    input: {
+      title: story.title,
+      storyType: story.storyType,
+      storytellerName: story.storytellerName,
+      storytellerSubtitle: story.storytellerSubtitle,
+      textContent: story.textContent,
+    },
+  };
+}
+
+export interface EligiblePools {
+  working: SampledStory[];
+  holdout: SampledStory[];
+}
+
+export async function loadEligiblePools(): Promise<EligiblePools> {
+  await createConnectionIfNotExists();
+
+  // Read-only: a plain `find` (SELECT), no writes anywhere in this tool.
+  const stories = await AppDataSource.getRepository(Story).find({
+    where: { state: In([StoryState.PUBLISHED, StoryState.REJECTED]) },
+  });
+
+  const eligible = compact(stories.map(toSampledStory));
+  const [holdout, working] = partition(eligible, (s) => isHoldout(s.id));
+
+  return { working, holdout };
+}
+
+/** Draws up to `perClass` approved and `perClass` rejected stories at random. */
+export function drawSample(
+  pool: SampledStory[],
+  perClass: number
+): SampledStory[] {
+  const [approved, rejected] = partition(
+    pool,
+    (s) => s.humanLabel === 'approved'
+  );
+  const sample = [
+    ...sampleSize(approved, perClass),
+    ...sampleSize(rejected, perClass),
+  ];
+  return sampleSize(sample, sample.length);
+}

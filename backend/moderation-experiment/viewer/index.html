@@ -1,0 +1,442 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Moderation Experiment Viewer</title>
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg: #f7f7f8;
+    --panel: #ffffff;
+    --border: #e2e2e6;
+    --text: #1a1a1e;
+    --muted: #6b6b74;
+    --danger: #b3261e;
+    --danger-bg: #fbe9e7;
+    --ok: #1e6b3a;
+    --ok-bg: #e6f4ea;
+    --accent: #3355dd;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #16161a;
+      --panel: #1f1f24;
+      --border: #33333a;
+      --text: #edeef0;
+      --muted: #9a9aa5;
+      --danger: #ff8a80;
+      --danger-bg: #3a1f1e;
+      --ok: #7fd9a0;
+      --ok-bg: #1c3324;
+      --accent: #7d93ff;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    padding: 16px;
+  }
+  h1 { font-size: 18px; margin: 0 0 4px; }
+  .sub { color: var(--muted); margin: 0 0 16px; font-size: 13px; }
+  .bar {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+  select, input[type="text"] {
+    background: var(--panel);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 13px;
+  }
+  label { display: flex; align-items: center; gap: 6px; font-size: 13px; }
+  .cards {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    min-width: 120px;
+  }
+  .card .label { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; }
+  .card .value { font-size: 20px; font-weight: 600; margin-top: 2px; }
+  .card.danger .value { color: var(--danger); }
+  .card.ok .value { color: var(--ok); }
+  table { width: 100%; border-collapse: collapse; background: var(--panel); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border); font-size: 13px; }
+  th { color: var(--muted); font-weight: 500; font-size: 11px; text-transform: uppercase; letter-spacing: 0.03em; }
+  tr.row { cursor: pointer; }
+  tr.row:hover { background: color-mix(in srgb, var(--accent) 8%, transparent); }
+  .badge { padding: 2px 8px; border-radius: 999px; font-size: 12px; font-weight: 600; }
+  .badge.approved { background: var(--ok-bg); color: var(--ok); }
+  .badge.rejected { background: var(--danger-bg); color: var(--danger); }
+  .mark { font-weight: 700; }
+  .mark.yes { color: var(--ok); }
+  .mark.no { color: var(--danger); }
+  .detail {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-top: none;
+  }
+  .detail td { padding: 12px 16px; }
+  .detail-grid { display: grid; grid-template-columns: 1fr 260px; gap: 20px; }
+  .story-text { white-space: pre-wrap; }
+  .rules { list-style: none; margin: 0; padding: 0; }
+  .rules li { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px dashed var(--border); font-size: 12px; }
+  .rules .p { font-variant-numeric: tabular-nums; }
+  .meta { color: var(--muted); font-size: 12px; margin-bottom: 8px; }
+  .empty { color: var(--muted); padding: 24px; text-align: center; }
+  .runPanel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin-bottom: 16px;
+  }
+  .runPanel h2 { font-size: 13px; margin: 0 0 10px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); }
+  .runForm { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .runForm input[type="number"] { width: 70px; }
+  .runForm input[type="text"] { width: 220px; }
+  button {
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 7px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  button:disabled { opacity: 0.5; cursor: not-allowed; }
+  .runStatus { font-size: 12px; color: var(--muted); margin-top: 8px; }
+  .runConsole {
+    display: none;
+    background: #0d0d10;
+    color: #d8d8dc;
+    font: 12px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
+    padding: 10px 12px;
+    border-radius: 6px;
+    margin-top: 10px;
+    max-height: 260px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+  }
+</style>
+</head>
+<body>
+  <h1>Moderation Experiment Viewer</h1>
+  <p class="sub">Local only. Story text and names below are real user submissions &mdash; never share this page or its data.</p>
+
+  <div class="runPanel">
+    <h2>Run a new experiment</h2>
+    <div class="runForm">
+      <select id="runModerator">
+        <option value="jev">jev</option>
+        <option value="llm">llm</option>
+      </select>
+      <label>Sample size <input type="number" id="runSampleSize" value="20" min="1" max="200" /></label>
+      <label><input type="checkbox" id="runNewSample" checked /> New sample</label>
+      <label><input type="checkbox" id="runHoldout" /> Holdout</label>
+      <input type="text" id="runModel" placeholder="model override (optional)" />
+      <button id="runButton">Run</button>
+    </div>
+    <div class="runStatus" id="runStatus"></div>
+    <pre class="runConsole" id="runConsole"></pre>
+  </div>
+
+  <div class="bar">
+    <select id="runSelect"></select>
+    <label><input type="checkbox" id="mismatchesOnly" /> Mismatches only</label>
+    <select id="ruleFilter">
+      <option value="">All rules</option>
+    </select>
+    <input type="text" id="search" placeholder="Search text/title&hellip;" />
+  </div>
+
+  <div class="cards" id="cards"></div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Human</th>
+        <th>Model</th>
+        <th>Correct</th>
+        <th>Approve p</th>
+        <th>Top rule</th>
+        <th>Cost</th>
+        <th>Title / excerpt</th>
+      </tr>
+    </thead>
+    <tbody id="rows"></tbody>
+  </table>
+  <div id="emptyState" class="empty" style="display:none">No stories match the current filters.</div>
+
+<script>
+let currentRun = null;
+let openId = null;
+
+async function loadRunList(preferredFilename) {
+  const res = await fetch('/results');
+  const files = await res.json();
+  const select = document.getElementById('runSelect');
+  select.innerHTML = '';
+  if (files.length === 0) {
+    select.innerHTML = '<option value="">No runs yet -- run `npm run experiment` first</option>';
+    return;
+  }
+  for (const f of files) {
+    const opt = document.createElement('option');
+    opt.value = f;
+    opt.textContent = f;
+    select.appendChild(opt);
+  }
+  // Filenames sort alphabetically, not chronologically ("*-latest.json"
+  // does not reliably land first) -- prefer an exact filename the caller
+  // knows is correct (e.g. the run that was just triggered) over guessing.
+  const toSelect = preferredFilename && files.includes(preferredFilename) ? preferredFilename : files[0];
+  select.value = toSelect;
+  await loadRun(toSelect);
+}
+
+async function loadRun(filename) {
+  if (!filename) return;
+  const res = await fetch('/results/' + filename);
+  currentRun = await res.json();
+  openId = null;
+  populateRuleFilter();
+  render();
+}
+
+function populateRuleFilter() {
+  const select = document.getElementById('ruleFilter');
+  const keys = new Set();
+  for (const s of currentRun.stories) {
+    if (s.ruleProbabilities) Object.keys(s.ruleProbabilities).forEach((k) => keys.add(k));
+  }
+  const current = select.value;
+  select.innerHTML = '<option value="">All rules</option>';
+  for (const k of keys) {
+    const opt = document.createElement('option');
+    opt.value = k;
+    opt.textContent = k;
+    select.appendChild(opt);
+  }
+  select.value = current;
+}
+
+function topRule(ruleProbabilities) {
+  if (!ruleProbabilities) return '&mdash;';
+  const entries = Object.entries(ruleProbabilities);
+  const [rule, p] = entries.reduce((best, cur) => (cur[1] > best[1] ? cur : best));
+  return `${rule} (${p.toFixed(2)})`;
+}
+
+function formatCost(cost) {
+  if (cost === null || cost === undefined) return 'n/a';
+  return '$' + cost.toFixed(cost < 0.01 ? 6 : 2);
+}
+
+function renderCards() {
+  const s = currentRun.summary;
+  const cards = document.getElementById('cards');
+  cards.innerHTML = '';
+  const items = [
+    { label: 'Moderator', value: `${currentRun.moderator} (${currentRun.model})`, cls: '' },
+    { label: 'Accuracy', value: (s.accuracy * 100).toFixed(1) + '%', cls: '' },
+    { label: 'False approve', value: `${s.falseApprove}/${s.totalRejected} (${(s.falseApproveRate * 100).toFixed(1)}%)`, cls: s.falseApprove > 0 ? 'danger' : 'ok' },
+    { label: 'False reject', value: `${s.falseReject}/${s.totalApproved} (${(s.falseRejectRate * 100).toFixed(1)}%)`, cls: '' },
+    { label: 'Scored / errors', value: `${s.scored} / ${s.errors}`, cls: '' },
+    { label: 'Total cost', value: formatCost(s.totalCostUsd), cls: '' },
+    { label: 'Cost per story', value: formatCost(s.avgCostUsd), cls: '' },
+  ];
+  for (const item of items) {
+    const div = document.createElement('div');
+    div.className = 'card ' + item.cls;
+    div.innerHTML = `<div class="label">${item.label}</div><div class="value">${item.value}</div>`;
+    cards.appendChild(div);
+  }
+}
+
+function matchesFilters(story) {
+  const mismatchesOnly = document.getElementById('mismatchesOnly').checked;
+  const ruleFilter = document.getElementById('ruleFilter').value;
+  const search = document.getElementById('search').value.trim().toLowerCase();
+
+  if (mismatchesOnly && (story.error || story.correct)) return false;
+  if (ruleFilter && story.ruleProbabilities && story.ruleProbabilities[ruleFilter] < 0.5) return false;
+  if (search) {
+    const haystack = ((story.title || '') + ' ' + (story.textContent || '')).toLowerCase();
+    if (!haystack.includes(search)) return false;
+  }
+  return true;
+}
+
+function ruleRows(story) {
+  if (!story.ruleProbabilities) return '<p class="meta">No per-rule data (error or older run).</p>';
+  const entries = Object.entries(story.ruleProbabilities).sort((a, b) => b[1] - a[1]);
+  return '<ul class="rules">' + entries.map(([k, p]) => {
+    const cls = p >= 0.5 ? 'yes' : 'no';
+    return `<li><span>${k}</span><span class="p mark ${cls}">${p.toFixed(2)}</span></li>`;
+  }).join('') + '</ul>';
+}
+
+function render() {
+  renderCards();
+  const tbody = document.getElementById('rows');
+  tbody.innerHTML = '';
+  const empty = document.getElementById('emptyState');
+
+  const stories = currentRun.stories.filter(matchesFilters);
+  empty.style.display = stories.length === 0 ? 'block' : 'none';
+
+  for (const story of stories) {
+    const tr = document.createElement('tr');
+    tr.className = 'row';
+    const correctMark = story.error ? '&mdash;' : (story.correct ? '<span class="mark yes">&check;</span>' : '<span class="mark no">&cross;</span>');
+    tr.innerHTML = `
+      <td>${story.id}</td>
+      <td><span class="badge ${story.humanLabel}">${story.humanLabel}</span></td>
+      <td>${story.modelLabel ? `<span class="badge ${story.modelLabel}">${story.modelLabel}</span>` : (story.error ? 'error' : '&mdash;')}</td>
+      <td>${correctMark}</td>
+      <td>${story.approveProbability !== undefined ? story.approveProbability.toFixed(2) : '&mdash;'}</td>
+      <td>${topRule(story.ruleProbabilities)}</td>
+      <td>${story.costUsd != null ? formatCost(story.costUsd) : '&mdash;'}</td>
+      <td>${story.textContent !== undefined ? escapeHtml((story.title || story.textContent || '').slice(0, 70)) : '<span class="meta">(redacted &mdash; holdout)</span>'}</td>
+    `;
+    tr.addEventListener('click', () => {
+      openId = openId === story.id ? null : story.id;
+      render();
+    });
+    tbody.appendChild(tr);
+
+    if (openId === story.id) {
+      const detailTr = document.createElement('tr');
+      detailTr.className = 'detail';
+      const detailTd = document.createElement('td');
+      detailTd.colSpan = 6;
+      detailTd.innerHTML = `
+        <div class="detail-grid">
+          <div>
+            <div class="meta">Story #${story.id}${story.error ? ' &mdash; error: ' + escapeHtml(story.error) : ''}</div>
+            <div class="story-text">${story.textContent !== undefined ? escapeHtml(story.textContent) : '(story content is not shown for holdout runs)'}</div>
+          </div>
+          <div>${ruleRows(story)}</div>
+        </div>
+      `;
+      detailTr.appendChild(detailTd);
+      tbody.appendChild(detailTr);
+    }
+  }
+}
+
+function escapeHtml(s) {
+  return s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
+document.getElementById('runSelect').addEventListener('change', (e) => loadRun(e.target.value));
+document.getElementById('mismatchesOnly').addEventListener('change', render);
+document.getElementById('ruleFilter').addEventListener('change', render);
+document.getElementById('search').addEventListener('input', render);
+
+async function startExperimentRun() {
+  const holdout = document.getElementById('runHoldout').checked;
+  if (holdout && !confirm('This evaluates the holdout set. Only do this once you believe the prompt is done -- repeatedly checking the holdout defeats its purpose. Continue?')) {
+    return;
+  }
+
+  const button = document.getElementById('runButton');
+  const status = document.getElementById('runStatus');
+  const consoleEl = document.getElementById('runConsole');
+  button.disabled = true;
+  status.textContent = 'Starting...';
+  consoleEl.style.display = 'none';
+  consoleEl.textContent = '';
+
+  const label = holdout ? 'holdout' : 'working';
+  const body = {
+    moderator: document.getElementById('runModerator').value,
+    sampleSize: Number(document.getElementById('runSampleSize').value),
+    newSample: document.getElementById('runNewSample').checked,
+    holdout,
+    model: document.getElementById('runModel').value.trim() || undefined,
+  };
+
+  let res;
+  try {
+    res = await fetch('/run', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+  } catch (e) {
+    status.textContent = 'Failed to reach the viewer server: ' + e;
+    button.disabled = false;
+    return;
+  }
+
+  if (res.status === 409) {
+    status.textContent = 'A run is already in progress.';
+    button.disabled = false;
+    return;
+  }
+  if (!res.ok) {
+    status.textContent = 'Failed to start run (HTTP ' + res.status + ').';
+    button.disabled = false;
+    return;
+  }
+
+  const { runId } = await res.json();
+  status.textContent = 'Running...';
+
+  let output = '';
+  const source = new EventSource('/run/' + runId + '/stream');
+  source.onmessage = (event) => {
+    const msg = JSON.parse(event.data);
+    if (msg.type === 'output') {
+      // Buffered but not shown -- if the run succeeds, the table below
+      // already carries this same information. Only surface it on failure,
+      // where there is no result file to show instead.
+      output += msg.text;
+    } else if (msg.type === 'done') {
+      button.disabled = false;
+      source.close();
+      if (msg.exitCode === 0) {
+        status.textContent = 'Done.';
+        loadRunList(label + '-latest.json');
+      } else {
+        status.textContent = `Exited with code ${msg.exitCode}. See output below.`;
+        consoleEl.textContent = output;
+        consoleEl.style.display = 'block';
+      }
+    }
+  };
+  source.onerror = () => {
+    status.textContent = 'Lost connection to the run stream.';
+    button.disabled = false;
+    if (output) {
+      consoleEl.textContent = output;
+      consoleEl.style.display = 'block';
+    }
+    source.close();
+  };
+}
+
+document.getElementById('runButton').addEventListener('click', startExperimentRun);
+
+loadRunList();
+</script>
+</body>
+</html>
