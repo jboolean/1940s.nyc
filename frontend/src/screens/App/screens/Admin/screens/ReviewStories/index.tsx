@@ -15,11 +15,11 @@ const DATE_FORMATTER = new Intl.DateTimeFormat('en-US', {
 });
 
 const labelByAiModerationFlag: Record<AiModerationFlag, string> = {
-  linkOrAd: 'Link or advertisement',
-  complaintOrCorrection: 'Complaint or correction, not a story',
+  linkOrAd: 'Advertisement',
+  complaintOrCorrection: 'Complaint',
   nonsense: 'Nonsense',
-  addressOnly: 'Address/business only, no detail',
-  offensive: 'Offensive content',
+  addressOnly: 'Lacks personal detail',
+  offensive: 'Offensive',
   trolling: 'Trolling',
 };
 
