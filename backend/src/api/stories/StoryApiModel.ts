@@ -1,3 +1,4 @@
+import { AiModerationFlag } from '../../business/moderation/moderationRules';
 import LngLat from '../../enum/LngLat';
 import StoryState from '../../enum/StoryState';
 import StoryType from '../../enum/StoryType';
@@ -23,6 +24,7 @@ type AdminFields = {
   recaptchaScore: number;
   title?: string;
   emailBounced: boolean;
+  moderationFlags: AiModerationFlag[];
 };
 
 // Can never be set by user

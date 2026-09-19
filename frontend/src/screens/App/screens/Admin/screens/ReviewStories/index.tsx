@@ -6,13 +6,22 @@ import { PHOTO_BASE } from 'shared/utils/apiConstants';
 
 import useReviewStoriesStore from './stores/ReviewStoriesStore';
 
-import { AdminStory } from 'screens/App/shared/types/Story';
+import { AdminStory, AiModerationFlag } from 'screens/App/shared/types/Story';
 import stylesheet from './ReviewStories.less';
 
 const DATE_FORMATTER = new Intl.DateTimeFormat('en-US', {
   dateStyle: 'full',
   timeStyle: 'short',
 });
+
+const labelByAiModerationFlag: Record<AiModerationFlag, string> = {
+  linkOrAd: 'Link or advertisement',
+  complaintOrCorrection: 'Complaint or correction, not a story',
+  nonsense: 'Nonsense',
+  addressOnly: 'Address/business only, no detail',
+  offensive: 'Offensive content',
+  trolling: 'Trolling',
+};
 
 function StoryMetadataView({ story }: { story: AdminStory }): JSX.Element {
   return (
@@ -38,6 +47,14 @@ function StoryMetadataView({ story }: { story: AdminStory }): JSX.Element {
           Email bounced
         </div>
       ) : null}
+      {story.moderationFlags.map((flag) => (
+        <div
+          key={flag}
+          className={classNames(stylesheet.score, stylesheet.bad)}
+        >
+          {labelByAiModerationFlag[flag]}
+        </div>
+      ))}
 
       {story.lngLat ? (
         <div>

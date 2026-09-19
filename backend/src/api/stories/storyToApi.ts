@@ -1,4 +1,5 @@
 import Story from '../../entities/Story';
+import { getExceededAiModerationFlags } from '../../business/moderation/moderationRules';
 import required from '../../business/utils/required';
 import {
   AdminStoryResponse,
@@ -26,6 +27,9 @@ export function toAdminStoryResponse(story: Story): AdminStoryResponse {
 
     recaptchaScore: story.recaptchaScore,
     emailBounced: !!story.bounce,
+    moderationFlags: story.aiModerationScore
+      ? getExceededAiModerationFlags(story.aiModerationScore.ruleProbabilities)
+      : [],
   };
 }
 

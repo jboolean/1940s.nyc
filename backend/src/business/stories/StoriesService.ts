@@ -3,6 +3,7 @@ import Story from '../../entities/Story';
 import User from '../../entities/User';
 import StoryState from '../../enum/StoryState';
 import StoryRepository from '../../repositories/StoryRepository';
+import { evaluateStory } from '../moderation/AiStoryModerationService';
 import {
   sendPublishedEmail,
   sendSubmittedAgainEmail,
@@ -54,6 +55,12 @@ async function onStorySubmitted(storyId: Story['id']): Promise<void> {
     }
   } catch (e) {
     console.error('Error auto-reviewing story', e);
+  }
+
+  try {
+    await evaluateStory(story);
+  } catch (e) {
+    console.error('Error evaluating story with AI moderation', e);
   }
 }
 
