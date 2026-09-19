@@ -46,6 +46,7 @@ function toSampledStory(story: Story): SampledStory | null {
   return {
     id: story.id,
     humanLabel,
+    reviewedAt: story.updatedAt.toISOString(),
     input: {
       title: story.title,
       storyType: story.storyType,
@@ -59,6 +60,22 @@ function toSampledStory(story: Story): SampledStory | null {
 export interface EligiblePools {
   working: SampledStory[];
   holdout: SampledStory[];
+}
+
+/**
+ * Keeps only stories reviewed in the last `months` months. Moderation
+ * standards drift over time (e.g. bare "I live here" claims used to be
+ * approved more often than they are now) -- restricting to recent stories
+ * gives a read on current policy instead of a blend of old and new
+ * standards.
+ */
+export function filterRecent(
+  pool: SampledStory[],
+  months: number
+): SampledStory[] {
+  const cutoff = new Date();
+  cutoff.setMonth(cutoff.getMonth() - months);
+  return pool.filter((s) => new Date(s.reviewedAt) >= cutoff);
 }
 
 export async function loadEligiblePools(): Promise<EligiblePools> {
@@ -87,6 +104,29 @@ export function drawSample(
   const sample = [
     ...sampleSize(approved, perClass),
     ...sampleSize(rejected, perClass),
+  ];
+  return sampleSize(sample, sample.length);
+}
+
+/**
+ * Draws a sample of roughly `total` stories preserving the pool's natural
+ * (unbalanced) approve/reject ratio -- a cheap stand-in for a `--full` run
+ * that still reflects real-world-weighted accuracy, without scoring the
+ * entire pool every time rules.ts changes.
+ */
+export function drawNaturalSample(
+  pool: SampledStory[],
+  total: number
+): SampledStory[] {
+  const [approved, rejected] = partition(
+    pool,
+    (s) => s.humanLabel === 'approved'
+  );
+  const approvedCount = Math.round((approved.length / pool.length) * total);
+  const rejectedCount = total - approvedCount;
+  const sample = [
+    ...sampleSize(approved, approvedCount),
+    ...sampleSize(rejected, rejectedCount),
   ];
   return sampleSize(sample, sample.length);
 }

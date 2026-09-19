@@ -35,5 +35,6 @@ export type HumanLabel = 'approved' | 'rejected';
 export interface SampledStory {
   id: number;
   humanLabel: HumanLabel;
+  reviewedAt: string;
   input: ModerationInput;
 }

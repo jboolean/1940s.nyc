@@ -6,7 +6,12 @@ import { Command, Option } from 'commander';
 import { AppDataSource } from '../src/createConnection';
 import createJevModerator from './moderators/jevModerator';
 import createLlmModerator from './moderators/llmModerator';
-import { drawSample, loadEligiblePools } from './sampling';
+import {
+  drawNaturalSample,
+  drawSample,
+  filterRecent,
+  loadEligiblePools,
+} from './sampling';
 import { Moderator, RuleKey, SampledStory } from './types';
 
 // Measured from process start (node boot + this module's own require()
@@ -29,6 +34,8 @@ interface Args {
   sampleSize: number;
   holdout: boolean;
   full: boolean;
+  natural: boolean;
+  recentMonths?: number;
   moderator: 'jev' | 'llm';
   model?: string;
   concurrency: number;
@@ -60,8 +67,19 @@ function parseArgs(argv: string[]): Args {
     )
     .option(
       '--full',
-      'with --holdout, evaluate the entire holdout pool instead of a --sample-size-bounded sample (unbounded -- the pool only grows over time)',
+      "evaluate the entire pool (working or, with --holdout, holdout) instead of a --sample-size-bounded sample. For the working pool this also uses the natural (unbalanced) class mix instead of drawSample's balanced perClass draw.",
       false
+    )
+    .option(
+      '--natural',
+      "working pool only: draw --sample-size TOTAL stories at the pool's natural (unbalanced) approve/reject ratio instead of a balanced perClass draw -- a cheap stand-in for --full that still reflects real-world-weighted accuracy without scoring the whole pool",
+      false
+    )
+    .addOption(
+      new Option(
+        '--recent-months <n>',
+        'restrict the pool to stories reviewed in the last N months before sampling/drawing -- moderation standards drift over time, so this reflects current policy instead of a blend of old and new standards'
+      ).argParser(Number)
     )
     .addOption(
       new Option('--moderator <name>', 'which backend to score with')
@@ -86,6 +104,9 @@ function parseArgs(argv: string[]): Args {
     sampleSize: Number(opts.sampleSize),
     holdout: Boolean(opts.holdout),
     full: Boolean(opts.full),
+    natural: Boolean(opts.natural),
+    recentMonths:
+      typeof opts.recentMonths === 'number' ? opts.recentMonths : undefined,
     moderator: opts.moderator === 'llm' ? 'llm' : 'jev',
     model: typeof opts.model === 'string' ? opts.model : undefined,
     concurrency: Number(opts.concurrency),
@@ -118,6 +139,7 @@ async function mapWithConcurrency<T, R>(
 interface ScoredStory {
   id: number;
   humanLabel: 'approved' | 'rejected';
+  reviewedAt: string;
   // Omitted entirely for holdout runs -- see `redactContent` below. Never
   // written to results/ or printed for holdout so there's no way to
   // accidentally read what you're supposed to be holding out.
@@ -141,6 +163,7 @@ async function score(
     const base: ScoredStory = {
       id: story.id,
       humanLabel: story.humanLabel,
+      reviewedAt: story.reviewedAt,
       ...(redactContent
         ? {}
         : { title: story.input.title, textContent: story.input.textContent }),
@@ -338,11 +361,21 @@ async function main(): Promise<void> {
   console.log(`Moderator: ${moderator.name} (${moderator.model})`);
 
   const poolsStart = performance.now();
-  const pools = await loadEligiblePools();
+  let pools = await loadEligiblePools();
   const loadPoolsMs = Math.round(performance.now() - poolsStart);
   console.log(
     `Eligible pool: ${pools.working.length} working, ${pools.holdout.length} holdout`
   );
+
+  if (args.recentMonths !== undefined) {
+    pools = {
+      working: filterRecent(pools.working, args.recentMonths),
+      holdout: filterRecent(pools.holdout, args.recentMonths),
+    };
+    console.log(
+      `Restricted to stories reviewed in the last ${args.recentMonths} months: ${pools.working.length} working, ${pools.holdout.length} holdout`
+    );
+  }
 
   let sample: SampledStory[];
   let label: 'working' | 'holdout';
@@ -368,7 +401,26 @@ async function main(): Promise<void> {
     );
   } else {
     label = 'working';
-    if (!args.newSample && existsSync(SAMPLE_CACHE_PATH)) {
+    if (args.full) {
+      // The whole working pool, unbalanced -- reflects the real-world
+      // approve/reject mix (most submissions are approved), unlike
+      // drawSample's balanced perClass draw used for iterating on rules.ts.
+      // Useful for checking overall real-world-weighted accuracy without
+      // touching the holdout set.
+      sample = pools.working;
+      console.log(
+        `Evaluating the FULL working pool (${sample.length} stories, natural class balance).`
+      );
+    } else if (args.natural) {
+      // Cheap stand-in for --full: same natural class ratio, bounded to
+      // --sample-size total stories, so real-world-weighted accuracy can be
+      // checked on every rules.ts iteration without the cost/time of
+      // scoring the entire pool.
+      sample = drawNaturalSample(pools.working, args.sampleSize);
+      console.log(
+        `Drew a natural-ratio sample (${sample.length} stories, real-world approve/reject mix).`
+      );
+    } else if (!args.newSample && existsSync(SAMPLE_CACHE_PATH)) {
       sample = JSON.parse(
         readFileSync(SAMPLE_CACHE_PATH, 'utf-8')
       ) as SampledStory[];

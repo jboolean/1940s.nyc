@@ -26,8 +26,19 @@ npm run experiment -- --sample-size 50 --new-sample
 npm run experiment -- --moderator llm       # try the LLM fallback instead
 npm run experiment -- --moderator llm --model anthropic/claude-haiku-4.5
 npm run experiment -- --holdout             # final check only, see below
+npm run experiment -- --full                # entire working pool, natural (unbalanced) class mix -- see below
+npm run experiment -- --natural --sample-size 300   # cheap stand-in for --full: N stories at the natural class ratio
+npm run experiment -- --recent-months 6     # restrict the pool to stories reviewed in the last 6 months -- see below
 npm run experiment -- --help                # list all flags
 ```
+
+### Balanced samples vs. the real class mix
+
+The default/`--new-sample` draw is deliberately balanced (equal approved and rejected), so iterating on `rules.ts` gets clear signal from both classes even though rejections are the rare case in the wild. That means the accuracy/false-approve/false-reject numbers from a normal run do NOT reflect real-world-weighted accuracy -- in production, roughly 85-90% of eligible stories are approved, so false-rejects on that large majority class matter much more to overall accuracy than the balanced samples let on. Pass `--full` (without `--holdout`) to score the entire working pool at its natural class mix instead, as a sanity check on real-world-weighted accuracy without touching the holdout set. `--natural --sample-size N` is a cheap stand-in for `--full`: it draws N stories at the pool's natural ratio instead of scoring the whole pool, so real-world-weighted accuracy can be checked on every `rules.ts` iteration without the time/cost of a full-pool run.
+
+### Moderation standards drift over time
+
+What counts as approvable has changed over time (e.g. bare "I live here" claims used to be approved more often than they are now), so the eligible pool is a blend of old and new standards. `--recent-months <n>` restricts sampling/drawing to stories reviewed in the last `n` months, which reflects current policy instead of that blend -- at the cost of a smaller eligible pool the more you restrict it.
 
 Each run prints a table of mismatches, a table of errors (if any), and a summary: accuracy, cost, and the false-approve rate. The false-approve rate matters most: it is the share of human-rejected stories the model would have auto-approved. That is the costly kind of mistake, since it means publishing something a human would have rejected. The false-reject rate (a human-approved story the model would have queued for review) is safer but reduces how much moderation gets automated.
 

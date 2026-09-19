@@ -158,7 +158,11 @@
 
   <div class="bar">
     <select id="runSelect"></select>
-    <label><input type="checkbox" id="mismatchesOnly" /> Mismatches only</label>
+    <select id="mismatchFilter">
+      <option value="all">All</option>
+      <option value="falseReject">False reject</option>
+      <option value="falseApprove">False approve</option>
+    </select>
     <select id="ruleFilter">
       <option value="">All rules</option>
     </select>
@@ -271,11 +275,15 @@ function renderCards() {
 }
 
 function matchesFilters(story) {
-  const mismatchesOnly = document.getElementById('mismatchesOnly').checked;
+  const mismatchFilter = document.getElementById('mismatchFilter').value;
   const ruleFilter = document.getElementById('ruleFilter').value;
   const search = document.getElementById('search').value.trim().toLowerCase();
 
-  if (mismatchesOnly && (story.error || story.correct)) return false;
+  if (mismatchFilter === 'falseReject') {
+    if (story.error || story.humanLabel !== 'approved' || story.modelLabel !== 'rejected') return false;
+  } else if (mismatchFilter === 'falseApprove') {
+    if (story.error || story.humanLabel !== 'rejected' || story.modelLabel !== 'approved') return false;
+  }
   if (ruleFilter && story.ruleProbabilities && story.ruleProbabilities[ruleFilter] < 0.5) return false;
   if (search) {
     const haystack = ((story.title || '') + ' ' + (story.textContent || '')).toLowerCase();
@@ -347,7 +355,7 @@ function escapeHtml(s) {
 }
 
 document.getElementById('runSelect').addEventListener('change', (e) => loadRun(e.target.value));
-document.getElementById('mismatchesOnly').addEventListener('change', render);
+document.getElementById('mismatchFilter').addEventListener('change', render);
 document.getElementById('ruleFilter').addEventListener('change', render);
 document.getElementById('search').addEventListener('input', render);
 
