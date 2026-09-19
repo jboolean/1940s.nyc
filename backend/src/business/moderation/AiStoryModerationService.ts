@@ -11,7 +11,10 @@ import {
 
 const MODEL = 'typesafe/jev-1.13';
 
-const client = new OpenRouter({ apiKey: process.env.OPENROUTER_SK });
+const client = new OpenRouter({
+  apiKey: process.env.OPENROUTER_SK,
+  timeoutMs: 5000,
+});
 const questions = buildNoulQuestions();
 
 export async function evaluateStory(
