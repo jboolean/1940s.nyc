@@ -30,9 +30,18 @@ function toHumanLabel(state: StoryState): HumanLabel | null {
   return null;
 }
 
+// "system" means an automated rejection (e.g. spam/bot filtering), not an
+// actual human moderation decision -- including these would corrupt the
+// ground truth this whole tool scores against. Checked in JS rather than
+// added to the SQL WHERE clause: TypeORM's Not('system') becomes SQL
+// `<> 'system'`, which under three-valued logic also silently drops NULL
+// last_reviewer rows -- not what was asked for.
+const AUTOMATED_REVIEWER = 'system';
+
 function toSampledStory(story: Story): SampledStory | null {
   const humanLabel = toHumanLabel(story.state);
   if (!humanLabel || !story.textContent) return null;
+  if (story.lastReviewer === AUTOMATED_REVIEWER) return null;
 
   return {
     id: story.id,
