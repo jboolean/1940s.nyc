@@ -8,6 +8,8 @@ export type AiModerationFlag =
 
 export const REJECT_THRESHOLD = 0.375;
 
+export const FLAG_THRESHOLD = 0.5;
+
 export interface RuleDefinition {
   instructions: string;
   criteria: { true: string; false: string };
@@ -88,7 +90,7 @@ export function combine(ruleProbabilities: Record<AiModerationFlag, number>): {
 export function getExceededAiModerationFlags(
   ruleProbabilities: Record<AiModerationFlag, number>
 ): AiModerationFlag[] {
-  return RULE_KEYS.filter((key) => ruleProbabilities[key] >= REJECT_THRESHOLD);
+  return RULE_KEYS.filter((key) => ruleProbabilities[key] >= FLAG_THRESHOLD);
 }
 
 export function buildNoulQuestions(): Record<
