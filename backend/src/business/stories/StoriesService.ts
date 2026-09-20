@@ -31,39 +31,35 @@ async function onStorySubmitted(storyId: Story['id']): Promise<void> {
   const story = await getStoryOrThrow(storyId, StoryState.SUBMITTED);
   const userRepository = AppDataSource.getRepository(User);
 
-  if (story.hasEverSubmitted) {
-    try {
-      await sendSubmittedAgainEmail(story);
-    } catch (e) {
-      console.error('Error sending story submitted email', e);
-    }
-    return;
-  }
+  const hasSubmittedBefore = story.hasEverSubmitted;
 
   await StoryRepository().update(story.id, {
     hasEverSubmitted: true,
   });
 
   let isUserBanned = false;
-  try {
-    const maybeUser = await userRepository.findOneBy({
-      email: story.storytellerEmail ?? '',
-    });
-    isUserBanned = maybeUser?.isBanned ?? false;
-    if (isUserBanned) {
-      await StoryRepository().update(story.id, {
-        state: StoryState.REJECTED,
-        lastReviewer: 'system',
+  if (!hasSubmittedBefore) {
+    try {
+      const maybeUser = await userRepository.findOneBy({
+        email: story.storytellerEmail ?? '',
       });
+      isUserBanned = maybeUser?.isBanned ?? false;
+      if (isUserBanned) {
+        await StoryRepository().update(story.id, {
+          state: StoryState.REJECTED,
+          lastReviewer: 'system',
+        });
+      }
+    } catch (e) {
+      console.error('Error auto-reviewing story', e);
     }
-  } catch (e) {
-    console.error('Error auto-reviewing story', e);
   }
 
   let isAutoPublished = false;
   try {
     const { ruleProbabilities } = await evaluateStory(story);
     if (
+      !hasSubmittedBefore &&
       !isUserBanned &&
       story.recaptchaScore >= MIN_RECAPTCHA_SCORE_TO_AUTO_PUBLISH &&
       combine(ruleProbabilities).approve
@@ -81,6 +77,8 @@ async function onStorySubmitted(storyId: Story['id']): Promise<void> {
   try {
     if (isAutoPublished) {
       await sendAutoPublishedEmail(story);
+    } else if (hasSubmittedBefore) {
+      await sendSubmittedAgainEmail(story);
     } else {
       await sendSubmittedEmail(story);
     }
