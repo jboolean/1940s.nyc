@@ -25,6 +25,12 @@ async function onStorySubmitted(storyId: Story['id']): Promise<void> {
   const story = await getStoryOrThrow(storyId, StoryState.SUBMITTED);
   const userRepository = AppDataSource.getRepository(User);
 
+  try {
+    await evaluateStory(story);
+  } catch (e) {
+    console.error('Error evaluating story with AI moderation', e);
+  }
+
   const hasSubmittedBefore = story.hasEverSubmitted;
 
   try {
@@ -55,12 +61,6 @@ async function onStorySubmitted(storyId: Story['id']): Promise<void> {
     }
   } catch (e) {
     console.error('Error auto-reviewing story', e);
-  }
-
-  try {
-    await evaluateStory(story);
-  } catch (e) {
-    console.error('Error evaluating story with AI moderation', e);
   }
 }
 
