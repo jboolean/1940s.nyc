@@ -4,12 +4,18 @@ import User from '../../entities/User';
 import StoryState from '../../enum/StoryState';
 import StoryRepository from '../../repositories/StoryRepository';
 import { evaluateStory } from '../moderation/AiStoryModerationService';
+import { combine } from '../moderation/moderationRules';
 import {
+  sendAutoPublishedEmail,
   sendPublishedEmail,
   sendSubmittedAgainEmail,
   sendSubmittedEmail,
   sendUserRemovedEmail,
 } from './StoryUserEmailService';
+
+// Matches the "% Human" flag shown in the admin review screen
+// (frontend/.../ReviewStories/index.tsx).
+const MIN_RECAPTCHA_SCORE_TO_AUTO_PUBLISH = 0.7;
 
 function getStoryOrThrow(
   storyId: Story['id'],
@@ -27,40 +33,57 @@ async function onStorySubmitted(storyId: Story['id']): Promise<void> {
 
   const hasSubmittedBefore = story.hasEverSubmitted;
 
-  try {
-    if (hasSubmittedBefore) {
-      await sendSubmittedAgainEmail(story);
-      return;
-    }
-    await sendSubmittedEmail(story);
-  } catch (e) {
-    console.error('Error sending story submitted email', e);
-  }
-
   await StoryRepository().update(story.id, {
     hasEverSubmitted: true,
   });
 
+  let isUserBanned = false;
+  if (!hasSubmittedBefore) {
+    try {
+      const maybeUser = await userRepository.findOneBy({
+        email: story.storytellerEmail ?? '',
+      });
+      isUserBanned = maybeUser?.isBanned ?? false;
+      if (isUserBanned) {
+        await StoryRepository().update(story.id, {
+          state: StoryState.REJECTED,
+          lastReviewer: 'system',
+        });
+      }
+    } catch (e) {
+      console.error('Error auto-reviewing story', e);
+    }
+  }
+
+  let isAutoPublished = false;
   try {
-    // If user with this email is banned, reject the story
-    const maybeUser = await userRepository.findOneBy({
-      email: story.storytellerEmail ?? '',
-    });
-    const isUserBanned = maybeUser?.isBanned ?? false;
-    if (isUserBanned) {
+    const { ruleProbabilities } = await evaluateStory(story);
+    if (
+      !hasSubmittedBefore &&
+      !isUserBanned &&
+      story.recaptchaScore >= MIN_RECAPTCHA_SCORE_TO_AUTO_PUBLISH &&
+      combine(ruleProbabilities).approve
+    ) {
       await StoryRepository().update(story.id, {
-        state: StoryState.REJECTED,
+        state: StoryState.PUBLISHED,
         lastReviewer: 'system',
       });
+      isAutoPublished = true;
     }
   } catch (e) {
-    console.error('Error auto-reviewing story', e);
+    console.error('Error evaluating story with AI moderation', e);
   }
 
   try {
-    await evaluateStory(story);
+    if (isAutoPublished) {
+      await sendAutoPublishedEmail(story);
+    } else if (hasSubmittedBefore) {
+      await sendSubmittedAgainEmail(story);
+    } else {
+      await sendSubmittedEmail(story);
+    }
   } catch (e) {
-    console.error('Error evaluating story with AI moderation', e);
+    console.error('Error sending story submitted email', e);
   }
 }
 

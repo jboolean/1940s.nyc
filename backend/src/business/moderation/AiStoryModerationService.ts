@@ -6,14 +6,20 @@ import {
   buildState,
   combine,
   AiModerationFlag,
+  AiStoryModerationScore,
 } from './moderationRules';
 
 const MODEL = 'typesafe/jev-1.13';
 
-const client = new OpenRouter({ apiKey: process.env.OPENROUTER_SK });
+const client = new OpenRouter({
+  apiKey: process.env.OPENROUTER_SK,
+  timeoutMs: 5000,
+});
 const questions = buildNoulQuestions();
 
-export async function evaluateStory(story: Story): Promise<void> {
+export async function evaluateStory(
+  story: Story
+): Promise<AiStoryModerationScore> {
   const response = await client.alpha.decisions.create({
     decisionsRequest: {
       model: MODEL,
@@ -36,13 +42,15 @@ export async function evaluateStory(story: Story): Promise<void> {
 
   const { approveProbability } = combine(ruleProbabilities);
 
-  await StoryRepository().update(story.id, {
-    aiModerationScore: {
-      model: response.model ?? MODEL,
-      evaluatedAt: new Date().toISOString(),
-      costUsd: response.usage.cost ?? null,
-      approveProbability,
-      ruleProbabilities,
-    },
-  });
+  const score: AiStoryModerationScore = {
+    model: response.model ?? MODEL,
+    evaluatedAt: new Date().toISOString(),
+    costUsd: response.usage.cost ?? null,
+    approveProbability,
+    ruleProbabilities,
+  };
+
+  await StoryRepository().update(story.id, { aiModerationScore: score });
+
+  return score;
 }
