@@ -1,3 +1,4 @@
+import axios from 'axios';
 import create from 'zustand';
 import { immer } from 'zustand/middleware/immer';
 
@@ -21,6 +22,8 @@ interface State {
   correctedLng: number | null;
   correctedLat: number | null;
   correctedAddress: string | null;
+  isSubmitting: boolean;
+  errorMessage: string | null;
 }
 
 interface ComputedState {
@@ -58,6 +61,8 @@ const useCorrectionsStore = create(
     correctedLat: null,
     correctedAddress: null,
     correctionType: null,
+    isSubmitting: false,
+    errorMessage: null,
 
     initialize: (photo: string) => {
       set((draft) => {
@@ -71,6 +76,8 @@ const useCorrectionsStore = create(
         draft.correctedLat = null;
         draft.correctedAddress = null;
         draft.correctionType = null;
+        draft.isSubmitting = false;
+        draft.errorMessage = null;
       });
 
       useLoginStore.getState().initialize();
@@ -154,6 +161,7 @@ const useCorrectionsStore = create(
     setCorrectedAddress: (address: string | null) => {
       set((draft) => {
         draft.correctedAddress = address;
+        draft.errorMessage = null;
       });
     },
 
@@ -174,16 +182,40 @@ const useCorrectionsStore = create(
 
       const photos = [photoId, ...alternates];
 
-      if (
-        correctionType === 'geocode' &&
-        typeof correctedLng === 'number' &&
-        typeof correctedLat === 'number'
-      ) {
-        await createGeocodeCorrection(photos, correctedLat, correctedLng);
-      }
+      set((draft) => {
+        draft.isSubmitting = true;
+        draft.errorMessage = null;
+      });
 
-      if (correctionType === 'address' && correctedAddress !== null) {
-        await createAddressCorrection(photos, correctedAddress);
+      try {
+        if (
+          correctionType === 'geocode' &&
+          typeof correctedLng === 'number' &&
+          typeof correctedLat === 'number'
+        ) {
+          await createGeocodeCorrection(photos, correctedLat, correctedLng);
+        }
+
+        if (correctionType === 'address' && correctedAddress !== null) {
+          await createAddressCorrection(photos, correctedAddress);
+        }
+      } catch (err) {
+        const serverMessage =
+          axios.isAxiosError<{ error?: string }>(err) &&
+          err.response?.status === 400
+            ? err.response.data?.error
+            : undefined;
+
+        set((draft) => {
+          draft.errorMessage =
+            serverMessage ??
+            'Something went wrong submitting your correction. Please try again.';
+        });
+        return;
+      } finally {
+        set((draft) => {
+          draft.isSubmitting = false;
+        });
       }
 
       set((draft) => {
