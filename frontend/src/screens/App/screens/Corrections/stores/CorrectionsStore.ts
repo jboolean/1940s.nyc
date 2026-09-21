@@ -200,11 +200,16 @@ const useCorrectionsStore = create(
           await createAddressCorrection(photos, correctedAddress);
         }
       } catch (err) {
+        const serverMessage =
+          axios.isAxiosError<{ error?: string }>(err) &&
+          err.response?.status === 400
+            ? err.response.data?.error
+            : undefined;
+
         set((draft) => {
           draft.errorMessage =
-            axios.isAxiosError(err) && err.response?.status === 400
-              ? "That doesn't look like a street address. Please enter only the house number and street, for example \u20181489 Broadway\u2019."
-              : 'Something went wrong submitting your correction. Please try again.';
+            serverMessage ??
+            'Something went wrong submitting your correction. Please try again.';
         });
         return;
       } finally {

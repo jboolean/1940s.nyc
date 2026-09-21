@@ -76,7 +76,7 @@ export class CorrectionsController {
 
     if (!(await isValidStreetAddress(address))) {
       throw new BadRequest(
-        'Enter only the house number and street, with nothing else'
+        'That does not look like a street address. Please enter only the house number and street, for example \u20181489 Broadway\u2019.'
       );
     }
 
