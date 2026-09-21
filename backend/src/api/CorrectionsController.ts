@@ -1,7 +1,8 @@
 import { Body, Post, Request, Route, Security } from '@tsoa/runtime';
 import * as express from 'express';
-import { Forbidden } from 'http-errors';
+import { BadRequest, Forbidden } from 'http-errors';
 import { AppDataSource } from '../createConnection';
+import { isValidStreetAddress } from '../business/corrections/AddressValidationService';
 import * as UserService from '../business/users/UserService';
 import AddressCorrection from '../entities/AddressCorrection';
 import GeocodeCorrection from '../entities/GeocodeCorrection';
@@ -72,6 +73,12 @@ export class CorrectionsController {
     const { photos, address } = correctionRequest;
 
     const userId = await getUserIdFromRequestForCorrection(req);
+
+    if (!(await isValidStreetAddress(address))) {
+      throw new BadRequest(
+        'Enter only the house number and street, with nothing else'
+      );
+    }
 
     const correctionsRepository =
       AppDataSource.getRepository(AddressCorrection);
