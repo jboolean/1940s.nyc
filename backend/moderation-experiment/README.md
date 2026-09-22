@@ -14,17 +14,9 @@ The tool scores a story two ways, against the same rules.
 
 Both backends read their rules and prompt text from [`rules.ts`](./rules.ts). That is the only file that holds prompt content. The moderator files (`moderators/jevModerator.ts` and `moderators/llmModerator.ts`) only handle the API call and response parsing. Edit the rule instructions, criteria, or the reject threshold in `rules.ts`, and both backends pick up the change.
 
+`rules.ts` is a hand-synced copy of the production rules in `../src/business/moderation/moderationRules.ts`, so that tuning here does not change the live site on its own. Once a change proves out, copy it across and set `MIN_REJECT_PROBABILITY` to match `REJECT_THRESHOLD`.
+
 Both backends use the official [`@openrouter/sdk`](https://www.npmjs.com/package/@openrouter/sdk) package, not raw HTTP calls, so requests and responses are typed and validated.
-
-## How to word a rule
-
-Write each rule as a statement about the submission, not as an instruction to a moderator. Say "this submission is an advertisement," never "this submission should be rejected because it is an advertisement." Approve and reject are this app's concepts. Jev does not know them. It is only asked how likely the statement is to be true, and the backend decides what to do with the answer.
-
-Within a rule, put every case that makes it true first, then every case that makes it false. Do not alternate.
-
-Both conventions were measured against 300 real stories. Together they took the auto-approve rate from 112 of 150 to 127 of 150 at the same rate of letting bad stories through.
-
-`rules.ts` is a copy of the production rules in `src/business/moderation/moderationRules.ts`, kept in sync by hand. That is on purpose: tuning here should not silently change what the live site does. When a change here proves out, copy it across and move `MIN_REJECT_PROBABILITY` to match `REJECT_THRESHOLD`.
 
 ## Running it
 

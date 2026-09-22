@@ -4,11 +4,9 @@ import { RuleKey } from './types';
  * THE PROMPT.
  *
  * Each entry is a yes/no ("noul") question about a property of the
- * submission. Keep approve/reject vocabulary out of these strings, and put
- * every true case before every false case -- see README.md, "How to word a
- * rule". Edit instructions/criteria here to iterate; both
+ * submission. Edit instructions/criteria here to iterate -- both
  * moderators/jevModerator.ts and moderators/llmModerator.ts read this same
- * definition.
+ * definition, so a change here changes both backends identically.
  *
  * Combine logic: reject if ANY rule's probability >= REJECT_THRESHOLD.
  * approveProbability = 1 - max(rule probabilities).
@@ -16,8 +14,7 @@ import { RuleKey } from './types';
  * Mirrors src/business/moderation/moderationRules.ts. Keep both in sync.
  */
 // Below neutral (0.5) on purpose: false-approves are costly, false-rejects
-// just go to human review. Flat from ~0.26 to ~0.42 on the balanced 300-story
-// sample; re-sweep with the viewer's threshold tab.
+// just go to human review. Re-sweep with the viewer's threshold tab.
 export const REJECT_THRESHOLD = 0.3;
 
 export interface RuleDefinition {

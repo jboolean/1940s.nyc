@@ -24,12 +24,9 @@ export interface RuleDefinition {
  * THE PROMPT.
  *
  * Each entry is a yes/no ("noul") question about a property of the
- * submission. Keep approve/reject vocabulary out of these strings, and put
- * every true case before every false case -- see moderation-experiment's
- * README, "How to word a rule".
+ * submission.
  *
- * Mirrors moderation-experiment/rules.ts, where changes are measured before
- * they land here. Keep both in sync.
+ * Mirrors moderation-experiment/rules.ts. Keep both in sync.
  */
 export const RULES: Record<AiModerationFlag, RuleDefinition> = {
   linkOrAd: {
