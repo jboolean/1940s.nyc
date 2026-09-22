@@ -14,6 +14,8 @@ The tool scores a story two ways, against the same rules.
 
 Both backends read their rules and prompt text from [`rules.ts`](./rules.ts). That is the only file that holds prompt content. The moderator files (`moderators/jevModerator.ts` and `moderators/llmModerator.ts`) only handle the API call and response parsing. Edit the rule instructions, criteria, or the reject threshold in `rules.ts`, and both backends pick up the change.
 
+`rules.ts` is a hand-synced copy of the production rules in `../src/business/moderation/moderationRules.ts`, so that tuning here does not change the live site on its own. Once a change proves out, copy it across and set `MIN_REJECT_PROBABILITY` to match `REJECT_THRESHOLD`.
+
 Both backends use the official [`@openrouter/sdk`](https://www.npmjs.com/package/@openrouter/sdk) package, not raw HTTP calls, so requests and responses are typed and validated.
 
 ## Running it
