@@ -20,14 +20,6 @@ export interface RuleDefinition {
   criteria: { true: string; false: string };
 }
 
-/**
- * THE PROMPT.
- *
- * Each entry is a yes/no ("noul") question about a property of the
- * submission.
- *
- * Mirrors moderation-experiment/rules.ts. Keep both in sync.
- */
 export const RULES: Record<AiModerationFlag, RuleDefinition> = {
   linkOrAd: {
     instructions:
