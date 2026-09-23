@@ -3,7 +3,13 @@ import ReviewQueueStaleTemplate from '../business/email/templates/StoriesReviewQ
 import StoryState from '../enum/StoryState';
 import StoryRepository from '../repositories/StoryRepository';
 
-const STALENESS_THRESHOLD_MS = 1000 * 60 * 60 * 24 * 2;
+const ONE_DAY_MS = 1000 * 60 * 60 * 24;
+
+// Stories should be reviewed within two days of submission.
+const SLO_THRESHOLD_MS = ONE_DAY_MS * 2;
+
+// Warn a day before the SLO is missed so moderators have time to act.
+const WARNING_THRESHOLD_MS = SLO_THRESHOLD_MS - ONE_DAY_MS;
 
 function forgeReviewStoriesUrl(): string {
   const storyEditUrl: URL = new URL(
@@ -24,19 +30,23 @@ async function getReviewerStats(): Promise<
   return stats;
 }
 
-export default async function checkStaleStories(): Promise<void> {
-  const hasStaleStories =
-    (await StoryRepository()
-      .createQueryBuilder('story')
-      .where({ state: StoryState.SUBMITTED })
-      .andWhere('story.updated_at < :stalenessThreshold', {
-        stalenessThreshold: new Date(Date.now() - STALENESS_THRESHOLD_MS),
-      })
-      .orderBy('story.updated_at', 'ASC')
-      .getCount()) > 0;
+// How long the story at the head of the review queue has been waiting, or 0
+// when the queue is empty.
+async function getLongestWaitMs(): Promise<number> {
+  const oldestStory = await StoryRepository()
+    .createQueryBuilder('story')
+    .where({ state: StoryState.SUBMITTED })
+    .orderBy('story.updated_at', 'ASC')
+    .getOne();
 
-  if (!hasStaleStories) {
-    console.log('No stale stories found');
+  return oldestStory ? Date.now() - oldestStory.updatedAt.getTime() : 0;
+}
+
+export default async function checkStaleStories(): Promise<void> {
+  const longestWaitMs = await getLongestWaitMs();
+
+  if (longestWaitMs < WARNING_THRESHOLD_MS) {
+    console.log('No stories approaching the review SLO');
     return;
   }
 
@@ -51,6 +61,7 @@ export default async function checkStaleStories(): Promise<void> {
       reviewStoriesUrl,
       storiesCount,
       stats,
+      isApproachingSlo: longestWaitMs < SLO_THRESHOLD_MS,
     },
     metadata: {},
     to: process.env.MODERATORS_TO_EMAIL ?? '',
