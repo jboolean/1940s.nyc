@@ -33,7 +33,7 @@
     "history": "^5.3.0",
     "immer": "^9.0.16",
     "lodash": "^4.18.1",
-    "maplibre-gl": "^5.6.2",
+    "maplibre-gl": "^6.4.1",
     "netlify-identity-widget": "^1.9.2",
     "normalize.css": "^8.0.1",
     "pmtiles": "^4.3.0",
