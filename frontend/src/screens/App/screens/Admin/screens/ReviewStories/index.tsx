@@ -23,6 +23,17 @@ const labelByAiModerationFlag: Record<AiModerationFlag, string> = {
   trolling: 'Trolling',
 };
 
+function RecommendedDot(): JSX.Element {
+  return (
+    <span
+      className={stylesheet.recommendedDot}
+      role="img"
+      aria-label="Recommended"
+      title="Recommended"
+    />
+  );
+}
+
 function StoryMetadataView({ story }: { story: AdminStory }): JSX.Element {
   return (
     <div className={stylesheet.metadata}>
@@ -136,21 +147,19 @@ export default function ReviewStories(): JSX.Element {
                 <Button
                   onClick={() => reviewStoriesStore.approveStory(story.id)}
                   buttonStyle={'primary'}
-                  className={classNames({
-                    [stylesheet.recommended]:
-                      story.recommendedAction === 'approve',
-                  })}
                 >
+                  {story.recommendedAction === 'approve' ? (
+                    <RecommendedDot />
+                  ) : null}
                   Approve
                 </Button>
                 <Button
                   onClick={() => reviewStoriesStore.rejectStory(story.id)}
                   buttonStyle={'secondary'}
-                  className={classNames({
-                    [stylesheet.recommended]:
-                      story.recommendedAction === 'reject',
-                  })}
                 >
+                  {story.recommendedAction === 'reject' ? (
+                    <RecommendedDot />
+                  ) : null}
                   Reject
                 </Button>
               </div>
