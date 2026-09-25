@@ -6,14 +6,17 @@ export type AiModerationFlag =
   | 'offensive'
   | 'trolling';
 
-// Below neutral (0.5) on purpose: auto-publishing something a human would
-// have rejected is costly, while a false reject just waits for review.
+// Below 0.5 because a false approve is costlier than a false reject.
 // Re-tune with moderation-experiment.
 export const MIN_REJECT_PROBABILITY = 0.3;
 
-// Separate, higher bar for showing a flag badge on the admin review screen.
-// Advisory only -- it never auto-publishes or auto-rejects anything.
+// Higher bar for flagging a story and recommending rejection. Stories between
+// the two thresholds get no recommendation.
 export const MIN_FLAG_PROBABILITY = 0.5;
+
+export const MIN_RECAPTCHA_SCORE_TO_APPROVE = 0.7;
+
+export type RecommendedAction = 'approve' | 'reject';
 
 export interface RuleDefinition {
   instructions: string;
@@ -98,6 +101,23 @@ export function getExceededAiModerationFlags(
   return RULE_KEYS.filter(
     (key) => ruleProbabilities[key] >= MIN_FLAG_PROBABILITY
   );
+}
+
+export function getRecommendedAction(
+  score: AiStoryModerationScore | null,
+  recaptchaScore: number
+): RecommendedAction | null {
+  if (!score) return null;
+  if (getExceededAiModerationFlags(score.ruleProbabilities).length > 0) {
+    return 'reject';
+  }
+  if (
+    combine(score.ruleProbabilities).approve &&
+    recaptchaScore >= MIN_RECAPTCHA_SCORE_TO_APPROVE
+  ) {
+    return 'approve';
+  }
+  return null;
 }
 
 export function buildNoulQuestions(): Record<

@@ -14,15 +14,10 @@ import {
 } from './sampling';
 import { Moderator, RuleKey, SampledStory } from './types';
 
-// Measured from process start (node boot + this module's own require()
-// graph -- @openrouter/sdk, typeorm, all entities -- finishing). Does NOT
-// include run.sh's SSM credential resolution or the tsc build step, both of
-// which happen before this process even starts.
+// Time from process start until this module's imports finish loading.
 const STARTUP_MS = Math.round(performance.now());
 
-// process.cwd(), not __dirname: run.sh always cds to backend/ before
-// running this, but this file itself runs from .build/moderation-experiment
-// (compiled output), where __dirname would point to the wrong place.
+// run.sh runs this from backend/; __dirname would point into .build/.
 const EXPERIMENT_DIR = path.join(process.cwd(), 'moderation-experiment');
 const CACHE_DIR = path.join(EXPERIMENT_DIR, '.cache');
 const RESULTS_DIR = path.join(EXPERIMENT_DIR, 'results');
@@ -140,9 +135,7 @@ interface ScoredStory {
   id: number;
   humanLabel: 'approved' | 'rejected';
   reviewedAt: string;
-  // Omitted entirely for holdout runs -- see `redactContent` below. Never
-  // written to results/ or printed for holdout so there's no way to
-  // accidentally read what you're supposed to be holding out.
+  // Omitted for holdout runs so the holdout content is never read.
   title?: string | null;
   textContent?: string;
   modelLabel?: 'approved' | 'rejected';
@@ -252,14 +245,10 @@ function summarize(scored: ScoredStory[]): Summary {
 }
 
 function formatCostUsd(cost: number): string {
-  // Costs per story are tiny (fractions of a cent); show enough precision to
-  // be meaningful instead of rounding everything to "$0.00".
   return `$${cost.toFixed(cost < 0.01 ? 6 : 2)}`;
 }
 
-// approveProbability is 1 - max(rule probabilities): whichever single rule
-// scored highest is the one that drove the decision. Surface that rule so a
-// mismatch is explainable at a glance, not just a bare number.
+// The highest-scoring rule is the one that decided the outcome.
 function topRule(ruleProbabilities?: Record<RuleKey, number>): string {
   if (!ruleProbabilities) return '—';
   const entries = Object.entries(ruleProbabilities) as [RuleKey, number][];
@@ -382,10 +371,6 @@ async function main(): Promise<void> {
 
   if (args.holdout) {
     label = 'holdout';
-    // Bounded by --sample-size by default, same as a working run -- the
-    // holdout pool only grows over time (it's ~20% of every eligible story
-    // ever), so "the whole pool" is an unbounded, ever-growing request
-    // unless you explicitly ask for it with --full.
     sample = args.full
       ? pools.holdout
       : drawSample(pools.holdout, args.sampleSize);
@@ -402,14 +387,11 @@ async function main(): Promise<void> {
   } else {
     label = 'working';
     if (args.full) {
-      // Whole pool at its real (unbalanced) class mix, unlike drawSample's
-      // balanced draw -- checks real-world accuracy without touching holdout.
       sample = pools.working;
       console.log(
         `Evaluating the FULL working pool (${sample.length} stories, natural class balance).`
       );
     } else if (args.natural) {
-      // Cheap stand-in for --full: same ratio, capped at --sample-size.
       sample = drawNaturalSample(pools.working, args.sampleSize);
       console.log(
         `Drew a natural-ratio sample (${sample.length} stories, real-world approve/reject mix).`
@@ -490,10 +472,7 @@ async function main(): Promise<void> {
   );
 }
 
-// TypeORM's pg pool keeps sockets open, which keeps the event loop (and this
-// process) alive indefinitely otherwise -- Node was sitting idle for ~10s
-// after the last log line waiting for those sockets to time out on their
-// own before this fix.
+// The pg pool's open sockets otherwise keep the process alive.
 async function closeDb(): Promise<void> {
   if (AppDataSource.isInitialized) await AppDataSource.destroy();
 }

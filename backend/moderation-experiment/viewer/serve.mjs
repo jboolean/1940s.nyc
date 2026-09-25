@@ -1,10 +1,6 @@
-// Zero-dependency static file server for viewing moderation experiment
-// results locally, and for triggering runs from the browser. Binds to
-// localhost only. Never publish this or its output anywhere else --
-// results contain real story text (sometimes offensive/sexual content per
-// the moderation rules being tested) and storyteller names. Triggering a
-// run from here makes real, billed OpenRouter calls and reads production
-// data, exactly like running `npm run experiment` yourself.
+// Local-only server for viewing experiment results and triggering runs.
+// Results contain real story text and storyteller names, and runs make
+// billed OpenRouter calls against production data.
 import { spawn } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
 import { readFile, readdir } from 'node:fs/promises';
@@ -21,8 +17,7 @@ const PORT = process.env.PORT ? Number(process.env.PORT) : 4500;
 const SAFE_FILENAME = /^[a-zA-Z0-9._-]+\.json$/;
 const SAFE_MODEL = /^[a-zA-Z0-9._/:-]+$/;
 
-// Only one run at a time -- this is a single-user local tool, and letting
-// two runs share the same sample-cache file would be confusing at best.
+// One run at a time, since runs share the sample cache file.
 let activeRun = null; // { id, logs: string[], exitCode: number|null, clients: Set<ServerResponse> }
 
 function broadcast(run, event) {

@@ -269,9 +269,7 @@ async function loadRunList(preferredFilename) {
     opt.textContent = f;
     select.appendChild(opt);
   }
-  // Filenames sort alphabetically, not chronologically ("*-latest.json"
-  // does not reliably land first) -- prefer an exact filename the caller
-  // knows is correct (e.g. the run that was just triggered) over guessing.
+  // Filenames don't sort chronologically, so prefer an exact filename.
   const toSelect = preferredFilename && files.includes(preferredFilename) ? preferredFilename : files[0];
   select.value = toSelect;
   await loadRun(toSelect);
@@ -477,9 +475,7 @@ async function startExperimentRun() {
   source.onmessage = (event) => {
     const msg = JSON.parse(event.data);
     if (msg.type === 'output') {
-      // Buffered but not shown -- if the run succeeds, the table below
-      // already carries this same information. Only surface it on failure,
-      // where there is no result file to show instead.
+      // Only shown on failure; on success the results table covers it.
       output += msg.text;
     } else if (msg.type === 'done') {
       button.disabled = false;
@@ -507,11 +503,8 @@ async function startExperimentRun() {
 
 document.getElementById('runButton').addEventListener('click', startExperimentRun);
 
-// --- Threshold chart -------------------------------------------------
-// Sweeps REJECT_THRESHOLD against the currently loaded run and plots
-// false-approve rate and % auto-approved, so you can see the tradeoff
-// without a separate generation step -- it's the same data already
-// loaded for the mismatches table above.
+// Plots false-approve rate and % auto-approved across REJECT_THRESHOLD
+// values for the loaded run.
 
 document.getElementById('tabMismatches').addEventListener('click', () => switchTab('mismatches'));
 document.getElementById('tabThreshold').addEventListener('click', () => switchTab('threshold'));

@@ -1,4 +1,7 @@
-import { AiModerationFlag } from '../../business/moderation/moderationRules';
+import {
+  AiModerationFlag,
+  RecommendedAction,
+} from '../../business/moderation/moderationRules';
 import LngLat from '../../enum/LngLat';
 import StoryState from '../../enum/StoryState';
 import StoryType from '../../enum/StoryType';
@@ -25,23 +28,16 @@ type AdminFields = {
   title?: string;
   emailBounced: boolean;
   moderationFlags: AiModerationFlag[];
+  recommendedAction: RecommendedAction | null;
 };
 
-// Can never be set by user
-// type NonUserSettableFields = 'id' | 'createdAt';
-
-// some fields are optional when it's a draft
+// Optional while the story is a draft
 type DraftOptionalFields =
   | 'storytellerEmail'
   | 'storytellerName'
   | 'storytellerSubtitle';
 
 type NonPublicFields = 'storytellerEmail';
-
-// type StoryDraftRequest = Optional<
-//   Omit<StoryApiModel, NonUserSettableFields>,
-//   DraftOptionalFields
-// >;
 
 type StoryDraftRequest = {
   storyType: StoryType;

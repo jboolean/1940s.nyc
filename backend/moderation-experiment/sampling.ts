@@ -10,9 +10,7 @@ import Story from '../src/entities/Story';
 import StoryState from '../src/enum/StoryState';
 import { HumanLabel, SampledStory } from './types';
 
-// Fixed so the holdout split is stable/reproducible across runs and across
-// time (new stories fall deterministically into working or holdout based on
-// id alone) without needing to persist any state.
+// Keeps each story's holdout assignment stable across runs.
 const HOLDOUT_SALT = 'fourtiesnyc-moderation-holdout-v1';
 const HOLDOUT_PERCENT = 20;
 
@@ -30,12 +28,8 @@ function toHumanLabel(state: StoryState): HumanLabel | null {
   return null;
 }
 
-// "system" means an automated rejection (e.g. spam/bot filtering), not an
-// actual human moderation decision -- including these would corrupt the
-// ground truth this whole tool scores against. Checked in JS rather than
-// added to the SQL WHERE clause: TypeORM's Not('system') becomes SQL
-// `<> 'system'`, which under three-valued logic also silently drops NULL
-// last_reviewer rows -- not what was asked for.
+// Automated decisions aren't ground truth. Filtered in JS because
+// `last_reviewer <> 'system'` in SQL would also drop NULL reviewers.
 const AUTOMATED_REVIEWER = 'system';
 
 function toSampledStory(story: Story): SampledStory | null {
@@ -75,7 +69,6 @@ export function filterRecent(
 export async function loadEligiblePools(): Promise<EligiblePools> {
   await createConnectionIfNotExists();
 
-  // Read-only: a plain `find` (SELECT), no writes anywhere in this tool.
   const stories = await AppDataSource.getRepository(Story).find({
     where: { state: In([StoryState.PUBLISHED, StoryState.REJECTED]) },
   });

@@ -56,4 +56,5 @@ export type AdminStory = Story & {
   title?: string;
   emailBounced: boolean;
   moderationFlags: AiModerationFlag[];
+  recommendedAction: 'approve' | 'reject' | null;
 };

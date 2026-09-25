@@ -1,20 +1,13 @@
 import { RuleKey } from './types';
 
 /**
- * THE PROMPT.
- *
- * Each entry is a yes/no ("noul") question about a property of the
- * submission. Edit instructions/criteria here to iterate -- both
- * moderators/jevModerator.ts and moderators/llmModerator.ts read this same
- * definition, so a change here changes both backends identically.
- *
- * Combine logic: reject if ANY rule's probability >= REJECT_THRESHOLD.
- * approveProbability = 1 - max(rule probabilities).
+ * The moderation prompt: one yes/no ("noul") question per rule, shared by
+ * both moderators. A story is rejected if any rule's probability reaches
+ * REJECT_THRESHOLD.
  *
  * Mirrors src/business/moderation/moderationRules.ts. Keep both in sync.
  */
-// Below neutral (0.5) on purpose: false-approves are costly, false-rejects
-// just go to human review. Re-sweep with the viewer's threshold tab.
+// Below 0.5 because a false approve is costlier than a false reject.
 export const REJECT_THRESHOLD = 0.3;
 
 export interface RuleDefinition {
@@ -170,9 +163,8 @@ export function buildState(input: {
   storytellerSubtitle: string | null;
   textContent: string;
 }): Record<string, unknown> {
-  // Excludes storytellerEmail (PII, not relevant here). Excludes title too:
-  // it's an AI-generated summary of textContent (src/cron/generateStoryTitles.ts),
-  // not something a human moderator saw, and adds no information of its own.
+  // Title is omitted: it's generated from textContent and moderators never
+  // see it.
   return {
     storyType: input.storyType,
     storytellerName: input.storytellerName,
