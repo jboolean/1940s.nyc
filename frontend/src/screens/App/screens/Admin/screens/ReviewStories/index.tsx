@@ -136,12 +136,20 @@ export default function ReviewStories(): JSX.Element {
                 <Button
                   onClick={() => reviewStoriesStore.approveStory(story.id)}
                   buttonStyle={'primary'}
+                  className={classNames({
+                    [stylesheet.recommended]:
+                      story.recommendedAction === 'approve',
+                  })}
                 >
                   Approve
                 </Button>
                 <Button
                   onClick={() => reviewStoriesStore.rejectStory(story.id)}
                   buttonStyle={'secondary'}
+                  className={classNames({
+                    [stylesheet.recommended]:
+                      story.recommendedAction === 'reject',
+                  })}
                 >
                   Reject
                 </Button>
