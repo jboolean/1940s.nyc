@@ -1,7 +1,7 @@
 import MerchInternalVariant from '../../enum/MerchInternalVariant';
 import absurd from '../utils/absurd';
 import { getPrintfileDirectUrl } from '../utils/printfileUtils';
-import { CatalogItem as PrintfulCatalogItem } from '../utils/printfulApi';
+import { CatalogItemWritable as PrintfulCatalogItemWritable } from '../utils/printfulApi';
 
 const INTERNAL_VARIANT_TO_PRINTFUL_VARIANT: Record<
   MerchInternalVariant,
@@ -13,7 +13,7 @@ const INTERNAL_VARIANT_TO_PRINTFUL_VARIANT: Record<
 export function makePrintfulItem(
   customMerchItemId: number,
   internalVariant: MerchInternalVariant
-): PrintfulCatalogItem {
+): PrintfulCatalogItemWritable {
   const printfulVariantId =
     INTERNAL_VARIANT_TO_PRINTFUL_VARIANT[internalVariant];
   switch (internalVariant) {

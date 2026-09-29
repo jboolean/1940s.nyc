@@ -1,5 +1,5 @@
 import isProduction from '../utils/isProduction';
-import { createWebhook, EventConfigurationRequest } from '../utils/printfulApi';
+import { createWebhook } from '../utils/printfulApi';
 
 // Webhooks are only in production, so safe to hardcode
 const API_BASE = 'https://api.1940s.nyc';
@@ -23,7 +23,7 @@ export default async function registerPrintfulWebhooks(): Promise<void> {
       default_url: `${API_BASE}/printful-webhooks`,
       events: INTERESTED_EVENTS.map((type) => ({
         type: type,
-      })) as EventConfigurationRequest[],
+      })),
     },
   });
 }
