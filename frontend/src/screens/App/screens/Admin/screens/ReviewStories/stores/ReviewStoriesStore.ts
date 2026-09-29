@@ -30,7 +30,7 @@ const useReviewStoriesStore = create(
         set((state) => {
           state.stories = stories;
         });
-      } catch (e) {
+      } catch {
         set((state) => {
           state.error = true;
         });
