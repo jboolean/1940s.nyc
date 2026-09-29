@@ -23,9 +23,6 @@ module.exports = merge(common, {
     new webpack.DefinePlugin({
       __DEV__: true,
       __API_BASE__: JSON.stringify(process.env.API_BASE || 'http://dev.1940s.nyc:3000'),
-      __STRIPE_PK__: JSON.stringify(
-        'pk_test_51HHaB6FCLBtNZLVl2eku10yXOnLMuYmiXDmK2iMo562DrZePotrkn49Acj7AINohiWzuUrgIp4OUDPRkbuvolmPo00x1AHBQLy'
-      ),
       __RECAPTCHA_PK__: JSON.stringify(RECAPTCHA_SITE_KEY_DEV),
       __DEPLOY_ENV__: JSON.stringify('dev'),
       __GIT_SHA__: JSON.stringify('dev'),

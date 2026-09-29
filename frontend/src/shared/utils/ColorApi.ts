@@ -1,5 +1,4 @@
 import api from 'utils/api';
-import getStripe from 'utils/getStripe';
 
 export async function redirectToCheckout(
   quantity: number,
@@ -8,8 +7,7 @@ export async function redirectToCheckout(
   const successUrl = `${window.location.protocol}//${window.location.host}${window.location.pathname}?noWelcome=&creditPurchaseSuccess=&quantity=${quantity}&unitPrice=${unitPriceForAnalytics}${window.location.hash}`;
   const cancelUrl = `${window.location.protocol}//${window.location.host}${window.location.pathname}?noWelcome=${window.location.hash}`;
 
-  const stripe = await getStripe();
-  const sessionResp = await api.post<{ sessionId: string }>(
+  const sessionResp = await api.post<{ sessionId: string; url: string }>(
     '/colorization/billing/buy-credits/sessions',
     {
       quantity,
@@ -18,13 +16,8 @@ export async function redirectToCheckout(
     },
     { timeout: 5000 }
   );
-  const { sessionId } = sessionResp.data;
-  const { error } = await stripe.redirectToCheckout({ sessionId });
-  if (error) {
-    console.warn(error);
-    // eslint-disable-next-line @typescript-eslint/only-throw-error
-    throw error;
-  }
+  const { url } = sessionResp.data;
+  window.location.href = url;
 }
 
 export async function getBalance(): Promise<number> {
