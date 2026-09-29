@@ -63,7 +63,7 @@ export async function cropVideoFrame(input: SharpInput): Promise<Buffer> {
 
   // Apply light trim on portrait photos to cut down borders as the crop is imperfect
   if (portrait) {
-    sharpForOutput = sharp(await sharpForOutput.toBuffer()).trim(20);
+    sharpForOutput = sharp(await sharpForOutput.toBuffer()).trim({ threshold: 20 });
   }
 
   return sharpForOutput.toBuffer();
