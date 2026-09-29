@@ -1,6 +1,6 @@
-import create from 'zustand';
+import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
-import { persist } from 'zustand/middleware';
+import { createJSONStorage, persist } from 'zustand/middleware';
 
 import netlifyIdentity, { User } from 'netlify-identity-widget';
 import pick from 'lodash/pick';
@@ -40,7 +40,7 @@ const useAuthStore = create(
     // persists the returnToRoute to local storage, so that we may return after login
     {
       name: 'auth',
-      getStorage: () => localStorage,
+      storage: createJSONStorage(() => localStorage),
       partialize: (state) => pick(state, 'returnToRoute'),
     }
   )

@@ -1,6 +1,7 @@
 import round from 'lodash/round';
 import * as maplibregl from 'maplibre-gl';
 import React from 'react';
+import { useShallow } from 'zustand/react/shallow';
 
 import useCorrectionsStore, {
   useCorrectionsStoreComputeds,
@@ -29,21 +30,23 @@ export default function LocationPickerModal(): JSX.Element {
     setCorrectedLngLat,
     photo,
   } = useCorrectionsStore(
-    ({
-      isMapOpen,
-      closeMap,
-      correctedLng,
-      correctedLat,
-      setCorrectedLngLat,
-      photo,
-    }) => ({
-      isMapOpen,
-      closeMap,
-      correctedLng,
-      correctedLat,
-      setCorrectedLngLat,
-      photo,
-    })
+    useShallow(
+      ({
+        isMapOpen,
+        closeMap,
+        correctedLng,
+        correctedLat,
+        setCorrectedLngLat,
+        photo,
+      }) => ({
+        isMapOpen,
+        closeMap,
+        correctedLng,
+        correctedLat,
+        setCorrectedLngLat,
+        photo,
+      })
+    )
   );
   const { previousLng, previousLat } = useCorrectionsStoreComputeds();
 

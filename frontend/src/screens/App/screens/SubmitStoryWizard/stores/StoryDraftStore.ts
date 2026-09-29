@@ -2,7 +2,7 @@ import { isNil, pick } from 'lodash';
 import useFeatureFlagsStore from 'screens/App/shared/stores/FeatureFlagsStore';
 import FeatureFlag from 'screens/App/shared/types/FeatureFlag';
 import { executeRecaptcha } from 'shared/utils/grecaptcha';
-import create from 'zustand';
+import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
 
 import {

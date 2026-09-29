@@ -2,8 +2,8 @@ import { Draft } from 'immer';
 import pick from 'lodash/pick';
 import useLoginStore from 'shared/stores/LoginStore';
 import recordEvent from 'shared/utils/recordEvent';
-import create from 'zustand';
-import { persist } from 'zustand/middleware';
+import { create } from 'zustand';
+import { createJSONStorage, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import redirectToCheckout from './redirectToCheckout';
 import redirectToCustomerPortal from './redirectToCustomerPortal';
@@ -183,7 +183,7 @@ const useTipJarStore = create(
     })),
     {
       name: 'tip-jar',
-      getStorage: () => localStorage,
+      storage: createJSONStorage(() => localStorage),
       partialize: (state) => pick(state, 'openedOn'),
     }
   )
