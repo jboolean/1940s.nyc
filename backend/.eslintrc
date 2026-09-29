@@ -5,9 +5,6 @@
   "env": {
     "node": true
   },
-  "parserOptions": {
-    "project": "./tsconfig.json"
-  },
   "ignorePatterns": [
     "src/third-party/*/client",
     "src/third-party/*/createClientConfig.ts"
