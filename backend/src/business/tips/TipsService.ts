@@ -38,7 +38,7 @@ export async function createTipCheckoutSession({
   user?: User;
   frequency: TipFrequency;
   gift?: GiftRegistry.Gift;
-}): Promise<string> {
+}): Promise<{ sessionId: string; url: string }> {
   const userId = user?.id;
   const stripeCustomerId: string | undefined =
     user?.stripeCustomerId ?? undefined;
@@ -118,7 +118,7 @@ export async function createTipCheckoutSession({
     undefined
   );
 
-  return session.id;
+  return { sessionId: session.id, url: session.url as string };
 }
 
 export async function createCustomerPortalSession(

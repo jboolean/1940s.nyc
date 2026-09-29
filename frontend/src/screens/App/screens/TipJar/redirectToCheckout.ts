@@ -1,5 +1,4 @@
 import api from 'utils/api';
-import getStripe from 'utils/getStripe';
 import Gift from './utils/Gift';
 import TipFrequency from './utils/TipFrequency';
 
@@ -18,16 +17,11 @@ export default async function redirectToCheckout(
     frequency,
     gift,
   };
-  const stripe = await getStripe();
-  const sessionResp = await api.post<{ sessionId: string }>(
+  const sessionResp = await api.post<{ sessionId: string; url: string }>(
     '/tips/session',
     options,
     { timeout: 5000 }
   );
-  const { sessionId } = sessionResp.data;
-  const { error } = await stripe.redirectToCheckout({ sessionId });
-  if (error) {
-    console.warn(error);
-    throw error;
-  }
+  const { url } = sessionResp.data;
+  window.location.href = url;
 }
