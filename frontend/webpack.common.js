@@ -27,7 +27,21 @@ module.exports = {
     }),
     new webpack.IgnorePlugin({ resourceRegExp: /^\.\/locale$/ }),
     new CopyPlugin({
-      patterns: [{ from: '_redirects' }, { from: 'terms.html' }],
+      patterns: [
+        { from: '_redirects' },
+        { from: 'terms.html' },
+        // Loaded at runtime by maplibre-gl via setWorkerUrl; the worker imports
+        // maplibre-gl-shared.mjs relative to itself, so both must sit together
+        // at the output root.
+        {
+          from: require.resolve('maplibre-gl/dist/maplibre-gl-worker.mjs'),
+          to: 'maplibre-gl-worker.mjs',
+        },
+        {
+          from: require.resolve('maplibre-gl/dist/maplibre-gl-shared.mjs'),
+          to: 'maplibre-gl-shared.mjs',
+        },
+      ],
     }),
     new ESLintPlugin({ fix: true, exclude: ['node_modules', '.yalc'] }),
   ],
@@ -98,6 +112,15 @@ module.exports = {
       },
     ],
   },
+  // maplibre-gl builds a worker URL with `new URL(variable, import.meta.url)`,
+  // which webpack cannot resolve statically. The expression is only evaluated
+  // for cross-origin worker URLs, and setWorkerUrl points at a same-origin one.
+  ignoreWarnings: [
+    {
+      module: /node_modules[\\/]maplibre-gl[\\/]/,
+      message: /Critical dependency: the request of a dependency is an expression/,
+    },
+  ],
   resolve: {
     extensions: ['.js', '.jsx', '.ts', '.tsx'],
     // directories named 'shared' will be resolved by lower modules, without ../../../.
