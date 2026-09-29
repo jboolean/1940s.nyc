@@ -14,5 +14,9 @@
     "experimentalDecorators": true,
     "module": "commonjs",
     "forceConsistentCasingInFileNames": true,
+    // @hey-api/openapi-ts ships declaration files that reference optional peer
+    // frameworks (Angular, Vue, Nuxt, ky, ofetch) and do not typecheck on their
+    // own. Only its runtime config types are imported here.
+    "skipLibCheck": true,
   }
 }

@@ -7,10 +7,8 @@ export default defineConfig({
   plugins: [
     {
       name: '@hey-api/client-axios',
-      bundle: false,
-      runtimeConfigPath: './createClientConfig.ts',
+      runtimeConfigPath: './createClientConfig',
     },
     { name: '@hey-api/sdk', asClass: false },
   ],
-  name: 'PrintfulClient',
 });
