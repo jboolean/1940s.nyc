@@ -35,7 +35,7 @@ export class TipsController {
   public async createTipSession(
     @Body() body: TipSessionRequest,
     @Request() req: express.Request
-  ): Promise<{ sessionId: string }> {
+  ): Promise<{ sessionId: string; url: string }> {
     const {
       amount,
       successUrl,
@@ -48,7 +48,7 @@ export class TipsController {
     const user = await UserService.getUser(userId);
 
     try {
-      const sessionId = await TipsService.createTipCheckoutSession({
+      return await TipsService.createTipCheckoutSession({
         amountMinorUnits: amount,
         successUrl,
         cancelUrl,
@@ -56,8 +56,6 @@ export class TipsController {
         frequency,
         gift,
       });
-
-      return { sessionId: sessionId };
     } catch (err) {
       if (err instanceof HttpError) {
         throw err;

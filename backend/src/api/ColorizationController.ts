@@ -78,7 +78,7 @@ export class ColorizationController extends Controller {
   public async createBuyCreditsSession(
     @Body() body: BuyCreditsSessionRequest,
     @Request() req: express.Request
-  ): Promise<{ sessionId: string }> {
+  ): Promise<{ sessionId: string; url: string }> {
     const { quantity, successUrl, cancelUrl } = body;
     const userId = await getUserFromRequestOrCreateAndSetCookie(req);
 
@@ -126,7 +126,7 @@ export class ColorizationController extends Controller {
         },
       });
 
-      return { sessionId: session.id };
+      return { sessionId: session.id, url: session.url as string };
     } catch (err) {
       console.error('Error creating Stripe session', err);
       throw err;
