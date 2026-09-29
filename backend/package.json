@@ -23,7 +23,7 @@
   "author": "Julian Boilen",
   "license": "ISC",
   "devDependencies": {
-    "@aws-sdk/client-s3": "^3.1045.0",
+    "@aws-sdk/client-s3": "^3.1053.0",
     "@hey-api/openapi-ts": "^0.64.1",
     "@sparticuz/chromium": "^149.0.0",
     "@tsoa/cli": "^4.1.3",
