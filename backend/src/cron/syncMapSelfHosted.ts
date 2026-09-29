@@ -27,7 +27,7 @@ export default async function syncMap(): Promise<void> {
 
   console.log('Generating PMTiles file...');
   // eslint-disable-next-line prettier/prettier
-  await using result = await tippecanoe(dataStream, {
+  using result = await tippecanoe(dataStream, {
     layer: 'photos-1940s',
     dropDensestAsNeeded: true,
     extendZoomsIfStillDropping: true,

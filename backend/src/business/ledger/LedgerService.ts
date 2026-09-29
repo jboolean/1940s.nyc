@@ -1,13 +1,8 @@
 import { TooManyRequests } from 'http-errors';
-import { MoreThan, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { AppDataSource } from '../../createConnection';
 import LedgerEntry from '../../entities/LedgerEntry';
 import LedgerEntryType from '../../enum/LedgerEntryType';
-
-const RATE_LIMIT_LOOKBACK = 24 * 60 * 60 * 1000; // 24 hours
-
-// We allow this much usage in the lookback window
-const MAX_LOOKBACK_USAGES = 1;
 
 const SINGLE_PHOTO_USAGE_AMOUNT_POSITIVE = 1;
 
@@ -42,23 +37,6 @@ async function hasEnoughBalance(
   return balance >= amountToConsume;
 }
 
-async function isRateLimitExceeded(
-  userId: number,
-  ledgerRepository: Repository<LedgerEntry>
-): Promise<boolean> {
-  const { recentUsageSum } = (await ledgerRepository
-    .createQueryBuilder('entry')
-    .select('SUM(-entry.amount)', 'recentUsageSum')
-    .where({
-      userId,
-      createdAt: MoreThan(new Date(Date.now() - RATE_LIMIT_LOOKBACK)),
-      type: LedgerEntryType.USAGE, // <- only looking at usages, not balance
-    })
-    .getRawOne<{ recentUsageSum: number }>()) ?? { recentUsageSum: 0 };
-
-  return recentUsageSum >= MAX_LOOKBACK_USAGES;
-}
-
 export class UsageCapError extends TooManyRequests {
   constructor() {
     super('Usage cap exceeded');
@@ -82,14 +60,12 @@ export async function withMeteredUsage<R>(
     const ledgerRepository =
       transactionalEntityManager.getRepository(LedgerEntry);
 
-    // Must have not exceeded the rate limit (regardless of balance) or have lifetime balance
-    const isAllowed =
-      !(await isRateLimitExceeded(userId, ledgerRepository)) ||
-      (await hasEnoughBalance(
-        userId,
-        SINGLE_PHOTO_USAGE_AMOUNT_POSITIVE,
-        ledgerRepository
-      ));
+    // Must have enough balance to cover the usage
+    const isAllowed = await hasEnoughBalance(
+      userId,
+      SINGLE_PHOTO_USAGE_AMOUNT_POSITIVE,
+      ledgerRepository
+    );
 
     if (!isAllowed) {
       throw new UsageCapError();
@@ -121,7 +97,7 @@ export async function grantCredits(
 
   let creditsToGrant = quantity;
 
-  // They may have gone negative from free daily usage, so we give them amnesty
+  // They may have a negative balance from before the free trial was removed, so we give them amnesty
   if (giveAmnesty) {
     creditsToGrant += amnesty;
   }

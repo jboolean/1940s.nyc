@@ -1,6 +1,6 @@
-import create from 'zustand';
+import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
-import { persist } from 'zustand/middleware';
+import { createJSONStorage, persist } from 'zustand/middleware';
 import FeatureFlag from '../types/FeatureFlag';
 
 // Map all FeatureFlags to false
@@ -32,7 +32,7 @@ const useFeatureFlagsStore = create(
     })),
     {
       name: 'featureFlags',
-      getStorage: () => localStorage,
+      storage: createJSONStorage(() => localStorage),
     }
   )
 );

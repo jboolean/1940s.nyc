@@ -1,7 +1,8 @@
 import { Body, Post, Request, Route, Security } from '@tsoa/runtime';
 import * as express from 'express';
-import { Forbidden } from 'http-errors';
+import { BadRequest, Forbidden } from 'http-errors';
 import { AppDataSource } from '../createConnection';
+import { isValidStreetAddress } from '../business/corrections/AddressValidationService';
 import * as UserService from '../business/users/UserService';
 import AddressCorrection from '../entities/AddressCorrection';
 import GeocodeCorrection from '../entities/GeocodeCorrection';
@@ -72,6 +73,12 @@ export class CorrectionsController {
     const { photos, address } = correctionRequest;
 
     const userId = await getUserIdFromRequestForCorrection(req);
+
+    if (!(await isValidStreetAddress(address))) {
+      throw new BadRequest(
+        'That does not look like a street address. Please enter only the house number and street, for example \u20181489 Broadway\u2019.'
+      );
+    }
 
     const correctionsRepository =
       AppDataSource.getRepository(AddressCorrection);

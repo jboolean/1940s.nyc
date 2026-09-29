@@ -1,20 +1,18 @@
-import create from 'zustand';
+import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
-import { persist } from 'zustand/middleware';
+import { createJSONStorage, persist } from 'zustand/middleware';
 
 import netlifyIdentity, { User } from 'netlify-identity-widget';
 import pick from 'lodash/pick';
-import { LocationDescriptor } from 'history';
-
 interface State {
   isAutheticated: boolean;
   user: User | null;
   jwt: string | null;
-  returnToRoute?: LocationDescriptor;
+  returnToRoute?: string;
 }
 
 interface Actions {
-  login(returnTo?: LocationDescriptor): void;
+  login(returnTo?: string): void;
   signout(): void;
   close(): void;
 }
@@ -26,7 +24,7 @@ const useAuthStore = create(
       isAutheticated: false,
       user: null,
       jwt: null,
-      login: (returnToRoute: LocationDescriptor) => {
+      login: (returnToRoute: string) => {
         netlifyIdentity.open('login');
         set((state) => {
           state.returnToRoute = returnToRoute;
@@ -42,7 +40,7 @@ const useAuthStore = create(
     // persists the returnToRoute to local storage, so that we may return after login
     {
       name: 'auth',
-      getStorage: () => localStorage,
+      storage: createJSONStorage(() => localStorage),
       partialize: (state) => pick(state, 'returnToRoute'),
     }
   )

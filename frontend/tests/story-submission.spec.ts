@@ -21,6 +21,9 @@ test('submit story wizard — all four steps to thank-you', async ({ page }) => 
   // If there's a text area, we're already at the content step.
   const textArea = page.locator('[data-testid="story-text-area"]');
   await expect(textArea).toBeVisible();
+  // Textarea should grow to fill available modal space (flex-grow: 1), not shrink to default 2-row height
+  const textAreaHeight = await textArea.evaluate((el) => el.clientHeight);
+  expect(textAreaHeight).toBeGreaterThan(150);
   await textArea.fill('Playwright test story');
   await page.locator('[data-testid="story-continue-button"]').click();
   await page

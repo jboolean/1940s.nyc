@@ -2,8 +2,8 @@ import OpenAI from 'openai';
 import createStoryTitlePrompt from './createStoryTitlePrompt';
 
 const openai = new OpenAI({
-  organization: 'org-TEbKEsj2LQsKAmHZRs1MoHHh',
-  apiKey: process.env.OPENAI_SK,
+  baseURL: 'https://openrouter.ai/api/v1',
+  apiKey: process.env.OPENROUTER_SK,
 });
 
 export async function suggestStoryTitle(storyContent: string): Promise<string> {

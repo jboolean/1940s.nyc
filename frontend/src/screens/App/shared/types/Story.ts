@@ -43,8 +43,18 @@ export type StoryDraftRequest = {
   textContent?: string;
 };
 
+export type AiModerationFlag =
+  | 'linkOrAd'
+  | 'complaintOrCorrection'
+  | 'nonsense'
+  | 'addressOnly'
+  | 'offensive'
+  | 'trolling';
+
 export type AdminStory = Story & {
   recaptchaScore: number;
   title?: string;
   emailBounced: boolean;
+  moderationFlags: AiModerationFlag[];
+  recommendedAction: 'approve' | 'reject' | null;
 };

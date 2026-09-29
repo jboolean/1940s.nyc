@@ -6,6 +6,8 @@ type StoryReviewEmailTemplateData = {
   storiesCount: number;
   reviewStoriesUrl: string;
   stats: { reviewer: string; count: number }[];
+  // Switches the wording between the early warning and the missed-SLO version.
+  isApproachingSlo: boolean;
 };
 
 class StoriesReviewQueueStaleTemplate extends EmailTemplate<

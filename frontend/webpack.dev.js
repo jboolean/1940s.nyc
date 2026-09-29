@@ -1,5 +1,5 @@
 const webpack = require('webpack');
-const merge = require('webpack-merge');
+const { merge } = require('webpack-merge');
 const common = require('./webpack.common.js');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const path = require('path');
@@ -16,7 +16,10 @@ module.exports = merge(common, {
   },
   cache: false,
   plugins: [
-    new ReactRefreshPlugin(),
+    // The error overlay covers the viewport with a full-screen iframe, which
+    // intercepts every click Playwright tries to make. Off under CI so a
+    // transient runtime error can't fail unrelated e2e tests.
+    new ReactRefreshPlugin({ overlay: !process.env.CI }),
     new webpack.DefinePlugin({
       __DEV__: true,
       __API_BASE__: JSON.stringify(process.env.API_BASE || 'http://dev.1940s.nyc:3000'),

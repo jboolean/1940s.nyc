@@ -6,13 +6,33 @@ import { PHOTO_BASE } from 'shared/utils/apiConstants';
 
 import useReviewStoriesStore from './stores/ReviewStoriesStore';
 
-import { AdminStory } from 'screens/App/shared/types/Story';
+import { AdminStory, AiModerationFlag } from 'screens/App/shared/types/Story';
 import stylesheet from './ReviewStories.less';
 
 const DATE_FORMATTER = new Intl.DateTimeFormat('en-US', {
   dateStyle: 'full',
   timeStyle: 'short',
 });
+
+const labelByAiModerationFlag: Record<AiModerationFlag, string> = {
+  linkOrAd: 'Advertisement',
+  complaintOrCorrection: 'Complaint',
+  nonsense: 'Nonsense',
+  addressOnly: 'Lacks personal detail',
+  offensive: 'Offensive',
+  trolling: 'Trolling',
+};
+
+function RecommendedDot(): JSX.Element {
+  return (
+    <span
+      className={stylesheet.recommendedDot}
+      role="img"
+      aria-label="Recommended"
+      title="Recommended"
+    />
+  );
+}
 
 function StoryMetadataView({ story }: { story: AdminStory }): JSX.Element {
   return (
@@ -38,6 +58,14 @@ function StoryMetadataView({ story }: { story: AdminStory }): JSX.Element {
           Email bounced
         </div>
       ) : null}
+      {story.moderationFlags.map((flag) => (
+        <div
+          key={flag}
+          className={classNames(stylesheet.score, stylesheet.bad)}
+        >
+          {labelByAiModerationFlag[flag]}
+        </div>
+      ))}
 
       {story.lngLat ? (
         <div>
@@ -101,6 +129,16 @@ export default function ReviewStories(): JSX.Element {
         </ul>
       </details>
 
+      {reviewStoriesStore.isLoading ? <p>Loading&hellip;</p> : null}
+
+      {reviewStoriesStore.error ? <p>Failed to load stories. </p> : null}
+
+      {!reviewStoriesStore.isLoading &&
+      !reviewStoriesStore.error &&
+      reviewStoriesStore.stories.length === 0 ? (
+        <p>No stories to review.</p>
+      ) : null}
+
       <div className={stylesheet.stories}>
         {reviewStoriesStore.stories.map((story) => (
           <React.Fragment key={story.id}>
@@ -110,12 +148,18 @@ export default function ReviewStories(): JSX.Element {
                   onClick={() => reviewStoriesStore.approveStory(story.id)}
                   buttonStyle={'primary'}
                 >
+                  {story.recommendedAction === 'approve' ? (
+                    <RecommendedDot />
+                  ) : null}
                   Approve
                 </Button>
                 <Button
                   onClick={() => reviewStoriesStore.rejectStory(story.id)}
                   buttonStyle={'secondary'}
                 >
+                  {story.recommendedAction === 'reject' ? (
+                    <RecommendedDot />
+                  ) : null}
                   Reject
                 </Button>
               </div>

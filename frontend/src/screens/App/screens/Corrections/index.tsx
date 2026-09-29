@@ -1,4 +1,5 @@
 import React from 'react';
+import { useShallow } from 'zustand/react/shallow';
 
 import useLoginStore from 'shared/stores/LoginStore';
 import useCorrectionsStore, {
@@ -17,8 +18,14 @@ import SelectAlternates from './components/SelectAlternates';
 import stylesheet from './Corrections.less';
 
 const CorrectionsDialogContent = (): JSX.Element | null => {
-  const { photo, submit, correctionType, setCorrectionType } =
-    useCorrectionsStore();
+  const {
+    photo,
+    submit,
+    correctionType,
+    setCorrectionType,
+    isSubmitting,
+    errorMessage,
+  } = useCorrectionsStore();
   const { canSubmit } = useCorrectionsStoreComputeds();
 
   const { isLoginValidated } = useLoginStore();
@@ -118,14 +125,17 @@ const CorrectionsDialogContent = (): JSX.Element | null => {
       </div>
 
       <div>
+        {errorMessage ? (
+          <p className={stylesheet.error}>{errorMessage}</p>
+        ) : null}
         <Button
           type="submit"
           buttonStyle="primary"
-          disabled={!(isLoginValidated && canSubmit)}
+          disabled={!(isLoginValidated && canSubmit) || isSubmitting}
           className={stylesheet.submitButton}
           onClick={submit}
         >
-          Submit correction
+          {isSubmitting ? 'Submitting\u2026' : 'Submit correction'}
         </Button>
       </div>
     </div>
@@ -134,10 +144,10 @@ const CorrectionsDialogContent = (): JSX.Element | null => {
 
 export default function Corrections(): JSX.Element {
   const { isOpen, isConfirmationOpen } = useCorrectionsStore(
-    ({ isOpen, isConfirmationOpen }) => ({
+    useShallow(({ isOpen, isConfirmationOpen }) => ({
       isOpen,
       isConfirmationOpen,
-    })
+    }))
   );
   const onRequestClose = useCorrectionsStore((state) => state.close);
 

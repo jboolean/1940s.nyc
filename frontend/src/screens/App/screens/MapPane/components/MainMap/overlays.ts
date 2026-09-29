@@ -4,6 +4,7 @@ import { bboxPolygon, booleanIntersects } from '@turf/turf';
 import { Feature } from 'geojson';
 import compact from 'lodash/compact';
 import flatMap from 'lodash/flatMap';
+import type * as maplibregl from 'maplibre-gl';
 import boroughBoundaries from './Borough Boundaries simplified.json';
 
 const LAYER_IDS = [

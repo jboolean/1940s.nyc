@@ -1,3 +1,4 @@
+import axios from 'axios';
 import * as Express from 'express';
 import { UserData } from 'gotrue-js';
 import { Unauthorized } from 'http-errors';
@@ -40,6 +41,20 @@ export async function expressAuthentication(
 
       return user;
     } catch (err) {
+      // Log the real cause - otherwise it's indistinguishable from an
+      // actually-invalid token.
+      if (axios.isAxiosError(err)) {
+        console.error(
+          'Netlify identity check failed',
+          err.response?.status,
+          err.response?.headers?.['content-type'],
+          typeof err.response?.data === 'string'
+            ? err.response.data.slice(0, 500)
+            : err.response?.data
+        );
+      } else {
+        console.error('Netlify identity check failed', err);
+      }
       throw new Unauthorized('Invalid token');
     }
 
