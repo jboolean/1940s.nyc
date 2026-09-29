@@ -1,6 +1,6 @@
 import { MerchInternalVariant } from 'shared/utils/merch/Order';
 import recordEvent from 'shared/utils/recordEvent';
-import create from 'zustand';
+import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
 import useLoginStore from '../../../../../shared/stores/LoginStore';
 import {

@@ -1,6 +1,6 @@
-import create from 'zustand';
+import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
-import { persist } from 'zustand/middleware';
+import { createJSONStorage, persist } from 'zustand/middleware';
 import ANNOUNCEMENTS_REGISTRY from './AnnouncementRegistry';
 import React from 'react';
 import Announcement from './Announcement';
@@ -29,7 +29,7 @@ const useAnnouncementBannerStore = create(
     })),
     {
       name: 'announcement-banner',
-      getStorage: () => localStorage,
+      storage: createJSONStorage(() => localStorage),
     }
   )
 );

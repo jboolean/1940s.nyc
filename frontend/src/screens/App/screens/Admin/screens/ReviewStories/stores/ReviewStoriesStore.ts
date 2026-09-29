@@ -1,6 +1,6 @@
 import { AdminStory, StoryState } from 'screens/App/shared/types/Story';
 import { getStoriesForReview, updateStoryState } from 'shared/utils/StoryApi';
-import create from 'zustand';
+import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
 
 interface State {

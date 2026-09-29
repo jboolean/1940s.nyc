@@ -1,4 +1,5 @@
 import React from 'react';
+import { useShallow } from 'zustand/react/shallow';
 
 import useLoginStore from 'shared/stores/LoginStore';
 import useCorrectionsStore, {
@@ -143,10 +144,10 @@ const CorrectionsDialogContent = (): JSX.Element | null => {
 
 export default function Corrections(): JSX.Element {
   const { isOpen, isConfirmationOpen } = useCorrectionsStore(
-    ({ isOpen, isConfirmationOpen }) => ({
+    useShallow(({ isOpen, isConfirmationOpen }) => ({
       isOpen,
       isConfirmationOpen,
-    })
+    }))
   );
   const onRequestClose = useCorrectionsStore((state) => state.close);
 

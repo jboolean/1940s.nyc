@@ -1,5 +1,5 @@
 import axios from 'axios';
-import create from 'zustand';
+import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
 
 import { isEmpty } from 'lodash';

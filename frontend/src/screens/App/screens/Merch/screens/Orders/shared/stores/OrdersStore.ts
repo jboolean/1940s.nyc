@@ -5,7 +5,7 @@ import {
   OrderItem,
 } from 'shared/utils/merch/Order';
 import * as merchApi from 'shared/utils/merch/merchApi';
-import create from 'zustand';
+import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
 
 interface State {
