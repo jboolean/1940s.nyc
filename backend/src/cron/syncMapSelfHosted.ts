@@ -1,4 +1,9 @@
-import { DeleteObjectCommand, ListObjectsV2Command, PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import {
+  DeleteObjectCommand,
+  ListObjectsV2Command,
+  PutObjectCommand,
+  S3Client,
+} from '@aws-sdk/client-s3';
 import { createReadStream } from 'fs';
 import { AppDataSource } from '../createConnection';
 import GeojsonEncoder from '../business/geodata/GeojsonEncoder';
@@ -37,7 +42,7 @@ export default async function syncMap(): Promise<void> {
   const pmtilesStream = createReadStream(result.outputPath);
 
   const key = `photos-1940s_${new Date().toISOString()}.pmtiles`;
-  
+
   await s3.send(
     new PutObjectCommand({
       Bucket: 'fourties-maps',
@@ -66,7 +71,7 @@ export default async function syncMap(): Promise<void> {
   console.log('Cleaning up old PMTiles files...');
   const sevenDaysAgo = new Date();
   sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-  
+
   const listCommand = new ListObjectsV2Command({
     Bucket: 'fourties-maps',
     Prefix: 'photos-1940s_',
@@ -74,7 +79,12 @@ export default async function syncMap(): Promise<void> {
   const listResponse = await s3.send(listCommand);
   if (listResponse.Contents) {
     for (const item of listResponse.Contents) {
-      if (item.Key && item.Key.endsWith('.pmtiles') && item.LastModified && item.LastModified < sevenDaysAgo) {
+      if (
+        item.Key &&
+        item.Key.endsWith('.pmtiles') &&
+        item.LastModified &&
+        item.LastModified < sevenDaysAgo
+      ) {
         console.log(`Deleting old PMTiles file: ${item.Key}`);
         const deleteCommand = new DeleteObjectCommand({
           Bucket: 'fourties-maps',

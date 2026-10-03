@@ -33,9 +33,7 @@ type AdminFields = {
 
 // Optional while the story is a draft
 type DraftOptionalFields =
-  | 'storytellerEmail'
-  | 'storytellerName'
-  | 'storytellerSubtitle';
+  'storytellerEmail' | 'storytellerName' | 'storytellerSubtitle';
 
 type NonPublicFields = 'storytellerEmail';
 
