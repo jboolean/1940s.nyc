@@ -47,7 +47,7 @@ export async function createMerchCheckoutSession({
       customer_creation: hasExistingCustomer ? undefined : 'always',
       customer_email: hasExistingCustomer
         ? undefined
-        : user?.email ?? undefined,
+        : (user?.email ?? undefined),
       payment_intent_data: {},
       shipping_address_collection: {
         allowed_countries: ['US'],

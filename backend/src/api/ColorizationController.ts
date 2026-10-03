@@ -120,7 +120,7 @@ export class ColorizationController extends Controller {
         customer_creation: hasExistingCustomer ? undefined : 'always',
         customer_email: hasExistingCustomer
           ? undefined
-          : user?.email ?? undefined,
+          : (user?.email ?? undefined),
         payment_intent_data: {
           setup_future_usage: 'on_session',
         },
