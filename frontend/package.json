@@ -108,7 +108,7 @@
     "html-webpack-plugin": "^5.6.7",
     "json-loader": "^0.5.7",
     "less": "^4.2.0",
-    "less-loader": "^11.1.0",
+    "less-loader": "^13.0.0",
     "lint-staged": "^13.0.3",
     "mini-css-extract-plugin": "^2.6.1",
     "postcss-loader": "^7.3.3",
