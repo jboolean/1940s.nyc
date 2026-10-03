@@ -26,8 +26,11 @@ export default function Alternates({
     void getAlternatePhotos(originalIdentifier).then(setAlternatePhotos);
   }, [originalIdentifier]);
 
+  const containerRef = React.useRef<HTMLDivElement>(null);
+
   return (
     <CSSTransition
+      nodeRef={containerRef}
       in={alternatePhotos.length > 1}
       classNames={{ ...stylesheet }}
       appear
@@ -38,6 +41,7 @@ export default function Alternates({
       }}
     >
       <div
+        ref={containerRef}
         className={classnames(stylesheet.container, className)}
         title="Alternate photos at this location"
         data-testid="alternates"

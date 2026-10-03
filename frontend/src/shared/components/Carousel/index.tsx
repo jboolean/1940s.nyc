@@ -37,10 +37,21 @@ export default function Carousel({
 
   const image = images[i];
 
+  // SwitchTransition keeps the outgoing and incoming image mounted together, so each needs its own ref
+  const nodeRefs = React.useRef(
+    new Map<number, React.RefObject<HTMLImageElement | null>>()
+  );
+  let nodeRef = nodeRefs.current.get(i);
+  if (!nodeRef) {
+    nodeRef = React.createRef<HTMLImageElement>();
+    nodeRefs.current.set(i, nodeRef);
+  }
+
   return (
     <SwitchTransition mode="in-out">
       <CSSTransition
         key={i}
+        nodeRef={nodeRef}
         timeout={{
           appear: 0,
           enter: 1000,
@@ -49,6 +60,7 @@ export default function Carousel({
         classNames={{ ...stylesheet }}
       >
         <img
+          ref={nodeRef}
           className={className}
           src={image.src}
           style={{ objectPosition: image.objectPosition }}

@@ -46,6 +46,8 @@ export function makeImgView(
  * The goal is to increase perceived load speed by starting an animation immediately while preloading the view.
  */
 export default class ImageSwitcher extends React.Component<Props, State> {
+  nodeRef = React.createRef<HTMLElement>();
+
   constructor(props: Props) {
     super(props);
     this.state = {
@@ -121,13 +123,17 @@ export default class ImageSwitcher extends React.Component<Props, State> {
 
     return (
       <CSSTransition
+        nodeRef={this.nodeRef}
         appear={true}
         in={!hide && loaded}
         classNames={{ ...stylesheet }}
         timeout={150}
         onExited={this.handleExited}
       >
-        {element}
+        {React.cloneElement(
+          element as React.ReactElement<{ ref?: React.Ref<HTMLElement> }>,
+          { ref: this.nodeRef }
+        )}
       </CSSTransition>
     );
   }

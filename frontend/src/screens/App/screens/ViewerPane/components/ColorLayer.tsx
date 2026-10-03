@@ -36,6 +36,7 @@ export default function ColorLayer({
   return (
     <>
       <CSSTransition
+        nodeRef={imageRef}
         appear={true}
         in={enabled && !isLoading}
         classNames={{ ...stylesheet }}
