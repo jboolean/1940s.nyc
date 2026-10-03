@@ -73,7 +73,7 @@ const STYLE_DEFAULTS = {
   backgroundColor: 'green',
 };
 
-const CustomizeBack = (): JSX.Element => {
+const CustomizeBack = (): React.JSX.Element => {
   const {
     customizing,
     draftCustomizationOptions,
@@ -185,7 +185,7 @@ const CustomizeBack = (): JSX.Element => {
   );
 };
 
-const CustomizeFront = (): JSX.Element => {
+const CustomizeFront = (): React.JSX.Element => {
   const {
     customizing,
     draftCustomizationOptions,
@@ -247,7 +247,7 @@ const CustomizeFront = (): JSX.Element => {
   );
 };
 
-export default function CustomizeModal(): JSX.Element {
+export default function CustomizeModal(): React.JSX.Element {
   const {
     customizing,
     dismissCustomizing,

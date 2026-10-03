@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function IntroGraph(): JSX.Element {
+export default function IntroGraph(): React.JSX.Element {
   return (
     <p>
       Whether you lived here, you&rsquo;re familiar with its history, or

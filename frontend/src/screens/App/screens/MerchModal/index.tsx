@@ -12,7 +12,7 @@ import useMerchCheckoutStore, {
 import FourtiesModal from 'shared/components/Modal';
 import stylesheet from './MerchModal.less';
 
-export default function MerchModal(): JSX.Element {
+export default function MerchModal(): React.JSX.Element {
   const {
     close: onRequestClose,
     errorMessage,

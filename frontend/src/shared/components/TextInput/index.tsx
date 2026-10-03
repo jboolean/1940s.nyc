@@ -8,7 +8,7 @@ interface TextInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 }
 
 const TextInput = React.forwardRef<HTMLInputElement, TextInputProps>(
-  ({ className, ...props }, ref): JSX.Element => {
+  ({ className, ...props }, ref): React.JSX.Element => {
     return (
       <input
         type="text"

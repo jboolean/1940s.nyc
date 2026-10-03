@@ -19,7 +19,7 @@ import { getStyle } from 'screens/App/shared/mapStyles/fourties.protomaps.style'
 
 const DEFAULT_LNG_LAT = [-73.99397, 40.7093] as const;
 
-export default function LocationPickerModal(): JSX.Element {
+export default function LocationPickerModal(): React.JSX.Element {
   const mapContainer = React.useRef<HTMLDivElement>(null);
   const map = React.useRef<maplibregl.Map | null>(null);
   const {

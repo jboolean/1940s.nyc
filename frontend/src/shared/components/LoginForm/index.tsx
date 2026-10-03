@@ -13,7 +13,7 @@ export default function LoginForm({
 }: {
   requireVerifiedEmail?: boolean;
   newEmailBehavior?: 'update' | 'reject' | 'create';
-}): JSX.Element {
+}): React.JSX.Element {
   const {
     emailAddress,
     isLoginValidated,

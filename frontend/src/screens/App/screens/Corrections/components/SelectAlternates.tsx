@@ -16,7 +16,7 @@ export default function SelectAlternates({
   description,
 }: {
   description: React.ReactNode;
-}): JSX.Element {
+}): React.JSX.Element {
   const {
     alternatesSelections,
     toggleAlternateSelection,

@@ -6,7 +6,7 @@ import recordEvent from 'shared/utils/recordEvent';
 export default function ThankYou({
   isOpen,
   onRequestClose,
-}: Pick<ReactModal.Props, 'isOpen' | 'onRequestClose'>): JSX.Element {
+}: Pick<ReactModal.Props, 'isOpen' | 'onRequestClose'>): React.JSX.Element {
   const navigate = useNavigate();
 
   const queryParamsRef = React.useRef(

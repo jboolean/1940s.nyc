@@ -27,7 +27,7 @@ interface State {
 const getSuggestionValue = (suggestion: Feature<Point>): string =>
   startCase((suggestion.properties.name as string).toLowerCase());
 
-const renderSuggestion = (suggestion: Feature<Point>): JSX.Element => (
+const renderSuggestion = (suggestion: Feature<Point>): React.JSX.Element => (
   <div>{startCase((suggestion.properties.name as string).toLowerCase())}</div>
 );
 
@@ -96,7 +96,7 @@ export default class Search extends React.Component<Props, State> {
     });
   };
 
-  render(): JSX.Element {
+  render(): React.JSX.Element {
     const { onFeatureSelected } = this.props;
     const { value, suggestions } = this.state;
 

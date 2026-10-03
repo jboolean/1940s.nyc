@@ -13,7 +13,7 @@ export default function ColorizeButton({
   photoIdentifier,
 }: {
   photoIdentifier: string;
-}): JSX.Element {
+}): React.JSX.Element {
   // This is a bit of a hack to only show for 40s photos, without making an api call to actually determine the collection
   const isColorizable = photoIdentifier.startsWith('nynyma');
   const colorizationEnabled = isColorizable;

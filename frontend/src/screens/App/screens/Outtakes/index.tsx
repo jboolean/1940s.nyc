@@ -18,7 +18,7 @@ export default function Outtakes({
   className,
 }: {
   className?: string;
-}): JSX.Element {
+}): React.JSX.Element {
   const nextToken = React.useRef<string>(undefined);
   const [photoSummariesPage, setPhotoSummariesPage] =
     React.useState<Paginated<PhotoSummary> | null>(null);

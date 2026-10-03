@@ -6,7 +6,7 @@ import ReviewMerch from './screens/ReviewMerch';
 import ReviewStories from './screens/ReviewStories';
 import PrivateRoute from './shared/components/PrivateRoute';
 
-export default function AdminRoutes(): JSX.Element {
+export default function AdminRoutes(): React.JSX.Element {
   return (
     <Routes>
       <Route path="login" element={<LoginPage />} />

@@ -62,7 +62,7 @@ function GiftOption({
   frequency: TipFrequency;
   description: React.ReactNode;
   imageSrc: string;
-}): JSX.Element {
+}): React.JSX.Element {
   const { selectedGift, setSelectedGift } = useTipJarStore();
   const id = useElementId('gift-option');
   const minimumDollars = minimum / 100;
@@ -104,7 +104,7 @@ const renderGift = ({
   gift,
   frequency,
   minimumAmount,
-}: Gift): JSX.Element | null => {
+}: Gift): React.JSX.Element | null => {
   switch (gift) {
     case 'tote-bag':
       return (
@@ -132,7 +132,7 @@ const renderGift = ({
   }
 };
 
-export default function TipJar(): JSX.Element {
+export default function TipJar(): React.JSX.Element {
   const {
     amountDollars,
     frequency,

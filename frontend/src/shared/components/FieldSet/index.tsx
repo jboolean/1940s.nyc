@@ -9,7 +9,10 @@ interface FieldSetProps extends React.InputHTMLAttributes<HTMLFieldSetElement> {
 
 type LegendProps = React.InputHTMLAttributes<HTMLLegendElement>;
 
-export function Legend({ className, ...props }: LegendProps): JSX.Element {
+export function Legend({
+  className,
+  ...props
+}: LegendProps): React.JSX.Element {
   return (
     <legend {...props} className={classNames(stylesheet.legend, className)} />
   );
@@ -18,7 +21,7 @@ export function Legend({ className, ...props }: LegendProps): JSX.Element {
 export default function FieldSet({
   className,
   ...props
-}: FieldSetProps): JSX.Element {
+}: FieldSetProps): React.JSX.Element {
   return (
     <fieldset
       {...props}

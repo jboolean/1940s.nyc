@@ -17,7 +17,7 @@ import FieldSet from 'shared/components/FieldSet';
 import SelectAlternates from './components/SelectAlternates';
 import stylesheet from './Corrections.less';
 
-const CorrectionsDialogContent = (): JSX.Element | null => {
+const CorrectionsDialogContent = (): React.JSX.Element | null => {
   const {
     photo,
     submit,
@@ -142,7 +142,7 @@ const CorrectionsDialogContent = (): JSX.Element | null => {
   );
 };
 
-export default function Corrections(): JSX.Element {
+export default function Corrections(): React.JSX.Element {
   const { isOpen, isConfirmationOpen } = useCorrectionsStore(
     useShallow(({ isOpen, isConfirmationOpen }) => ({
       isOpen,

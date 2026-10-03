@@ -16,7 +16,7 @@ export default function Overlay({
 }: React.PropsWithChildren<{
   className?: string;
   overlayRef?: RefObject<HTMLDivElement>;
-}>): JSX.Element {
+}>): React.JSX.Element {
   // This feature flag is useful in development to prevent the overlay from disappearing
   const alwaysShowOverlay = useFeatureFlag(FeatureFlag.ALWAYS_SHOW_OVERLAY);
 
@@ -31,6 +31,7 @@ export default function Overlay({
   const [isOverlayVisible, setIsOverlayVisible] =
     React.useState(alwaysShowOverlay);
   const timeoutRef = React.useRef<number | null>(null);
+  const contentRef = React.useRef<HTMLDivElement>(null);
 
   // peek in so people can see this overlay exists
   React.useEffect(() => {
@@ -116,6 +117,7 @@ export default function Overlay({
       ref={overlayRef}
     >
       <CSSTransition
+        nodeRef={contentRef}
         in={isOverlayVisible}
         classNames={{ ...stylesheet }}
         appear
@@ -123,7 +125,9 @@ export default function Overlay({
         mountOnEnter
         unmountOnExit
       >
-        <div className={stylesheet.overlayContent}>{children}</div>
+        <div ref={contentRef} className={stylesheet.overlayContent}>
+          {children}
+        </div>
       </CSSTransition>
     </div>
   );

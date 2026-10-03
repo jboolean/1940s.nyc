@@ -74,7 +74,7 @@ export function OptimizeExperimentsProvider({
   children,
 }: {
   children?: React.ReactNode;
-}): JSX.Element {
+}): React.JSX.Element {
   const [assignmentsByExperimentId, setAssignmentsByExperimentId] =
     React.useState<Record<string, VariantAssignments>>({});
   React.useEffect(() => {
@@ -100,8 +100,8 @@ export function ExperimentVariantsConsumer({
   children,
 }: {
   experimentId: string;
-  children: (variants: number[]) => JSX.Element;
-}): JSX.Element {
+  children: (variants: number[]) => React.JSX.Element;
+}): React.JSX.Element {
   return (
     <ExperimentAssignmentsContext.Consumer>
       {(assignmentsByExperimentId) =>

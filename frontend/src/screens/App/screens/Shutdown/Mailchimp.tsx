@@ -2,7 +2,7 @@ import React from 'react';
 
 import stylesheet from './mailchimp.less';
 
-export default function Mailchimp(): JSX.Element {
+export default function Mailchimp(): React.JSX.Element {
   return (
     <div
       className={stylesheet.mailchimp}

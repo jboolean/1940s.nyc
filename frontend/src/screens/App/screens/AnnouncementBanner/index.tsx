@@ -5,7 +5,7 @@ import useAnnouncementBannerStore, {
   useAnnouncementBannerStoreComputeds,
 } from './AnnouncementBannerStore';
 
-export default function AnnouncementBanner(): JSX.Element | null {
+export default function AnnouncementBanner(): React.JSX.Element | null {
   const dismiss = useAnnouncementBannerStore((state) => state.dismiss);
   const { announcementToDisplay } = useAnnouncementBannerStoreComputeds();
 

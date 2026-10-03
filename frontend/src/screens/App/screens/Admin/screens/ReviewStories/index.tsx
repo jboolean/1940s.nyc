@@ -23,7 +23,7 @@ const labelByAiModerationFlag: Record<AiModerationFlag, string> = {
   trolling: 'Trolling',
 };
 
-function RecommendedDot(): JSX.Element {
+function RecommendedDot(): React.JSX.Element {
   return (
     <span
       className={stylesheet.recommendedDot}
@@ -34,7 +34,11 @@ function RecommendedDot(): JSX.Element {
   );
 }
 
-function StoryMetadataView({ story }: { story: AdminStory }): JSX.Element {
+function StoryMetadataView({
+  story,
+}: {
+  story: AdminStory;
+}): React.JSX.Element {
   return (
     <div className={stylesheet.metadata}>
       <div>
@@ -87,7 +91,7 @@ function StoryMetadataView({ story }: { story: AdminStory }): JSX.Element {
   );
 }
 
-export default function ReviewStories(): JSX.Element {
+export default function ReviewStories(): React.JSX.Element {
   const reviewStoriesStore = useReviewStoriesStore();
 
   React.useEffect(() => {

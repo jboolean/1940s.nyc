@@ -5,7 +5,7 @@ import FourtiesModal from 'shared/components/Modal';
 import useLoginStore from 'shared/stores/LoginStore';
 import useTipJarStore from './TipJarStore';
 
-export default function LoginToManageModal(): JSX.Element {
+export default function LoginToManageModal(): React.JSX.Element {
   const { isLoginOpen, closeLogin, redirectToCustomerPortal } =
     useTipJarStore();
 

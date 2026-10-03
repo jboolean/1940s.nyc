@@ -12,7 +12,7 @@ export default function TextButton({
   children: React.ReactNode;
   onClick: () => void;
   className?: string;
-}): JSX.Element {
+}): React.JSX.Element {
   return (
     <button
       type="button"

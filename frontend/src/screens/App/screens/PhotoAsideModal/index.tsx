@@ -15,7 +15,7 @@ export default function PhotoAsideModal({
   carouselProps,
   children,
   ...props
-}: Props): JSX.Element {
+}: Props): React.JSX.Element {
   return (
     <FourtiesModal
       size="large"

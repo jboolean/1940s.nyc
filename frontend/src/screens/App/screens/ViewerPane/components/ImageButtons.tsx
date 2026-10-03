@@ -12,7 +12,7 @@ import ColorizeButton from './ColorizeButton';
 const ORDER_PRINT_EXTERNAL_LINK_MESSAGE =
   'You are leaving 1940s.nyc for the Department of Records and Information Services (DORIS), with which 1940s.nyc is not affilliated. 1940s.nyc cannot help with orders placed through DORIS. ' +
   'Copies are from the original negatives will not include colorization from 1940s.nyc. ';
-export default function ImageButtons(): JSX.Element {
+export default function ImageButtons(): React.JSX.Element {
   const { identifier: photoIdentifier } = useParams<{ identifier?: string }>();
   const initializeStoryDraft = useStoryDraftStore((state) => state.initialize);
   const initializeCorrections = useCorrectionsStore(

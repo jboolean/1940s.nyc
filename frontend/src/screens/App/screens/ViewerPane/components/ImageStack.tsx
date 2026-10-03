@@ -12,6 +12,8 @@ type Props = {
   imgProps?: Omit<ImgHTMLAttributes<unknown>, 'src'>;
   className: string;
   isFullResVisible?: boolean;
+  // Lets ImageSwitcher's transition find the root element
+  ref?: React.Ref<HTMLDivElement>;
 };
 
 type ImageFormat = '720-jpg' | '420-jpg' | 'jpg';
@@ -25,7 +27,7 @@ function HighResLayer({
   photoIdentifier,
 }: {
   photoIdentifier: string;
-}): JSX.Element {
+}): React.JSX.Element {
   const [loaded, setLoaded] = React.useState(false);
 
   return (
@@ -48,11 +50,12 @@ export default function ImageStack({
   imgProps,
   className,
   isFullResVisible,
-}: Props): JSX.Element | null {
+  ref,
+}: Props): React.JSX.Element | null {
   const baseImageSrc = forgeImgSrc(photoIdentifier);
 
   return (
-    <div className={className}>
+    <div ref={ref} className={className}>
       {isFullResVisible && (
         <HighResLayer
           key={'high-res_' + photoIdentifier}

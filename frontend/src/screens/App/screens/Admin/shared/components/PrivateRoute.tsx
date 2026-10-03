@@ -10,7 +10,7 @@ interface PrivateRouteProps {
 
 export default function PrivateRoute({
   children,
-}: PrivateRouteProps): JSX.Element {
+}: PrivateRouteProps): React.JSX.Element {
   const isAuthenticated = useAuthStore((state) => state.isAutheticated);
   const location = useLocation();
 

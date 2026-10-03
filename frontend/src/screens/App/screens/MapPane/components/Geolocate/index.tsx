@@ -64,7 +64,7 @@ export default class Geolocate extends React.Component<Props, State> {
     console.warn(error);
   }
 
-  render(): JSX.Element {
+  render(): React.JSX.Element {
     const { className } = this.props;
     const { loading } = this.state;
     return (

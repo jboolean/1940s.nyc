@@ -13,7 +13,7 @@ export default function ColorLayer({
 }: {
   photoIdentifier: string;
   className?: string;
-}): JSX.Element | null {
+}): React.JSX.Element | null {
   const {
     colorEnabledForIdentifier,
     colorizedImageSrc,
@@ -36,6 +36,7 @@ export default function ColorLayer({
   return (
     <>
       <CSSTransition
+        nodeRef={imageRef}
         appear={true}
         in={enabled && !isLoading}
         classNames={{ ...stylesheet }}

@@ -4,7 +4,7 @@ import MainMap from '../../MapPane/components/MainMap';
 
 import stylesheet from '../ToteBag.less';
 
-export default function ToteBag(): JSX.Element {
+export default function ToteBag(): React.JSX.Element {
   const containerRef = React.useRef<HTMLDivElement>(null);
   const [attributionText, setAttributionText] = React.useState<string>('');
 

@@ -26,7 +26,7 @@ export default function ProductOption({
   imageSrcDefault,
   quantity,
   onQuantityChange,
-}: ProductOptionProps): JSX.Element {
+}: ProductOptionProps): React.JSX.Element {
   const priceDollars = priceAmount / 100;
   const [isHovered, setIsHovered] = React.useState(false);
   const imageSrc = isHovered ? imageSrcHover : imageSrcDefault;

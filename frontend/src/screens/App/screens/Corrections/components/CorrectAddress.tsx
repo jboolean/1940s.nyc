@@ -12,7 +12,7 @@ import TextInput from 'shared/components/TextInput';
 
 import stylesheet from './CorrectAddress.less';
 
-export default function CorrectAddress(): JSX.Element {
+export default function CorrectAddress(): React.JSX.Element {
   const { correctedAddress, setCorrectedAddress } = useCorrectionsStore();
   const { previousAddress: defaultAddress } = useCorrectionsStoreComputeds();
 

@@ -6,7 +6,7 @@ export default function Intro({
   onBeginTextStory,
 }: {
   onBeginTextStory: () => void;
-}): JSX.Element {
+}): React.JSX.Element {
   return (
     <div>
       <h1>Add your story</h1>

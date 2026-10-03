@@ -10,9 +10,9 @@ export default function Labeled({
   className,
 }: {
   labelText: string;
-  renderInput: ({ id }: { id: string }) => JSX.Element;
+  renderInput: ({ id }: { id: string }) => React.JSX.Element;
   className?: string;
-}): JSX.Element {
+}): React.JSX.Element {
   const id = useElementId('labled-input-');
 
   return (
