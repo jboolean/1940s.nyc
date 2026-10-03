@@ -68,7 +68,7 @@
     "serverless-webpack": "^5.15.4",
     "ts-jest": "^29.4.12",
     "ts-loader": "^9.5.4",
-    "typescript": "^5.2.2",
+    "typescript": "^7.0.2",
     "webpack": "^5.104.1",
     "webpack-node-externals": "^3.0.0"
   },
