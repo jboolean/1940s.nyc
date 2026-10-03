@@ -27,7 +27,7 @@ export default function FourtiesModal({
   onAfterOpen = noop,
   children,
   ...props
-}: FourtiesModalProps): JSX.Element {
+}: FourtiesModalProps): React.JSX.Element {
   const [width, height] = useWindowSize();
   // On small screens the modal is full width and uses the light theme
   const isFullWidthModal =

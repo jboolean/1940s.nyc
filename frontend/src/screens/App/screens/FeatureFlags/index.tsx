@@ -5,7 +5,7 @@ import useFeatureFlagsStore from 'screens/App/shared/stores/FeatureFlagsStore';
 import { Link } from 'react-router';
 import { lowerCase, upperFirst } from 'lodash';
 
-export default function FeatureFlags(): JSX.Element {
+export default function FeatureFlags(): React.JSX.Element {
   const featureFlags = useFeatureFlagsStore();
 
   const handleFeatureFlagChange =

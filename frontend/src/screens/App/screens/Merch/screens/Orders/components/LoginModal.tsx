@@ -5,7 +5,7 @@ import FourtiesModal from 'shared/components/Modal';
 import useLoginStore from 'shared/stores/LoginStore';
 import useOrdersStore from '../shared/stores/OrdersStore';
 
-export default function LoginModal(): JSX.Element {
+export default function LoginModal(): React.JSX.Element {
   const { isLoginOpen, closeLogin } = useOrdersStore();
 
   const { isLoginValidated } = useLoginStore();

@@ -15,7 +15,7 @@ export default function Product({
   product,
   quantity,
   onQuantityChange,
-}: ProductProps): JSX.Element | null {
+}: ProductProps): React.JSX.Element | null {
   switch (product.variant) {
     case MerchInternalVariant.TOTE_BAG_SMALL:
       return (

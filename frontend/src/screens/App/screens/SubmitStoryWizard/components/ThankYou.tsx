@@ -5,7 +5,7 @@ export default function ThankYou({
   onCloseClicked,
 }: {
   onCloseClicked: () => void;
-}): JSX.Element {
+}): React.JSX.Element {
   return (
     <div data-testid="story-thank-you">
       <h1>Thank you for sharing</h1>

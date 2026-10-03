@@ -74,7 +74,7 @@ function DatadogRouteTracker(): null {
   return null;
 }
 
-function Modals(): JSX.Element {
+function Modals(): React.JSX.Element {
   const [isThankYouOpen, setThankYouOpen] = React.useState(thankYouInitial);
   const [isCreditPurchaseSuccessOpen, setCreditPurchaseSuccessOpen] =
     React.useState(creditSuccessInitial);
@@ -150,7 +150,7 @@ function MainContentLayout({
   children,
 }: {
   children: React.ReactNode;
-}): JSX.Element {
+}): React.JSX.Element {
   return (
     <div className={stylesheet.outermostContainer}>
       <AnnouncementBanner />
@@ -166,7 +166,7 @@ function ContextWrappers({
   children,
 }: {
   children: React.ReactNode;
-}): JSX.Element {
+}): React.JSX.Element {
   const initialize = useLoginStore((state) => state.initialize);
 
   React.useEffect(() => {
@@ -176,7 +176,7 @@ function ContextWrappers({
   return <OptimizeExperimentsProvider>{children}</OptimizeExperimentsProvider>;
 }
 
-export default function App(): JSX.Element {
+export default function App(): React.JSX.Element {
   return (
     <ContextWrappers>
       <BrowserRouter>

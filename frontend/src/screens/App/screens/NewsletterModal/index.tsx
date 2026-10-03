@@ -5,7 +5,7 @@ import Modal from 'shared/components/Modal';
 import stylesheet from './NewsletterModal.less';
 import useNewsletterModalStore from './stores/NewsletterModalStore';
 
-export default function NewsletterModal(): JSX.Element {
+export default function NewsletterModal(): React.JSX.Element {
   const {
     isOpen,
     email,

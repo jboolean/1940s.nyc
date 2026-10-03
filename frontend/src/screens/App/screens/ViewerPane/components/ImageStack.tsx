@@ -25,7 +25,7 @@ function HighResLayer({
   photoIdentifier,
 }: {
   photoIdentifier: string;
-}): JSX.Element {
+}): React.JSX.Element {
   const [loaded, setLoaded] = React.useState(false);
 
   return (
@@ -48,7 +48,7 @@ export default function ImageStack({
   imgProps,
   className,
   isFullResVisible,
-}: Props): JSX.Element | null {
+}: Props): React.JSX.Element | null {
   const baseImageSrc = forgeImgSrc(photoIdentifier);
 
   return (

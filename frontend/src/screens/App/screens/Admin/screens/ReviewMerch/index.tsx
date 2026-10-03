@@ -10,7 +10,7 @@ const DATE_FORMATTER = new Intl.DateTimeFormat('en-US', {
   timeStyle: 'short',
 });
 
-function OrderMetadataView({ order }: { order: Order }): JSX.Element {
+function OrderMetadataView({ order }: { order: Order }): React.JSX.Element {
   return (
     <div className={stylesheet.metadata}>
       <div>
@@ -30,7 +30,7 @@ function OrderMetadataView({ order }: { order: Order }): JSX.Element {
   );
 }
 
-function OrderItemView({ item }: { item: OrderItem }): JSX.Element {
+function OrderItemView({ item }: { item: OrderItem }): React.JSX.Element {
   const reviewMerchStore = useReviewMerchStore();
 
   return (
@@ -67,7 +67,7 @@ function OrderItemView({ item }: { item: OrderItem }): JSX.Element {
   );
 }
 
-export default function ReviewMerch(): JSX.Element {
+export default function ReviewMerch(): React.JSX.Element {
   const reviewMerchStore = useReviewMerchStore();
 
   React.useEffect(() => {

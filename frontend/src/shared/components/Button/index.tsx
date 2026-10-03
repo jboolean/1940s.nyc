@@ -25,7 +25,7 @@ export default function Button({
   buttonStyle,
   buttonTheme = 'modal',
   ...props
-}: ButtonProps): JSX.Element {
+}: ButtonProps): React.JSX.Element {
   return (
     <ColorThemeContext.Consumer>
       {(colorTheme) => (
@@ -52,7 +52,7 @@ export function ButtonStyledLink({
   buttonStyle,
   buttonTheme = 'modal',
   ...props
-}: ButtonStyledLinkProps): JSX.Element {
+}: ButtonStyledLinkProps): React.JSX.Element {
   return (
     <ColorThemeContext.Consumer>
       {(colorTheme) => (

@@ -14,7 +14,7 @@ import LocationPickerModal from './LocationPickerModal';
 import Labeled from 'shared/components/Labeled';
 import stylesheet from './CorrectGeocode.less';
 
-export default function CorrectGeocode(): JSX.Element {
+export default function CorrectGeocode(): React.JSX.Element {
   const { openMap, correctedLng, correctedLat, setCorrectedLngLat } =
     useCorrectionsStore();
   const { previousLng: defaultLng, previousLat: defaultLat } =

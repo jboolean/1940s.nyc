@@ -8,7 +8,7 @@ import BagFront, { Color } from './components/Front';
 import { useLocation } from 'react-router';
 import stylesheet from './ToteBag.less';
 
-export default function ToteBag(): JSX.Element {
+export default function ToteBag(): React.JSX.Element {
   const containerRef = React.useRef<HTMLDivElement>(null);
 
   const location = useLocation();

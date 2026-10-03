@@ -136,7 +136,9 @@ class MapLibreMap
     return (
       <div
         className={classnames(stylesheet.map, propsClassName)}
-        ref={(el) => (this.mapContainer = el)}
+        ref={(el) => {
+          this.mapContainer = el;
+        }}
         data-testid="map"
       />
     );

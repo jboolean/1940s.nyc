@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router';
 import Button from 'shared/components/Button';
 import useAuthStore from 'shared/stores/AuthStore';
 
-export default function LoginPage(): JSX.Element {
+export default function LoginPage(): React.JSX.Element {
   const login = useAuthStore((state) => state.login);
   const close = useAuthStore((state) => state.close);
   const isAutheticated = useAuthStore((state) => state.isAutheticated);

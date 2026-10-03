@@ -110,7 +110,7 @@ export default class ImageSwitcher extends React.Component<Props, State> {
     });
   }
 
-  render(): JSX.Element {
+  render(): React.JSX.Element {
     const { visibleView, hide, loaded } = this.state;
 
     // Use the one from props if it is the same key so we get the most up-to-date element

@@ -17,7 +17,7 @@ interface Props {
 export default function Welcome({
   isOpen,
   onRequestClose,
-}: Props): JSX.Element {
+}: Props): React.JSX.Element {
   // Used to hide this annoying modal in development
   const isWelcomeDisabled = useFeatureFlag(FeatureFlag.DISABLE_WELCOME_MODAL);
 

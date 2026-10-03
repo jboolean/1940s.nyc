@@ -37,16 +37,16 @@
     "normalize.css": "^8.0.1",
     "pmtiles": "^4.3.0",
     "qs": "^6.16.0",
-    "react": "^18.3.1",
+    "react": "^19.2.0",
     "react-autosuggest": "^10.1.0",
-    "react-dom": "^18.3.1",
-    "react-modal": "^3.16.1",
-    "react-number-format": "^5.3.1",
+    "react-dom": "^19.2.0",
+    "react-modal": "^3.16.3",
+    "react-number-format": "^5.4.5",
     "react-router": "^7.18.0",
     "react-transition-group": "^4.4.5",
     "react-virtualized-auto-sizer": "^2.0.3",
-    "react-window": "^1.8.7",
-    "react-window-infinite-loader": "^1.0.9",
+    "react-window": "^1.8.11",
+    "react-window-infinite-loader": "^1.0.10",
     "zustand": "^5.0.13"
   },
   "devDependencies": {
@@ -77,9 +77,9 @@
     "@types/netlify-identity-widget": "^1.9.3",
     "@types/prettier": "^2.7.1",
     "@types/qs": "^6.9.7",
-    "@types/react": "^18.3.31",
+    "@types/react": "^19.2.0",
     "@types/react-autosuggest": "^10.1.11",
-    "@types/react-dom": "^18.3.7",
+    "@types/react-dom": "^19.2.0",
     "@types/react-modal": "^3.13.1",
     "@types/react-refresh": "~0.14.5",
     "@types/react-transition-group": "^4.4.12",
@@ -138,7 +138,10 @@
   },
   "overrides": {
     "@typescript-eslint/parser": "^8.59.2",
-    "@typescript-eslint/eslint-plugin": "^8.59.2"
+    "@typescript-eslint/eslint-plugin": "^8.59.2",
+    "@sentry/react": {
+      "react": "^19.2.0"
+    }
   },
   "files": [
     "dist"

@@ -9,7 +9,7 @@ const STORY_AUTH_TOKEN_KEY = 'token';
  * This is the landing page for the edit link in story emails.
  * It just rehydrates the story draft store with the story data and redirects.
  */
-export default function EditStory(): JSX.Element {
+export default function EditStory(): React.JSX.Element {
   const { search } = useLocation();
   const searchParams = new URLSearchParams(search);
 

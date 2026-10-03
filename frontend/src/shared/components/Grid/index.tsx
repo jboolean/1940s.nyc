@@ -27,7 +27,7 @@ type GridProps<T> = {
   aspectRatio: number;
   items: T[];
   totalItems: number;
-  renderItem: (item: T) => JSX.Element;
+  renderItem: (item: T) => React.JSX.Element;
   loadMoreItems: (upTo: number) => Promise<void>;
 };
 
@@ -51,7 +51,7 @@ function Grid<T>({
   listRef,
 
   loadMoreItems,
-}: GridProps<T> & SizeProps & PrivateProps): JSX.Element | null {
+}: GridProps<T> & SizeProps & PrivateProps): React.JSX.Element | null {
   const containerWidth = containerWidthMaybeUndefined ?? 0;
   const containerHeight = containerHeightMaybeUndefined ?? 0;
 
@@ -164,10 +164,10 @@ function Grid<T>({
 
 export default function AutoSizeGrid<T>({
   ...gripProps
-}: GridProps<T>): JSX.Element {
+}: GridProps<T>): React.JSX.Element {
   // AutoSizer unmounts children when width is 0, so we pull state/refs up to here, its parent
-  const visibleItemIRef = React.useRef<number>();
-  const listRef = React.useRef<List>();
+  const visibleItemIRef = React.useRef<number | undefined>(undefined);
+  const listRef = React.useRef<List | undefined>(undefined);
 
   return (
     <AutoSizer

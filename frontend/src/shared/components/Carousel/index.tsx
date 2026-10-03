@@ -18,7 +18,7 @@ export default function Carousel({
 }: {
   images: Image[];
   className: string;
-}): JSX.Element {
+}): React.JSX.Element {
   const [i, setI] = React.useState(0);
   React.useEffect(() => {
     const handle = setInterval(() => {

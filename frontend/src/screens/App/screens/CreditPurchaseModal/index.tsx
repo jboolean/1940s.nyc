@@ -13,7 +13,7 @@ import LoginForm from 'shared/components/LoginForm';
 import useLoginStore from '../../../../shared/stores/LoginStore';
 import stylesheet from './CreditPurchaseModal.less';
 
-export default function CreditPurchaseModal(): JSX.Element {
+export default function CreditPurchaseModal(): React.JSX.Element {
   const {
     close: onRequestClose,
     errorMessage,

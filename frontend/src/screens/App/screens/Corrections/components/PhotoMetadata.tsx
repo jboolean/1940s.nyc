@@ -18,7 +18,7 @@ export default function PhotoMetadata({
   photo,
 }: {
   photo?: Photo;
-}): JSX.Element {
+}): React.JSX.Element {
   // Lot numbers are strings, but can almost always be parsed as numbers and displayed better.
 
   return (

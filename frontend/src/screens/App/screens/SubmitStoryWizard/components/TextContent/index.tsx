@@ -40,7 +40,7 @@ export default function TextContent({
   isAudioStorytellingEnabled: boolean;
   storyState: StoryState;
   onUnpublish: () => void;
-}): JSX.Element {
+}): React.JSX.Element {
   const handleTextContentChange: ChangeEventHandler<HTMLTextAreaElement> = (
     event
   ) => {

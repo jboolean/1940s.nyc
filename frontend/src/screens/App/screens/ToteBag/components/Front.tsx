@@ -14,7 +14,7 @@ export default function Front({
   foregroundColor?: Color;
   backgroundColor?: Color;
   style?: 'outline' | 'solid';
-}): JSX.Element {
+}): React.JSX.Element {
   return (
     <div
       className={classNames(

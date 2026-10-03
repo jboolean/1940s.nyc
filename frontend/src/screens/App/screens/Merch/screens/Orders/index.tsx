@@ -28,7 +28,7 @@ const itemImages: Record<MerchInternalVariant, string> = {
   [MerchInternalVariant.TOTE_BAG_SMALL]: ToteBagSmallImage,
 };
 
-function TrackOrderLink({ order }: { order: Order }): JSX.Element {
+function TrackOrderLink({ order }: { order: Order }): React.JSX.Element {
   if (!order.trackingUrl) {
     return null;
   }
@@ -39,7 +39,7 @@ function TrackOrderLink({ order }: { order: Order }): JSX.Element {
   );
 }
 
-function OrderStatus({ order }: { order: Order }): JSX.Element {
+function OrderStatus({ order }: { order: Order }): React.JSX.Element {
   const { state, fulfillmentState } = order;
 
   switch (state) {
@@ -84,7 +84,7 @@ function OrderStatus({ order }: { order: Order }): JSX.Element {
   }
 }
 
-function OrderItem({ item }: { item: Order['items'][0] }): JSX.Element {
+function OrderItem({ item }: { item: Order['items'][0] }): React.JSX.Element {
   const { openItemForCustomizing } = useOrdersStore();
 
   return (
@@ -111,7 +111,7 @@ function OrderItem({ item }: { item: Order['items'][0] }): JSX.Element {
   );
 }
 
-function OrdersList({ orders }: { orders: Order[] }): JSX.Element {
+function OrdersList({ orders }: { orders: Order[] }): React.JSX.Element {
   const formatter = new Intl.DateTimeFormat('en-US', {
     year: 'numeric',
     month: 'long',
@@ -136,7 +136,7 @@ function OrdersList({ orders }: { orders: Order[] }): JSX.Element {
   );
 }
 
-export default function Orders(): JSX.Element {
+export default function Orders(): React.JSX.Element {
   const { orders, initialize: loadOrders, openLogin } = useOrdersStore();
 
   useEffect(() => {

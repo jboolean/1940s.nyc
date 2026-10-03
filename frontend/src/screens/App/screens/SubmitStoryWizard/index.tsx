@@ -14,7 +14,7 @@ import useStoryDraftStore, {
   useStoryDraftStoreComputeds,
 } from './stores/StoryDraftStore';
 
-const StoryWizardContent = (): JSX.Element | null => {
+const StoryWizardContent = (): React.JSX.Element | null => {
   const {
     step,
     draftStory,
@@ -76,7 +76,7 @@ const StoryWizardContent = (): JSX.Element | null => {
   return null;
 };
 
-export default function SubmitStoryWizard(): JSX.Element {
+export default function SubmitStoryWizard(): React.JSX.Element {
   const isOpen = useStoryDraftStore((state) => state.isOpen);
   const onRequestClose = useStoryDraftStore((state) => state.close);
 

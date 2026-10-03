@@ -13,7 +13,7 @@ export default function ColorLayer({
 }: {
   photoIdentifier: string;
   className?: string;
-}): JSX.Element | null {
+}): React.JSX.Element | null {
   const {
     colorEnabledForIdentifier,
     colorizedImageSrc,

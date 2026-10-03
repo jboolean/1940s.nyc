@@ -7,7 +7,7 @@ interface Props {
   photoIdentifier: string;
 }
 
-export default function Stories({ photoIdentifier }: Props): JSX.Element {
+export default function Stories({ photoIdentifier }: Props): React.JSX.Element {
   const [stories, setStories] = React.useState<StoryType[]>([]);
 
   React.useEffect(() => {

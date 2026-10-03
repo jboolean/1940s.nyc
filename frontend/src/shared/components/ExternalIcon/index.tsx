@@ -3,7 +3,7 @@ import ExternalIconSrc from 'shared/assets/external.svg?asset';
 
 import stylesheet from './ExternalIcon.less';
 
-export default function ExternalIcon(): JSX.Element {
+export default function ExternalIcon(): React.JSX.Element {
   return (
     <img
       src={ExternalIconSrc}

@@ -6,7 +6,7 @@ import TextInput from './TextInput';
 
 export default function CurrencyInput({
   ...props
-}: NumericFormatProps): JSX.Element {
+}: NumericFormatProps): React.JSX.Element {
   return (
     <NumericFormat
       decimalScale={2}

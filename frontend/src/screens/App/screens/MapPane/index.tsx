@@ -23,7 +23,7 @@ import { openNewsletterModal } from '../NewsletterModal';
 import { useTipJarStore } from '../TipJar';
 import useAmountPresets from '../TipJar/useAmountPresets';
 
-function SuggestedTip(): JSX.Element {
+function SuggestedTip(): React.JSX.Element {
   const [lowestAmount] = useAmountPresets();
   return <NumericFormat displayType="text" prefix="$" value={lowestAmount} />;
 }
@@ -49,7 +49,7 @@ function withTipJar<P extends TipJarProps, C extends React.ComponentType<P>>(
 ): React.FunctionComponent<Omit<P, keyof TipJarProps>> {
   function WithTipJar<PassProps extends Omit<P, keyof TipJarProps>>(
     props: PassProps
-  ): JSX.Element {
+  ): React.JSX.Element {
     const { open } = useTipJarStore();
     // @ts-ignore -- I give up
     return <Component {...props} handleOpenTipJar={open} />;
@@ -257,7 +257,7 @@ class MapPane extends React.Component<PropsWithNavigate, State> {
 
 function MapPaneWithNavigate(
   props: Omit<PropsWithNavigate, 'navigate'>
-): JSX.Element {
+): React.JSX.Element {
   const navigate = useNavigate();
   return <MapPane {...props} navigate={navigate} />;
 }

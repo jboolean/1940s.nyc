@@ -30,7 +30,7 @@ const ClickToZoomHitArea = ({
   wrapper: ReactZoomPanPinchContentRef;
   isZoomed: boolean;
   isPanning: boolean;
-}): JSX.Element | null => {
+}): React.JSX.Element | null => {
   const canHover = useCanHover();
 
   const startXRef = React.useRef<number>(0);
@@ -81,7 +81,7 @@ export default function ViewerPane({
   className,
 }: {
   className: string;
-}): JSX.Element {
+}): React.JSX.Element {
   const { identifier: photoIdentifier } = useParams<{ identifier?: string }>();
   const navigate = useNavigate();
 

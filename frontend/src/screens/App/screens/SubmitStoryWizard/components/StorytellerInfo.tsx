@@ -29,7 +29,7 @@ export default function StorytellerInfo({
   onStorytellerEmailChange: (newStorytellerEmail: string) => void;
   onGoBackToToContentStepClick: () => void;
   onSubmit: () => void;
-}): JSX.Element {
+}): React.JSX.Element {
   return (
     <div className={stylesheet.container}>
       <h1>Add your story</h1>

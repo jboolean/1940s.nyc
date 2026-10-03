@@ -17,7 +17,7 @@ export default function Alternates({
 }: {
   className?: string;
   originalIdentifier: string;
-}): JSX.Element | null {
+}): React.JSX.Element | null {
   const location = useLocation();
   const [alternatePhotos, setAlternatePhotos] = React.useState<Photo[]>([]);
 
