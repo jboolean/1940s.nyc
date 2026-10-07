@@ -1,3 +1,5 @@
+import './src/tracer';
+
 import 'reflect-metadata';
 import serverlessHttp from 'serverless-http';
 import 'source-map-support/register';
