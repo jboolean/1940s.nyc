@@ -98,7 +98,7 @@
     "openai": "^6.39.0",
     "pg": "^8.8.0",
     "pg-query-stream": "^4.3.0",
-    "postmark": "^4.0.4",
+    "postmark": "^5.1.0",
     "puppeteer-core": "^24.1.1",
     "reflect-metadata": "^0.1.13",
     "serverless-http": "^4.0.0",
