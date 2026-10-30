@@ -99,7 +99,7 @@
     "pg": "^8.8.0",
     "pg-query-stream": "^4.3.0",
     "postmark": "^4.0.4",
-    "puppeteer-core": "^24.1.1",
+    "puppeteer-core": "^25.16.0",
     "reflect-metadata": "^0.1.13",
     "serverless-http": "^4.0.0",
     "sharp": "^0.35.5",
