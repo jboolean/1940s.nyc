@@ -1,7 +1,6 @@
 import { In } from 'typeorm';
 import * as MerchOrderService from '../business/merch/MerchOrderService';
-import { applyProdigiOrder } from '../business/prodigi/ProdigiCallbackService';
-import * as ProdigiService from '../business/prodigi/ProdigiService';
+import { handleOrderCallback } from '../business/prodigi/ProdigiCallbackService';
 import { AppDataSource } from '../createConnection';
 import MerchOrder from '../entities/MerchOrder';
 import MerchOrderFulfillmentState from '../enum/MerchOrderFulfillmentState';
@@ -31,7 +30,10 @@ export async function submitPendingProdigiOrders(): Promise<void> {
       console.log('[prodigi] Submitting order', order.id);
       await MerchOrderService.submitOrderForFulfillment(order.id);
     } catch (e) {
-      console.error(`[prodigi] Failed to submit order ${order.id}`, e);
+      console.error(
+        `[merch-alert] failed to submit Prodigi order ${order.id}`,
+        e
+      );
     }
   }
 }
@@ -65,10 +67,7 @@ export async function syncSubmittedProdigiOrders(): Promise<void> {
   for (const order of orders) {
     const providerOrderId = order.providerOrderId as string;
     try {
-      const prodigiOrder = await ProdigiService.getOrder(providerOrderId);
-      if (prodigiOrder) {
-        await applyProdigiOrder(providerOrderId, prodigiOrder);
-      }
+      await handleOrderCallback(providerOrderId, true);
       // Touch the row so orders are visited in turn.
       await repository.update(order.id, { updatedAt: new Date() });
     } catch (e) {

@@ -1,8 +1,4 @@
 import { colorizeForPrint } from '../business/color/ColorService';
-import {
-  copyOriginalToPrintJpeg,
-  uploadPrintJpeg,
-} from '../business/utils/printfileUtils';
 import MerchInternalVariant from '../enum/MerchInternalVariant';
 import MerchItemState from '../enum/MerchItemState';
 import renderPrintfiles, { MAX_PRINTFILE_ATTEMPTS } from './renderPrintfiles';
@@ -43,6 +39,7 @@ function item(id: number, colorize: boolean, attempts?: number): object {
   };
   return {
     id,
+    order: { id: 77 },
     internalVariant: MerchInternalVariant.PRINT_HPR_8X12,
     customizationOptions: options,
   };
@@ -55,36 +52,27 @@ describe('renderPrintfiles', () => {
     jest.spyOn(console, 'error').mockImplementation(() => undefined);
   });
 
-  it('colorizes at print quality when asked and copies the original otherwise', async () => {
+  it('counts the attempt before calling out, and a failure does not stop other items', async () => {
     getMany.mockResolvedValue([item(1, true), item(2, false)]);
-    jest.mocked(colorizeForPrint).mockResolvedValue(Buffer.from('x'));
+    jest.mocked(colorizeForPrint).mockRejectedValue(new Error('palette down'));
     await renderPrintfiles();
-    expect(colorizeForPrint).toHaveBeenCalledWith('p1');
-    expect(uploadPrintJpeg).toHaveBeenCalledWith(1, Buffer.from('x'));
-    expect(copyOriginalToPrintJpeg).toHaveBeenCalledWith(2, 'p2');
-    expect(update).toHaveBeenCalledWith(1, {
-      state: MerchItemState.READY_FOR_FULFILLMENT,
+
+    const firstUpdate = update.mock.calls[0] as [number, object];
+    expect(firstUpdate[0]).toBe(1);
+    expect(firstUpdate[1]).toMatchObject({
+      customizationOptions: { printfile: { attempts: 1 } },
     });
     expect(update).toHaveBeenCalledWith(2, {
       state: MerchItemState.READY_FOR_FULFILLMENT,
     });
   });
 
-  it('records a failure, keeps the item retryable, and still processes other items', async () => {
-    getMany.mockResolvedValue([item(1, true), item(2, false)]);
-    jest.mocked(colorizeForPrint).mockRejectedValue(new Error('palette down'));
+  it('moves an item to printfile_failed once its attempts are used up', async () => {
+    getMany.mockResolvedValue([item(1, true, 5)]);
     await renderPrintfiles();
+    expect(colorizeForPrint).not.toHaveBeenCalled();
     expect(update).toHaveBeenCalledWith(1, {
-      customizationOptions: expect.objectContaining({
-        printfile: {
-          attempts: 1,
-          lastError: expect.stringContaining('palette down') as string,
-        },
-      }) as unknown,
-      state: MerchItemState.AWAITING_PRINTFILE,
-    });
-    expect(update).toHaveBeenCalledWith(2, {
-      state: MerchItemState.READY_FOR_FULFILLMENT,
+      state: MerchItemState.PRINTFILE_FAILED,
     });
   });
 

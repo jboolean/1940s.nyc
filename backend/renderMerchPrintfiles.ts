@@ -18,9 +18,10 @@ async function runStep(name: string, step: () => Promise<void>): Promise<void> {
 }
 
 export const handler = withSetup(async () => {
+  // Quick steps first, so slow rendering can never keep them from running.
+  await runStep('submit Prodigi orders', submitPendingProdigiOrders);
+  await runStep('sync Prodigi orders', syncSubmittedProdigiOrders);
   await runStep('render tote printfiles', renderMerchPrintfilesImpl);
   await runStep('render print files', renderPrintfilesImpl);
   await runStep('add items to orders', addMerchItemsToOrderImpl);
-  await runStep('submit Prodigi orders', submitPendingProdigiOrders);
-  await runStep('sync Prodigi orders', syncSubmittedProdigiOrders);
 });

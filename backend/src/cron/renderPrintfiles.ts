@@ -10,8 +10,8 @@ import MerchOrderItem from '../entities/MerchOrderItem';
 import MerchItemState from '../enum/MerchItemState';
 import MerchOrderState from '../enum/MerchOrderState';
 
-// Colorizing at the highest Palette resolution is slow, so keep batches small.
-const LIMIT = 3;
+const LIMIT = 2;
+const COLORIZE_TIMEOUT_MS = 90_000;
 export const MAX_PRINTFILE_ATTEMPTS = 5;
 
 async function createPrintfile(
@@ -19,10 +19,16 @@ async function createPrintfile(
   options: PrintCustomizationOptions
 ): Promise<void> {
   if (options.colorize) {
-    await uploadPrintJpeg(
-      item.id,
-      await colorizeForPrint(options.photoIdentifier)
-    );
+    const image = await Promise.race([
+      colorizeForPrint(options.photoIdentifier),
+      new Promise<never>((_, reject) =>
+        setTimeout(
+          () => reject(new Error('Colorization timed out')),
+          COLORIZE_TIMEOUT_MS
+        )
+      ),
+    ]);
+    await uploadPrintJpeg(item.id, image);
   } else {
     await copyOriginalToPrintJpeg(item.id, options.photoIdentifier);
   }
@@ -61,6 +67,21 @@ export default async function renderPrintfiles(): Promise<void> {
       continue;
     }
 
+    // Count the attempt first, so an item whose call hangs still runs out of attempts.
+    const attempts = (options.printfile?.attempts ?? 0) + 1;
+    if (attempts > MAX_PRINTFILE_ATTEMPTS) {
+      console.error(
+        `[merch-alert] print file for item ${item.id} (order ${item.order.id}) gave up after ${MAX_PRINTFILE_ATTEMPTS} attempts`
+      );
+      await repository.update(item.id, {
+        state: MerchItemState.PRINTFILE_FAILED,
+      });
+      continue;
+    }
+    await repository.update(item.id, {
+      customizationOptions: { ...options, printfile: { attempts } },
+    });
+
     console.log('[prints] Creating print file for item', item.id);
     try {
       await createPrintfile(item, options);
@@ -68,10 +89,8 @@ export default async function renderPrintfiles(): Promise<void> {
         state: MerchItemState.READY_FOR_FULFILLMENT,
       });
     } catch (e) {
-      const attempts = (options.printfile?.attempts ?? 0) + 1;
-      const exhausted = attempts >= MAX_PRINTFILE_ATTEMPTS;
       console.error(
-        `[prints] Print file for item ${item.id} failed (attempt ${attempts}${exhausted ? ', giving up' : ''})`,
+        `[merch-alert] print file for item ${item.id} (order ${item.order.id}) failed, attempt ${attempts}`,
         e
       );
       await repository.update(item.id, {
@@ -79,9 +98,6 @@ export default async function renderPrintfiles(): Promise<void> {
           ...options,
           printfile: { attempts, lastError: String(e).slice(0, 500) },
         },
-        state: exhausted
-          ? MerchItemState.PRINTFILE_FAILED
-          : MerchItemState.AWAITING_PRINTFILE,
       });
     }
   }

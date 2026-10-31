@@ -1,4 +1,5 @@
 import { BadRequest } from 'http-errors';
+import { Brackets } from 'typeorm';
 import { AppDataSource } from '../../createConnection';
 import MerchCustomizationOptions from '../../entities/MerchCustomizationOptions';
 import MerchOrder from '../../entities/MerchOrder';
@@ -197,8 +198,10 @@ export async function submitOrderForFulfillment(
 
   await getFulfillmentProvider(order.provider).submitOrderForFulfillment(order);
 
-  order.state = MerchOrderState.SUBMITTED_FOR_FULFILLMENT;
-  await orderRepository.save(order);
+  // Targeted update: a status callback may have changed the order since it was loaded.
+  await orderRepository.update(orderId, {
+    state: MerchOrderState.SUBMITTED_FOR_FULFILLMENT,
+  });
 }
 
 export async function cancelOrder(orderId: number): Promise<void> {
@@ -293,6 +296,10 @@ export async function onShipmentSent(
     return;
   }
 
+  if (order.trackingUrl === trackingUrl) {
+    return;
+  }
+
   order.trackingUrl = trackingUrl;
   order = await orderRepository.save(order);
 
@@ -323,17 +330,40 @@ export async function getOrdersForReview(): Promise<MerchOrder[]> {
 }
 
 export async function getOrdersWithExceptions(): Promise<MerchOrder[]> {
+  const stuckBefore = new Date(Date.now() - 60 * 60 * 1000);
   return await AppDataSource.getRepository(MerchOrder)
     .createQueryBuilder('order')
     .innerJoinAndSelect('order.items', 'items')
     .innerJoinAndSelect('order.user', 'user')
-    .where({ state: MerchOrderState.SUBMITTED_FOR_FULFILLMENT })
-    .andWhere('order.fulfillmentState in (:...states)', {
-      states: [
-        MerchOrderFulfillmentState.FAILED,
-        MerchOrderFulfillmentState.ON_HOLD,
-      ],
+    .where(
+      new Brackets((qb) =>
+        qb
+          .where({ state: MerchOrderState.SUBMITTED_FOR_FULFILLMENT })
+          .andWhere('order.fulfillmentState in (:...states)', {
+            states: [
+              MerchOrderFulfillmentState.FAILED,
+              MerchOrderFulfillmentState.ON_HOLD,
+            ],
+          })
+      )
+    )
+    // A print file that could not be created
+    .orWhere('items.state = :printfileFailed', {
+      printfileFailed: MerchItemState.PRINTFILE_FAILED,
     })
+    // A Prodigi order that could not be sent for over an hour
+    .orWhere(
+      new Brackets((qb) =>
+        qb
+          .where('order.provider = :prodigi', {
+            prodigi: MerchProvider.PRODIGI,
+          })
+          .andWhere('order.state = :pending', {
+            pending: MerchOrderState.PENDING_SUBMISSION,
+          })
+          .andWhere('order.updatedAt < :stuckBefore', { stuckBefore })
+      )
+    )
     .orderBy('order.createdAt', 'DESC')
     .getMany();
 }
