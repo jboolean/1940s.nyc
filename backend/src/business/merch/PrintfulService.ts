@@ -56,9 +56,8 @@ export async function createEmptyOrder(
 }
 
 export async function addItemToOrder(item: MerchOrderItem): Promise<void> {
-  const printfulOrderId = required(
-    item.order.providerOrderId,
-    'item.order.printfulOrderId'
+  const printfulOrderId = Number(
+    required(item.order.providerOrderId, 'item.order.providerOrderId')
   );
 
   // Idempotency

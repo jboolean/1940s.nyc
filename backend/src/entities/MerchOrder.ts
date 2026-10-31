@@ -36,8 +36,8 @@ export default class MerchOrder {
   @OneToMany(() => MerchOrderItem, (item) => item.order, { eager: true })
   items: MerchOrderItem[];
 
-  @Column()
-  providerOrderId?: number;
+  @Column({ type: 'varchar', nullable: true })
+  providerOrderId?: string;
 
   @Column({ unique: true })
   stripeCheckoutSessionId: string;
