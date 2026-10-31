@@ -8,8 +8,17 @@ const router = express.Router();
 router.use(express.json({ type: () => true }));
 
 router.post('/', async (req, res) => {
+  let event: ReturnType<typeof parseCallbackEvent>;
   try {
-    const event = parseCallbackEvent(req.body);
+    event = parseCallbackEvent(req.body);
+  } catch (e) {
+    // Retrying a payload we cannot parse will never help, so do not answer with a
+    // status that asks Prodigi to send it again.
+    console.error('[Prodigi webhook] Ignoring a callback we cannot parse', e);
+    res.status(400).send();
+    return;
+  }
+  try {
     const ok = await ProdigiCallbackService.handleOrderCallback(
       event.order.id,
       event.kind === 'order.shipments.shipment'
