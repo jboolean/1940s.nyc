@@ -22,7 +22,8 @@ CREATE TABLE merch_shipments (
   provider_shipment_id varchar NOT NULL,
   tracking_url varchar,
   tracking_number varchar,
-  carrier varchar
+  carrier varchar,
+  emailed_at timestamp
 );
 
 CREATE UNIQUE INDEX merch_shipments_order_provider_shipment_idx
@@ -31,4 +32,6 @@ CREATE UNIQUE INDEX merch_shipments_order_provider_shipment_idx
 COMMIT;
 ```
 
-Check the existing timestamp column type first (`\d merch_orders`) and use the same type (`timestamp` vs `timestamptz`) for `created_at` and `updated_at`.
+`emailed_at` is set when the shipped email is claimed for sending and cleared again if sending fails, so a provider retry resends it.
+
+Check the existing timestamp column type first (`\d merch_orders`) and use the same type (`timestamp` vs `timestamptz`) for `created_at`, `updated_at` and `emailed_at`.

@@ -1,13 +1,14 @@
 import { BadRequest } from 'http-errors';
+import { IsNull } from 'typeorm';
 import { AppDataSource } from '../../createConnection';
 import MerchOrder from '../../entities/MerchOrder';
 import MerchOrderItem from '../../entities/MerchOrderItem';
+import MerchShipment from '../../entities/MerchShipment';
 import ShippingAddress from '../../entities/ShippingAddress';
 import MerchInternalVariant from '../../enum/MerchInternalVariant';
 import MerchOrderFulfillmentState from '../../enum/MerchOrderFulfillmentState';
 import MerchOrderState from '../../enum/MerchOrderState';
 import MerchProvider from '../../enum/MerchProvider';
-import MerchShipment from '../../entities/MerchShipment';
 import EmailService from '../email/EmailService';
 import OrderCustomizeTemplate from '../email/templates/OrderCustomizeTemplate';
 import { OrderTemplateData } from '../email/templates/OrderEmailTemplateData';
@@ -198,7 +199,7 @@ export async function onShipmentSent(
 ): Promise<void> {
   const orderRepository = AppDataSource.getRepository(MerchOrder);
   const shipmentRepository = AppDataSource.getRepository(MerchShipment);
-  let order = await orderRepository.findOneBy({
+  const order = await orderRepository.findOneBy({
     provider,
     providerOrderId,
   });
@@ -208,44 +209,61 @@ export async function onShipmentSent(
     return;
   }
 
-  const existing = await shipmentRepository.findOneBy({
+  // Upsert so concurrent or retried deliveries of the same shipment converge on one row.
+  await shipmentRepository.upsert(
+    {
+      orderId: order.id,
+      providerShipmentId: shipmentInfo.providerShipmentId,
+      trackingUrl: shipmentInfo.trackingUrl ?? null,
+      trackingNumber: shipmentInfo.trackingNumber ?? null,
+      carrier: shipmentInfo.carrier ?? null,
+    },
+    ['orderId', 'providerShipmentId']
+  );
+  const shipment = await shipmentRepository.findOneByOrFail({
     orderId: order.id,
     providerShipmentId: shipmentInfo.providerShipmentId,
   });
-  const shipment = existing ?? new MerchShipment();
-  shipment.orderId = order.id;
-  shipment.providerShipmentId = shipmentInfo.providerShipmentId;
-  shipment.trackingUrl = shipmentInfo.trackingUrl ?? null;
-  shipment.trackingNumber = shipmentInfo.trackingNumber ?? null;
-  shipment.carrier = shipmentInfo.carrier ?? null;
-  await shipmentRepository.save(shipment);
 
-  if (shipmentInfo.trackingUrl) {
-    order.trackingUrl = shipmentInfo.trackingUrl;
-    order = await orderRepository.save(order);
+  // order.trackingUrl follows the most recently created shipment, so a retry of an older one cannot move it back.
+  const latest = await shipmentRepository.findOne({
+    where: { orderId: order.id },
+    order: { id: 'DESC' },
+  });
+  if (latest?.trackingUrl && latest.trackingUrl !== order.trackingUrl) {
+    order.trackingUrl = latest.trackingUrl;
+    await orderRepository.save(order);
   }
 
-  if (existing) {
-    // Provider retried or re-sent the same shipment; the customer was already emailed.
+  // Claim the email atomically so exactly one delivery sends it; release the claim if sending fails so a retry sends it.
+  const claim = await shipmentRepository.update(
+    { id: shipment.id, emailedAt: IsNull() },
+    { emailedAt: new Date() }
+  );
+  if (!claim.affected) {
     return;
   }
 
-  const user = await UserService.getUser(order.userId);
+  try {
+    const user = await UserService.getUser(order.userId);
+    if (user.email) {
+      const orderShippedEmail = OrderShippedTemplate.createTemplatedEmail({
+        to: user.email,
+        templateContext: {
+          ...createOrderEmailTemplateData(order),
+          trackingUrl: shipment.trackingUrl ?? undefined,
+        },
+        metadata: {
+          orderId: order.id.toString(),
+          userId: user.id.toString(),
+        },
+      });
 
-  if (user.email) {
-    const orderShippedEmail = OrderShippedTemplate.createTemplatedEmail({
-      to: user.email,
-      templateContext: {
-        ...createOrderEmailTemplateData(order),
-        trackingUrl: shipmentInfo.trackingUrl,
-      },
-      metadata: {
-        orderId: order.id.toString(),
-        userId: user.id.toString(),
-      },
-    });
-
-    await EmailService.sendTemplateEmail(orderShippedEmail);
+      await EmailService.sendTemplateEmail(orderShippedEmail);
+    }
+  } catch (e) {
+    await shipmentRepository.update({ id: shipment.id }, { emailedAt: null });
+    throw e;
   }
 }
 

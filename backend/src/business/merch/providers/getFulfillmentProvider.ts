@@ -2,6 +2,7 @@ import MerchInternalVariant from '../../../enum/MerchInternalVariant';
 import MerchProvider from '../../../enum/MerchProvider';
 import FulfillmentProvider from './FulfillmentProvider';
 import PrintfulFulfillmentProvider from './PrintfulFulfillmentProvider';
+import ProdigiFulfillmentProvider from './ProdigiFulfillmentProvider';
 
 const PROVIDER_FOR_VARIANT: Record<MerchInternalVariant, MerchProvider> = {
   [MerchInternalVariant.TOTE_BAG_SMALL]: MerchProvider.PRINTFUL,
@@ -9,13 +10,7 @@ const PROVIDER_FOR_VARIANT: Record<MerchInternalVariant, MerchProvider> = {
 
 const PROVIDERS: Record<MerchProvider, FulfillmentProvider> = {
   [MerchProvider.PRINTFUL]: PrintfulFulfillmentProvider,
-  [MerchProvider.PRODIGI]: {
-    createOrder: () => Promise.reject(new Error('Prodigi is not implemented')),
-    addItemToOrder: () =>
-      Promise.reject(new Error('Prodigi is not implemented')),
-    submitOrderForFulfillment: () =>
-      Promise.reject(new Error('Prodigi is not implemented')),
-  },
+  [MerchProvider.PRODIGI]: ProdigiFulfillmentProvider,
 };
 
 export function selectProviderForItems(

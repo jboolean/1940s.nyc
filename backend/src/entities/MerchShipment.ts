@@ -38,4 +38,7 @@ export default class MerchShipment {
 
   @Column({ type: 'varchar', nullable: true })
   carrier: string | null;
+
+  @Column({ type: 'timestamp', nullable: true })
+  emailedAt: Date | null;
 }
