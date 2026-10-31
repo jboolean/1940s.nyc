@@ -20,8 +20,6 @@ export interface PrintCustomizationOptions {
   variant: PrintVariant;
   photoIdentifier: string;
   colorize: boolean;
-  // Print file generation bookkeeping, written by the render cron.
-  printfile?: { attempts: number; lastError?: string };
 }
 
 type MerchCustomizationOptions =

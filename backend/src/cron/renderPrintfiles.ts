@@ -73,7 +73,7 @@ export default async function renderPrintfiles(): Promise<void> {
     }
 
     // Count the attempt first, so an item whose call hangs still runs out of attempts.
-    const attempts = (options.printfile?.attempts ?? 0) + 1;
+    const attempts = (item.printfileAttempts ?? 0) + 1;
     if (attempts > MAX_PRINTFILE_ATTEMPTS) {
       console.error(
         `[merch-alert] print file for item ${item.id} (order ${item.order.id}) gave up after ${MAX_PRINTFILE_ATTEMPTS} attempts`
@@ -84,7 +84,7 @@ export default async function renderPrintfiles(): Promise<void> {
       continue;
     }
     await repository.update(item.id, {
-      customizationOptions: { ...options, printfile: { attempts } },
+      printfileAttempts: attempts,
     });
 
     console.log('[prints] Creating print file for item', item.id);
@@ -99,10 +99,7 @@ export default async function renderPrintfiles(): Promise<void> {
         e
       );
       await repository.update(item.id, {
-        customizationOptions: {
-          ...options,
-          printfile: { attempts, lastError: String(e).slice(0, 500) },
-        },
+        printfileError: String(e).slice(0, 500),
       });
     }
   }

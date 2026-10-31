@@ -30,18 +30,21 @@ jest.mock('../business/utils/printfileUtils', () => ({
   uploadPrintJpeg: jest.fn(),
 }));
 
-function item(id: number, colorize: boolean, attempts?: number): object {
-  const options = {
-    variant: MerchInternalVariant.PRINT_HPR_8X12,
-    photoIdentifier: `p${id}`,
-    colorize,
-    ...(attempts !== undefined && { printfile: { attempts } }),
-  };
+function item(
+  id: number,
+  colorize: boolean,
+  printfileAttempts?: number
+): object {
   return {
     id,
     order: { id: 77 },
     internalVariant: MerchInternalVariant.PRINT_HPR_8X12,
-    customizationOptions: options,
+    printfileAttempts,
+    customizationOptions: {
+      variant: MerchInternalVariant.PRINT_HPR_8X12,
+      photoIdentifier: `p${id}`,
+      colorize,
+    },
   };
 }
 
@@ -59,8 +62,9 @@ describe('renderPrintfiles', () => {
 
     const firstUpdate = update.mock.calls[0] as [number, object];
     expect(firstUpdate[0]).toBe(1);
-    expect(firstUpdate[1]).toMatchObject({
-      customizationOptions: { printfile: { attempts: 1 } },
+    expect(firstUpdate[1]).toMatchObject({ printfileAttempts: 1 });
+    expect(update).toHaveBeenCalledWith(1, {
+      printfileError: 'Error: palette down',
     });
     expect(update).toHaveBeenCalledWith(2, {
       state: MerchItemState.READY_FOR_FULFILLMENT,
