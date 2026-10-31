@@ -286,7 +286,7 @@ export async function onShipmentSent(
   trackingUrl: string
 ): Promise<void> {
   const orderRepository = AppDataSource.getRepository(MerchOrder);
-  let order = await orderRepository.findOneBy({
+  const order = await orderRepository.findOneBy({
     provider,
     providerOrderId,
   });
@@ -296,12 +296,21 @@ export async function onShipmentSent(
     return;
   }
 
-  if (order.trackingUrl === trackingUrl) {
+  // Only the caller that actually changes the URL sends the email, so a callback and the
+  // polling job handling the same shipment cannot both send it.
+  const updated = await orderRepository
+    .createQueryBuilder()
+    .update(MerchOrder)
+    .set({ trackingUrl })
+    .where('id = :id AND tracking_url IS DISTINCT FROM :trackingUrl', {
+      id: order.id,
+      trackingUrl,
+    })
+    .execute();
+  if (!updated.affected) {
     return;
   }
-
   order.trackingUrl = trackingUrl;
-  order = await orderRepository.save(order);
 
   const user = await UserService.getUser(order.userId);
 
@@ -330,40 +339,60 @@ export async function getOrdersForReview(): Promise<MerchOrder[]> {
 }
 
 export async function getOrdersWithExceptions(): Promise<MerchOrder[]> {
+  const repository = AppDataSource.getRepository(MerchOrder);
   const stuckBefore = new Date(Date.now() - 60 * 60 * 1000);
-  return await AppDataSource.getRepository(MerchOrder)
+
+  // Find the orders first, so the returned orders include all of their items.
+  const matches = await repository
+    .createQueryBuilder('order')
+    .leftJoin('order.items', 'items')
+    .select('order.id')
+    .where('order.state != :canceled', { canceled: MerchOrderState.CANCELED })
+    .andWhere(
+      new Brackets((qb) =>
+        qb
+          // Failed or held at the printer
+          .where(
+            new Brackets((q) =>
+              q
+                .where({ state: MerchOrderState.SUBMITTED_FOR_FULFILLMENT })
+                .andWhere('order.fulfillmentState in (:...states)', {
+                  states: [
+                    MerchOrderFulfillmentState.FAILED,
+                    MerchOrderFulfillmentState.ON_HOLD,
+                  ],
+                })
+            )
+          )
+          // A print file that could not be created
+          .orWhere('items.state = :printfileFailed', {
+            printfileFailed: MerchItemState.PRINTFILE_FAILED,
+          })
+          // A Prodigi order that could not be sent for over an hour
+          .orWhere(
+            new Brackets((q) =>
+              q
+                .where('order.provider = :prodigi', {
+                  prodigi: MerchProvider.PRODIGI,
+                })
+                .andWhere('order.state = :pending', {
+                  pending: MerchOrderState.PENDING_SUBMISSION,
+                })
+                .andWhere('order.updatedAt < :stuckBefore', { stuckBefore })
+            )
+          )
+      )
+    )
+    .getMany();
+  if (matches.length === 0) {
+    return [];
+  }
+
+  return await repository
     .createQueryBuilder('order')
     .innerJoinAndSelect('order.items', 'items')
     .innerJoinAndSelect('order.user', 'user')
-    .where(
-      new Brackets((qb) =>
-        qb
-          .where({ state: MerchOrderState.SUBMITTED_FOR_FULFILLMENT })
-          .andWhere('order.fulfillmentState in (:...states)', {
-            states: [
-              MerchOrderFulfillmentState.FAILED,
-              MerchOrderFulfillmentState.ON_HOLD,
-            ],
-          })
-      )
-    )
-    // A print file that could not be created
-    .orWhere('items.state = :printfileFailed', {
-      printfileFailed: MerchItemState.PRINTFILE_FAILED,
-    })
-    // A Prodigi order that could not be sent for over an hour
-    .orWhere(
-      new Brackets((qb) =>
-        qb
-          .where('order.provider = :prodigi', {
-            prodigi: MerchProvider.PRODIGI,
-          })
-          .andWhere('order.state = :pending', {
-            pending: MerchOrderState.PENDING_SUBMISSION,
-          })
-          .andWhere('order.updatedAt < :stuckBefore', { stuckBefore })
-      )
-    )
+    .where('order.id in (:...ids)', { ids: matches.map((o) => o.id) })
     .orderBy('order.createdAt', 'DESC')
     .getMany();
 }

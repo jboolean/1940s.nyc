@@ -19,16 +19,21 @@ async function createPrintfile(
   options: PrintCustomizationOptions
 ): Promise<void> {
   if (options.colorize) {
-    const image = await Promise.race([
-      colorizeForPrint(options.photoIdentifier),
-      new Promise<never>((_, reject) =>
-        setTimeout(
-          () => reject(new Error('Colorization timed out')),
-          COLORIZE_TIMEOUT_MS
-        )
-      ),
-    ]);
-    await uploadPrintJpeg(item.id, image);
+    let timer: NodeJS.Timeout | undefined;
+    try {
+      const image = await Promise.race([
+        colorizeForPrint(options.photoIdentifier),
+        new Promise<never>((_, reject) => {
+          timer = setTimeout(
+            () => reject(new Error('Colorization timed out')),
+            COLORIZE_TIMEOUT_MS
+          );
+        }),
+      ]);
+      await uploadPrintJpeg(item.id, image);
+    } finally {
+      clearTimeout(timer);
+    }
   } else {
     await copyOriginalToPrintJpeg(item.id, options.photoIdentifier);
   }
