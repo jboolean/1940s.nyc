@@ -68,6 +68,9 @@ export default async function renderPrintfiles(): Promise<void> {
       !isPrintVariant(item.internalVariant)
     ) {
       console.error('[prints] Item has no print customization', item.id);
+      logCountMetric(METRICS_NAMESPACE, 'PrintfileGiveUp', {
+        Stage: process.env.STAGE ?? 'unknown',
+      });
       await repository.update(item.id, {
         state: MerchItemState.PRINTFILE_FAILED,
       });

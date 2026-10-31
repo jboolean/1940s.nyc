@@ -48,6 +48,32 @@ function item(
   };
 }
 
+// The metric arrives as a CloudWatch EMF line, so the assertion reads it back the way the agent does.
+function expectGiveUpMetric(): void {
+  const lines = jest
+    .mocked(console.log)
+    .mock.calls.map(([line]) => String(line))
+    .filter((line) => line.startsWith('{'))
+    .map((line) => JSON.parse(line) as Record<string, unknown>);
+
+  expect(lines).toHaveLength(1);
+  const { _aws, ...values } = lines[0];
+  const aws = _aws as Record<string, unknown>;
+  expect(typeof aws.Timestamp).toBe('number');
+  delete aws.Timestamp;
+  expect(aws).toEqual({
+    CloudWatchMetrics: [
+      {
+        Namespace: 'fourtiesnyc/merch',
+        Dimensions: [['Stage']],
+        Metrics: [{ Name: 'PrintfileGiveUp', Unit: 'Count' }],
+      },
+    ],
+  });
+  expect(typeof values.Stage).toBe('string');
+  expect(values.PrintfileGiveUp).toBe(1);
+}
+
 describe('renderPrintfiles', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -78,28 +104,22 @@ describe('renderPrintfiles', () => {
     expect(update).toHaveBeenCalledWith(1, {
       state: MerchItemState.PRINTFILE_FAILED,
     });
+    expectGiveUpMetric();
+  });
 
-    const lines = jest
-      .mocked(console.log)
-      .mock.calls.map(([line]) => String(line))
-      .filter((line) => line.startsWith('{'))
-      .map((line) => JSON.parse(line) as Record<string, unknown>);
-    expect(lines).toHaveLength(1);
-    const { _aws, ...values } = lines[0];
-    const aws = _aws as Record<string, unknown>;
-    expect(typeof aws.Timestamp).toBe('number');
-    delete aws.Timestamp;
-    expect(aws).toEqual({
-      CloudWatchMetrics: [
-        {
-          Namespace: 'fourtiesnyc/merch',
-          Dimensions: [['Stage']],
-          Metrics: [{ Name: 'PrintfileGiveUp', Unit: 'Count' }],
-        },
-      ],
+  it('counts an item with no print customization as a give-up', async () => {
+    const unprintable: { customizationOptions?: unknown } = {
+      ...item(3, false),
+    };
+    delete unprintable.customizationOptions;
+    getMany.mockResolvedValue([unprintable]);
+
+    await renderPrintfiles();
+
+    expect(update).toHaveBeenCalledWith(3, {
+      state: MerchItemState.PRINTFILE_FAILED,
     });
-    expect(typeof values.Stage).toBe('string');
-    expect(values.PrintfileGiveUp).toBe(1);
+    expectGiveUpMetric();
   });
 
   it('gives up visibly after repeated failures', async () => {
