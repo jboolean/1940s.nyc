@@ -97,9 +97,7 @@ export async function createMerchOrder(
       );
 
       order.providerOrderId = providerOrder.providerOrderId;
-      if (!providerOrder.providerOrderId) {
-        order.shippingAddress = shippingAddress;
-      }
+      order.shippingAddress = shippingAddress;
       order.state = MerchOrderState.BUILDING;
       order.fulfillmentState = providerOrder.fulfillmentState;
 

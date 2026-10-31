@@ -81,19 +81,23 @@ describe('createMerchOrder', () => {
     ).resolves.toMatchObject({ id: 7 });
   });
 
-  it('sends the customization email, not the confirmation, for an item bought uncustomized', async () => {
+  it('records the shipping address when the provider creates its order now', async () => {
     selectProvider.mockReturnValue(MerchProvider.PRINTFUL);
     jest.mocked(getFulfillmentProvider).mockReturnValue({
+      sendsCustomizationEmail: false,
       createOrder: () => Promise.resolve({ providerOrderId: 'pf_1' }),
     } as never);
 
-    await createMerchOrder(1, 'cs_5', {}, [
-      { variant: MerchInternalVariant.TOTE_BAG_SMALL },
+    await createMerchOrder(1, 'cs_4', { line1: '1 Main St' }, [
+      { variant: print.variant, customizationOptions: print },
     ]);
 
-    expect(EmailService.sendTemplateEmail).toHaveBeenCalledWith(
-      'customize-email'
-    );
+    const savedOrder = saved[1] as {
+      providerOrderId?: string;
+      shippingAddress?: unknown;
+    };
+    expect(savedOrder.providerOrderId).toBe('pf_1');
+    expect(savedOrder.shippingAddress).toEqual({ line1: '1 Main St' });
   });
 
   it('returns the existing order for a checkout session it has already seen', async () => {

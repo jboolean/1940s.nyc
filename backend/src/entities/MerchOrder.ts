@@ -50,10 +50,7 @@ export default class MerchOrder {
   @ManyToOne(() => User)
   user: User;
 
-  @OneToMany(() => MerchShipment, (shipment) => shipment.order)
-  shipments: MerchShipment[];
-
-  // Kept for providers that create their order only at submission.
+  // The address the order ships to, recorded at checkout.
   @Column({ type: 'jsonb', nullable: true })
   shippingAddress?: ShippingAddress | null;
 
