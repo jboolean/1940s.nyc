@@ -97,7 +97,7 @@ describe('createPrintCheckoutSession', () => {
     expect(lineItem?.quantity).toBe(2);
     expect(lineItem?.price_data?.unit_amount).toBe(1900);
     expect(lineItem?.price_data?.product_data?.images?.[0]).toMatch(
-      /720-jpg\/p1\.jpg$/
+      /420-jpg\/p1\.jpg$/
     );
     expect(lineItem?.price_data?.product_data?.metadata).toEqual({
       'product-type': 'print',

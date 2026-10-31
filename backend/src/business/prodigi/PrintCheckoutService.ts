@@ -26,7 +26,7 @@ export interface AvailablePrintProduct {
 
 export function getThumbnailUrl(photoIdentifier: string): string {
   return bypassCloudflare(
-    `https://photos.1940s.nyc/720-jpg/${photoIdentifier}.jpg`
+    `https://photos.1940s.nyc/420-jpg/${photoIdentifier}.jpg`
   );
 }
 
