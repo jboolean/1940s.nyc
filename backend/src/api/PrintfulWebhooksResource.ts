@@ -20,7 +20,7 @@ router.post<'/', unknown, unknown, Webhook, unknown>('/', async (req, res) => {
         PrintfulToMerchOrderStatusMap[order.status as PrintfulOrderStatus];
       await MerchOrderService.onPrinterStatusChanged(
         MerchProvider.PRINTFUL,
-        order.id,
+        String(order.id),
         newState
       );
 
@@ -32,7 +32,7 @@ router.post<'/', unknown, unknown, Webhook, unknown>('/', async (req, res) => {
       const order = shipmentSentEvent.data.order;
       await MerchOrderService.onShipmentSent(
         MerchProvider.PRINTFUL,
-        order.id,
+        String(order.id),
         shipment.tracking_url
       );
       break;

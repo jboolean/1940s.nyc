@@ -1,5 +1,5 @@
 import { AppDataSource } from '../createConnection';
-import * as PrintfulService from '../business/merch/PrintfulService';
+import getFulfillmentProvider from '../business/merch/providers/getFulfillmentProvider';
 import MerchOrder from '../entities/MerchOrder';
 import MerchOrderItem from '../entities/MerchOrderItem';
 import MerchItemState from '../enum/MerchItemState';
@@ -20,7 +20,7 @@ export default async function addMerchItemsToOrder(): Promise<void> {
     .getMany();
 
   for (const item of items) {
-    await PrintfulService.addItemToOrder(item);
+    await getFulfillmentProvider(item.order.provider).addItemToOrder(item);
 
     await itemRepository.update(item.id, {
       state: MerchItemState.ADDED_TO_ORDER,

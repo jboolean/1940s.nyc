@@ -12,10 +12,10 @@ import OrderCustomizeTemplate from '../email/templates/OrderCustomizeTemplate';
 import { OrderTemplateData } from '../email/templates/OrderEmailTemplateData';
 import OrderShippedTemplate from '../email/templates/OrderShippedTemplate';
 import * as UserService from '../users/UserService';
-import absurd from '../utils/absurd';
 import isProduction from '../utils/isProduction';
-import required from '../utils/required';
-import * as PrintfulService from './PrintfulService';
+import getFulfillmentProvider, {
+  selectProviderForItems,
+} from './providers/getFulfillmentProvider';
 
 const API_BASE = isProduction()
   ? 'http://api.1940s.nyc'
@@ -45,18 +45,19 @@ export async function createMerchOrder(
     let order = new MerchOrder();
     order.userId = userId;
     order.state = MerchOrderState.BUILDING;
-    order.provider = MerchProvider.PRINTFUL;
+    const provider = selectProviderForItems(itemTypes);
+    order.provider = provider;
     order.stripeCheckoutSessionId = stripeCheckoutSessionId;
     order = await orderRepository.save(order);
 
-    const printfulOrder = await PrintfulService.createEmptyOrder(
+    const providerOrder = await getFulfillmentProvider(provider).createOrder(
       order.id,
       shippingAddress
     );
 
-    order.providerOrderId = printfulOrder.id;
+    order.providerOrderId = providerOrder.providerOrderId;
     order.state = MerchOrderState.BUILDING;
-    order.fulfillmentState = MerchOrderFulfillmentState.DRAFT;
+    order.fulfillmentState = providerOrder.fulfillmentState;
 
     order = await orderRepository.save(order);
 
@@ -113,15 +114,7 @@ export async function submitOrderForFulfillment(
   const orderRepository = AppDataSource.getRepository(MerchOrder);
   const order = await orderRepository.findOneByOrFail({ id: orderId });
 
-  switch (order.provider) {
-    case MerchProvider.PRINTFUL:
-      await PrintfulService.submitOrderForFulfillment(
-        required(order.providerOrderId, 'providerOrderId')
-      );
-      break;
-    default:
-      absurd(order.provider);
-  }
+  await getFulfillmentProvider(order.provider).submitOrderForFulfillment(order);
 
   order.state = MerchOrderState.SUBMITTED_FOR_FULFILLMENT;
   await orderRepository.save(order);
@@ -149,7 +142,7 @@ export async function cancelOrder(orderId: number): Promise<void> {
 
 export async function onPrinterStatusChanged(
   provider: MerchProvider,
-  providerOrderId: number,
+  providerOrderId: string,
   newFulfillmentState: MerchOrderFulfillmentState
 ): Promise<void> {
   const orderRepository = AppDataSource.getRepository(MerchOrder);
@@ -192,7 +185,7 @@ export async function onPrinterStatusChanged(
 
 export async function onShipmentSent(
   provider: MerchProvider,
-  providerOrderId: number,
+  providerOrderId: string,
   trackingUrl: string
 ): Promise<void> {
   const orderRepository = AppDataSource.getRepository(MerchOrder);
