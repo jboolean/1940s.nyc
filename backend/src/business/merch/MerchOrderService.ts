@@ -302,10 +302,8 @@ export async function onShipmentSent(
     .createQueryBuilder()
     .update(MerchOrder)
     .set({ trackingUrl })
-    .where('id = :id AND tracking_url IS DISTINCT FROM :trackingUrl', {
-      id: order.id,
-      trackingUrl,
-    })
+    .where({ id: order.id })
+    .andWhere('trackingUrl IS DISTINCT FROM :trackingUrl', { trackingUrl })
     .execute();
   if (!updated.affected) {
     return;
@@ -390,8 +388,8 @@ export async function getOrdersWithExceptions(): Promise<MerchOrder[]> {
 
   return await repository
     .createQueryBuilder('order')
-    .innerJoinAndSelect('order.items', 'items')
-    .innerJoinAndSelect('order.user', 'user')
+    .leftJoinAndSelect('order.items', 'items')
+    .leftJoinAndSelect('order.user', 'user')
     .where('order.id in (:...ids)', { ids: matches.map((o) => o.id) })
     .orderBy('order.createdAt', 'DESC')
     .getMany();
