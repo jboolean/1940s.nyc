@@ -50,6 +50,8 @@ provider:
     RAPIDAPI_API_KEY: ${ssm:/${self:service}-${sls:stage}-rapidapi-api-key}
     PRINTFUL_SK: ${ssm:/${self:service}-${sls:stage}-printful-sk}
     PRODIGI_SK: ${ssm:/${self:service}-${sls:stage}-prodigi-sk}
+    # See src/business/prodigi/ProdigiService.ts
+    PRODIGI_LIVE_ORDERS_ENABLED: ${self:custom.prodigiLiveOrdersEnabled.${sls:stage}}
 plugins:
   - serverless-plugin-conditional-functions
   - serverless-webpack
@@ -144,6 +146,10 @@ custom:
   webpack:
     webpackConfig: "webpack.config.js"
   bucket: fourties-photos
+  prodigiLiveOrdersEnabled:
+    production: 'false'
+    staging: 'false'
+    dev: 'false'
   domain:
     production: api.1940s.nyc
     staging: api.staging.1940s.nyc
