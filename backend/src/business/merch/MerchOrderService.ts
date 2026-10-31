@@ -310,18 +310,34 @@ export async function onShipmentSent(
     return;
   }
 
-  // Claim the email before sending it, so a callback and the polling job cannot both send one and
-  // a retry after a failed send still can.
-  const claimed = await orderRepository
-    .createQueryBuilder()
-    .update(MerchOrder)
-    .set({ emailedTrackingUrl: trackingUrl })
-    .where({ id: order.id })
-    .andWhere('emailedTrackingUrl IS DISTINCT FROM :trackingUrl', {
-      trackingUrl,
-    })
-    .execute();
-  if (!claimed.affected) {
+  // Two callers can report the same shipment at once: the Prodigi callback and the submission poller.
+  // Each one locks the order row, writes the tracking link to emailed_tracking_url, and sends only if
+  // the column did not already hold that same link. That write is what keeps the two from both
+  // sending, and a caller whose send fails clears its own write so a retry can have another go.
+  // Delivery is at-least-once: a send the provider accepted but never acknowledged clears the write,
+  // and the next retry sends a second copy.
+  // Two gaps are accepted here. A crash between the write and the send skips this email for good,
+  // since nothing clears a write left behind. And retries only arrive from Prodigi's callbacks and
+  // the submission poller, which stops revisiting an order once Prodigi calls it complete.
+  const claim = await orderRepository.manager.transaction(async (manager) => {
+    // Read under the row lock so the value we put back if the send fails is the one this write
+    // replaces, not whatever the order held when it was loaded.
+    const rows = await manager.query<
+      Array<{ emailed_tracking_url: string | null }>
+    >(
+      'select emailed_tracking_url from merch_orders where id = $1 for update',
+      [order.id]
+    );
+    const previous = rows[0]?.emailed_tracking_url ?? null;
+    if (previous === trackingUrl) {
+      return { claimed: false, previous };
+    }
+    await manager.update(MerchOrder, order.id, {
+      emailedTrackingUrl: trackingUrl,
+    });
+    return { claimed: true, previous };
+  });
+  if (!claim.claimed) {
     return;
   }
 
@@ -337,14 +353,21 @@ export async function onShipmentSent(
   try {
     await EmailService.sendTemplateEmail(orderShippedEmail);
   } catch (e) {
-    // Nothing went out, so release the claim and let the next retry send it.
-    await orderRepository
-      .createQueryBuilder()
-      .update(MerchOrder)
-      .set({ emailedTrackingUrl: order.emailedTrackingUrl ?? null })
-      .where({ id: order.id })
-      .andWhere('emailedTrackingUrl = :trackingUrl', { trackingUrl })
-      .execute();
+    // Nothing went out, so clear the write and let the next retry send it.
+    try {
+      await orderRepository
+        .createQueryBuilder()
+        .update(MerchOrder)
+        .set({ emailedTrackingUrl: claim.previous })
+        .where({ id: order.id })
+        .andWhere('emailedTrackingUrl = :trackingUrl', { trackingUrl })
+        .execute();
+    } catch (releaseError) {
+      console.error(
+        '[merch] Failed to clear the emailed tracking link',
+        releaseError
+      );
+    }
     throw e;
   }
 }
