@@ -41,4 +41,11 @@ export default class MerchOrderItem {
     nullable: true,
   })
   lastEmailMessageId?: string;
+
+  // Print file generation bookkeeping, written by the render cron.
+  @Column({ type: 'integer', nullable: true })
+  printfileAttempts?: number | null;
+
+  @Column({ type: 'varchar', nullable: true })
+  printfileError?: string | null;
 }
