@@ -4,6 +4,7 @@ import { NavigateFunction, useMatch, useNavigate } from 'react-router';
 
 import classnames from 'classnames';
 import * as maplibregl from 'maplibre-gl';
+import type { StyleSpecification } from 'maplibre-gl';
 
 import { MapInterface, MapProps } from './MapInterface';
 import * as overlays from './overlays';
@@ -29,9 +30,17 @@ class MapLibreMap
   private map: maplibregl.Map | null = null;
 
   async componentDidMount(): Promise<void> {
+    let style: StyleSpecification;
+    try {
+      style = await getStyle();
+    } catch (error) {
+      console.error('Error loading map style:', error);
+      return;
+    }
+
     const map: maplibregl.Map = new maplibregl.Map({
       container: this.mapContainer,
-      style: await getStyle(),
+      style,
       center: [-73.99397, 40.7093],
       zoom: 13.69,
       maxBounds: [
