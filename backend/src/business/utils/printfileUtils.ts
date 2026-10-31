@@ -55,14 +55,14 @@ export function getPrintfileDirectUrl(customMerchItemId: number): string {
 }
 
 function getPrintJpegKey(merchItemId: number): string {
-  const destinationDirectory = isProduction() ? 'prints' : 'prints-dev';
+  const destinationDirectory = isProduction() ? 'printfiles' : 'printfiles-dev';
   // Not guessable from the item id alone; Prodigi fetches this without credentials.
   const suffix = crypto
     .createHmac('sha256', required(process.env.JWT_SECRET, 'JWT_SECRET'))
     .update(`print-jpeg:${merchItemId}`)
     .digest('hex')
     .slice(0, 16);
-  return `merch/${destinationDirectory}/${merchItemId}-${suffix}.jpg`;
+  return `merch/${destinationDirectory}/prodigi/${merchItemId}-${suffix}.jpg`;
 }
 
 export async function uploadPrintJpeg(
