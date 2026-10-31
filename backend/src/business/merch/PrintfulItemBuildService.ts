@@ -1,10 +1,9 @@
 import MerchInternalVariant from '../../enum/MerchInternalVariant';
-import absurd from '../utils/absurd';
 import { getPrintfileDirectUrl } from '../utils/printfileUtils';
 import { CatalogItemWritable as PrintfulCatalogItemWritable } from '../utils/printfulApi';
 
 const INTERNAL_VARIANT_TO_PRINTFUL_VARIANT: Record<
-  MerchInternalVariant,
+  MerchInternalVariant.TOTE_BAG_SMALL,
   number
 > = {
   [MerchInternalVariant.TOTE_BAG_SMALL]: 4533, // Product 84
@@ -14,13 +13,12 @@ export function makePrintfulItem(
   customMerchItemId: number,
   internalVariant: MerchInternalVariant
 ): PrintfulCatalogItemWritable {
-  const printfulVariantId =
-    INTERNAL_VARIANT_TO_PRINTFUL_VARIANT[internalVariant];
   switch (internalVariant) {
     case MerchInternalVariant.TOTE_BAG_SMALL:
       return {
         source: 'catalog',
-        catalog_variant_id: printfulVariantId,
+        catalog_variant_id:
+          INTERNAL_VARIANT_TO_PRINTFUL_VARIANT[internalVariant],
         external_id: customMerchItemId.toString(),
         placements: [
           {
@@ -43,6 +41,6 @@ export function makePrintfulItem(
         ],
       };
     default:
-      absurd(internalVariant);
+      throw new Error(`Printful does not fulfill ${internalVariant}`);
   }
 }

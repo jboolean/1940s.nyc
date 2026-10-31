@@ -1,6 +1,6 @@
+import { In } from 'typeorm';
 import { AppDataSource } from '../createConnection';
 import renderToteBag from '../business/merch/renderToteBag';
-import absurd from '../business/utils/absurd';
 import { uploadPrintfile } from '../business/utils/printfileUtils';
 import MerchOrderItem from '../entities/MerchOrderItem';
 import MerchInternalVariant from '../enum/MerchInternalVariant';
@@ -14,6 +14,7 @@ export default async function renderMerch(): Promise<void> {
     .createQueryBuilder('custom_merch_items')
     .where({
       state: MerchItemState.CUSTOMIZED,
+      internalVariant: In([MerchInternalVariant.TOTE_BAG_SMALL]),
     })
     .limit(LIMIT)
     .getMany();
@@ -44,7 +45,8 @@ export default async function renderMerch(): Promise<void> {
         });
         break;
       default:
-        absurd(variant);
+        console.error('No tote bag renderer for variant', variant, item.id);
+        continue;
     }
 
     await uploadPrintfile(item.id, buffer);

@@ -4,11 +4,19 @@ import stripe from '../../third-party/stripe';
 import isProduction from '../utils/isProduction';
 import required from '../utils/required';
 
-export const MERCH_PRODUCT_IDS: Record<MerchInternalVariant, string> = {
+const MERCH_PRODUCT_IDS: Partial<Record<MerchInternalVariant, string>> = {
   [MerchInternalVariant.TOTE_BAG_SMALL]: isProduction()
     ? 'prod_RmpsQvWdhK6uZf'
     : 'prod_RjkZ81n7LrxUnl',
 };
+
+export function hasMerchProduct(variant: MerchInternalVariant): boolean {
+  return variant in MERCH_PRODUCT_IDS;
+}
+
+export function getMerchProductId(variant: MerchInternalVariant): string {
+  return required(MERCH_PRODUCT_IDS[variant], `Stripe product for ${variant}`);
+}
 
 export const getPriceIdForProduct = (productId: string): Promise<string> =>
   stripe.products
@@ -24,7 +32,7 @@ export const getAllAvailableProducts = async (): Promise<AvailableProduct[]> =>
   Promise.all(
     [MerchInternalVariant.TOTE_BAG_SMALL].map(async (variant) => {
       const product = await stripe.products.retrieve(
-        MERCH_PRODUCT_IDS[variant],
+        getMerchProductId(variant),
         { expand: ['default_price'] }
       );
       const price = required(

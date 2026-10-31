@@ -6,6 +6,9 @@ import ProdigiFulfillmentProvider from './ProdigiFulfillmentProvider';
 
 const PROVIDER_FOR_VARIANT: Record<MerchInternalVariant, MerchProvider> = {
   [MerchInternalVariant.TOTE_BAG_SMALL]: MerchProvider.PRINTFUL,
+  [MerchInternalVariant.PRINT_HPR_4X6]: MerchProvider.PRODIGI,
+  [MerchInternalVariant.PRINT_HPR_8X12]: MerchProvider.PRODIGI,
+  [MerchInternalVariant.PRINT_FAP_8X12_FRAMED]: MerchProvider.PRODIGI,
 };
 
 const PROVIDERS: Record<MerchProvider, FulfillmentProvider> = {
