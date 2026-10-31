@@ -119,6 +119,7 @@ export class MerchController extends Controller {
             await MerchOrderService.submitOrderForFulfillment(orderId);
             break;
           case MerchOrderState.BUILDING:
+          case MerchOrderState.SUBMITTING:
           case MerchOrderState.SUBMITTED_FOR_FULFILLMENT:
           case MerchOrderState.CANCELED:
             throw new BadRequest('Invalid state transition');

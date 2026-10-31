@@ -18,6 +18,7 @@ import OrderShippedTemplate from '../email/templates/OrderShippedTemplate';
 import * as UserService from '../users/UserService';
 import { summarizeItems } from '../prodigi/printOrderSummary';
 import isProduction from '../utils/isProduction';
+import type { CreatedProviderOrder } from './providers/FulfillmentProvider';
 import getFulfillmentProvider, {
   selectProviderForItems,
 } from './providers/getFulfillmentProvider';
@@ -192,20 +193,63 @@ export async function submitOrderForFulfillment(
   orderId: number
 ): Promise<void> {
   const orderRepository = AppDataSource.getRepository(MerchOrder);
+
+  // Claim the order before the printer is called, so a cancel that lands first wins and no order
+  // the customer was told is canceled gets printed. Only one submitter can hold the claim.
+  // An order left in submitting by a submitter that died mid-call is not retried automatically —
+  // the printer may already have it — so it is raised on the admin exceptions page instead.
+  const { affected: claimed } = await orderRepository
+    .createQueryBuilder()
+    .update(MerchOrder)
+    .set({ state: MerchOrderState.SUBMITTING })
+    .where({ id: orderId, state: MerchOrderState.PENDING_SUBMISSION })
+    .execute();
+  if (!claimed) {
+    console.log('Order was claimed or canceled before submission', orderId);
+    return;
+  }
+
   const order = await orderRepository.findOneByOrFail({ id: orderId });
 
-  const providerOrder = await getFulfillmentProvider(
-    order.provider
-  ).submitOrderForFulfillment(order);
+  let providerOrder: CreatedProviderOrder;
+  try {
+    providerOrder = await getFulfillmentProvider(
+      order.provider
+    ).submitOrderForFulfillment(order);
+  } catch (e) {
+    // Nothing was sent, so release the claim and leave the order to be retried.
+    await orderRepository
+      .createQueryBuilder()
+      .update(MerchOrder)
+      .set({ state: MerchOrderState.PENDING_SUBMISSION })
+      .where({ id: orderId, state: MerchOrderState.SUBMITTING })
+      .execute();
+    throw e;
+  }
 
-  // Targeted update: a status callback may have changed the order since it was loaded. The provider
-  // id is written right away so callbacks, which can arrive immediately, find the order.
-  await orderRepository.update(orderId, {
-    state: MerchOrderState.SUBMITTED_FOR_FULFILLMENT,
-    ...(providerOrder.providerOrderId
-      ? { providerOrderId: providerOrder.providerOrderId }
-      : {}),
-  });
+  // The printer's id is recorded even if the order has moved on, so its order can still be found.
+  if (providerOrder.providerOrderId) {
+    await orderRepository.update(orderId, {
+      providerOrderId: providerOrder.providerOrderId,
+    });
+  }
+
+  // Still conditional: a cancel or a callback may have won the race while the printer was being
+  // called. A callback that already moved the order on means the submission is recorded anyway.
+  const { affected: submitted } = await orderRepository
+    .createQueryBuilder()
+    .update(MerchOrder)
+    .set({ state: MerchOrderState.SUBMITTED_FOR_FULFILLMENT })
+    .where({ id: orderId, state: MerchOrderState.SUBMITTING })
+    .execute();
+  if (!submitted) {
+    const settled = await orderRepository.findOneByOrFail({ id: orderId });
+    if (settled.state !== MerchOrderState.SUBMITTED_FOR_FULFILLMENT) {
+      console.error(
+        `[merch-alert] order ${orderId} was ${settled.state} while the printer was creating it; order ${providerOrder.providerOrderId} was created at the printer and needs attention`
+      );
+    }
+  }
 }
 
 export async function cancelOrder(orderId: number): Promise<void> {
@@ -269,9 +313,11 @@ export async function onPrinterStatusChanged(
     // If needed, update the order state based on the fulfillment state
     // Generally the order state is updated directly by this app, but if actions are taken directly in the printer, we need to update the state here
     if (
-      [MerchOrderState.BUILDING, MerchOrderState.PENDING_SUBMISSION].includes(
-        order.state
-      )
+      [
+        MerchOrderState.BUILDING,
+        MerchOrderState.PENDING_SUBMISSION,
+        MerchOrderState.SUBMITTING,
+      ].includes(order.state)
     ) {
       if (newFulfillmentState === MerchOrderFulfillmentState.CANCELED) {
         order.state = MerchOrderState.CANCELED;
@@ -406,15 +452,19 @@ export async function getOrdersWithExceptions(): Promise<MerchOrder[]> {
           .orWhere('items.state = :printfileFailed', {
             printfileFailed: MerchItemState.PRINTFILE_FAILED,
           })
-          // A Prodigi order that could not be sent for over an hour
+          // A Prodigi order that could not be sent for over an hour, or one whose submitter
+          // died after claiming it and before the printer accepted it.
           .orWhere(
             new Brackets((q) =>
               q
                 .where('order.provider = :prodigi', {
                   prodigi: MerchProvider.PRODIGI,
                 })
-                .andWhere('order.state = :pending', {
-                  pending: MerchOrderState.PENDING_SUBMISSION,
+                .andWhere('order.state in (:...unstuck)', {
+                  unstuck: [
+                    MerchOrderState.PENDING_SUBMISSION,
+                    MerchOrderState.SUBMITTING,
+                  ],
                 })
                 .andWhere('order.updatedAt < :stuckBefore', { stuckBefore })
             )
