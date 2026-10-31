@@ -2,7 +2,7 @@ import User from '../../entities/User';
 import MerchInternalVariant from '../../enum/MerchInternalVariant';
 import stripe from '../../third-party/stripe';
 import isProduction from '../utils/isProduction';
-import { MERCH_PRODUCT_IDS } from './ProductRegistry';
+import { getMerchProductId } from './ProductRegistry';
 
 // This is the tote bag US price.
 // To do international or other products at correct rates, this should be made dynamic.
@@ -34,7 +34,7 @@ export async function createMerchCheckoutSession({
       line_items: await Promise.all(
         items.map(async (item) => ({
           price: await stripe.products
-            .retrieve(MERCH_PRODUCT_IDS[item.variant])
+            .retrieve(getMerchProductId(item.variant))
             .then((product) => product.default_price as string),
           quantity: item.quantity,
         }))

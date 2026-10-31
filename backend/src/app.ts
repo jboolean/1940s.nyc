@@ -23,6 +23,7 @@ import {
 import { IpDeniedError } from 'express-ipfilter';
 import PostmarkWebhooksResource from './api/PostmarkWebhooksResource';
 import PrintfulWebhooksResource from './api/PrintfulWebhooksResource';
+import ProdigiWebhooksResource from './api/ProdigiWebhooksResource';
 import StripeWebhooksResource from './api/StripeWebhooksResource';
 
 // Cloudflare -> CloudFront (edge-optimized API Gateway) -> API Gateway
@@ -82,6 +83,7 @@ app.use('/geodata', GeodataResource);
 app.use('/stripe-webhooks', StripeWebhooksResource);
 app.use('/postmark-webhooks', PostmarkWebhooksResource);
 app.use('/printful-webhooks', PrintfulWebhooksResource);
+app.use('/prodigi-webhooks', ProdigiWebhooksResource);
 
 // Tsoa
 // eslint-disable-next-line @typescript-eslint/no-unsafe-call
