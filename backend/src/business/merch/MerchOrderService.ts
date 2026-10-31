@@ -1,17 +1,21 @@
 import { BadRequest } from 'http-errors';
 import { AppDataSource } from '../../createConnection';
+import MerchCustomizationOptions from '../../entities/MerchCustomizationOptions';
 import MerchOrder from '../../entities/MerchOrder';
 import MerchOrderItem from '../../entities/MerchOrderItem';
 import ShippingAddress from '../../entities/ShippingAddress';
 import MerchInternalVariant from '../../enum/MerchInternalVariant';
+import MerchItemState from '../../enum/MerchItemState';
 import MerchOrderFulfillmentState from '../../enum/MerchOrderFulfillmentState';
 import MerchOrderState from '../../enum/MerchOrderState';
 import MerchProvider from '../../enum/MerchProvider';
 import EmailService from '../email/EmailService';
+import OrderConfirmationTemplate from '../email/templates/OrderConfirmationTemplate';
 import OrderCustomizeTemplate from '../email/templates/OrderCustomizeTemplate';
 import { OrderTemplateData } from '../email/templates/OrderEmailTemplateData';
 import OrderShippedTemplate from '../email/templates/OrderShippedTemplate';
 import * as UserService from '../users/UserService';
+import { summarizeItems } from '../prodigi/printOrderSummary';
 import isProduction from '../utils/isProduction';
 import getFulfillmentProvider, {
   selectProviderForItems,
@@ -33,12 +37,20 @@ function createOrderEmailTemplateData(order: MerchOrder): OrderTemplateData {
   };
 }
 
+export interface NewOrderItem {
+  variant: MerchInternalVariant;
+  customizationOptions?: MerchCustomizationOptions;
+  state?: MerchItemState;
+}
+
 export async function createMerchOrder(
   userId: number,
   stripeCheckoutSessionId: string,
   shippingAddress: ShippingAddress,
-  itemTypes: MerchInternalVariant[]
+  newItems: NewOrderItem[],
+  providerShippingMethod?: string
 ): Promise<MerchOrder> {
+  const itemTypes = newItems.map((i) => i.variant);
   return AppDataSource.transaction(async (transactionalEntityManager) => {
     const orderRepository =
       transactionalEntityManager.getRepository(MerchOrder);
@@ -48,6 +60,7 @@ export async function createMerchOrder(
     const provider = selectProviderForItems(itemTypes);
     order.provider = provider;
     order.stripeCheckoutSessionId = stripeCheckoutSessionId;
+    order.providerShippingMethod = providerShippingMethod ?? null;
     order = await orderRepository.save(order);
 
     const providerOrder = await getFulfillmentProvider(provider).createOrder(
@@ -63,10 +76,16 @@ export async function createMerchOrder(
 
     const itemRepository =
       transactionalEntityManager.getRepository(MerchOrderItem);
-    const items = itemTypes.map((type) => {
+    const items = newItems.map((newItem) => {
       const item = new MerchOrderItem();
       item.order = order;
-      item.internalVariant = type;
+      item.internalVariant = newItem.variant;
+      if (newItem.customizationOptions) {
+        item.customizationOptions = newItem.customizationOptions;
+      }
+      if (newItem.state) {
+        item.state = newItem.state;
+      }
       return item;
     });
     await itemRepository.save(items);
@@ -77,17 +96,27 @@ export async function createMerchOrder(
 
     if (user.email) {
       // There really should be an email at this point, set earlier in the Stripe webhook
+      const metadata = {
+        orderId: order.id.toString(),
+        userId: user.id.toString(),
+      };
 
-      const orderCustomizeEmail = OrderCustomizeTemplate.createTemplatedEmail({
-        to: user.email,
-        templateContext: createOrderEmailTemplateData(order),
-        metadata: {
-          orderId: order.id.toString(),
-          userId: user.id.toString(),
-        },
-      });
+      const email = getFulfillmentProvider(provider).sendsCustomizationEmail
+        ? OrderCustomizeTemplate.createTemplatedEmail({
+            to: user.email,
+            templateContext: createOrderEmailTemplateData(order),
+            metadata,
+          })
+        : OrderConfirmationTemplate.createTemplatedEmail({
+            to: user.email,
+            templateContext: {
+              ...createOrderEmailTemplateData(order),
+              itemsSummary: summarizeItems(newItems),
+            },
+            metadata,
+          });
 
-      await EmailService.sendTemplateEmail(orderCustomizeEmail);
+      await EmailService.sendTemplateEmail(email);
     }
 
     return order;

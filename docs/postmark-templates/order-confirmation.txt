@@ -1,0 +1,5 @@
+Thanks for your order! We received it and will send it to the printer. Your order: {{ itemsSummary }}.
+
+View your order any time: {{ ordersUrl }}
+
+We'll email you again when it ships.

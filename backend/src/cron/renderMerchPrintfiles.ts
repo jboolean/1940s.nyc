@@ -26,6 +26,11 @@ export default async function renderMerch(): Promise<void> {
       continue;
     }
 
+    if (customizationOptions.variant !== MerchInternalVariant.TOTE_BAG_SMALL) {
+      console.error('Not a tote bag item', item.id);
+      continue;
+    }
+
     const { lat, lng, style, foregroundColor, backgroundColor } =
       customizationOptions;
 

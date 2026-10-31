@@ -11,6 +11,22 @@ interface ToteBagCustomizationOptions {
   backgroundColor?: Color;
 }
 
-type MerchCustomizationOptions = ToteBagCustomizationOptions;
+export type PrintVariant =
+  | MerchInternalVariant.PRINT_HPR_4X6
+  | MerchInternalVariant.PRINT_HPR_8X12
+  | MerchInternalVariant.PRINT_FAP_4X6
+  | MerchInternalVariant.PRINT_FAP_8X12
+  | MerchInternalVariant.PRINT_PHO_4X6
+  | MerchInternalVariant.PRINT_PHO_8X12
+  | MerchInternalVariant.PRINT_FAP_8X12_FRAMED;
+
+export interface PrintCustomizationOptions {
+  variant: PrintVariant;
+  photoIdentifier: string;
+  colorize: boolean;
+}
+
+type MerchCustomizationOptions =
+  ToteBagCustomizationOptions | PrintCustomizationOptions;
 
 export default MerchCustomizationOptions;

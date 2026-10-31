@@ -10,6 +10,10 @@ export interface CreatedProviderOrder {
 }
 
 interface FulfillmentProvider {
+  // True when the customer finishes the item themselves from an emailed link (tote bags).
+  // Otherwise the order is customized at purchase and gets a plain confirmation email.
+  readonly sendsCustomizationEmail: boolean;
+
   createOrder(
     merchOrderId: number,
     shippingAddress: ShippingAddress

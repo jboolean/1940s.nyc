@@ -8,14 +8,44 @@ import type Stripe from 'stripe';
 import EmailCampaignService from '../business/email/EmailCampaignService';
 import * as LedgerService from '../business/ledger/LedgerService';
 import * as MerchOrderService from '../business/merch/MerchOrderService';
+import { isPrintVariant } from '../business/prodigi/printCatalog';
+import { PRODIGI_SHIPPING_METHOD_METADATA_KEY } from '../business/prodigi/printShipping';
 import * as UserService from '../business/users/UserService';
 import isProduction from '../business/utils/isProduction';
+import { PrintVariant } from '../entities/MerchCustomizationOptions';
 import MerchInternalVariant from '../enum/MerchInternalVariant';
+import MerchItemState from '../enum/MerchItemState';
 const router = express.Router();
 
+function printLineItemToOrderItems(
+  lineItem: Stripe.LineItem
+): MerchOrderService.NewOrderItem[] {
+  const metadata = (lineItem.price?.product as Stripe.Product)
+    .metadata as ProductMetadata;
+  const variant = metadata['merch-internal-variant'];
+  const photoIdentifier = metadata['photo-identifier'];
+  if (!variant || !isPrintVariant(variant) || !photoIdentifier) {
+    throw new Error(
+      `Print line item ${lineItem.id} is missing its variant or photo identifier`
+    );
+  }
+  const customizationOptions = {
+    variant: variant as PrintVariant,
+    photoIdentifier,
+    colorize: metadata.colorize === 'true',
+  };
+  return Array.from({ length: lineItem.quantity ?? 1 }, () => ({
+    variant,
+    customizationOptions,
+    state: MerchItemState.AWAITING_PRINTFILE,
+  }));
+}
+
 type ProductMetadata = {
-  'product-type'?: 'color-credit' | 'merch' | 'tip';
+  'product-type'?: 'color-credit' | 'merch' | 'print' | 'tip';
   'merch-internal-variant'?: MerchInternalVariant;
+  'photo-identifier'?: string;
+  colorize?: 'true' | 'false';
 };
 
 const STRIPE_IPS = [
@@ -67,7 +97,11 @@ router.post<'/', unknown, unknown, Stripe.Event, unknown>(
         const expandedSession = await stripe.checkout.sessions.retrieve(
           session.id,
           {
-            expand: ['line_items', 'line_items.data.price.product'],
+            expand: [
+              'line_items',
+              'line_items.data.price.product',
+              'shipping_cost.shipping_rate',
+            ],
           }
         );
         const paymentIntentId =
@@ -148,13 +182,39 @@ router.post<'/', unknown, unknown, Stripe.Event, unknown>(
             userId,
             session.id,
             shippingAddress,
-            itemTypes
+            itemTypes.map((variant) => ({ variant }))
           );
 
           console.log('Created merch order', order);
         }
 
-        if (!creditsLineItems.length) {
+        const printLineItems = byProductType['print'] ?? [];
+        if (printLineItems.length) {
+          const shippingDetails =
+            expandedSession.collected_information?.shipping_details;
+          const shippingRate = expandedSession.shipping_cost?.shipping_rate as
+            Stripe.ShippingRate | undefined;
+          const order = await MerchOrderService.createMerchOrder(
+            userId,
+            session.id,
+            {
+              name: shippingDetails?.name,
+              line1: shippingDetails?.address.line1 ?? undefined,
+              line2: shippingDetails?.address.line2 ?? undefined,
+              city: shippingDetails?.address.city ?? undefined,
+              stateCode: shippingDetails?.address.state ?? undefined,
+              postalCode: shippingDetails?.address.postal_code ?? undefined,
+              countryCode: shippingDetails?.address.country ?? undefined,
+            },
+            printLineItems.flatMap(printLineItemToOrderItems),
+            shippingRate?.metadata?.[PRODIGI_SHIPPING_METHOD_METADATA_KEY]
+          );
+
+          console.log('Created print order', order);
+        }
+
+        // Print purchases are not tips, so they do not earn credits.
+        if (!creditsLineItems.length && !printLineItems.length) {
           // Grant some credits from their non-credit payment, see comment on LedgerService
           if (
             userId &&

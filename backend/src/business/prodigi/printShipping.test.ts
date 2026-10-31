@@ -1,0 +1,46 @@
+import type { Quote } from 'prodigi-print-api';
+import { buildShippingOptions } from './printShipping';
+
+function quote(method: string, shipping: string, service: string): Quote {
+  return {
+    shipmentMethod: method,
+    costSummary: { shipping: { amount: shipping, currency: 'USD' } },
+    shipments: [{ carrier: { name: 'UPS', service } }],
+  } as unknown as Quote;
+}
+
+describe('buildShippingOptions', () => {
+  it('charges exactly the quoted cost and records the Prodigi method', () => {
+    const options = buildShippingOptions([
+      quote('Budget', '6.85', 'UPS Ground'),
+      quote('Standard', '11.85', 'UPS Ground Plus'),
+      quote('Express', '22.65', 'UPS 3 Day Select'),
+      quote('Overnight', '35.60', 'UPS Next Day'),
+    ]);
+    expect(
+      options.map((o) => [
+        o.shipping_rate_data?.fixed_amount?.amount,
+        o.shipping_rate_data?.metadata?.['prodigi-shipping-method'],
+        o.shipping_rate_data?.display_name,
+      ])
+    ).toEqual([
+      [685, 'Budget', 'Budget (UPS Ground)'],
+      [1185, 'Standard', 'Standard (UPS Ground Plus)'],
+      [2265, 'Express', 'Express (UPS 3 Day Select)'],
+    ]);
+    expect(options[0].shipping_rate_data?.delivery_estimate).toBeDefined();
+  });
+
+  it('drops Budget when it is no cheaper than Standard', () => {
+    const options = buildShippingOptions([
+      quote('Budget', '24.80', 'UPS Ground'),
+      quote('Standard', '24.80', 'UPS Ground'),
+      quote('Express', '35.60', 'UPS 3 Day Select'),
+    ]);
+    expect(
+      options.map(
+        (o) => o.shipping_rate_data?.metadata?.['prodigi-shipping-method']
+      )
+    ).toEqual(['Standard', 'Express']);
+  });
+});
