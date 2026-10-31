@@ -17,7 +17,7 @@ import MerchInternalVariant from '../enum/MerchInternalVariant';
 import MerchItemState from '../enum/MerchItemState';
 const router = express.Router();
 
-function printLineItemToOrderItems(
+export function printLineItemToOrderItems(
   lineItem: Stripe.LineItem
 ): MerchOrderService.NewOrderItem[] {
   const metadata = (lineItem.price?.product as Stripe.Product)
@@ -189,11 +189,25 @@ router.post<'/', unknown, unknown, Stripe.Event, unknown>(
         }
 
         const printLineItems = byProductType['print'] ?? [];
-        if (printLineItems.length) {
+        if (printLineItems.length && merchLineItems.length) {
+          // Our checkouts never mix them (one order has one provider). Fulfil neither silently.
+          console.error(
+            'Checkout session mixes tote bags and prints; the print items were NOT fulfilled',
+            { sessionId: session.id }
+          );
+        } else if (printLineItems.length) {
           const shippingDetails =
             expandedSession.collected_information?.shipping_details;
           const shippingRate = expandedSession.shipping_cost?.shipping_rate as
             Stripe.ShippingRate | undefined;
+          const prodigiShippingMethod =
+            shippingRate?.metadata?.[PRODIGI_SHIPPING_METHOD_METADATA_KEY];
+          if (!prodigiShippingMethod) {
+            console.warn(
+              'Print checkout has no Prodigi shipping method; defaulting to Standard',
+              { sessionId: session.id }
+            );
+          }
           const order = await MerchOrderService.createMerchOrder(
             userId,
             session.id,
@@ -207,7 +221,7 @@ router.post<'/', unknown, unknown, Stripe.Event, unknown>(
               countryCode: shippingDetails?.address.country ?? undefined,
             },
             printLineItems.flatMap(printLineItemToOrderItems),
-            shippingRate?.metadata?.[PRODIGI_SHIPPING_METHOD_METADATA_KEY]
+            prodigiShippingMethod ?? 'Standard'
           );
 
           console.log('Created print order', order);

@@ -23,6 +23,14 @@ export function buildShippingOptions(
 ): Stripe.Checkout.SessionCreateParams.ShippingOption[] {
   const offered = quotes
     .filter((q) => q.shipmentMethod in OFFERED_METHODS)
+    .map((q) => {
+      if (q.costSummary.shipping.currency !== 'USD') {
+        throw new Error(
+          `Prodigi quoted shipping in ${q.costSummary.shipping.currency}, not USD`
+        );
+      }
+      return q;
+    })
     .map((q) => ({
       method: q.shipmentMethod as ShippingMethod,
       cents: toCents(q.costSummary.shipping.amount),

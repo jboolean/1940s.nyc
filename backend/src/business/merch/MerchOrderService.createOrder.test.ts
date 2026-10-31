@@ -16,10 +16,12 @@ const repo = {
     return Promise.resolve(Array.isArray(e) ? e : { ...(e as object), id: 7 });
   }),
   findOneByOrFail: jest.fn(() => Promise.resolve({ id: 7, userId: 1 })),
+  findOneBy: jest.fn(() => Promise.resolve(null)),
 };
 
 jest.mock('../../createConnection', () => ({
   AppDataSource: {
+    getRepository: () => repo,
     transaction: (fn: (m: unknown) => unknown) =>
       fn({ getRepository: () => repo }),
   },
@@ -125,5 +127,39 @@ describe('createMerchOrder', () => {
     expect(
       OrderConfirmationTemplate.createTemplatedEmail
     ).not.toHaveBeenCalled();
+  });
+
+  it('does not fail or roll back the order when the confirmation email fails', async () => {
+    jest.spyOn(console, 'error').mockImplementation(() => undefined);
+    selectProvider.mockReturnValue(MerchProvider.PRODIGI);
+    jest.mocked(getFulfillmentProvider).mockReturnValue({
+      sendsCustomizationEmail: false,
+      createOrder: () => Promise.resolve({}),
+    } as never);
+    jest
+      .mocked(EmailService.sendTemplateEmail)
+      .mockRejectedValueOnce(new Error('postmark'));
+
+    await expect(
+      createMerchOrder(
+        1,
+        'cs_3',
+        {},
+        [{ variant: print.variant, customizationOptions: print }],
+        'Standard'
+      )
+    ).resolves.toMatchObject({ id: 7 });
+  });
+
+  it('returns the existing order for a checkout session it has already seen', async () => {
+    jest.spyOn(console, 'warn').mockImplementation(() => undefined);
+    repo.findOneBy.mockResolvedValueOnce({ id: 42 } as never);
+    const provider = { sendsCustomizationEmail: false, createOrder: jest.fn() };
+    jest.mocked(getFulfillmentProvider).mockReturnValue(provider as never);
+
+    await expect(
+      createMerchOrder(1, 'cs_dup', {}, [{ variant: print.variant }])
+    ).resolves.toEqual({ id: 42 });
+    expect(provider.createOrder).not.toHaveBeenCalled();
   });
 });

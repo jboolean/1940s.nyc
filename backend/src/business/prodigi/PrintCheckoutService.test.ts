@@ -9,6 +9,9 @@ jest.mock('../../createConnection', () => ({
   AppDataSource: { getRepository: () => ({ findOne }) },
 }));
 jest.mock('./ProdigiService', () => ({ getQuotes: jest.fn() }));
+jest.mock('../merch/providers/ProdigiFulfillmentProvider', () => ({
+  PRODIGI_FULFILLMENT_IMPLEMENTED: true,
+}));
 jest.mock('../../third-party/stripe', () => ({
   __esModule: true,
   default: {
@@ -35,13 +38,13 @@ describe('createPrintCheckoutSession', () => {
       borough: 'Manhattan',
       effectiveAddress: { address: '1 Main St' },
     });
-    jest
-      .mocked(stripe.products.retrieve)
-      .mockResolvedValue({ default_price: { unit_amount: 1900 } } as never);
+    jest.mocked(stripe.products.retrieve).mockResolvedValue({
+      default_price: { unit_amount: 1900, currency: 'usd' },
+    } as never);
     jest.mocked(ProdigiService.getQuotes).mockResolvedValue([
       {
         shipmentMethod: 'Standard',
-        costSummary: { shipping: { amount: '11.85' } },
+        costSummary: { shipping: { amount: '11.85', currency: 'USD' } },
         shipments: [{ carrier: { service: 'UPS Ground' } }],
       },
     ] as never);

@@ -51,76 +51,114 @@ export async function createMerchOrder(
   providerShippingMethod?: string
 ): Promise<MerchOrder> {
   const itemTypes = newItems.map((i) => i.variant);
-  return AppDataSource.transaction(async (transactionalEntityManager) => {
-    const orderRepository =
-      transactionalEntityManager.getRepository(MerchOrder);
-    let order = new MerchOrder();
-    order.userId = userId;
-    order.state = MerchOrderState.BUILDING;
-    const provider = selectProviderForItems(itemTypes);
-    order.provider = provider;
-    order.stripeCheckoutSessionId = stripeCheckoutSessionId;
-    order.providerShippingMethod = providerShippingMethod ?? null;
-    order = await orderRepository.save(order);
 
-    const providerOrder = await getFulfillmentProvider(provider).createOrder(
-      order.id,
-      shippingAddress
-    );
-
-    order.providerOrderId = providerOrder.providerOrderId;
-    order.state = MerchOrderState.BUILDING;
-    order.fulfillmentState = providerOrder.fulfillmentState;
-
-    order = await orderRepository.save(order);
-
-    const itemRepository =
-      transactionalEntityManager.getRepository(MerchOrderItem);
-    const items = newItems.map((newItem) => {
-      const item = new MerchOrderItem();
-      item.order = order;
-      item.internalVariant = newItem.variant;
-      if (newItem.customizationOptions) {
-        item.customizationOptions = newItem.customizationOptions;
-      }
-      if (newItem.state) {
-        item.state = newItem.state;
-      }
-      return item;
+  // Stripe can deliver the same completed session more than once.
+  const existing = await AppDataSource.getRepository(MerchOrder).findOneBy({
+    stripeCheckoutSessionId,
+  });
+  if (existing) {
+    console.warn('Order already exists for checkout session', {
+      stripeCheckoutSessionId,
+      orderId: existing.id,
     });
-    await itemRepository.save(items);
+    return existing;
+  }
 
-    order = await orderRepository.findOneByOrFail({ id: order.id });
+  const provider = selectProviderForItems(itemTypes);
+  const fulfillmentProvider = getFulfillmentProvider(provider);
 
-    const user = await UserService.getUser(userId);
+  const created = await AppDataSource.transaction(
+    async (transactionalEntityManager) => {
+      const orderRepository =
+        transactionalEntityManager.getRepository(MerchOrder);
+      let order = new MerchOrder();
+      order.userId = userId;
+      order.state = MerchOrderState.BUILDING;
+      order.provider = provider;
+      order.stripeCheckoutSessionId = stripeCheckoutSessionId;
+      order.providerShippingMethod = providerShippingMethod ?? null;
+      order = await orderRepository.save(order);
 
-    if (user.email) {
-      // There really should be an email at this point, set earlier in the Stripe webhook
-      const metadata = {
-        orderId: order.id.toString(),
-        userId: user.id.toString(),
-      };
+      const providerOrder = await fulfillmentProvider.createOrder(
+        order.id,
+        shippingAddress
+      );
 
-      const email = getFulfillmentProvider(provider).sendsCustomizationEmail
-        ? OrderCustomizeTemplate.createTemplatedEmail({
-            to: user.email,
-            templateContext: createOrderEmailTemplateData(order),
-            metadata,
-          })
-        : OrderConfirmationTemplate.createTemplatedEmail({
+      order.providerOrderId = providerOrder.providerOrderId;
+      order.state = MerchOrderState.BUILDING;
+      order.fulfillmentState = providerOrder.fulfillmentState;
+
+      order = await orderRepository.save(order);
+
+      const itemRepository =
+        transactionalEntityManager.getRepository(MerchOrderItem);
+      const items = newItems.map((newItem) => {
+        const item = new MerchOrderItem();
+        item.order = order;
+        item.internalVariant = newItem.variant;
+        if (newItem.customizationOptions) {
+          item.customizationOptions = newItem.customizationOptions;
+        }
+        if (newItem.state) {
+          item.state = newItem.state;
+        }
+        return item;
+      });
+      await itemRepository.save(items);
+
+      order = await orderRepository.findOneByOrFail({ id: order.id });
+
+      // The tote bag customization email is how the customer finishes their order, so it stays inside
+      // the transaction. Other emails are informational and sent after the commit.
+      if (fulfillmentProvider.sendsCustomizationEmail) {
+        const user = await UserService.getUser(userId);
+        if (user.email) {
+          // There really should be an email at this point, set earlier in the Stripe webhook
+          await EmailService.sendTemplateEmail(
+            OrderCustomizeTemplate.createTemplatedEmail({
+              to: user.email,
+              templateContext: createOrderEmailTemplateData(order),
+              metadata: {
+                orderId: order.id.toString(),
+                userId: user.id.toString(),
+              },
+            })
+          );
+        }
+      }
+
+      return order;
+    }
+  );
+
+  if (!fulfillmentProvider.sendsCustomizationEmail) {
+    try {
+      const user = await UserService.getUser(userId);
+      if (user.email) {
+        await EmailService.sendTemplateEmail(
+          OrderConfirmationTemplate.createTemplatedEmail({
             to: user.email,
             templateContext: {
-              ...createOrderEmailTemplateData(order),
+              ...createOrderEmailTemplateData(created),
               itemsSummary: summarizeItems(newItems),
             },
-            metadata,
-          });
-
-      await EmailService.sendTemplateEmail(email);
+            metadata: {
+              orderId: created.id.toString(),
+              userId: user.id.toString(),
+            },
+          })
+        );
+      }
+    } catch (e) {
+      // The order is already placed and paid; a missing confirmation must not fail it.
+      console.error(
+        `Failed to send confirmation email for order ${created.id}`,
+        e
+      );
     }
+  }
 
-    return order;
-  });
+  return created;
 }
 
 export async function createOrderItems(

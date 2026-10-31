@@ -1,4 +1,4 @@
-import { BadRequest, NotFound } from 'http-errors';
+import { BadRequest, NotFound, ServiceUnavailable } from 'http-errors';
 import type Stripe from 'stripe';
 import { AppDataSource } from '../../createConnection';
 import Photo from '../../entities/Photo';
@@ -8,6 +8,7 @@ import MerchInternalVariant from '../../enum/MerchInternalVariant';
 import stripe from '../../third-party/stripe';
 import { bypassCloudflare } from '../utils/cloudflareOrigins';
 import required from '../utils/required';
+import { PRODIGI_FULFILLMENT_IMPLEMENTED } from '../merch/providers/ProdigiFulfillmentProvider';
 import { getActivePrintProducts, PrintProduct } from './printCatalog';
 import * as ProdigiService from './ProdigiService';
 import { buildShippingOptions } from './printShipping';
@@ -38,12 +39,20 @@ async function getUnitAmount(product: PrintProduct): Promise<number> {
     stripeProduct.default_price as Stripe.Price | null,
     `default price of ${product.variant}`
   );
+  if (price.currency !== 'usd') {
+    throw new Error(
+      `${product.variant} price is in ${price.currency}, not usd`
+    );
+  }
   return required(price.unit_amount, `unit_amount of ${product.variant}`);
 }
 
 export async function getAvailablePrintProducts(): Promise<
   AvailablePrintProduct[]
 > {
+  if (!PRODIGI_FULFILLMENT_IMPLEMENTED) {
+    return [];
+  }
   return Promise.all(
     getActivePrintProducts().map(async (product) => ({
       variant: product.variant,
@@ -71,6 +80,9 @@ export async function createPrintCheckoutSession({
   quantity: number;
   colorize: boolean;
 }): Promise<{ sessionId: string; url: string }> {
+  if (!PRODIGI_FULFILLMENT_IMPLEMENTED) {
+    throw new ServiceUnavailable('Prints are not available yet');
+  }
   const product = getActivePrintProducts().find((p) => p.variant === variant);
   if (!product) {
     throw new BadRequest(`${variant} is not available`);

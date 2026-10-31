@@ -1,10 +1,15 @@
 import type { Quote } from 'prodigi-print-api';
 import { buildShippingOptions } from './printShipping';
 
-function quote(method: string, shipping: string, service: string): Quote {
+function quote(
+  method: string,
+  shipping: string,
+  service: string,
+  currency = 'USD'
+): Quote {
   return {
     shipmentMethod: method,
-    costSummary: { shipping: { amount: shipping, currency: 'USD' } },
+    costSummary: { shipping: { amount: shipping, currency } },
     shipments: [{ carrier: { name: 'UPS', service } }],
   } as unknown as Quote;
 }
@@ -42,5 +47,11 @@ describe('buildShippingOptions', () => {
         (o) => o.shipping_rate_data?.metadata?.['prodigi-shipping-method']
       )
     ).toEqual(['Standard', 'Express']);
+  });
+
+  it('rejects quotes that are not in USD', () => {
+    expect(() =>
+      buildShippingOptions([quote('Standard', '9.00', 'x', 'GBP')])
+    ).toThrow(/GBP/);
   });
 });
