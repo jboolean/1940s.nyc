@@ -17,7 +17,7 @@ interface FulfillmentProvider {
 
   addItemToOrder(item: MerchOrderItem): Promise<void>;
 
-  submitOrderForFulfillment(order: MerchOrder): Promise<void>;
+  submitOrderForFulfillment(order: MerchOrder): Promise<CreatedProviderOrder>;
 
   // Cancels an order that was already submitted, for providers that support it. Throws if it cannot be canceled.
   cancelSubmittedOrder?(order: MerchOrder): Promise<void>;

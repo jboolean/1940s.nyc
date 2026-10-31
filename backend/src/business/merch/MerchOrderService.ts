@@ -194,11 +194,17 @@ export async function submitOrderForFulfillment(
   const orderRepository = AppDataSource.getRepository(MerchOrder);
   const order = await orderRepository.findOneByOrFail({ id: orderId });
 
-  await getFulfillmentProvider(order.provider).submitOrderForFulfillment(order);
+  const providerOrder = await getFulfillmentProvider(
+    order.provider
+  ).submitOrderForFulfillment(order);
 
-  // Targeted update: a status callback may have changed the order since it was loaded.
+  // Targeted update: a status callback may have changed the order since it was loaded. The provider
+  // id is written right away so callbacks, which can arrive immediately, find the order.
   await orderRepository.update(orderId, {
     state: MerchOrderState.SUBMITTED_FOR_FULFILLMENT,
+    ...(providerOrder.providerOrderId
+      ? { providerOrderId: providerOrder.providerOrderId }
+      : {}),
   });
 }
 

@@ -27,10 +27,13 @@ const PrintfulFulfillmentProvider: FulfillmentProvider = {
     await PrintfulService.addItemToOrder(item);
   },
 
-  async submitOrderForFulfillment(order: MerchOrder): Promise<void> {
+  async submitOrderForFulfillment(
+    order: MerchOrder
+  ): Promise<CreatedProviderOrder> {
     await PrintfulService.submitOrderForFulfillment(
       Number(required(order.providerOrderId, 'providerOrderId'))
     );
+    return {};
   },
 };
 
