@@ -61,6 +61,7 @@ describe('handleOrderCallback', () => {
         trackingUrl: 'http://t/1',
         trackingNumber: 'Z1',
         carrier: 'UPS',
+        readyToEmail: true,
       }
     );
   });
@@ -74,9 +75,54 @@ describe('handleOrderCallback', () => {
   it('ignores unknown merch orders and orders Prodigi does not return', async () => {
     findOneBy.mockResolvedValueOnce(null);
     expect(await handleOrderCallback(5, 'ord_1')).toBe('ignored');
-    jest.mocked(ProdigiService.getOrder).mockResolvedValueOnce(undefined);
-    expect(await handleOrderCallback(5, 'ord_1')).toBe('ignored');
     expect(MerchOrderService.onPrinterStatusChanged).not.toHaveBeenCalled();
+  });
+
+  it('asks for a retry when Prodigi returns 404, as it does for a held order', async () => {
+    jest.mocked(ProdigiService.getOrder).mockResolvedValueOnce(undefined);
+    expect(await handleOrderCallback(5, 'ord_1')).toBe('retry');
+    expect(MerchOrderService.onPrinterStatusChanged).not.toHaveBeenCalled();
+  });
+
+  it('defers the shipped email until tracking exists', async () => {
+    const untracked = {
+      ...fetched,
+      shipments: [
+        {
+          id: 'shp_1',
+          dispatchDate: '2026-01-01',
+          carrier: { name: 'UPS', service: 'Ground' },
+        },
+      ],
+    } as unknown as Order;
+    jest.mocked(ProdigiService.getOrder).mockResolvedValueOnce(untracked);
+    await handleOrderCallback(5, 'ord_1');
+    expect(MerchOrderService.onShipmentSent).toHaveBeenCalledWith(
+      MerchProvider.PRODIGI,
+      'ord_1',
+      expect.objectContaining({ readyToEmail: false })
+    );
+  });
+
+  it('emails an untracked shipment once the order is complete', async () => {
+    const complete = {
+      ...fetched,
+      status: { ...fetched.status, stage: 'Complete' },
+      shipments: [
+        {
+          id: 'shp_1',
+          dispatchDate: '2026-01-01',
+          carrier: { name: 'UPS', service: 'Ground' },
+        },
+      ],
+    } as unknown as Order;
+    jest.mocked(ProdigiService.getOrder).mockResolvedValueOnce(complete);
+    await handleOrderCallback(5, 'ord_1');
+    expect(MerchOrderService.onShipmentSent).toHaveBeenCalledWith(
+      MerchProvider.PRODIGI,
+      'ord_1',
+      expect.objectContaining({ readyToEmail: true })
+    );
   });
 
   it('asks for a retry when the Prodigi order id is not recorded yet', async () => {

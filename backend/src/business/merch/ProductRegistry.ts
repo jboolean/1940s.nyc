@@ -10,6 +10,10 @@ const MERCH_PRODUCT_IDS: Partial<Record<MerchInternalVariant, string>> = {
     : 'prod_RjkZ81n7LrxUnl',
 };
 
+export function hasMerchProduct(variant: MerchInternalVariant): boolean {
+  return variant in MERCH_PRODUCT_IDS;
+}
+
 export function getMerchProductId(variant: MerchInternalVariant): string {
   return required(MERCH_PRODUCT_IDS[variant], `Stripe product for ${variant}`);
 }

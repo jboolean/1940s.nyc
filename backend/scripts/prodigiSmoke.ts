@@ -4,7 +4,8 @@
  *   PRODIGI_BASE_URL=<host> PRODIGI_SK=<key> npx tsx scripts/prodigiSmoke.ts [--order <photoIdentifier>]
  *
  * Without --order this only issues GET requests and quote requests, so it is safe against the live API.
- * --order creates (then cancels) one order per catalog product and is refused outside the sandbox.
+ * --order creates (then cancels) one order per catalog product and is refused unless the base URL is the sandbox,
+ * even if PRODIGI_LIVE_ORDERS_ENABLED is set.
  */
 import type { Quote } from 'prodigi-print-api';
 import { getAllPrintProducts } from '../src/business/prodigi/printCatalog';
@@ -52,6 +53,7 @@ async function verifyProduct(
 async function main(): Promise<void> {
   const baseUrl = process.env.PRODIGI_BASE_URL ?? '';
   console.log('Environment:', prodigiEnvironmentFromBaseUrl(baseUrl));
+  const environment = prodigiEnvironmentFromBaseUrl(baseUrl);
   const orderPhoto = process.argv.includes('--order')
     ? process.argv[process.argv.indexOf('--order') + 1]
     : undefined;
@@ -85,6 +87,9 @@ async function main(): Promise<void> {
   }
 
   if (orderPhoto) {
+    if (environment !== 'sandbox') {
+      throw new Error('--order is only allowed against the sandbox');
+    }
     for (const product of getAllPrintProducts()) {
       const created = await ProdigiService.createOrder({
         merchantReference: `smoke-${product.variant}-${Date.now()}`,
@@ -121,6 +126,7 @@ async function main(): Promise<void> {
         created.status.stage,
         JSON.stringify(created.items[0].assets.map((a) => a.status))
       );
+      await ProdigiService.cancelOrder(created.id);
     }
   }
 

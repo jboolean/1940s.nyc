@@ -28,11 +28,16 @@ router.post<'/:merchOrderId/:token', { merchOrderId: string; token: string }>(
       return;
     }
 
-    const result = await ProdigiCallbackService.handleOrderCallback(
-      merchOrderId,
-      prodigiOrderId
-    );
-    res.status(result === 'retry' ? 503 : 200).send();
+    try {
+      const result = await ProdigiCallbackService.handleOrderCallback(
+        merchOrderId,
+        prodigiOrderId
+      );
+      res.status(result === 'retry' ? 503 : 200).send();
+    } catch (e) {
+      console.error('[Prodigi webhook] Failed to process callback', e);
+      res.status(503).send();
+    }
   }
 );
 

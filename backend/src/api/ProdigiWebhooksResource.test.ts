@@ -71,6 +71,12 @@ describe('Prodigi webhook', () => {
     expect(handle).toHaveBeenCalledWith(5, 'ord_1');
   });
 
+  it('answers 503 instead of hanging when processing throws', async () => {
+    jest.spyOn(console, 'error').mockImplementation(() => undefined);
+    handle.mockRejectedValue(new Error('prodigi 500'));
+    expect(await post('5', createCallbackToken(5), event)).toBe(503);
+  });
+
   it('asks Prodigi to retry when the order is not recorded yet', async () => {
     handle.mockResolvedValue('retry');
     expect(await post('5', createCallbackToken(5), event)).toBe(503);

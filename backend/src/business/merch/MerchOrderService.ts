@@ -190,6 +190,8 @@ export interface ShipmentInfo {
   trackingUrl?: string;
   trackingNumber?: string;
   carrier?: string;
+  // False defers the shipped email to a later call for the same shipment (default true).
+  readyToEmail?: boolean;
 }
 
 export async function onShipmentSent(
@@ -214,9 +216,14 @@ export async function onShipmentSent(
     {
       orderId: order.id,
       providerShipmentId: shipmentInfo.providerShipmentId,
-      trackingUrl: shipmentInfo.trackingUrl ?? null,
-      trackingNumber: shipmentInfo.trackingNumber ?? null,
-      carrier: shipmentInfo.carrier ?? null,
+      // Absent fields are left out so a later update never overwrites known tracking with null.
+      ...(shipmentInfo.trackingUrl && {
+        trackingUrl: shipmentInfo.trackingUrl,
+      }),
+      ...(shipmentInfo.trackingNumber && {
+        trackingNumber: shipmentInfo.trackingNumber,
+      }),
+      ...(shipmentInfo.carrier && { carrier: shipmentInfo.carrier }),
     },
     ['orderId', 'providerShipmentId']
   );
@@ -233,6 +240,10 @@ export async function onShipmentSent(
   if (latest?.trackingUrl && latest.trackingUrl !== order.trackingUrl) {
     order.trackingUrl = latest.trackingUrl;
     await orderRepository.save(order);
+  }
+
+  if (shipmentInfo.readyToEmail === false) {
+    return;
   }
 
   // Claim the email atomically so exactly one delivery sends it; release the claim if sending fails so a retry sends it.

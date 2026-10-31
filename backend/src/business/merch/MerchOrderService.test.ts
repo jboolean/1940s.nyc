@@ -138,6 +138,28 @@ describe('onShipmentSent', () => {
     expect(orders.save).not.toHaveBeenCalled();
   });
 
+  it('records an untracked shipment without emailing when the email is deferred', async () => {
+    await onShipmentSent(MerchProvider.PRODIGI, '9', {
+      providerShipmentId: 's1',
+      readyToEmail: false,
+    });
+    expect(shipments.upsert).toHaveBeenCalledTimes(1);
+    expect(sendEmail).not.toHaveBeenCalled();
+  });
+
+  it('never overwrites known tracking fields with null', async () => {
+    await onShipmentSent(MerchProvider.PRODIGI, '9', {
+      providerShipmentId: 's1',
+      carrier: 'UPS',
+    });
+    const [values] = shipments.upsert.mock.calls[0] as [
+      Record<string, unknown>,
+    ];
+    expect(values).not.toHaveProperty('trackingUrl');
+    expect(values).not.toHaveProperty('trackingNumber');
+    expect(values).toHaveProperty('carrier', 'UPS');
+  });
+
   it('ignores unknown orders', async () => {
     orders.findOneBy.mockResolvedValue(null);
     await onShipmentSent(MerchProvider.PRINTFUL, '9', info);

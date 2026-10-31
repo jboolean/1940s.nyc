@@ -56,3 +56,7 @@ export async function getQuotes(request: CreateQuoteRequest): Promise<Quote[]> {
 export async function getProduct(sku: string): Promise<Product> {
   return (await getClient().products.get(sku)).product;
 }
+
+export async function cancelOrder(orderId: string): Promise<void> {
+  await getClient().orders.cancel(orderId);
+}

@@ -9,7 +9,8 @@ import prodigiOrderToFulfillmentState from './ProdigiToMerchOrderStatusMap';
 export type CallbackResult =
   | 'processed'
   | 'ignored'
-  // The merch order exists but has no Prodigi order id recorded yet; the callback should be retried.
+  // Nothing can be applied yet (the Prodigi order id is not recorded, or Prodigi cannot return the
+  // order, as happens while it is held in the account's order edit window); Prodigi should retry.
   | 'retry';
 
 async function applyProdigiOrder(
@@ -22,6 +23,7 @@ async function applyProdigiOrder(
     prodigiOrderToFulfillmentState(prodigiOrder)
   );
 
+  const orderComplete = prodigiOrder.status.stage === 'Complete';
   for (const shipment of prodigiOrder.shipments) {
     if (!shipment.dispatchDate) {
       continue;
@@ -34,6 +36,9 @@ async function applyProdigiOrder(
         trackingUrl: shipment.tracking?.url,
         trackingNumber: shipment.tracking?.number,
         carrier: shipment.carrier.name,
+        // Tracking is only present for tracked services and may arrive after dispatch, so hold the
+        // shipped email until it exists, unless the order is complete and none is coming.
+        readyToEmail: Boolean(shipment.tracking?.url) || orderComplete,
       }
     );
   }
@@ -69,7 +74,7 @@ export async function handleOrderCallback(
   const prodigiOrder = await ProdigiService.getOrder(callbackProdigiOrderId);
   if (!prodigiOrder) {
     console.warn('Prodigi order not found when re-fetching', merchOrderId);
-    return 'ignored';
+    return 'retry';
   }
 
   await applyProdigiOrder(merchOrder.providerOrderId, prodigiOrder);
