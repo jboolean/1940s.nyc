@@ -37,7 +37,7 @@ export function printLineItemToOrderItems(
   return Array.from({ length: lineItem.quantity ?? 1 }, () => ({
     variant,
     customizationOptions,
-    state: MerchItemState.AWAITING_PRINTFILE,
+    state: MerchItemState.CUSTOMIZED,
   }));
 }
 
