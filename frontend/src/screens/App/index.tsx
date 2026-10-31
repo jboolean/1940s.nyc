@@ -38,7 +38,7 @@ import NewsletterModal from './screens/NewsletterModal';
 import SubmitStoryWizard from './screens/SubmitStoryWizard';
 import TipJar, { useTipJarStore } from './screens/TipJar';
 
-const IS_SHUTDOWN = false;
+const IS_SHUTDOWN = true;
 
 const searchParams = new URLSearchParams(window.location.search);
 
@@ -47,7 +47,7 @@ const creditSuccessInitial = searchParams.has('creditPurchaseSuccess');
 const openTipJarOnLoad = searchParams.has('openTipJar');
 const openMerchOnLoad = searchParams.has('openMerch');
 const noWelcome = searchParams.has('noWelcome');
-const noTipJar = searchParams.has('noTipJar');
+const noTipJar = searchParams.has('noTipJar') || IS_SHUTDOWN;
 const openCreditPurchaseOnLoad = searchParams.has('openCreditPurchase');
 
 if (noWelcome) searchParams.delete('noWelcome');
