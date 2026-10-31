@@ -296,33 +296,56 @@ export async function onShipmentSent(
     return;
   }
 
-  // Only the caller that actually changes the URL sends the email, so a callback and the
-  // polling job handling the same shipment cannot both send it.
-  const updated = await orderRepository
+  await orderRepository
     .createQueryBuilder()
     .update(MerchOrder)
     .set({ trackingUrl })
     .where({ id: order.id })
     .andWhere('trackingUrl IS DISTINCT FROM :trackingUrl', { trackingUrl })
     .execute();
-  if (!updated.affected) {
-    return;
-  }
   order.trackingUrl = trackingUrl;
 
   const user = await UserService.getUser(order.userId);
+  if (!user.email) {
+    return;
+  }
 
-  if (user.email) {
-    const orderShippedEmail = OrderShippedTemplate.createTemplatedEmail({
-      to: user.email,
-      templateContext: createOrderEmailTemplateData(order),
-      metadata: {
-        orderId: order.id.toString(),
-        userId: user.id.toString(),
-      },
-    });
+  // Claim the email before sending it, so a callback and the polling job cannot both send one and
+  // a retry after a failed send still can.
+  const claimed = await orderRepository
+    .createQueryBuilder()
+    .update(MerchOrder)
+    .set({ emailedTrackingUrl: trackingUrl })
+    .where({ id: order.id })
+    .andWhere('emailedTrackingUrl IS DISTINCT FROM :trackingUrl', {
+      trackingUrl,
+    })
+    .execute();
+  if (!claimed.affected) {
+    return;
+  }
 
+  const orderShippedEmail = OrderShippedTemplate.createTemplatedEmail({
+    to: user.email,
+    templateContext: createOrderEmailTemplateData(order),
+    metadata: {
+      orderId: order.id.toString(),
+      userId: user.id.toString(),
+    },
+  });
+
+  try {
     await EmailService.sendTemplateEmail(orderShippedEmail);
+  } catch (e) {
+    // Nothing went out, so release the claim and let the next retry send it.
+    await orderRepository
+      .createQueryBuilder()
+      .update(MerchOrder)
+      .set({ emailedTrackingUrl: order.emailedTrackingUrl ?? null })
+      .where({ id: order.id })
+      .andWhere('emailedTrackingUrl = :trackingUrl', { trackingUrl })
+      .execute();
+    throw e;
   }
 }
 

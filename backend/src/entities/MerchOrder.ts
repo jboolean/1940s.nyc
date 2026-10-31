@@ -63,4 +63,8 @@ export default class MerchOrder {
 
   @Column({ nullable: true })
   trackingUrl?: string;
+
+  // The shipment URL the customer has already been emailed about.
+  @Column({ type: 'varchar', nullable: true })
+  emailedTrackingUrl?: string | null;
 }
