@@ -1,4 +1,5 @@
 import { colorizeForPrint } from '../business/color/ColorService';
+import { logCountMetric } from '../business/utils/metrics';
 import {
   copyOriginalToPrintJpeg,
   uploadPrintJpeg,
@@ -13,6 +14,7 @@ import MerchOrderState from '../enum/MerchOrderState';
 const LIMIT = 2;
 const COLORIZE_TIMEOUT_MS = 90_000;
 export const MAX_PRINTFILE_ATTEMPTS = 5;
+export const METRICS_NAMESPACE = 'fourtiesnyc/merch';
 
 async function createPrintfile(
   item: MerchOrderItem,
@@ -78,6 +80,9 @@ export default async function renderPrintfiles(): Promise<void> {
       console.error(
         `[merch-alert] print file for item ${item.id} (order ${item.order.id}) gave up after ${MAX_PRINTFILE_ATTEMPTS} attempts`
       );
+      logCountMetric(METRICS_NAMESPACE, 'PrintfileGiveUp', {
+        Stage: process.env.STAGE ?? 'unknown',
+      });
       await repository.update(item.id, {
         state: MerchItemState.PRINTFILE_FAILED,
       });
