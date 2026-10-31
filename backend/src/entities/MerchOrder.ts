@@ -11,7 +11,6 @@ import MerchOrderFulfillmentState from '../enum/MerchOrderFulfillmentState';
 import MerchOrderState from '../enum/MerchOrderState';
 import MerchProvider from '../enum/MerchProvider';
 import MerchOrderItem from './MerchOrderItem';
-import MerchShipment from './MerchShipment';
 import User from './User';
 
 @Entity('merch_orders')
@@ -49,10 +48,6 @@ export default class MerchOrder {
   @ManyToOne(() => User)
   user: User;
 
-  @OneToMany(() => MerchShipment, (shipment) => shipment.order)
-  shipments: MerchShipment[];
-
-  // Most recent shipment's tracking URL.
   @Column({ nullable: true })
   trackingUrl?: string;
 }

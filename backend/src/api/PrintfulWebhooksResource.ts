@@ -30,21 +30,10 @@ router.post<'/', unknown, unknown, Webhook, unknown>('/', async (req, res) => {
       const shipmentSentEvent = event as ShipmentSent;
       const shipment = shipmentSentEvent.data.shipment;
       const order = shipmentSentEvent.data.order;
-      if (shipment?.id === undefined || shipment.id === null) {
-        console.error(
-          'Printful shipment_sent webhook missing shipment id',
-          event
-        );
-        break;
-      }
       await MerchOrderService.onShipmentSent(
         MerchProvider.PRINTFUL,
         String(order.id),
-        {
-          providerShipmentId: String(shipment.id),
-          trackingUrl: shipment.tracking_url,
-          trackingNumber: shipment.tracking_number,
-        }
+        shipment.tracking_url
       );
       break;
     }

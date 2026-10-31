@@ -16,7 +16,6 @@ import MailingListMember from './entities/MailingListMember';
 
 import MerchOrder from './entities/MerchOrder';
 import MerchOrderItem from './entities/MerchOrderItem';
-import MerchShipment from './entities/MerchShipment';
 import Photo from './entities/Photo';
 
 import Story from './entities/Story';
@@ -36,7 +35,6 @@ const ENTITIES = [
   MailingListMember,
   MerchOrder,
   MerchOrderItem,
-  MerchShipment,
   Photo,
   Story,
   User,

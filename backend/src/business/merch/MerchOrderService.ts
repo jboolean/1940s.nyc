@@ -1,9 +1,7 @@
 import { BadRequest } from 'http-errors';
-import { IsNull } from 'typeorm';
 import { AppDataSource } from '../../createConnection';
 import MerchOrder from '../../entities/MerchOrder';
 import MerchOrderItem from '../../entities/MerchOrderItem';
-import MerchShipment from '../../entities/MerchShipment';
 import ShippingAddress from '../../entities/ShippingAddress';
 import MerchInternalVariant from '../../enum/MerchInternalVariant';
 import MerchOrderFulfillmentState from '../../enum/MerchOrderFulfillmentState';
@@ -185,23 +183,13 @@ export async function onPrinterStatusChanged(
   }
 }
 
-export interface ShipmentInfo {
-  providerShipmentId: string;
-  trackingUrl?: string;
-  trackingNumber?: string;
-  carrier?: string;
-  // False defers the shipped email to a later call for the same shipment (default true).
-  readyToEmail?: boolean;
-}
-
 export async function onShipmentSent(
   provider: MerchProvider,
   providerOrderId: string,
-  shipmentInfo: ShipmentInfo
+  trackingUrl: string
 ): Promise<void> {
   const orderRepository = AppDataSource.getRepository(MerchOrder);
-  const shipmentRepository = AppDataSource.getRepository(MerchShipment);
-  const order = await orderRepository.findOneBy({
+  let order = await orderRepository.findOneBy({
     provider,
     providerOrderId,
   });
@@ -211,70 +199,22 @@ export async function onShipmentSent(
     return;
   }
 
-  // Upsert so concurrent or retried deliveries of the same shipment converge on one row.
-  await shipmentRepository.upsert(
-    {
-      orderId: order.id,
-      providerShipmentId: shipmentInfo.providerShipmentId,
-      // Absent fields are left out so a later update never overwrites known tracking with null.
-      ...(shipmentInfo.trackingUrl && {
-        trackingUrl: shipmentInfo.trackingUrl,
-      }),
-      ...(shipmentInfo.trackingNumber && {
-        trackingNumber: shipmentInfo.trackingNumber,
-      }),
-      ...(shipmentInfo.carrier && { carrier: shipmentInfo.carrier }),
-    },
-    ['orderId', 'providerShipmentId']
-  );
-  const shipment = await shipmentRepository.findOneByOrFail({
-    orderId: order.id,
-    providerShipmentId: shipmentInfo.providerShipmentId,
-  });
+  order.trackingUrl = trackingUrl;
+  order = await orderRepository.save(order);
 
-  // order.trackingUrl follows the most recently created shipment, so a retry of an older one cannot move it back.
-  const latest = await shipmentRepository.findOne({
-    where: { orderId: order.id },
-    order: { id: 'DESC' },
-  });
-  if (latest?.trackingUrl && latest.trackingUrl !== order.trackingUrl) {
-    order.trackingUrl = latest.trackingUrl;
-    await orderRepository.save(order);
-  }
+  const user = await UserService.getUser(order.userId);
 
-  if (shipmentInfo.readyToEmail === false) {
-    return;
-  }
+  if (user.email) {
+    const orderShippedEmail = OrderShippedTemplate.createTemplatedEmail({
+      to: user.email,
+      templateContext: createOrderEmailTemplateData(order),
+      metadata: {
+        orderId: order.id.toString(),
+        userId: user.id.toString(),
+      },
+    });
 
-  // Claim the email atomically so exactly one delivery sends it; release the claim if sending fails so a retry sends it.
-  const claim = await shipmentRepository.update(
-    { id: shipment.id, emailedAt: IsNull() },
-    { emailedAt: new Date() }
-  );
-  if (!claim.affected) {
-    return;
-  }
-
-  try {
-    const user = await UserService.getUser(order.userId);
-    if (user.email) {
-      const orderShippedEmail = OrderShippedTemplate.createTemplatedEmail({
-        to: user.email,
-        templateContext: {
-          ...createOrderEmailTemplateData(order),
-          trackingUrl: shipment.trackingUrl ?? undefined,
-        },
-        metadata: {
-          orderId: order.id.toString(),
-          userId: user.id.toString(),
-        },
-      });
-
-      await EmailService.sendTemplateEmail(orderShippedEmail);
-    }
-  } catch (e) {
-    await shipmentRepository.update({ id: shipment.id }, { emailedAt: null });
-    throw e;
+    await EmailService.sendTemplateEmail(orderShippedEmail);
   }
 }
 

@@ -4,14 +4,10 @@ import {
   Order,
   ProdigiApiError,
   ProdigiClient,
-  Product,
   Quote,
 } from 'prodigi-print-api';
+import isProduction from '../utils/isProduction';
 import required from '../utils/required';
-import {
-  assertOrderCreationAllowed,
-  prodigiEnvironmentFromBaseUrl,
-} from './prodigiConfig';
 
 let client: ProdigiClient | undefined;
 
@@ -19,25 +15,23 @@ function getClient(): ProdigiClient {
   if (!client) {
     client = new ProdigiClient({
       apiKey: required(process.env.PRODIGI_SK, 'PRODIGI_SK'),
-      environment: prodigiEnvironmentFromBaseUrl(
-        required(process.env.PRODIGI_BASE_URL, 'PRODIGI_BASE_URL')
-      ),
+      environment: isProduction() ? 'production' : 'sandbox',
     });
   }
   return client;
 }
 
+// Orders on the live API cost real money.
 export async function createOrder(request: CreateOrderRequest): Promise<Order> {
-  assertOrderCreationAllowed(
-    required(process.env.PRODIGI_BASE_URL, 'PRODIGI_BASE_URL'),
-    process.env.PRODIGI_LIVE_ORDERS_ENABLED
-  );
-  const outcome = await getClient().orders.create(request);
-  return outcome.order;
+  if (isProduction() && process.env.PRODIGI_LIVE_ORDERS_ENABLED !== 'true') {
+    throw new Error(
+      'Refusing to create a Prodigi order on the live API: PRODIGI_LIVE_ORDERS_ENABLED is not true'
+    );
+  }
+  return (await getClient().orders.create(request)).order;
 }
 
-// Returns undefined when Prodigi has no such order. An order held by the account's
-// order edit window also reads as not found until the hold is released.
+// Prodigi returns 404 for an order held in the account's order edit window.
 export async function getOrder(orderId: string): Promise<Order | undefined> {
   try {
     return (await getClient().orders.get(orderId)).order;
@@ -49,14 +43,10 @@ export async function getOrder(orderId: string): Promise<Order | undefined> {
   }
 }
 
-export async function getQuotes(request: CreateQuoteRequest): Promise<Quote[]> {
-  return (await getClient().quotes.create(request)).quotes;
-}
-
-export async function getProduct(sku: string): Promise<Product> {
-  return (await getClient().products.get(sku)).product;
-}
-
 export async function cancelOrder(orderId: string): Promise<void> {
   await getClient().orders.cancel(orderId);
+}
+
+export async function getQuotes(request: CreateQuoteRequest): Promise<Quote[]> {
+  return (await getClient().quotes.create(request)).quotes;
 }

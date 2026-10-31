@@ -1,44 +1,24 @@
 import express from 'express';
 import { parseCallbackEvent } from 'prodigi-print-api';
 import * as ProdigiCallbackService from '../business/prodigi/ProdigiCallbackService';
-import { isValidCallbackToken } from '../business/prodigi/prodigiCallbackAuth';
 
 const router = express.Router();
 
-// Prodigi does not sign callbacks. The path carries a per-order token, and the handler
-// re-fetches the order from Prodigi rather than trusting the body.
-router.post<'/:merchOrderId/:token', { merchOrderId: string; token: string }>(
-  '/:merchOrderId/:token',
-  async (req, res) => {
-    const merchOrderId = Number(req.params.merchOrderId);
-    if (
-      !Number.isInteger(merchOrderId) ||
-      !isValidCallbackToken(merchOrderId, req.params.token)
-    ) {
-      res.status(401).send();
-      return;
-    }
+// Accept the body whatever Content-Type Prodigi sends.
+router.use(express.json({ type: () => true }));
 
-    let prodigiOrderId: string;
-    try {
-      prodigiOrderId = parseCallbackEvent(req.body).order.id;
-    } catch (e) {
-      console.warn('[Prodigi webhook] Unparseable callback', e);
-      res.status(400).send();
-      return;
-    }
-
-    try {
-      const result = await ProdigiCallbackService.handleOrderCallback(
-        merchOrderId,
-        prodigiOrderId
-      );
-      res.status(result === 'retry' ? 503 : 200).send();
-    } catch (e) {
-      console.error('[Prodigi webhook] Failed to process callback', e);
-      res.status(503).send();
-    }
+router.post('/', async (req, res) => {
+  try {
+    const event = parseCallbackEvent(req.body);
+    const ok = await ProdigiCallbackService.handleOrderCallback(
+      event.order.id,
+      event.kind === 'order.shipments.shipment'
+    );
+    res.status(ok ? 200 : 503).send();
+  } catch (e) {
+    console.error('[Prodigi webhook] Failed to process callback', e);
+    res.status(503).send();
   }
-);
+});
 
 export default router;
