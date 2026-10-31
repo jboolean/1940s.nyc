@@ -6,7 +6,14 @@ import * as MerchOrderService from '../merch/MerchOrderService';
 import * as ProdigiService from './ProdigiService';
 import prodigiOrderToFulfillmentState from './ProdigiToMerchOrderStatusMap';
 
-export async function updateStatus(
+export type CallbackResult =
+  | 'processed'
+  | 'ignored'
+  // Nothing can be applied yet (the Prodigi order id is not recorded, or Prodigi cannot return the
+  // order, as happens while it is held in the account's order edit window); Prodigi should retry.
+  | 'retry';
+
+export async function applyProdigiOrder(
   providerOrderId: string,
   prodigiOrder: Order
 ): Promise<void> {

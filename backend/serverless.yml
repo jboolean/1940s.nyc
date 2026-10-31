@@ -128,7 +128,7 @@ functions:
     handler: renderMerchPrintfiles.handler
     events:
       - schedule: rate(5 minutes)
-    timeout: 120
+    timeout: 300
     layers:
       # Provides @sparticuz/chromium at /opt/nodejs/node_modules - the actual
       # runtime source of the module (it's a devDependency in package.json, used

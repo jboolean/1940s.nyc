@@ -96,6 +96,9 @@ export async function createMerchOrder(
       );
 
       order.providerOrderId = providerOrder.providerOrderId;
+      if (!providerOrder.providerOrderId) {
+        order.shippingAddress = shippingAddress;
+      }
       order.state = MerchOrderState.BUILDING;
       order.fulfillmentState = providerOrder.fulfillmentState;
 
@@ -202,12 +205,25 @@ export async function cancelOrder(orderId: number): Promise<void> {
   const orderRepository = AppDataSource.getRepository(MerchOrder);
   const order = await orderRepository.findOneByOrFail({ id: orderId });
 
+  const provider = getFulfillmentProvider(order.provider);
   if (
+    provider.cancelSubmittedOrder &&
+    order.state === MerchOrderState.SUBMITTED_FOR_FULFILLMENT &&
+    order.fulfillmentState !== MerchOrderFulfillmentState.CANCELED
+  ) {
+    try {
+      await provider.cancelSubmittedOrder(order);
+    } catch (e) {
+      console.warn('Provider could not cancel order', orderId, e);
+      throw new BadRequest('The printer can no longer cancel this order');
+    }
+    order.fulfillmentState = MerchOrderFulfillmentState.CANCELED;
+  } else if (
     ![
       MerchOrderFulfillmentState.DRAFT,
       MerchOrderFulfillmentState.CANCELED,
       undefined,
-    ].includes(order.fulfillmentState)
+    ].includes(order.fulfillmentState ?? undefined)
   ) {
     // In the future we could support canceling in Printful here.
     // Printful has not built canceling into their v2 API yet.

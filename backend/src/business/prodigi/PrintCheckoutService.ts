@@ -1,14 +1,14 @@
-import { BadRequest, NotFound, ServiceUnavailable } from 'http-errors';
+import { BadRequest, NotFound } from 'http-errors';
+import type Stripe from 'stripe';
 import { AppDataSource } from '../../createConnection';
 import Photo from '../../entities/Photo';
 import User from '../../entities/User';
 import Collection from '../../enum/Collection';
 import MerchInternalVariant from '../../enum/MerchInternalVariant';
 import stripe from '../../third-party/stripe';
-import { getCatalogDefaultPrice } from '../merch/checkoutSession';
-import { PRODIGI_FULFILLMENT_IMPLEMENTED } from '../merch/providers/ProdigiFulfillmentProvider';
+import { bypassCloudflare } from '../utils/cloudflareOrigins';
 import required from '../utils/required';
-import { PRINT_PRODUCTS } from './printCatalog';
+import { getActivePrintProducts, PrintProduct } from './printCatalog';
 import * as ProdigiService from './ProdigiService';
 import { buildShippingOptions } from './printShipping';
 
@@ -26,9 +26,6 @@ export interface AvailablePrintProduct {
 export async function getAvailablePrintProducts(): Promise<
   AvailablePrintProduct[]
 > {
-  if (!PRODIGI_FULFILLMENT_IMPLEMENTED) {
-    return [];
-  }
   return Promise.all(
     PRINT_PRODUCTS.map(async (product) => ({
       variant: product.variant,
@@ -58,10 +55,7 @@ export async function createPrintCheckoutSession({
   quantity: number;
   colorize: boolean;
 }): Promise<{ sessionId: string; url: string }> {
-  if (!PRODIGI_FULFILLMENT_IMPLEMENTED) {
-    throw new ServiceUnavailable('Prints are not available yet');
-  }
-  const product = PRINT_PRODUCTS.find((p) => p.variant === variant);
+  const product = getActivePrintProducts().find((p) => p.variant === variant);
   if (!product) {
     throw new BadRequest(`${variant} is not available`);
   }

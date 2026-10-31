@@ -9,9 +9,6 @@ jest.mock('../../createConnection', () => ({
   AppDataSource: { getRepository: () => ({ findOne }) },
 }));
 jest.mock('./ProdigiService', () => ({ getQuotes: jest.fn() }));
-jest.mock('../merch/providers/ProdigiFulfillmentProvider', () => ({
-  PRODIGI_FULFILLMENT_IMPLEMENTED: true,
-}));
 jest.mock('../../third-party/stripe', () => ({
   __esModule: true,
   default: {

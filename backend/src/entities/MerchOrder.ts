@@ -11,6 +11,8 @@ import MerchOrderFulfillmentState from '../enum/MerchOrderFulfillmentState';
 import MerchOrderState from '../enum/MerchOrderState';
 import MerchProvider from '../enum/MerchProvider';
 import MerchOrderItem from './MerchOrderItem';
+import ShippingAddress from './ShippingAddress';
+import MerchShipment from './MerchShipment';
 import User from './User';
 
 @Entity('merch_orders')
@@ -47,6 +49,13 @@ export default class MerchOrder {
 
   @ManyToOne(() => User)
   user: User;
+
+  @OneToMany(() => MerchShipment, (shipment) => shipment.order)
+  shipments: MerchShipment[];
+
+  // Kept for providers that create their order only at submission.
+  @Column({ type: 'jsonb', nullable: true })
+  shippingAddress?: ShippingAddress | null;
 
   // Provider-specific shipping service chosen at checkout (a Prodigi shippingMethod for Prodigi orders).
   @Column({ type: 'varchar', nullable: true })

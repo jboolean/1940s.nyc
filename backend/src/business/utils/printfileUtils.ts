@@ -1,4 +1,5 @@
 import {
+  CopyObjectCommand,
   GetObjectCommand,
   PutObjectCommand,
   S3Client,
@@ -48,5 +49,50 @@ export async function getPrintfileUrl(
 export function getPrintfileDirectUrl(customMerchItemId: number): string {
   return bypassCloudflare(
     `https://photos.1940s.nyc/${getPrintfileKey(customMerchItemId)}`
+  );
+}
+
+function getPrintJpegKey(merchItemId: number): string {
+  const destinationDirectory = isProduction() ? 'prints' : 'prints-dev';
+  return `merch/${destinationDirectory}/${merchItemId}.jpg`;
+}
+
+export async function uploadPrintJpeg(
+  merchItemId: number,
+  buffer: Buffer
+): Promise<void> {
+  await s3.send(
+    new PutObjectCommand({
+      Bucket: 'fourties-photos',
+      Key: getPrintJpegKey(merchItemId),
+      Body: buffer,
+      ContentType: 'image/jpeg',
+      CacheControl: 'no-cache',
+    })
+  );
+}
+
+// Server-side copy of the full-resolution original, without downloading it.
+export async function copyOriginalToPrintJpeg(
+  merchItemId: number,
+  photoIdentifier: string
+): Promise<void> {
+  await s3.send(
+    new CopyObjectCommand({
+      Bucket: 'fourties-photos',
+      CopySource: `fourties-photos/jpg/${photoIdentifier}.jpg`,
+      Key: getPrintJpegKey(merchItemId),
+      ContentType: 'image/jpeg',
+      MetadataDirective: 'REPLACE',
+      CacheControl: 'no-cache',
+    })
+  );
+}
+
+// Plain unsigned URL on the direct origin. Prodigi fetches it with GET (user agent
+// Prodigi-Fulfilment/1.0), and going around Cloudflare keeps its bot protection from blocking the fetch.
+export function getPrintJpegDirectUrl(merchItemId: number): string {
+  return bypassCloudflare(
+    `https://photos.1940s.nyc/${getPrintJpegKey(merchItemId)}`
   );
 }

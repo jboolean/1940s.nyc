@@ -1,0 +1,88 @@
+import { colorizeForPrint } from '../business/color/ColorService';
+import {
+  copyOriginalToPrintJpeg,
+  uploadPrintJpeg,
+} from '../business/utils/printfileUtils';
+import { isPrintVariant } from '../business/prodigi/printCatalog';
+import { AppDataSource } from '../createConnection';
+import { PrintCustomizationOptions } from '../entities/MerchCustomizationOptions';
+import MerchOrderItem from '../entities/MerchOrderItem';
+import MerchItemState from '../enum/MerchItemState';
+import MerchOrderState from '../enum/MerchOrderState';
+
+// Colorizing at the highest Palette resolution is slow, so keep batches small.
+const LIMIT = 3;
+export const MAX_PRINTFILE_ATTEMPTS = 5;
+
+async function createPrintfile(
+  item: MerchOrderItem,
+  options: PrintCustomizationOptions
+): Promise<void> {
+  if (options.colorize) {
+    await uploadPrintJpeg(
+      item.id,
+      await colorizeForPrint(options.photoIdentifier)
+    );
+  } else {
+    await copyOriginalToPrintJpeg(item.id, options.photoIdentifier);
+  }
+}
+
+/**
+ * Generates print files for purchased print items. Each item is handled on its own, so a failure
+ * never blocks other items or orders: it is recorded on the item, retried on later runs, and after
+ * MAX_PRINTFILE_ATTEMPTS the item moves to printfile_failed for a person to look at.
+ */
+export default async function renderPrintfiles(): Promise<void> {
+  const repository = AppDataSource.getRepository(MerchOrderItem);
+  // Least recently touched first, so an item that keeps failing cannot hold back the others.
+  const items = await repository
+    .createQueryBuilder('item')
+    .innerJoinAndSelect('item.order', 'order')
+    .where('item.state = :state', { state: MerchItemState.AWAITING_PRINTFILE })
+    .andWhere('order.state != :canceled', {
+      canceled: MerchOrderState.CANCELED,
+    })
+    .orderBy('item.updatedAt', 'ASC')
+    .limit(LIMIT)
+    .getMany();
+
+  for (const item of items) {
+    const options = item.customizationOptions;
+    if (
+      !options ||
+      !('photoIdentifier' in options) ||
+      !isPrintVariant(item.internalVariant)
+    ) {
+      console.error('[prints] Item has no print customization', item.id);
+      await repository.update(item.id, {
+        state: MerchItemState.PRINTFILE_FAILED,
+      });
+      continue;
+    }
+
+    console.log('[prints] Creating print file for item', item.id);
+    try {
+      await createPrintfile(item, options);
+      await repository.update(item.id, {
+        state: MerchItemState.READY_FOR_FULFILLMENT,
+      });
+    } catch (e) {
+      const attempts = (options.printfile?.attempts ?? 0) + 1;
+      const exhausted = attempts >= MAX_PRINTFILE_ATTEMPTS;
+      console.error(
+        `[prints] Print file for item ${item.id} failed (attempt ${attempts}${exhausted ? ', giving up' : ''})`,
+        e
+      );
+      await repository.update(item.id, {
+        customizationOptions: {
+          ...options,
+          printfile: { attempts, lastError: String(e).slice(0, 500) },
+        },
+        state: exhausted
+          ? MerchItemState.PRINTFILE_FAILED
+          : MerchItemState.AWAITING_PRINTFILE,
+      });
+    }
+  }
+}
