@@ -18,21 +18,21 @@ export const PRINT_PRODUCTS: PrintProduct[] = [
     sku: 'GLOBAL-HPR-4X6',
     attributes: {},
     sizing,
-    label: '4×6 in print',
+    label: '4×6 print',
   },
   {
     variant: MerchInternalVariant.PRINT_HPR_8X12,
     sku: 'GLOBAL-HPR-8X12',
     attributes: {},
     sizing,
-    label: '8×12 in print',
+    label: '8×12 print',
   },
   {
     variant: MerchInternalVariant.PRINT_FAP_8X12_FRAMED,
     sku: 'GLOBAL-BOX-8X12',
     attributes: { color: 'black' },
     sizing,
-    label: '8×12 in framed print',
+    label: '8×12 framed print',
   },
 ];
 
