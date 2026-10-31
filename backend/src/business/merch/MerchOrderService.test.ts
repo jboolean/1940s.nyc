@@ -28,71 +28,27 @@ interface FakeOrder {
   emailedTrackingUrl: string | null;
 }
 
-interface FakeManager {
-  transaction<T>(fn: (m: FakeManager) => Promise<T>): Promise<T>;
-  query(sql: string, params: unknown[]): Promise<unknown[]>;
-  update(entity: unknown, id: number, patch: Partial<FakeOrder>): Promise<void>;
-}
-
 interface FakeStore {
   rows: FakeOrder[];
   addOrder(providerOrderId: string): FakeOrder;
   failNextUpdate(): void;
 }
 
+// The claim is one conditional UPDATE, so the fake only has to model that statement: match the
+// conditions, assign on a hit, report the row count.
 jest.mock('../../createConnection', () => {
   const rows: FakeOrder[] = [];
   let nextId = 1;
   let failNextUpdate = false;
-  // The write reads the row under a lock, so the fake runs transactions one at a time.
-  let queue: Promise<unknown> = Promise.resolve();
 
-  const serialize = <T>(fn: () => Promise<T>): Promise<T> => {
-    const run = queue.then(fn, fn);
-    queue = run.then(
-      () => undefined,
-      () => undefined
-    );
-    return run;
-  };
-
-  const condition = (
-    sql: string,
-    params: { trackingUrl?: string }
-  ): ((row: FakeOrder) => boolean) => {
-    if (sql === 'trackingUrl IS DISTINCT FROM :trackingUrl') {
-      return (row) => row.trackingUrl !== params.trackingUrl;
+  const condition = (sql: string, params: { trackingUrl?: string }) => {
+    if (sql === 'emailedTrackingUrl IS DISTINCT FROM :trackingUrl') {
+      return (row: FakeOrder) => row.emailedTrackingUrl !== params.trackingUrl;
     }
     if (sql === 'emailedTrackingUrl = :trackingUrl') {
-      return (row) => row.emailedTrackingUrl === params.trackingUrl;
+      return (row: FakeOrder) => row.emailedTrackingUrl === params.trackingUrl;
     }
     throw new Error(`Unexpected condition: ${sql}`);
-  };
-
-  const manager: FakeManager = {
-    transaction: <T>(fn: (m: FakeManager) => Promise<T>): Promise<T> =>
-      serialize(() => fn(manager)),
-    query: (sql: string, params: unknown[]): Promise<unknown[]> => {
-      if (!sql.includes('for update')) {
-        return Promise.reject(new Error(`Unexpected query: ${sql}`));
-      }
-      const row = rows.find((r) => r.id === params[0]);
-      return Promise.resolve(
-        row ? [{ emailed_tracking_url: row.emailedTrackingUrl }] : []
-      );
-    },
-    update: (
-      _entity: unknown,
-      id: number,
-      patch: Partial<FakeOrder>
-    ): Promise<void> => {
-      const row = rows.find((r) => r.id === id);
-      if (!row) {
-        return Promise.reject(new Error(`No order row ${id}`));
-      }
-      Object.assign(row, patch);
-      return Promise.resolve();
-    },
   };
 
   const repository = {
@@ -137,7 +93,6 @@ jest.mock('../../createConnection', () => {
       };
       return builder;
     },
-    manager,
   };
 
   const store: FakeStore = {
@@ -224,7 +179,7 @@ it('emails again for a later shipment and moves the marker', async () => {
   expect(order.emailedTrackingUrl).toBe(URL_TWO);
 });
 
-it('keeps the earlier shipment marker when a later send fails, and retries it', async () => {
+it('releases the claim when a later send fails, and retries it', async () => {
   const order = addOrder('ord_later_fail');
 
   await onShipmentSent(MerchProvider.PRODIGI, 'ord_later_fail', URL_ONE);
@@ -234,7 +189,7 @@ it('keeps the earlier shipment marker when a later send fails, and retries it', 
   ).rejects.toThrow('postmark is down');
 
   expect(order.trackingUrl).toBe(URL_TWO);
-  expect(order.emailedTrackingUrl).toBe(URL_ONE);
+  expect(order.emailedTrackingUrl).toBeNull();
 
   await onShipmentSent(MerchProvider.PRODIGI, 'ord_later_fail', URL_TWO);
   expect(order.emailedTrackingUrl).toBe(URL_TWO);
