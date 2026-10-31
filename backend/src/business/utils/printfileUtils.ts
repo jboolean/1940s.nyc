@@ -5,10 +5,8 @@ import {
   S3Client,
 } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
-import crypto from 'crypto';
 import { bypassCloudflare } from './cloudflareOrigins';
 import isProduction from './isProduction';
-import required from './required';
 
 const s3 = new S3Client();
 
@@ -56,13 +54,8 @@ export function getPrintfileDirectUrl(customMerchItemId: number): string {
 
 function getPrintJpegKey(merchItemId: number): string {
   const destinationDirectory = isProduction() ? 'printfiles' : 'printfiles-dev';
-  // Not guessable from the item id alone; Prodigi fetches this without credentials.
-  const suffix = crypto
-    .createHmac('sha256', required(process.env.JWT_SECRET, 'JWT_SECRET'))
-    .update(`print-jpeg:${merchItemId}`)
-    .digest('hex')
-    .slice(0, 16);
-  return `merch/${destinationDirectory}/prodigi/${merchItemId}-${suffix}.jpg`;
+  // Prodigi fetches this without credentials.
+  return `merch/${destinationDirectory}/${merchItemId}.jpg`;
 }
 
 export async function uploadPrintJpeg(
