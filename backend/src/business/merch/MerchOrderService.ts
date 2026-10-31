@@ -7,15 +7,16 @@ import MerchInternalVariant from '../../enum/MerchInternalVariant';
 import MerchOrderFulfillmentState from '../../enum/MerchOrderFulfillmentState';
 import MerchOrderState from '../../enum/MerchOrderState';
 import MerchProvider from '../../enum/MerchProvider';
+import MerchShipment from '../../entities/MerchShipment';
 import EmailService from '../email/EmailService';
 import OrderCustomizeTemplate from '../email/templates/OrderCustomizeTemplate';
 import { OrderTemplateData } from '../email/templates/OrderEmailTemplateData';
 import OrderShippedTemplate from '../email/templates/OrderShippedTemplate';
 import * as UserService from '../users/UserService';
-import absurd from '../utils/absurd';
 import isProduction from '../utils/isProduction';
-import required from '../utils/required';
-import * as PrintfulService from './PrintfulService';
+import getFulfillmentProvider, {
+  selectProviderForItems,
+} from './providers/getFulfillmentProvider';
 
 const API_BASE = isProduction()
   ? 'http://api.1940s.nyc'
@@ -45,18 +46,19 @@ export async function createMerchOrder(
     let order = new MerchOrder();
     order.userId = userId;
     order.state = MerchOrderState.BUILDING;
-    order.provider = MerchProvider.PRINTFUL;
+    const provider = selectProviderForItems(itemTypes);
+    order.provider = provider;
     order.stripeCheckoutSessionId = stripeCheckoutSessionId;
     order = await orderRepository.save(order);
 
-    const printfulOrder = await PrintfulService.createEmptyOrder(
+    const providerOrder = await getFulfillmentProvider(provider).createOrder(
       order.id,
       shippingAddress
     );
 
-    order.providerOrderId = printfulOrder.id;
+    order.providerOrderId = providerOrder.providerOrderId;
     order.state = MerchOrderState.BUILDING;
-    order.fulfillmentState = MerchOrderFulfillmentState.DRAFT;
+    order.fulfillmentState = providerOrder.fulfillmentState;
 
     order = await orderRepository.save(order);
 
@@ -113,15 +115,7 @@ export async function submitOrderForFulfillment(
   const orderRepository = AppDataSource.getRepository(MerchOrder);
   const order = await orderRepository.findOneByOrFail({ id: orderId });
 
-  switch (order.provider) {
-    case MerchProvider.PRINTFUL:
-      await PrintfulService.submitOrderForFulfillment(
-        required(order.providerOrderId, 'providerOrderId')
-      );
-      break;
-    default:
-      absurd(order.provider);
-  }
+  await getFulfillmentProvider(order.provider).submitOrderForFulfillment(order);
 
   order.state = MerchOrderState.SUBMITTED_FOR_FULFILLMENT;
   await orderRepository.save(order);
@@ -149,7 +143,7 @@ export async function cancelOrder(orderId: number): Promise<void> {
 
 export async function onPrinterStatusChanged(
   provider: MerchProvider,
-  providerOrderId: number,
+  providerOrderId: string,
   newFulfillmentState: MerchOrderFulfillmentState
 ): Promise<void> {
   const orderRepository = AppDataSource.getRepository(MerchOrder);
@@ -190,12 +184,20 @@ export async function onPrinterStatusChanged(
   }
 }
 
+export interface ShipmentInfo {
+  providerShipmentId: string;
+  trackingUrl?: string;
+  trackingNumber?: string;
+  carrier?: string;
+}
+
 export async function onShipmentSent(
   provider: MerchProvider,
-  providerOrderId: number,
-  trackingUrl: string
+  providerOrderId: string,
+  shipmentInfo: ShipmentInfo
 ): Promise<void> {
   const orderRepository = AppDataSource.getRepository(MerchOrder);
+  const shipmentRepository = AppDataSource.getRepository(MerchShipment);
   let order = await orderRepository.findOneBy({
     provider,
     providerOrderId,
@@ -206,15 +208,37 @@ export async function onShipmentSent(
     return;
   }
 
-  order.trackingUrl = trackingUrl;
-  order = await orderRepository.save(order);
+  const existing = await shipmentRepository.findOneBy({
+    orderId: order.id,
+    providerShipmentId: shipmentInfo.providerShipmentId,
+  });
+  const shipment = existing ?? new MerchShipment();
+  shipment.orderId = order.id;
+  shipment.providerShipmentId = shipmentInfo.providerShipmentId;
+  shipment.trackingUrl = shipmentInfo.trackingUrl ?? null;
+  shipment.trackingNumber = shipmentInfo.trackingNumber ?? null;
+  shipment.carrier = shipmentInfo.carrier ?? null;
+  await shipmentRepository.save(shipment);
+
+  if (shipmentInfo.trackingUrl) {
+    order.trackingUrl = shipmentInfo.trackingUrl;
+    order = await orderRepository.save(order);
+  }
+
+  if (existing) {
+    // Provider retried or re-sent the same shipment; the customer was already emailed.
+    return;
+  }
 
   const user = await UserService.getUser(order.userId);
 
   if (user.email) {
     const orderShippedEmail = OrderShippedTemplate.createTemplatedEmail({
       to: user.email,
-      templateContext: createOrderEmailTemplateData(order),
+      templateContext: {
+        ...createOrderEmailTemplateData(order),
+        trackingUrl: shipmentInfo.trackingUrl,
+      },
       metadata: {
         orderId: order.id.toString(),
         userId: user.id.toString(),
