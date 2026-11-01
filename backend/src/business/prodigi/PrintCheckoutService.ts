@@ -1,15 +1,17 @@
 import { BadRequest, NotFound } from 'http-errors';
-import type Stripe from 'stripe';
 import { AppDataSource } from '../../createConnection';
 import Photo from '../../entities/Photo';
 import User from '../../entities/User';
 import Collection from '../../enum/Collection';
 import MerchInternalVariant from '../../enum/MerchInternalVariant';
 import stripe from '../../third-party/stripe';
+import {
+  buildCheckoutSessionFields,
+  getCatalogDefaultPrice,
+} from '../merch/checkoutSession';
 import { getMerchLabel } from '../merch/merchCatalog';
-import { bypassCloudflare } from '../utils/cloudflareOrigins';
 import required from '../utils/required';
-import { PRINT_PRODUCTS, PrintProduct } from './printCatalog';
+import { PRINT_PRODUCTS } from './printCatalog';
 import * as ProdigiService from './ProdigiService';
 import { buildShippingOptions } from './printShipping';
 
@@ -23,29 +25,9 @@ export interface AvailablePrintProduct {
   priceAmount: number;
 }
 
-export function getThumbnailUrl(photoIdentifier: string): string {
-  return bypassCloudflare(
-    `https://photos.1940s.nyc/420-jpg/${photoIdentifier}.jpg`
-  );
-}
-
-// The Stripe product is keyed by the internal variant id and its default price is the source of truth.
-async function getUnitAmount(product: PrintProduct): Promise<number> {
-  const stripeProduct = await stripe.products.retrieve(product.variant, {
-    expand: ['default_price'],
-  });
-  const price = required(
-    stripeProduct.default_price as Stripe.Price | null,
-    `default price of ${product.variant}`
-  );
-  if (price.currency !== 'usd') {
-    throw new Error(
-      `${product.variant} price is in ${price.currency}, not usd`
-    );
-  }
-  return required(price.unit_amount, `unit_amount of ${product.variant}`);
-}
-
+// The Stripe product is keyed by the internal variant id and its default price is the source of
+// truth. The card details and the customer's colorize choice are per purchase, so they travel on
+// the line item's own metadata rather than on the product.
 export async function getAvailablePrintProducts(): Promise<
   AvailablePrintProduct[]
 > {
@@ -53,7 +35,10 @@ export async function getAvailablePrintProducts(): Promise<
     PRINT_PRODUCTS.map(async (product) => ({
       variant: product.variant,
       label: getMerchLabel(product.variant),
-      priceAmount: await getUnitAmount(product),
+      priceAmount: required(
+        (await getCatalogDefaultPrice(product.variant)).unit_amount,
+        `unit_amount of ${product.variant}`
+      ),
     }))
   );
 }
@@ -94,8 +79,10 @@ export async function createPrintCheckoutSession({
     throw new BadRequest('Prints are only available for 1940s photos');
   }
 
-  const [unitAmount, quotes] = await Promise.all([
-    getUnitAmount(product),
+  // The price comes from Stripe; it is read here so a missing or non-USD price fails now, not at
+  // the webhook.
+  const [price, quotes] = await Promise.all([
+    getCatalogDefaultPrice(product.variant),
     ProdigiService.getQuotes({
       destinationCountryCode: 'US',
       items: [
@@ -114,43 +101,23 @@ export async function createPrintCheckoutSession({
   }
 
   const address = photo.effectiveAddress?.address;
-  const stripeCustomerId: string | undefined =
-    user?.stripeCustomerId ?? undefined;
 
   const session = await stripe.checkout.sessions.create({
-    cancel_url: cancelUrl,
-    success_url: successUrl,
+    ...buildCheckoutSessionFields({ successUrl, cancelUrl, user }),
     mode: 'payment',
     line_items: [
       {
+        price: price.id,
         quantity,
-        price_data: {
-          currency: 'usd',
-          unit_amount: unitAmount,
-          product_data: {
-            name: colorize
-              ? `${getMerchLabel(product.variant)}, AI colorized`
-              : getMerchLabel(product.variant),
-            description: address
-              ? `${address}, ${photo.borough ?? 'NYC'} (1940s tax photo)`
-              : `1940s tax photo ${photo.identifier}`,
-            images: [getThumbnailUrl(photo.identifier)],
-            metadata: {
-              'product-type': PRINT_PRODUCT_TYPE,
-              'merch-internal-variant': product.variant,
-              'photo-identifier': photo.identifier,
-              colorize: String(colorize),
-            },
-          },
+        metadata: {
+          'photo-identifier': photo.identifier,
+          colorize: String(colorize),
+          description: address
+            ? `${address}, ${photo.borough ?? 'NYC'} (1940s tax photo)`
+            : `1940s tax photo ${photo.identifier}`,
         },
       },
     ],
-    metadata: { userId: user?.id ?? null },
-    customer: stripeCustomerId,
-    // See MerchCheckoutService: forces a customer so the webhook can attach it to the user.
-    customer_creation: stripeCustomerId ? undefined : 'always',
-    customer_email: stripeCustomerId ? undefined : (user?.email ?? undefined),
-    shipping_address_collection: { allowed_countries: ['US'] },
     shipping_options: shippingOptions,
   });
 
