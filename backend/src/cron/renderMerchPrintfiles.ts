@@ -22,13 +22,23 @@ import MerchItemState from '../enum/MerchItemState';
 import MerchOrderState from '../enum/MerchOrderState';
 import absurd from '../business/utils/absurd';
 
-// Colorizing is the only slow render and the only one with a timeout of its own, so a run starts at
-// most two of them, 180s of the Lambda's 300s. The other six items are a tote's map render or a
-// full-resolution server-side copy, neither of which calls the colorizer, so they share the
-// remaining 120s rather than competing with it.
-const BATCH_LIMIT = 8;
-export const MAX_COLORIZED_PER_RUN = 2;
+// The Lambda allows 300s and the submit and sync steps that run before rendering share it, so
+// rendering keeps to RENDER_BUDGET_MS. Colorizing is the one render that can take a minute, so it is
+// budgeted separately; the rest are a tote's map render or a server-side copy, capped at
+// ITEM_TIMEOUT_MS. The batch is what fits both caps inside the budget, so neither a long queue nor
+// one hung render can push a run past it.
+const RENDER_BUDGET_MS = 270_000;
 const COLORIZE_TIMEOUT_MS = 90_000;
+// Above the ~65s a tote takes on puppeteer's defaults, so this catches a hang rather than a slow
+// but working render.
+const ITEM_TIMEOUT_MS = 75_000;
+export const MAX_COLORIZED_PER_RUN = 2;
+const BATCH_LIMIT =
+  MAX_COLORIZED_PER_RUN +
+  Math.floor(
+    (RENDER_BUDGET_MS - MAX_COLORIZED_PER_RUN * COLORIZE_TIMEOUT_MS) /
+      ITEM_TIMEOUT_MS
+  );
 export const MAX_PRINTFILE_ATTEMPTS = 5;
 export const METRICS_NAMESPACE = 'fourtiesnyc/merch';
 
@@ -38,16 +48,19 @@ interface RenderedPrintfile {
   buffer?: Buffer;
 }
 
-async function colorize(photoIdentifier: string): Promise<Buffer> {
+// The work behind the timeout is not cancelled, so a render that is still running when its slot ends
+// keeps running in the background. It is bounded by the batch size and the invocation ends with it.
+async function withTimeout<T>(
+  ms: number,
+  what: string,
+  work: Promise<T>
+): Promise<T> {
   let timer: NodeJS.Timeout | undefined;
   try {
     return await Promise.race([
-      colorizeForPrint(photoIdentifier),
+      work,
       new Promise<never>((_, reject) => {
-        timer = setTimeout(
-          () => reject(new Error('Colorization timed out')),
-          COLORIZE_TIMEOUT_MS
-        );
+        timer = setTimeout(() => reject(new Error(`${what} timed out`)), ms);
       }),
     ]);
   } finally {
@@ -67,13 +80,17 @@ async function renderTote(
   }
   return {
     extension: getPrintfileExtensionForVariant(item.internalVariant),
-    buffer: await renderToteBag({
-      lat,
-      lng,
-      style,
-      foregroundColor,
-      backgroundColor,
-    }),
+    buffer: await withTimeout(
+      ITEM_TIMEOUT_MS,
+      'Tote bag render',
+      renderToteBag({
+        lat,
+        lng,
+        style,
+        foregroundColor,
+        backgroundColor,
+      })
+    ),
   };
 }
 
@@ -86,10 +103,21 @@ async function renderPrint(
   }
   const extension = getPrintfileExtensionForVariant(item.internalVariant);
   if (options.colorize) {
-    return { extension, buffer: await colorize(options.photoIdentifier) };
+    return {
+      extension,
+      buffer: await withTimeout(
+        COLORIZE_TIMEOUT_MS,
+        'Colorization',
+        colorizeForPrint(options.photoIdentifier)
+      ),
+    };
   }
   // A server-side copy of the full-resolution original, so the bytes never pass through here.
-  await copyOriginalToPrintJpeg(item.id, options.photoIdentifier);
+  await withTimeout(
+    ITEM_TIMEOUT_MS,
+    'Original copy',
+    copyOriginalToPrintJpeg(item.id, options.photoIdentifier)
+  );
   return { extension };
 }
 
