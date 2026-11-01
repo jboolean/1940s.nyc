@@ -5,13 +5,14 @@ import { API_BASE } from 'utils/apiConstants';
 
 import Button, { ButtonStyledLink } from 'shared/components/Button';
 import recordEvent from 'shared/utils/recordEvent';
+import { useFeatureFlag } from '../../../shared/stores/FeatureFlagsStore';
+import FeatureFlag from '../../../shared/types/FeatureFlag';
 import { useCorrectionsStore } from '../../Corrections';
+import { openPrintModal } from '../../PrintModal';
+import { ORDER_PRINT_EXTERNAL_LINK_MESSAGE } from '../../PrintModal/archivesLink';
 import { useStoryDraftStore } from '../../SubmitStoryWizard';
 import ColorizeButton from './ColorizeButton';
 
-const ORDER_PRINT_EXTERNAL_LINK_MESSAGE =
-  'You are leaving 1940s.nyc for the Department of Records and Information Services (DORIS), with which 1940s.nyc is not affilliated. 1940s.nyc cannot help with orders placed through DORIS. ' +
-  'Copies are from the original negatives will not include colorization from 1940s.nyc. ';
 export default function ImageButtons(): React.JSX.Element {
   const { identifier: photoIdentifier } = useParams<{ identifier?: string }>();
   const initializeStoryDraft = useStoryDraftStore((state) => state.initialize);
@@ -19,25 +20,41 @@ export default function ImageButtons(): React.JSX.Element {
     (state) => state.initialize
   );
 
+  const printOrdersEnabled = useFeatureFlag(FeatureFlag.PRINT_ORDERS);
+
+  const orderPrintEvent = {
+    category: 'Image Viewer',
+    action: 'Clicks Order Print',
+  };
+  const orderPrintProps = {
+    buttonTheme: 'viewer',
+    buttonStyle: 'secondary',
+    'data-testid': 'order-print-button',
+    children: 'Order Print',
+  } as const;
+
   return (
     <div>
-      <ButtonStyledLink
-        buttonTheme="viewer"
-        buttonStyle="secondary"
-        href={`${API_BASE}/photos/${photoIdentifier}/buy-prints`}
-        target="_blank"
-        data-testid="order-print-button"
-        onClick={() => {
-          recordEvent({
-            category: 'Image Viewer',
-            action: 'Clicks Order Print',
-          });
-          alert(ORDER_PRINT_EXTERNAL_LINK_MESSAGE);
-          return true;
-        }}
-      >
-        Order Print
-      </ButtonStyledLink>
+      {printOrdersEnabled ? (
+        <Button
+          {...orderPrintProps}
+          onClick={() => {
+            recordEvent(orderPrintEvent);
+            if (photoIdentifier) openPrintModal(photoIdentifier);
+          }}
+        />
+      ) : (
+        <ButtonStyledLink
+          {...orderPrintProps}
+          href={`${API_BASE}/photos/${photoIdentifier}/buy-prints`}
+          target="_blank"
+          onClick={() => {
+            recordEvent(orderPrintEvent);
+            alert(ORDER_PRINT_EXTERNAL_LINK_MESSAGE);
+            return true;
+          }}
+        />
+      )}
       <ColorizeButton photoIdentifier={photoIdentifier} />
       <Button
         buttonTheme="viewer"

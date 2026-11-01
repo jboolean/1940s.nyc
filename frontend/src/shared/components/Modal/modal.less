@@ -138,3 +138,15 @@
   background-color: @creme;
   color: @font-color-dark;
 }
+
+// Overrides both the fixed height and the full-screen height, so a modal with
+// little in it is not mostly empty space.
+.modal.contentSized {
+  &.large,
+  &.x-large {
+    height: auto;
+    top: 50%;
+    transform: translateY(-50%);
+    overflow-y: auto;
+  }
+}

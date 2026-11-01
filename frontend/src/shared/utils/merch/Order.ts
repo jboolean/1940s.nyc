@@ -2,9 +2,12 @@
 
 export enum MerchInternalVariant {
   TOTE_BAG_SMALL = 'tote-bag-small',
+  PRINT_HPR_4X6 = 'print-hpr-4x6',
+  PRINT_HPR_8X12 = 'print-hpr-8x12',
+  PRINT_FAP_8X12_FRAMED = 'print-fap-8x12-framed',
 }
 
-interface ToteBagCustomizationOptions {
+export interface ToteBagCustomizationOptions {
   variant: MerchInternalVariant.TOTE_BAG_SMALL;
   lat: number;
   lng: number;
@@ -13,7 +16,39 @@ interface ToteBagCustomizationOptions {
   backgroundColor: 'red' | 'green' | 'creme' | 'dark';
 }
 
-export type MerchCustomizationOptions = ToteBagCustomizationOptions;
+export type PrintVariant =
+  | MerchInternalVariant.PRINT_HPR_4X6
+  | MerchInternalVariant.PRINT_HPR_8X12
+  | MerchInternalVariant.PRINT_FAP_8X12_FRAMED;
+
+export interface PrintCustomizationOptions {
+  variant: PrintVariant;
+  photoIdentifier: string;
+  colorize: boolean;
+}
+
+export type MerchCustomizationOptions =
+  | ToteBagCustomizationOptions
+  | PrintCustomizationOptions;
+
+export function isPrintOptions(
+  options: MerchCustomizationOptions
+): options is PrintCustomizationOptions {
+  return 'photoIdentifier' in options;
+}
+
+export function isToteOptions(
+  options: MerchCustomizationOptions
+): options is ToteBagCustomizationOptions {
+  return !isPrintOptions(options);
+}
+
+export function getToteOptions(
+  item: OrderItem
+): ToteBagCustomizationOptions | undefined {
+  const options = item.customizationOptions;
+  return options && isToteOptions(options) ? options : undefined;
+}
 
 export enum MerchOrderState {
   BUILDING = 'building', // Order is in draft, items are being added
@@ -27,6 +62,7 @@ export enum MerchItemState {
   PURCHASED = 'purchased', // Item purchased; may need customization
   CUSTOMIZED = 'customized', // Customization complete
   READY_FOR_FULFILLMENT = 'ready_for_fulfillment', // Ready to be added to an order
+  PRINTFILE_FAILED = 'printfile_failed', // Print file could not be created
   ADDED_TO_ORDER = 'added_to_order', // Item has been added to an order
 }
 
@@ -44,6 +80,8 @@ export enum MerchOrderFulfillmentState {
 export interface OrderItem {
   id: number;
   internalVariant: MerchInternalVariant;
+  // The customer-facing name, sent by the API so the catalog lives in one place.
+  label: string;
   customizationOptions?: MerchCustomizationOptions;
   state: MerchItemState;
 }
