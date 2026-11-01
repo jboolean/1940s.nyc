@@ -88,9 +88,7 @@ describe('createMerchOrder', () => {
       createOrder: () => Promise.resolve({ providerOrderId: 'pf_1' }),
     } as never);
 
-    await createMerchOrder(1, 'cs_4', { line1: '1 Main St' }, [
-      { variant: print.variant, customizationOptions: print },
-    ]);
+    await createMerchOrder(1, 'cs_4', { line1: '1 Main St' }, [print]);
 
     const savedOrder = saved[1] as {
       providerOrderId?: string;
