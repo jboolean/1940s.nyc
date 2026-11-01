@@ -187,6 +187,9 @@ const usePrintCheckoutStore = create(
         }, 5000);
       } catch (error) {
         console.error('Print checkout failed', error);
+        // A failure from a modal that has since been closed and reopened must not land in the new
+        // one, where it would show an error and re-enable the button mid-retry.
+        if (request !== latestRequest || !get().isOpen) return;
         set((draft) => {
           draft.errorMessage = 'Something went wrong. Please try again.';
           draft.isCheckingOut = false;
