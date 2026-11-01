@@ -15,36 +15,20 @@ export function getAvailablePrintProducts(): Promise<
     .then((resp) => resp.data);
 }
 
+export interface PrintCheckoutItem {
+  photoIdentifier: string;
+  variant: MerchInternalVariant;
+  quantity: number;
+  colorize: boolean;
+}
+
 export async function createPrintCheckoutSession(
-  request: {
-    photoIdentifier: string;
-    variant: MerchInternalVariant;
-    quantity: number;
-    colorize: boolean;
-  },
+  items: PrintCheckoutItem[],
   successUrl: string,
   cancelUrl: string
 ): Promise<string> {
   const resp = await api.post<{ sessionId: string; url: string }>(
     '/print-checkout/session',
-    { ...request, successUrl, cancelUrl },
-    { timeout: 10000 }
-  );
-  return resp.data.url;
-}
-
-export async function createPrintCartCheckoutSession(
-  items: {
-    photoIdentifier: string;
-    variant: MerchInternalVariant;
-    quantity: number;
-    colorize: boolean;
-  }[],
-  successUrl: string,
-  cancelUrl: string
-): Promise<string> {
-  const resp = await api.post<{ sessionId: string; url: string }>(
-    '/print-checkout/cart-session',
     { items, successUrl, cancelUrl },
     { timeout: 10000 }
   );

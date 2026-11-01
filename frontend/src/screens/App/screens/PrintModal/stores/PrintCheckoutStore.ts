@@ -149,6 +149,13 @@ const usePrintCheckoutStore = create(
     addToCart: () => {
       const { photo, variant, quantity, colorize } = get();
       if (!photo || !variant) return;
+      if (usePrintCartStore.getState().isCheckingOut) {
+        set((draft) => {
+          draft.errorMessage =
+            'Your cart is being checked out. Please try again in a moment.';
+        });
+        return;
+      }
       const added = usePrintCartStore.getState().addItem({
         photoIdentifier: photo.identifier,
         variant,
@@ -187,7 +194,7 @@ const usePrintCheckoutStore = create(
 
         const base = `${window.location.protocol}//${window.location.host}${window.location.pathname}`;
         const url = await createPrintCheckoutSession(
-          { photoIdentifier: photo.identifier, variant, quantity, colorize },
+          [{ photoIdentifier: photo.identifier, variant, quantity, colorize }],
           `${base}?noWelcome=&printSuccess=${window.location.hash}`,
           `${base}?noWelcome=${window.location.hash}`
         );

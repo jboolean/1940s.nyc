@@ -10,7 +10,7 @@ import { useFeatureFlag } from '../../shared/stores/FeatureFlagsStore';
 import FeatureFlag from '../../shared/types/FeatureFlag';
 import { forgeImgSrc } from '../ViewerPane/components/ImageStack';
 import {
-  createPrintCartCheckoutSession,
+  createPrintCheckoutSession,
   getAvailablePrintProducts,
   PrintProductApiResponse,
 } from '../PrintModal/utils/PrintCheckoutApi';
@@ -59,9 +59,11 @@ export function PrintCartButton({
 function QuantityInput({
   quantity,
   onChange,
+  disabled,
 }: {
   quantity: number;
   onChange: (quantity: number) => void;
+  disabled: boolean;
 }): React.JSX.Element {
   const [text, setText] = React.useState(String(quantity));
   React.useEffect(() => setText(String(quantity)), [quantity]);
@@ -85,6 +87,7 @@ function QuantityInput({
         setText(String(clamped));
         onChange(clamped);
       }}
+      disabled={disabled}
       className={stylesheet.quantityInput}
       data-testid="print-cart-quantity"
     />
@@ -92,11 +95,18 @@ function QuantityInput({
 }
 
 export default function PrintCartModal(): React.JSX.Element {
-  const { items, isOpen, close, removeItem, setQuantity } = usePrintCartStore();
+  const {
+    items,
+    isOpen,
+    isCheckingOut,
+    close,
+    removeItem,
+    setQuantity,
+    setCheckingOut,
+  } = usePrintCartStore();
   const [products, setProducts] = React.useState<
     PrintProductApiResponse[] | null
   >(null);
-  const [isCheckingOut, setCheckingOut] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
 
   React.useEffect(() => {
@@ -116,7 +126,7 @@ export default function PrintCartModal(): React.JSX.Element {
     return () => {
       cancelled = true;
     };
-  }, [isOpen]);
+  }, [isOpen, setCheckingOut]);
 
   // Coming back from Stripe with the back button can restore the page as it was left.
   React.useEffect(() => {
@@ -146,8 +156,13 @@ export default function PrintCartModal(): React.JSX.Element {
         value: total || undefined,
       });
       const base = `${window.location.protocol}//${window.location.host}${window.location.pathname}`;
-      const url = await createPrintCartCheckoutSession(
-        items,
+      const url = await createPrintCheckoutSession(
+        items.map(({ photoIdentifier, variant, quantity, colorize }) => ({
+          photoIdentifier,
+          variant,
+          quantity,
+          colorize,
+        })),
         `${base}?noWelcome=&printSuccess=cart${window.location.hash}`,
         `${base}?noWelcome=${window.location.hash}`
       );
@@ -232,9 +247,13 @@ export default function PrintCartModal(): React.JSX.Element {
                         <QuantityInput
                           quantity={item.quantity}
                           onChange={(quantity) => setQuantity(item, quantity)}
+                          disabled={isCheckingOut}
                         />
                       </label>
-                      <TextButton onClick={() => removeItem(item)}>
+                      <TextButton
+                        onClick={() => removeItem(item)}
+                        disabled={isCheckingOut}
+                      >
                         Remove
                       </TextButton>
                     </div>

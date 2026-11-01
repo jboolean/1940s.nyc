@@ -22,15 +22,19 @@ interface State {
   // When the cart last changed. A cart untouched for CART_LIFETIME_MS is dropped on load.
   savedAt: number;
   isOpen: boolean;
+  // While a checkout request is in flight the cart cannot change, so the request and the cart
+  // stay the same.
+  isCheckingOut: boolean;
 }
 
 interface Actions {
-  // Returns false, leaving the cart unchanged, when the item would not fit: the cart is full or
-  // the line would go past the per-line quantity limit.
+  // Returns false, leaving the cart unchanged, when the item would not fit (the cart is full or
+  // the line would go past the per-line quantity limit) or a checkout is in flight.
   addItem: (item: CartItem) => boolean;
   removeItem: (item: CartItem) => void;
   setQuantity: (item: CartItem, quantity: number) => void;
   clear: () => void;
+  setCheckingOut: (isCheckingOut: boolean) => void;
   open: () => void;
   close: () => void;
 }
@@ -88,8 +92,10 @@ const usePrintCartStore = create(
       items: [],
       savedAt: 0,
       isOpen: false,
+      isCheckingOut: false,
 
       addItem: (item) => {
+        if (get().isCheckingOut) return false;
         const existing = get().items.find((i) => isSameItem(i, item));
         if (!existing && get().items.length >= MAX_CART_ITEMS) return false;
         if (existing && existing.quantity + item.quantity > MAX_ITEM_QUANTITY) {
@@ -108,6 +114,7 @@ const usePrintCartStore = create(
       },
 
       removeItem: (item) => {
+        if (get().isCheckingOut) return;
         set((draft) => {
           draft.items = draft.items.filter((i) => !isSameItem(i, item));
           draft.savedAt = Date.now();
@@ -115,6 +122,7 @@ const usePrintCartStore = create(
       },
 
       setQuantity: (item, quantity) => {
+        if (get().isCheckingOut) return;
         set((draft) => {
           const match = draft.items.find((i) => isSameItem(i, item));
           if (match) {
@@ -132,6 +140,12 @@ const usePrintCartStore = create(
           draft.items = [];
           draft.savedAt = Date.now();
           draft.isOpen = false;
+        });
+      },
+
+      setCheckingOut: (isCheckingOut) => {
+        set((draft) => {
+          draft.isCheckingOut = isCheckingOut;
         });
       },
 

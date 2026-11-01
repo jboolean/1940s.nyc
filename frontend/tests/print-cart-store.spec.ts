@@ -82,6 +82,23 @@ test('refuses to merge past the per-line quantity limit', async () => {
   expect(store.getState().items[0].quantity).toBe(MAX_ITEM_QUANTITY);
 });
 
+test('does not change while a checkout is in flight', async () => {
+  const { store } = await loadStore();
+  store.getState().addItem(item);
+
+  store.getState().setCheckingOut(true);
+  expect(store.getState().addItem({ ...item, photoIdentifier: 'other' })).toBe(
+    false
+  );
+  store.getState().setQuantity(item, 5);
+  store.getState().removeItem(item);
+  expect(store.getState().items).toEqual([item]);
+
+  store.getState().setCheckingOut(false);
+  store.getState().removeItem(item);
+  expect(store.getState().items).toEqual([]);
+});
+
 test('quantity is capped and removing drops the line', async () => {
   const { store, MAX_ITEM_QUANTITY } = await loadStore();
 
