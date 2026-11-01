@@ -2,14 +2,34 @@
 @import '../../../../shared/styles/viewport.less';
 
 .cartModal {
-  text-align: left;
+  text-align: center;
+
+  h1 {
+    text-align: center;
+  }
 }
 
 .content {
   display: flex;
   flex-direction: column;
+  align-items: center;
+  text-align: center;
   height: 100%;
+}
+
+.itemsArea {
+  flex-grow: 1;
   overflow-y: auto;
+  width: 100%;
+}
+
+.summary {
+  margin: 0.5rem 0;
+}
+
+.buttonRow {
+  display: flex;
+  justify-content: center;
 }
 
 .error {
@@ -18,7 +38,9 @@
 
 .items {
   list-style: none;
-  margin: 1rem 0;
+  margin: 1rem auto;
+  max-width: 40rem;
+  text-align: left;
   padding: 0;
   display: flex;
   flex-direction: column;
@@ -53,13 +75,6 @@
   width: 4.5rem;
 }
 
-.footer {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  align-items: flex-start;
-}
-
 .finePrint {
   font-size: 12px;
 }
@@ -68,11 +83,18 @@
   composes: visuallyhidden from '../../../../shared/styles/utils.less';
 }
 
+.buttonLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  height: 100%;
+}
+
 .badge {
-  display: inline-block;
-  margin-left: 0.4rem;
   min-width: 1rem;
+  height: 1rem;
   padding: 0 0.25rem;
+  box-sizing: border-box;
   border-radius: 0.5rem;
   background: @green;
   color: white;
@@ -80,5 +102,15 @@
   line-height: 1rem;
   font-weight: bold;
   text-align: center;
-  vertical-align: middle;
+}
+
+@media screen and (max-width: @modal-width-max),
+  screen and (max-height: @modal-height-max) {
+  .cartModal h1 {
+    text-align: left;
+  }
+
+  .content {
+    text-align: left;
+  }
 }

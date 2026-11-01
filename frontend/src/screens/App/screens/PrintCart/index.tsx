@@ -41,13 +41,15 @@ export function PrintCartButton({
         open();
       }}
     >
-      Cart 🛒
-      <span
-        className={stylesheet.badge}
-        data-testid="print-cart-count"
-        aria-label={`${count} in cart`}
-      >
-        {count}
+      <span className={stylesheet.buttonLabel}>
+        Cart
+        <span
+          className={stylesheet.badge}
+          data-testid="print-cart-count"
+          aria-label={`${count} in cart`}
+        >
+          {count}
+        </span>
       </span>
     </button>
   );
@@ -139,103 +141,100 @@ export default function PrintCartModal(): React.JSX.Element {
       shouldCloseOnEsc
       shouldCloseOnOverlayClick
       size="large"
-      isContentSized
       className={stylesheet.cartModal}
     >
       <div className={stylesheet.content} data-testid="print-cart-modal">
         <h1>Your cart</h1>
-        {items.length === 0 && <p>Your cart is empty.</p>}
-        {errorMessage && (
-          <div className={stylesheet.error} data-testid="print-cart-error">
-            {errorMessage}
-          </div>
-        )}
-        {hasUnavailable && (
-          <div
-            className={stylesheet.error}
-            data-testid="print-cart-unavailable"
-          >
-            {products.length === 0
-              ? 'Prints are not available to order here right now. Please try again later.'
-              : 'Some prints in your cart are no longer available. Remove them to continue.'}
-          </div>
-        )}
-        <ul className={stylesheet.items}>
-          {items.map((item) => {
-            const product = priceOf(item);
-            return (
-              <li
-                key={`${item.photoIdentifier}|${item.variant}|${item.colorize}`}
-                className={stylesheet.item}
-                data-testid="print-cart-item"
-              >
-                <img
-                  src={forgeImgSrc(item.photoIdentifier, '420-jpg')}
-                  alt=""
-                  className={stylesheet.thumbnail}
-                />
-                <div className={stylesheet.details}>
-                  <div>
-                    {product?.label ?? item.variant}
-                    {item.colorize ? ', AI colorized' : ''}
-                  </div>
-                  {product && (
-                    <NumericFormat
-                      displayType="text"
-                      prefix="$"
-                      value={product.priceAmount / 100}
-                      decimalScale={product.priceAmount % 100 === 0 ? 0 : 2}
-                      fixedDecimalScale
-                    />
-                  )}
-                  <div className={stylesheet.controls}>
-                    <label>
-                      <span className={stylesheet.visuallyHidden}>
-                        Quantity
-                      </span>
-                      <Select
-                        value={item.quantity}
-                        onChange={(e) =>
-                          setQuantity(item, parseInt(e.target.value, 10))
-                        }
-                        className={stylesheet.quantitySelect}
-                        data-testid="print-cart-quantity"
-                      >
-                        {QUANTITIES.map((q) => (
-                          <option key={q} value={q}>
-                            {q}
-                          </option>
-                        ))}
-                      </Select>
-                    </label>
-                    <TextButton onClick={() => removeItem(item)}>
-                      Remove
-                    </TextButton>
-                  </div>
-                </div>
-              </li>
-            );
-          })}
-        </ul>
-        {items.length > 0 && (
-          <div className={stylesheet.footer}>
-            <div>
-              {products !== null && !hasUnavailable && (
-                <>
-                  <NumericFormat
-                    displayType="text"
-                    prefix="$"
-                    value={total / 100}
-                    decimalScale={total % 100 === 0 ? 0 : 2}
-                    fixedDecimalScale
-                    data-testid="print-cart-total"
-                  />{' '}
-                  <span className={stylesheet.finePrint}>
-                    Shipping will be added
-                  </span>
-                </>
-              )}
+        <div className={stylesheet.itemsArea}>
+          {items.length === 0 && <p>Your cart is empty.</p>}
+          {errorMessage && (
+            <div className={stylesheet.error} data-testid="print-cart-error">
+              {errorMessage}
             </div>
+          )}
+          {hasUnavailable && (
+            <div
+              className={stylesheet.error}
+              data-testid="print-cart-unavailable"
+            >
+              {products.length === 0
+                ? 'Prints are not available to order here right now. Please try again later.'
+                : 'Some prints in your cart are no longer available. Remove them to continue.'}
+            </div>
+          )}
+          <ul className={stylesheet.items}>
+            {items.map((item) => {
+              const product = priceOf(item);
+              return (
+                <li
+                  key={`${item.photoIdentifier}|${item.variant}|${item.colorize}`}
+                  className={stylesheet.item}
+                  data-testid="print-cart-item"
+                >
+                  <img
+                    src={forgeImgSrc(item.photoIdentifier, '420-jpg')}
+                    alt=""
+                    className={stylesheet.thumbnail}
+                  />
+                  <div className={stylesheet.details}>
+                    <div>
+                      {product?.label ?? item.variant}
+                      {item.colorize ? ', AI colorized' : ''}
+                    </div>
+                    {product && (
+                      <NumericFormat
+                        displayType="text"
+                        prefix="$"
+                        value={product.priceAmount / 100}
+                        decimalScale={product.priceAmount % 100 === 0 ? 0 : 2}
+                        fixedDecimalScale
+                      />
+                    )}
+                    <div className={stylesheet.controls}>
+                      <label>
+                        <span className={stylesheet.visuallyHidden}>
+                          Quantity
+                        </span>
+                        <Select
+                          value={item.quantity}
+                          onChange={(e) =>
+                            setQuantity(item, parseInt(e.target.value, 10))
+                          }
+                          className={stylesheet.quantitySelect}
+                          data-testid="print-cart-quantity"
+                        >
+                          {QUANTITIES.map((q) => (
+                            <option key={q} value={q}>
+                              {q}
+                            </option>
+                          ))}
+                        </Select>
+                      </label>
+                      <TextButton onClick={() => removeItem(item)}>
+                        Remove
+                      </TextButton>
+                    </div>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+        {items.length > 0 && products !== null && !hasUnavailable && (
+          <div className={stylesheet.summary}>
+            <NumericFormat
+              displayType="text"
+              prefix="$"
+              value={total / 100}
+              decimalScale={total % 100 === 0 ? 0 : 2}
+              fixedDecimalScale
+              data-testid="print-cart-total"
+            />{' '}
+            <span className={stylesheet.finePrint}>Shipping will be added</span>
+          </div>
+        )}
+        {items.length > 0 && (
+          <div className={stylesheet.buttonRow}>
             <Button
               buttonStyle="primary"
               onClick={() => void checkout()}
