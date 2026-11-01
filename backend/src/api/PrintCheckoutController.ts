@@ -18,6 +18,19 @@ interface PrintSessionRequest {
   colorize: boolean;
 }
 
+interface PrintCartItem {
+  photoIdentifier: string;
+  variant: MerchInternalVariant;
+  quantity: number;
+  colorize: boolean;
+}
+
+interface PrintCartSessionRequest {
+  successUrl: string;
+  cancelUrl: string;
+  items: PrintCartItem[];
+}
+
 interface PrintProductApiResponse {
   variant: MerchInternalVariant;
   label: string;
@@ -49,6 +62,38 @@ export class PrintCheckoutController {
         throw err;
       }
       console.error('Failed to create print checkout session', err);
+      throw new InternalServerError('Failed to create session');
+    }
+  }
+
+  @Security('user-token')
+  @Post('/cart-session')
+  public async createPrintCartSession(
+    @Body() body: PrintCartSessionRequest,
+    @Request() req: express.Request
+  ): Promise<{ sessionId: string; url: string }> {
+    const userId = await getUserFromRequestOrCreateAndSetCookie(req);
+    const user = await UserService.getUser(userId);
+
+    try {
+      const { successUrl, cancelUrl, items } = body;
+      return await MerchCheckoutService.createMerchCheckoutSession({
+        successUrl,
+        cancelUrl,
+        user,
+        items: items.map(
+          ({ variant, quantity, photoIdentifier, colorize }) => ({
+            variant,
+            quantity,
+            print: { photoIdentifier, colorize },
+          })
+        ),
+      });
+    } catch (err) {
+      if (err instanceof HttpError) {
+        throw err;
+      }
+      console.error('Failed to create print cart checkout session', err);
       throw new InternalServerError('Failed to create session');
     }
   }
