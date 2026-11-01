@@ -51,7 +51,10 @@ export async function handleOrderCallback(
   await updateStatus(prodigiOrderId, prodigiOrder);
 
   if (isShipmentEvent) {
-    // The latest dispatched shipment is the one this event is about.
+    // The latest dispatched shipment is the one this event is about. A shipment with no tracking
+    // URL is skipped, so an untracked one sends no shipped email at all until the whole order is
+    // Complete. Emailing it at dispatch would need a per-shipment marker, since the order's
+    // emailed_tracking_url doubles as the record that this notification has gone out.
     const shipment = prodigiOrder.shipments
       .filter((s) => s.dispatchDate && s.tracking?.url)
       .sort((a, b) =>
