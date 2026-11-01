@@ -16,13 +16,8 @@ export interface ToteBagCustomizationOptions {
   backgroundColor: 'red' | 'green' | 'creme' | 'dark';
 }
 
-export type PrintVariant =
-  | MerchInternalVariant.PRINT_HPR_4X6
-  | MerchInternalVariant.PRINT_HPR_8X12
-  | MerchInternalVariant.PRINT_FAP_8X12_FRAMED;
-
 export interface PrintCustomizationOptions {
-  variant: PrintVariant;
+  variant: Exclude<MerchInternalVariant, MerchInternalVariant.TOTE_BAG_SMALL>;
   photoIdentifier: string;
   colorize: boolean;
 }
@@ -34,13 +29,13 @@ export type MerchCustomizationOptions =
 export function isPrintOptions(
   options: MerchCustomizationOptions
 ): options is PrintCustomizationOptions {
-  return 'photoIdentifier' in options;
+  return options.variant !== MerchInternalVariant.TOTE_BAG_SMALL;
 }
 
 export function isToteOptions(
   options: MerchCustomizationOptions
 ): options is ToteBagCustomizationOptions {
-  return !isPrintOptions(options);
+  return options.variant === MerchInternalVariant.TOTE_BAG_SMALL;
 }
 
 export function getToteOptions(
