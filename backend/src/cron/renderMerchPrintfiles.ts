@@ -161,6 +161,8 @@ function render(
   }
 }
 
+// Kept out of render's switch because the loop has to know before counting an attempt: an item over
+// the colorize budget is skipped untouched, which render could only do by also owning the budget.
 function needsColorizing(
   item: MerchOrderItem,
   options: MerchCustomizationOptions
