@@ -26,29 +26,23 @@ export default async function renderMerch(): Promise<void> {
       continue;
     }
 
-    if (customizationOptions.variant !== MerchInternalVariant.TOTE_BAG_SMALL) {
-      console.error('Not a tote bag item', item.id);
-      continue;
-    }
-
-    const { lat, lng, style, foregroundColor, backgroundColor } =
-      customizationOptions;
-
-    const variant = item.internalVariant;
-
     let buffer: Buffer;
-    switch (variant) {
+    switch (item.internalVariant) {
       case MerchInternalVariant.TOTE_BAG_SMALL:
-        buffer = await renderToteBag({
-          lat,
-          lng,
-          style,
-          foregroundColor,
-          backgroundColor,
-        });
+        if (
+          customizationOptions.variant !== MerchInternalVariant.TOTE_BAG_SMALL
+        ) {
+          console.error('Not a tote bag item', item.id);
+          continue;
+        }
+        buffer = await renderToteBag(customizationOptions);
         break;
       default:
-        console.error('No tote bag renderer for variant', variant, item.id);
+        console.error(
+          'No tote bag renderer for variant',
+          item.internalVariant,
+          item.id
+        );
         continue;
     }
 

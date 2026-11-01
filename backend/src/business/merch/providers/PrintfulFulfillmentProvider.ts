@@ -9,8 +9,6 @@ import FulfillmentProvider, {
 } from './FulfillmentProvider';
 
 const PrintfulFulfillmentProvider: FulfillmentProvider = {
-  sendsCustomizationEmail: true,
-
   async createOrder(
     merchOrderId: number,
     shippingAddress: ShippingAddress

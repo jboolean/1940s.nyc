@@ -43,6 +43,16 @@ export interface NewOrderItem {
   state?: MerchItemState;
 }
 
+// An item that arrives still purchased is one the customer finishes themselves, so the order sends
+// the customization email instead of the plain confirmation. Tote bags arrive that way; prints
+// arrive fully specified and customized, so a print order gets the confirmation.
+function needsCustomization(newItems: NewOrderItem[]): boolean {
+  return newItems.some(
+    (item) =>
+      (item.state ?? MerchItemState.PURCHASED) === MerchItemState.PURCHASED
+  );
+}
+
 export async function createMerchOrder(
   userId: number,
   stripeCheckoutSessionId: string,
@@ -66,6 +76,7 @@ export async function createMerchOrder(
 
   const provider = selectProviderForItems(itemTypes);
   const fulfillmentProvider = getFulfillmentProvider(provider);
+  const sendsCustomizationEmail = needsCustomization(newItems);
 
   const created = await AppDataSource.transaction(
     async (transactionalEntityManager) => {
@@ -110,7 +121,7 @@ export async function createMerchOrder(
 
       // The tote bag customization email is how the customer finishes their order, so it stays inside
       // the transaction. Other emails are informational and sent after the commit.
-      if (fulfillmentProvider.sendsCustomizationEmail) {
+      if (sendsCustomizationEmail) {
         const user = await UserService.getUser(userId);
         if (user.email) {
           // There really should be an email at this point, set earlier in the Stripe webhook
@@ -131,7 +142,7 @@ export async function createMerchOrder(
     }
   );
 
-  if (!fulfillmentProvider.sendsCustomizationEmail) {
+  if (!sendsCustomizationEmail) {
     try {
       const user = await UserService.getUser(userId);
       if (user.email) {
