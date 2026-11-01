@@ -1,5 +1,8 @@
 import axios from 'axios';
-import type { StyleSpecification } from 'maplibre-gl';
+import type {
+  StyleSpecification,
+  VectorSourceSpecification,
+} from 'maplibre-gl';
 
 function getOnce<T>(fn: () => Promise<T>): () => Promise<T> {
   let p: Promise<T> | null = null;
@@ -7,12 +10,19 @@ function getOnce<T>(fn: () => Promise<T>): () => Promise<T> {
 }
 
 export const getStyle: () => Promise<StyleSpecification> = getOnce(async () => {
-  const latestPhotosSourceUrl = await axios
-    .get<{ currentKey: string }>(
+  // Without the version file the photo dots cannot be located, but the base map still works.
+  let photosSource: VectorSourceSpecification = { type: 'vector', tiles: [] };
+  try {
+    const res = await axios.get<{ currentKey: string }>(
       'https://maptiles.1940s.nyc/photos-1940s_version.json'
-    )
-    .then((res) => res.data.currentKey)
-    .then((key: string) => `pmtiles://https://maptiles.1940s.nyc/${key}`);
+    );
+    photosSource = {
+      type: 'vector',
+      url: `pmtiles://https://maptiles.1940s.nyc/${res.data.currentKey}`,
+    };
+  } catch (error) {
+    console.error('Failed to load the photo tiles version', error);
+  }
 
   return {
     version: 8,
@@ -29,10 +39,7 @@ export const getStyle: () => Promise<StyleSpecification> = getOnce(async () => {
         url: 'pmtiles://https://maptiles.1940s.nyc/bbl.pmtiles',
         attribution: 'MapPLUTO, NYC Planning',
       },
-      'photos-1940s': {
-        type: 'vector',
-        url: latestPhotosSourceUrl,
-      },
+      'photos-1940s': photosSource,
     },
     sprite: [
       {
