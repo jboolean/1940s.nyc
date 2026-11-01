@@ -22,8 +22,12 @@ import MerchItemState from '../enum/MerchItemState';
 import MerchOrderState from '../enum/MerchOrderState';
 import absurd from '../business/utils/absurd';
 
-// Three items keeps a run inside the Lambda's 300s timeout even when each one hits the colorize cap.
-const LIMIT = 3;
+// Colorizing is the only slow render and the only one with a timeout of its own, so a run starts at
+// most two of them, 180s of the Lambda's 300s. The other six items are a tote's map render or a
+// full-resolution server-side copy, neither of which calls the colorizer, so they share the
+// remaining 120s rather than competing with it.
+const BATCH_LIMIT = 8;
+export const MAX_COLORIZED_PER_RUN = 2;
 const COLORIZE_TIMEOUT_MS = 90_000;
 export const MAX_PRINTFILE_ATTEMPTS = 5;
 export const METRICS_NAMESPACE = 'fourtiesnyc/merch';
@@ -111,6 +115,17 @@ function render(
   }
 }
 
+function needsColorizing(
+  item: MerchOrderItem,
+  options: MerchCustomizationOptions
+): boolean {
+  return (
+    item.internalVariant !== MerchInternalVariant.TOTE_BAG_SMALL &&
+    options.variant !== MerchInternalVariant.TOTE_BAG_SMALL &&
+    options.colorize
+  );
+}
+
 // Each item is handled on its own so one failure does not block others. Failures are retried; after
 // MAX_PRINTFILE_ATTEMPTS the item moves to printfile_failed.
 export default async function renderMerchPrintfiles(): Promise<void> {
@@ -123,8 +138,12 @@ export default async function renderMerchPrintfiles(): Promise<void> {
       canceled: MerchOrderState.CANCELED,
     })
     .orderBy('item.updatedAt', 'ASC')
-    .limit(LIMIT)
+    .limit(BATCH_LIMIT)
     .getMany();
+
+  // Oldest first, so the colorize budget goes to the items that have waited longest; the rest wait
+  // for the next run, which is a few minutes away.
+  let colorizedThisRun = 0;
 
   for (const item of itemsToRender) {
     const label = getMerchLabel(item.internalVariant);
@@ -144,6 +163,13 @@ export default async function renderMerchPrintfiles(): Promise<void> {
     if (!options) {
       await giveUp('no customization options');
       continue;
+    }
+
+    if (needsColorizing(item, options)) {
+      if (colorizedThisRun >= MAX_COLORIZED_PER_RUN) {
+        continue;
+      }
+      colorizedThisRun += 1;
     }
 
     // Count the attempt first, so an item whose call hangs still runs out of attempts.

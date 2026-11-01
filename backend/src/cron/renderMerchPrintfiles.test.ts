@@ -4,6 +4,7 @@ import MerchOrderState from '../enum/MerchOrderState';
 import { colorizeForPrint } from '../business/color/ColorService';
 import renderToteBag from '../business/merch/renderToteBag';
 import renderMerchPrintfiles, {
+  MAX_COLORIZED_PER_RUN,
   MAX_PRINTFILE_ATTEMPTS,
 } from './renderMerchPrintfiles';
 
@@ -103,6 +104,22 @@ describe('renderMerchPrintfiles', () => {
     jest.clearAllMocks();
     jest.spyOn(console, 'log').mockImplementation(() => undefined);
     jest.spyOn(console, 'error').mockImplementation(() => undefined);
+  });
+
+  it('colorizes no more than the run budget and leaves the rest for the next run', async () => {
+    const items: object[] = [];
+    for (let id = 1; id <= MAX_COLORIZED_PER_RUN + 2; id += 1) {
+      items.push(printItem(id, true));
+    }
+    items.push(toteItem(99));
+    getMany.mockResolvedValue(items);
+    jest.mocked(colorizeForPrint).mockResolvedValue(Buffer.from('jpg'));
+
+    await renderMerchPrintfiles();
+
+    expect(colorizeForPrint).toHaveBeenCalledTimes(MAX_COLORIZED_PER_RUN);
+    // The tote is behind the skipped prints in the queue, and still renders.
+    expect(renderToteBag).toHaveBeenCalledTimes(1);
   });
 
   it('renders a tote and a print, uploading each with its own extension', async () => {
