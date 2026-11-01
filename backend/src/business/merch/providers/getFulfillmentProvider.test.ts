@@ -1,7 +1,9 @@
+import MerchInternalVariant from '../../../enum/MerchInternalVariant';
 import MerchProvider from '../../../enum/MerchProvider';
 import getFulfillmentProvider, {
   getProvidersNeedingReview,
   getProvidersWithoutReview,
+  selectProviderForItems,
 } from './getFulfillmentProvider';
 
 // The providers themselves pull in their API clients, which want credentials at import time.
@@ -33,5 +35,28 @@ describe('provider capabilities', () => {
         !requiresReview
       );
     }
+  });
+});
+
+describe('selectProviderForItems', () => {
+  it('picks the one provider every item shares', () => {
+    expect(
+      selectProviderForItems([
+        MerchInternalVariant.PRINT_HPR_4X6,
+        MerchInternalVariant.PRINT_FAP_8X12_FRAMED,
+      ])
+    ).toBe(MerchProvider.PRODIGI);
+  });
+
+  it('refuses a variant the catalog does not sell rather than guessing a printer', () => {
+    expect(() =>
+      selectProviderForItems(['tote-bag-large' as MerchInternalVariant])
+    ).toThrow('No provider for variant tote-bag-large');
+  });
+
+  it('refuses an order with no items', () => {
+    expect(() => selectProviderForItems([])).toThrow(
+      'An order needs at least one item'
+    );
   });
 });

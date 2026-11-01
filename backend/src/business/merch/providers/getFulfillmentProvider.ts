@@ -13,14 +13,16 @@ const PROVIDERS: Record<MerchProvider, FulfillmentProvider> = {
 export function selectProviderForItems(
   itemTypes: MerchInternalVariant[]
 ): MerchProvider {
-  const providers = new Set(itemTypes.map(getMerchProvider));
-  if (providers.size > 1) {
+  const [only, ...others] = new Set(itemTypes.map(getMerchProvider));
+  if (!only) {
+    throw new Error('An order needs at least one item');
+  }
+  if (others.length) {
     throw new Error(
-      `Items in one order must use a single provider, got: ${[...providers].join(', ')}`
+      `Items in one order must use a single provider, got: ${[only, ...others].join(', ')}`
     );
   }
-  const [only] = [...providers];
-  return only ?? MerchProvider.PRINTFUL;
+  return only;
 }
 
 export function getMerchProvider(variant: MerchInternalVariant): MerchProvider {

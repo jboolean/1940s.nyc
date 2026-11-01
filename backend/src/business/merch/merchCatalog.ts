@@ -65,8 +65,14 @@ export function getMerchLabel(variant: MerchInternalVariant): string {
   return MERCH_CATALOG[variant]?.label ?? variant;
 }
 
+// Unlike the display lookups, this has no fallback: the provider prints and charges for the order,
+// and a variant missing from the catalog is one nobody can fulfil.
 export function getMerchProvider(variant: MerchInternalVariant): MerchProvider {
-  return MERCH_CATALOG[variant]?.provider ?? MerchProvider.PRINTFUL;
+  const provider = MERCH_CATALOG[variant]?.provider;
+  if (!provider) {
+    throw new Error(`No provider for variant ${variant}`);
+  }
+  return provider;
 }
 
 export function getPrintfileExtensionForVariant(
