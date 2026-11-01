@@ -7,8 +7,7 @@ import FulfillmentProvider, {
   CreatedProviderOrder,
 } from './FulfillmentProvider';
 
-// Prodigi has no draft orders: creating the order is what submits it. Nothing is sent to Prodigi
-// until every print file is ready and the order is submitted.
+// Prodigi has no draft orders, so nothing is created there until the order is submitted.
 const ProdigiFulfillmentProvider: FulfillmentProvider = {
   // Every order waits for a person to look it over, Prodigi's included.
   requiresReview: true,

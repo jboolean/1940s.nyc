@@ -12,7 +12,6 @@ import MerchOrderState from '../enum/MerchOrderState';
 import MerchProvider from '../enum/MerchProvider';
 import MerchOrderItem from './MerchOrderItem';
 import ShippingAddress from './ShippingAddress';
-import MerchShipment from './MerchShipment';
 import User from './User';
 
 @Entity('merch_orders')

@@ -2,7 +2,6 @@ import type { CreateOrderRequest, ShippingMethod } from 'prodigi-print-api';
 import MerchOrder from '../../entities/MerchOrder';
 import { getPrintfileDirectUrl } from '../utils/printfileUtils';
 import required from '../utils/required';
-import { createCallbackUrl } from './prodigiCallbackAuth';
 import { getPrintProduct } from './printCatalog';
 
 const SHIPPING_METHODS: ShippingMethod[] = [
@@ -32,7 +31,6 @@ export function buildProdigiOrder(
     // Makes re-submitting after a failure return the existing Prodigi order instead of a duplicate.
     idempotencyKey: `merch-order-${order.id}`,
     shippingMethod,
-    callbackUrl: createCallbackUrl(order.id),
     recipient: {
       name: required(address.name, 'shippingAddress.name'),
       email: recipientEmail,
@@ -52,7 +50,10 @@ export function buildProdigiOrder(
       },
     },
     items: order.items.map((item) => {
-      const product = getPrintProduct(item.internalVariant);
+      const product = required(
+        getPrintProduct(item.internalVariant),
+        `print product for ${item.internalVariant}`
+      );
       return {
         merchantReference: `item-${item.id}`,
         sku: product.sku,

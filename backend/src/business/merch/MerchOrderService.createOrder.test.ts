@@ -81,10 +81,24 @@ describe('createMerchOrder', () => {
     ).resolves.toMatchObject({ id: 7 });
   });
 
+  it('sends the customization email, not the confirmation, for an item bought uncustomized', async () => {
+    selectProvider.mockReturnValue(MerchProvider.PRINTFUL);
+    jest.mocked(getFulfillmentProvider).mockReturnValue({
+      createOrder: () => Promise.resolve({ providerOrderId: 'pf_1' }),
+    } as never);
+
+    await createMerchOrder(1, 'cs_5', {}, [
+      { variant: MerchInternalVariant.TOTE_BAG_SMALL },
+    ]);
+
+    expect(EmailService.sendTemplateEmail).toHaveBeenCalledWith(
+      'customize-email'
+    );
+  });
+
   it('records the shipping address when the provider creates its order now', async () => {
     selectProvider.mockReturnValue(MerchProvider.PRINTFUL);
     jest.mocked(getFulfillmentProvider).mockReturnValue({
-      sendsCustomizationEmail: false,
       createOrder: () => Promise.resolve({ providerOrderId: 'pf_1' }),
     } as never);
 
