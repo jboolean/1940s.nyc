@@ -19,6 +19,7 @@ import { NumericFormat } from 'react-number-format';
 import ExternalIcon from 'shared/components/ExternalIcon';
 import recordEvent from 'shared/utils/recordEvent';
 import { openMerchModal } from '../MerchModal';
+import { PrintCartButton } from '../PrintCart';
 import { openNewsletterModal } from '../NewsletterModal';
 import { useTipJarStore } from '../TipJar';
 import useAmountPresets from '../TipJar/useAmountPresets';
@@ -154,6 +155,8 @@ class MapPane extends React.Component<PropsWithNavigate, State> {
           >
             Tote 👜
           </button>
+
+          <PrintCartButton className={stylesheet.action} />
 
           <button
             type="button"

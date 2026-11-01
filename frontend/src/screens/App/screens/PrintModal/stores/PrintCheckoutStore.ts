@@ -4,6 +4,7 @@ import { getPhoto, Photo } from 'shared/utils/photosApi';
 import recordEvent from 'shared/utils/recordEvent';
 import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
+import usePrintCartStore from '../../PrintCart/stores/PrintCartStore';
 import {
   createPrintCheckoutSession,
   getAvailablePrintProducts,
@@ -33,6 +34,7 @@ interface Actions {
   setVariant: (variant: MerchInternalVariant) => void;
   setQuantity: (quantity: number) => void;
   setColorize: (colorize: boolean) => void;
+  addToCart: () => void;
   checkout: () => Promise<void>;
 }
 
@@ -142,6 +144,26 @@ const usePrintCheckoutStore = create(
       set((draft) => {
         draft.colorize = colorize;
       });
+    },
+
+    addToCart: () => {
+      const { photo, variant, quantity, colorize } = get();
+      if (!photo || !variant) return;
+      const added = usePrintCartStore.getState().addItem({
+        photoIdentifier: photo.identifier,
+        variant,
+        quantity,
+        colorize,
+      });
+      if (!added) {
+        set((draft) => {
+          draft.errorMessage =
+            'Your cart cannot hold any more of this. Check out or remove something first.';
+        });
+        return;
+      }
+      recordEvent({ category: 'Prints', action: 'Click Add To Cart' });
+      get().close();
     },
 
     checkout: async () => {
