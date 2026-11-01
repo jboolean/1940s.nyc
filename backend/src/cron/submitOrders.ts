@@ -10,8 +10,10 @@ import MerchProvider from '../enum/MerchProvider';
 
 const LIMIT = 5;
 
-// Providers that do not wait for review submit themselves, so their orders are sent without a
-// person looking at them. A failed order stays pending_submission and is retried on the next run.
+// Every provider waits for a person, so no order submits itself and this finds nothing to do. An
+// order reaches the printer when someone presses Submit on the admin review page. It is kept for
+// the providers that would submit on their own: giving one back requiresReview: false is the whole
+// change, and a submission that fails then stays pending_submission to be retried on the next run.
 export async function submitPendingOrders(): Promise<void> {
   const orders = await AppDataSource.getRepository(MerchOrder).find({
     where: {
