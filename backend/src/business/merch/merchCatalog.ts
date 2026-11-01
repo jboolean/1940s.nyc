@@ -2,7 +2,8 @@ import MerchInternalVariant from '../../enum/MerchInternalVariant';
 import MerchProvider from '../../enum/MerchProvider';
 import type { PrintfileExtension } from '../utils/printfileUtils';
 
-// How a variant's print file is made, which is what the render cron branches on.
+// How a variant's print file is made. The render cron switches on the variant itself; this is what
+// groups the prints, for the print variant list and the Stripe webhook's print check.
 type MerchKind = 'tote' | 'print';
 
 interface MerchVariantInfo {
