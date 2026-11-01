@@ -4,7 +4,6 @@ import MerchOrderState from '../enum/MerchOrderState';
 import { colorizeForPrint } from '../business/color/ColorService';
 import renderToteBag from '../business/merch/renderToteBag';
 import renderMerchPrintfiles, {
-  MAX_COLORIZED_PER_RUN,
   MAX_PRINTFILE_ATTEMPTS,
   withTimeout,
 } from './renderMerchPrintfiles';
@@ -107,23 +106,7 @@ describe('renderMerchPrintfiles', () => {
     jest.spyOn(console, 'error').mockImplementation(() => undefined);
   });
 
-  it('colorizes no more than the run budget and leaves the rest for the next run', async () => {
-    const items: object[] = [];
-    for (let id = 1; id <= MAX_COLORIZED_PER_RUN + 2; id += 1) {
-      items.push(printItem(id, true));
-    }
-    items.push(toteItem(99));
-    getMany.mockResolvedValue(items);
-    jest.mocked(colorizeForPrint).mockResolvedValue(Buffer.from('jpg'));
-
-    await renderMerchPrintfiles();
-
-    expect(colorizeForPrint).toHaveBeenCalledTimes(MAX_COLORIZED_PER_RUN);
-    // The tote is behind the skipped prints in the queue, and still renders.
-    expect(renderToteBag).toHaveBeenCalledTimes(1);
-  });
-
-  it('gives up an exhausted item without spending a colorize slot on it', async () => {
+  it('gives up an exhausted item and renders the rest of the batch', async () => {
     getMany.mockResolvedValue([
       printItem(1, true, MAX_PRINTFILE_ATTEMPTS),
       printItem(2, true),
@@ -136,7 +119,6 @@ describe('renderMerchPrintfiles', () => {
     expect(update).toHaveBeenCalledWith(1, {
       state: MerchItemState.PRINTFILE_FAILED,
     });
-    // The fresh colorized item gets the slot the exhausted one would have taken.
     expect(colorizeForPrint).toHaveBeenCalledTimes(1);
     expect(update).toHaveBeenCalledWith(2, {
       state: MerchItemState.READY_FOR_FULFILLMENT,

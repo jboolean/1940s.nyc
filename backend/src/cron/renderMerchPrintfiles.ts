@@ -21,24 +21,13 @@ import MerchInternalVariant from '../enum/MerchInternalVariant';
 import MerchItemState from '../enum/MerchItemState';
 import MerchOrderState from '../enum/MerchOrderState';
 
-// The Lambda allows 300s and the submit and sync steps that run before rendering share it, so
-// rendering keeps to RENDER_BUDGET_MS. Colorizing is the one render that can take a minute, so it is
-// budgeted separately; the rest are a tote's map render or a server-side copy, capped at
-// ITEM_TIMEOUT_MS. The batch is what fits both caps inside the budget, so neither a long queue nor
-// one hung render can push a run past it.
-const RENDER_BUDGET_MS = 270_000;
-const COLORIZE_TIMEOUT_MS = 90_000;
+// Small enough that a run keeps inside the Lambda's 300s timeout even when every item is slow, with
+// the rest left for the next run a few minutes later.
+const LIMIT = 3;
 // A tote can take up to ~65s before puppeteer's own timeouts give up, and a cold Chromium start
 // comes on top of that, so this leaves room for a slow render that is still working and only
 // catches one that has hung.
-const ITEM_TIMEOUT_MS = 90_000;
-export const MAX_COLORIZED_PER_RUN = 2;
-const BATCH_LIMIT =
-  MAX_COLORIZED_PER_RUN +
-  Math.floor(
-    (RENDER_BUDGET_MS - MAX_COLORIZED_PER_RUN * COLORIZE_TIMEOUT_MS) /
-      ITEM_TIMEOUT_MS
-  );
+const RENDER_TIMEOUT_MS = 90_000;
 export const MAX_PRINTFILE_ATTEMPTS = 5;
 export const METRICS_NAMESPACE = 'fourtiesnyc/merch';
 
@@ -93,7 +82,7 @@ async function renderTote(
   return {
     extension: getPrintfileExtensionForVariant(item.internalVariant),
     buffer: await withTimeout(
-      ITEM_TIMEOUT_MS,
+      RENDER_TIMEOUT_MS,
       'Tote bag render',
       renderToteBag({
         lat,
@@ -118,7 +107,7 @@ async function renderPrint(
     return {
       extension,
       buffer: await withTimeout(
-        COLORIZE_TIMEOUT_MS,
+        RENDER_TIMEOUT_MS,
         'Colorization',
         colorizeForPrint(options.photoIdentifier)
       ),
@@ -126,7 +115,7 @@ async function renderPrint(
   }
   // A server-side copy of the full-resolution original, so the bytes never pass through here.
   await withTimeout(
-    ITEM_TIMEOUT_MS,
+    RENDER_TIMEOUT_MS,
     'Original copy',
     copyOriginalToPrintJpeg(item.id, options.photoIdentifier)
   );
@@ -161,19 +150,6 @@ function render(
   }
 }
 
-// Kept out of render's switch because the loop has to know before counting an attempt: an item over
-// the colorize budget is skipped untouched, which render could only do by also owning the budget.
-function needsColorizing(
-  item: MerchOrderItem,
-  options: MerchCustomizationOptions
-): boolean {
-  return (
-    item.internalVariant !== MerchInternalVariant.TOTE_BAG_SMALL &&
-    options.variant !== MerchInternalVariant.TOTE_BAG_SMALL &&
-    options.colorize
-  );
-}
-
 // Each item is handled on its own so one failure does not block others. Failures are retried; after
 // MAX_PRINTFILE_ATTEMPTS the item moves to printfile_failed.
 export default async function renderMerchPrintfiles(): Promise<void> {
@@ -186,12 +162,8 @@ export default async function renderMerchPrintfiles(): Promise<void> {
       canceled: MerchOrderState.CANCELED,
     })
     .orderBy('item.updatedAt', 'ASC')
-    .limit(BATCH_LIMIT)
+    .limit(LIMIT)
     .getMany();
-
-  // Oldest first, so the colorize budget goes to the items that have waited longest; the rest wait
-  // for the next run, which is a few minutes away.
-  let colorizedThisRun = 0;
 
   for (const item of itemsToRender) {
     const label = getMerchLabel(item.internalVariant);
@@ -218,15 +190,6 @@ export default async function renderMerchPrintfiles(): Promise<void> {
     if (attempts > MAX_PRINTFILE_ATTEMPTS) {
       await giveUp(`still failing after ${MAX_PRINTFILE_ATTEMPTS} attempts`);
       continue;
-    }
-
-    // Spend the colorize budget only on an item that will actually render, so an exhausted one
-    // gives up without costing a fresh item its slot.
-    if (needsColorizing(item, options)) {
-      if (colorizedThisRun >= MAX_COLORIZED_PER_RUN) {
-        continue;
-      }
-      colorizedThisRun += 1;
     }
 
     await repository.update(item.id, {
