@@ -1,4 +1,5 @@
 import type { Sizing } from 'prodigi-print-api';
+import type { PrintVariant } from '../../entities/MerchCustomizationOptions';
 import MerchInternalVariant from '../../enum/MerchInternalVariant';
 
 export interface PrintProduct {
@@ -40,4 +41,10 @@ export function getPrintProduct(
   variant: MerchInternalVariant
 ): PrintProduct | undefined {
   return PRINT_PRODUCTS.find((p) => p.variant === variant);
+}
+
+export function isPrintVariant(
+  variant: MerchInternalVariant
+): variant is PrintVariant {
+  return !!getPrintProduct(variant);
 }

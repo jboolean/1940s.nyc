@@ -1,17 +1,21 @@
 import { BadRequest } from 'http-errors';
 import { AppDataSource } from '../../createConnection';
+import MerchCustomizationOptions from '../../entities/MerchCustomizationOptions';
 import MerchOrder from '../../entities/MerchOrder';
 import MerchOrderItem from '../../entities/MerchOrderItem';
 import ShippingAddress from '../../entities/ShippingAddress';
 import MerchInternalVariant from '../../enum/MerchInternalVariant';
+import MerchItemState from '../../enum/MerchItemState';
 import MerchOrderFulfillmentState from '../../enum/MerchOrderFulfillmentState';
 import MerchOrderState from '../../enum/MerchOrderState';
 import MerchProvider from '../../enum/MerchProvider';
 import EmailService from '../email/EmailService';
+import OrderConfirmationTemplate from '../email/templates/OrderConfirmationTemplate';
 import OrderCustomizeTemplate from '../email/templates/OrderCustomizeTemplate';
 import { OrderTemplateData } from '../email/templates/OrderEmailTemplateData';
 import OrderShippedTemplate from '../email/templates/OrderShippedTemplate';
 import * as UserService from '../users/UserService';
+import { summarizeItems } from '../prodigi/printOrderSummary';
 import isProduction from '../utils/isProduction';
 import getFulfillmentProvider, {
   selectProviderForItems,
@@ -33,65 +37,139 @@ function createOrderEmailTemplateData(order: MerchOrder): OrderTemplateData {
   };
 }
 
+export interface NewOrderItem {
+  variant: MerchInternalVariant;
+  customizationOptions?: MerchCustomizationOptions;
+  state?: MerchItemState;
+}
+
+// An item that arrives still purchased is one the customer finishes themselves, so the order sends
+// the customization email instead of the plain confirmation. Tote bags arrive that way; prints
+// arrive fully specified and customized, so a print order gets the confirmation.
+function needsCustomization(newItems: NewOrderItem[]): boolean {
+  return newItems.some(
+    (item) =>
+      (item.state ?? MerchItemState.PURCHASED) === MerchItemState.PURCHASED
+  );
+}
+
 export async function createMerchOrder(
   userId: number,
   stripeCheckoutSessionId: string,
   shippingAddress: ShippingAddress,
-  itemTypes: MerchInternalVariant[]
+  newItems: NewOrderItem[],
+  providerShippingMethod?: string
 ): Promise<MerchOrder> {
-  return AppDataSource.transaction(async (transactionalEntityManager) => {
-    const orderRepository =
-      transactionalEntityManager.getRepository(MerchOrder);
-    let order = new MerchOrder();
-    order.userId = userId;
-    order.state = MerchOrderState.BUILDING;
-    const provider = selectProviderForItems(itemTypes);
-    order.provider = provider;
-    order.stripeCheckoutSessionId = stripeCheckoutSessionId;
-    order = await orderRepository.save(order);
+  const itemTypes = newItems.map((i) => i.variant);
 
-    const providerOrder = await getFulfillmentProvider(provider).createOrder(
-      order.id,
-      shippingAddress
-    );
-
-    order.providerOrderId = providerOrder.providerOrderId;
-    order.state = MerchOrderState.BUILDING;
-    order.fulfillmentState = providerOrder.fulfillmentState;
-
-    order = await orderRepository.save(order);
-
-    const itemRepository =
-      transactionalEntityManager.getRepository(MerchOrderItem);
-    const items = itemTypes.map((type) => {
-      const item = new MerchOrderItem();
-      item.order = order;
-      item.internalVariant = type;
-      return item;
-    });
-    await itemRepository.save(items);
-
-    order = await orderRepository.findOneByOrFail({ id: order.id });
-
-    const user = await UserService.getUser(userId);
-
-    if (user.email) {
-      // There really should be an email at this point, set earlier in the Stripe webhook
-
-      const orderCustomizeEmail = OrderCustomizeTemplate.createTemplatedEmail({
-        to: user.email,
-        templateContext: createOrderEmailTemplateData(order),
-        metadata: {
-          orderId: order.id.toString(),
-          userId: user.id.toString(),
-        },
-      });
-
-      await EmailService.sendTemplateEmail(orderCustomizeEmail);
-    }
-
-    return order;
+  // Stripe can deliver the same completed session more than once.
+  const existing = await AppDataSource.getRepository(MerchOrder).findOneBy({
+    stripeCheckoutSessionId,
   });
+  if (existing) {
+    console.warn('Order already exists for checkout session', {
+      stripeCheckoutSessionId,
+      orderId: existing.id,
+    });
+    return existing;
+  }
+
+  const provider = selectProviderForItems(itemTypes);
+  const fulfillmentProvider = getFulfillmentProvider(provider);
+  const sendsCustomizationEmail = needsCustomization(newItems);
+
+  const created = await AppDataSource.transaction(
+    async (transactionalEntityManager) => {
+      const orderRepository =
+        transactionalEntityManager.getRepository(MerchOrder);
+      let order = new MerchOrder();
+      order.userId = userId;
+      order.state = MerchOrderState.BUILDING;
+      order.provider = provider;
+      order.stripeCheckoutSessionId = stripeCheckoutSessionId;
+      order.providerShippingMethod = providerShippingMethod ?? null;
+      order = await orderRepository.save(order);
+
+      const providerOrder = await fulfillmentProvider.createOrder(
+        order.id,
+        shippingAddress
+      );
+
+      order.providerOrderId = providerOrder.providerOrderId;
+      order.state = MerchOrderState.BUILDING;
+      order.fulfillmentState = providerOrder.fulfillmentState;
+
+      order = await orderRepository.save(order);
+
+      const itemRepository =
+        transactionalEntityManager.getRepository(MerchOrderItem);
+      const items = newItems.map((newItem) => {
+        const item = new MerchOrderItem();
+        item.order = order;
+        item.internalVariant = newItem.variant;
+        if (newItem.customizationOptions) {
+          item.customizationOptions = newItem.customizationOptions;
+        }
+        if (newItem.state) {
+          item.state = newItem.state;
+        }
+        return item;
+      });
+      await itemRepository.save(items);
+
+      order = await orderRepository.findOneByOrFail({ id: order.id });
+
+      // The tote bag customization email is how the customer finishes their order, so it stays inside
+      // the transaction. Other emails are informational and sent after the commit.
+      if (sendsCustomizationEmail) {
+        const user = await UserService.getUser(userId);
+        if (user.email) {
+          // There really should be an email at this point, set earlier in the Stripe webhook
+          await EmailService.sendTemplateEmail(
+            OrderCustomizeTemplate.createTemplatedEmail({
+              to: user.email,
+              templateContext: createOrderEmailTemplateData(order),
+              metadata: {
+                orderId: order.id.toString(),
+                userId: user.id.toString(),
+              },
+            })
+          );
+        }
+      }
+
+      return order;
+    }
+  );
+
+  if (!sendsCustomizationEmail) {
+    try {
+      const user = await UserService.getUser(userId);
+      if (user.email) {
+        await EmailService.sendTemplateEmail(
+          OrderConfirmationTemplate.createTemplatedEmail({
+            to: user.email,
+            templateContext: {
+              ...createOrderEmailTemplateData(created),
+              itemsSummary: summarizeItems(newItems),
+            },
+            metadata: {
+              orderId: created.id.toString(),
+              userId: user.id.toString(),
+            },
+          })
+        );
+      }
+    } catch (e) {
+      // The order is already placed and paid; a missing confirmation must not fail it.
+      console.error(
+        `Failed to send confirmation email for order ${created.id}`,
+        e
+      );
+    }
+  }
+
+  return created;
 }
 
 export async function createOrderItems(

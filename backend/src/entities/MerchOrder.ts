@@ -48,6 +48,10 @@ export default class MerchOrder {
   @ManyToOne(() => User)
   user: User;
 
+  // Provider-specific shipping service chosen at checkout (a Prodigi shippingMethod for Prodigi orders).
+  @Column({ type: 'varchar', nullable: true })
+  providerShippingMethod?: string | null;
+
   @Column({ nullable: true })
   trackingUrl?: string;
 }

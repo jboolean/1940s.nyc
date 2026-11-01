@@ -29,6 +29,14 @@ export function selectProviderForItems(
   return only ?? MerchProvider.PRINTFUL;
 }
 
+export function getMerchProvider(variant: MerchInternalVariant): MerchProvider {
+  const provider = PROVIDER_FOR_VARIANT[variant];
+  if (!provider) {
+    throw new Error(`No provider for variant ${variant}`);
+  }
+  return provider;
+}
+
 export default function getFulfillmentProvider(
   provider: MerchProvider
 ): FulfillmentProvider {
