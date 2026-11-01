@@ -21,7 +21,8 @@ const router = express.Router();
 
 // A tote bag is customized by the customer after purchase, so each of its copies is one item
 // with no options. A print arrives fully specified from checkout: the variant comes off the
-// product, and the card details off the line item's own metadata, since they are per purchase.
+// product, and the customization choices off the line item's own metadata, since they are per
+// purchase.
 export function merchLineItemToOrderItems(
   lineItem: Stripe.LineItem
 ): MerchOrderService.NewOrderItem[] {

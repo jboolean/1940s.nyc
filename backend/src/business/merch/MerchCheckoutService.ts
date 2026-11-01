@@ -31,8 +31,8 @@ export interface CheckoutItem {
   print?: { photoIdentifier: string; colorize: boolean };
 }
 
-// The card details are per purchase, so they ride on the line item's own metadata, which the
-// webhook reads back to build the order item.
+// The customization choices are per purchase, so they ride on the line item's own metadata, which
+// the webhook reads back to build the order item.
 async function describePrint({
   photoIdentifier,
   colorize,

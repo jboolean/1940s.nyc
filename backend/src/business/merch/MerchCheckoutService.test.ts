@@ -82,7 +82,7 @@ describe('createMerchCheckoutSession', () => {
     expect(findOne).not.toHaveBeenCalled();
   });
 
-  it('references the print default price, carries the card details and quotes Prodigi shipping', async () => {
+  it('references the print default price, carries the customization choices and quotes Prodigi shipping', async () => {
     await createMerchCheckoutSession({ ...urls, items: [print] });
 
     const params = sessionParams();
