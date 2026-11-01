@@ -36,8 +36,6 @@ describe('createMerchCheckoutSession', () => {
     findOne.mockResolvedValue({
       identifier: 'p1',
       collection: Collection.FOURTIES,
-      borough: 'Manhattan',
-      effectiveAddress: { address: '1 Main St' },
     });
     jest.mocked(stripe.products.retrieve).mockResolvedValue({
       default_price: { id: 'price_1', unit_amount: 1900, currency: 'usd' },
@@ -93,7 +91,6 @@ describe('createMerchCheckoutSession', () => {
         metadata: {
           'photo-identifier': 'p1',
           colorize: 'true',
-          description: '1 Main St, Manhattan (1940s tax photo)',
         },
       },
     ]);

@@ -39,7 +39,6 @@ async function describePrint({
 }: NonNullable<CheckoutItem['print']>): Promise<Stripe.MetadataParam> {
   const photo = await AppDataSource.getRepository(Photo).findOne({
     where: { identifier: photoIdentifier },
-    relations: { effectiveAddress: true },
   });
   if (!photo) {
     throw new NotFound('Photo not found');
@@ -47,13 +46,9 @@ async function describePrint({
   if (photo.collection !== Collection.FOURTIES) {
     throw new BadRequest('Prints are only available for 1940s photos');
   }
-  const address = photo.effectiveAddress?.address;
   return {
     'photo-identifier': photo.identifier,
     colorize: String(colorize),
-    description: address
-      ? `${address}, ${photo.borough ?? 'NYC'} (1940s tax photo)`
-      : `1940s tax photo ${photo.identifier}`,
   };
 }
 
