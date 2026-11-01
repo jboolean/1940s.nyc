@@ -1,18 +1,23 @@
 import { BadRequest, NotFound } from 'http-errors';
-import type Stripe from 'stripe';
 import { AppDataSource } from '../../createConnection';
 import Photo from '../../entities/Photo';
 import User from '../../entities/User';
 import Collection from '../../enum/Collection';
 import MerchInternalVariant from '../../enum/MerchInternalVariant';
 import stripe from '../../third-party/stripe';
-import { bypassCloudflare } from '../utils/cloudflareOrigins';
+import {
+  buildCheckoutSessionFields,
+  getCatalogDefaultPrice,
+} from '../merch/checkoutSession';
+import { getMerchLabel } from '../merch/merchCatalog';
 import required from '../utils/required';
 import { getActivePrintProducts, PrintProduct } from './printCatalog';
 import * as ProdigiService from './ProdigiService';
 import { buildShippingOptions } from './printShipping';
 
 const MAX_QUANTITY = 10;
+
+export const PRINT_PRODUCT_TYPE = 'print';
 
 export interface AvailablePrintProduct {
   variant: MerchInternalVariant;
@@ -29,7 +34,7 @@ export async function getAvailablePrintProducts(): Promise<
   return Promise.all(
     PRINT_PRODUCTS.map(async (product) => ({
       variant: product.variant,
-      label: product.label,
+      label: getMerchLabel(product.variant),
       priceAmount: required(
         (await getCatalogDefaultPrice(product.variant)).unit_amount,
         `unit_amount of ${product.variant}`
@@ -55,7 +60,7 @@ export async function createPrintCheckoutSession({
   quantity: number;
   colorize: boolean;
 }): Promise<{ sessionId: string; url: string }> {
-  const product = getActivePrintProducts().find((p) => p.variant === variant);
+  const product = PRINT_PRODUCTS.find((p) => p.variant === variant);
   if (!product) {
     throw new BadRequest(`${variant} is not available`);
   }
@@ -96,12 +101,9 @@ export async function createPrintCheckoutSession({
   }
 
   const address = photo.effectiveAddress?.address;
-  const stripeCustomerId: string | undefined =
-    user?.stripeCustomerId ?? undefined;
 
   const session = await stripe.checkout.sessions.create({
-    cancel_url: cancelUrl,
-    success_url: successUrl,
+    ...buildCheckoutSessionFields({ successUrl, cancelUrl, user }),
     mode: 'payment',
     line_items: [
       {
@@ -116,12 +118,6 @@ export async function createPrintCheckoutSession({
         },
       },
     ],
-    metadata: { userId: user?.id ?? null },
-    customer: stripeCustomerId,
-    // See MerchCheckoutService: forces a customer so the webhook can attach it to the user.
-    customer_creation: stripeCustomerId ? undefined : 'always',
-    customer_email: stripeCustomerId ? undefined : (user?.email ?? undefined),
-    shipping_address_collection: { allowed_countries: ['US'] },
     shipping_options: shippingOptions,
   });
 

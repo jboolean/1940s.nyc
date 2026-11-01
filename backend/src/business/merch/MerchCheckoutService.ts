@@ -3,6 +3,10 @@ import User from '../../entities/User';
 import MerchInternalVariant from '../../enum/MerchInternalVariant';
 import stripe from '../../third-party/stripe';
 import isProduction from '../utils/isProduction';
+import {
+  buildCheckoutSessionFields,
+  getCatalogDefaultPrice,
+} from './checkoutSession';
 import { getMerchProductId, hasMerchProduct } from './ProductRegistry';
 
 // This is the tote bag US price.
@@ -29,37 +33,18 @@ export async function createMerchCheckoutSession({
     );
   }
 
-  const userId = user?.id;
-  const stripeCustomerId: string | undefined =
-    user?.stripeCustomerId ?? undefined;
-  const hasExistingCustomer = !!stripeCustomerId;
-
   const session = await stripe.checkout.sessions.create(
     {
-      cancel_url: cancelUrl,
+      ...buildCheckoutSessionFields({ successUrl, cancelUrl, user }),
       mode: 'payment',
-      success_url: successUrl,
       line_items: await Promise.all(
         items.map(async (item) => ({
-          price: await stripe.products
-            .retrieve(getMerchProductId(item.variant))
-            .then((product) => product.default_price as string),
+          price: (await getCatalogDefaultPrice(getMerchProductId(item.variant)))
+            .id,
           quantity: item.quantity,
         }))
       ),
-      metadata: {
-        userId: userId ?? null,
-      },
-      customer: stripeCustomerId,
-      // History: Stripe used to always create a customer, then it started creating "guest customers" instead (annoying!). This is to force it to always create a customer which we can attach to the user in the webhook.
-      customer_creation: hasExistingCustomer ? undefined : 'always',
-      customer_email: hasExistingCustomer
-        ? undefined
-        : (user?.email ?? undefined),
       payment_intent_data: {},
-      shipping_address_collection: {
-        allowed_countries: ['US'],
-      },
       shipping_options: [
         {
           shipping_rate: DEFAULT_SHIPPING_RATE,

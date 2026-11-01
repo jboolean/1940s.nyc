@@ -40,7 +40,7 @@ export function printLineItemToOrderItems(
   )['merch-internal-variant'];
   const purchase = (lineItem.metadata ?? {}) as LineItemMetadata;
   const photoIdentifier = purchase['photo-identifier'];
-  if (!variant || !getPrintProduct(variant) || !photoIdentifier) {
+  if (!variant || !isPrintVariant(variant) || !photoIdentifier) {
     throw new Error(
       `Print line item ${lineItem.id} is missing its variant or photo identifier`
     );

@@ -65,6 +65,7 @@ function printLineItem(overrides: object = {}): object {
   return {
     id: 'li_1',
     quantity: 2,
+    metadata: { 'photo-identifier': 'p1', colorize: 'true' },
     price: {
       product: {
         metadata: {
