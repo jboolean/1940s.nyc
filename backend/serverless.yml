@@ -49,6 +49,7 @@ provider:
     OPENROUTER_SK: ${ssm:/${self:service}-${sls:stage}-openrouter-sk}
     RAPIDAPI_API_KEY: ${ssm:/${self:service}-${sls:stage}-rapidapi-api-key}
     PRINTFUL_SK: ${ssm:/${self:service}-${sls:stage}-printful-sk}
+    PRODIGI_SK: ${ssm:/${self:service}-${sls:stage}-prodigi-sk}
 plugins:
   - serverless-plugin-conditional-functions
   - serverless-webpack
