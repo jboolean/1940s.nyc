@@ -7,20 +7,17 @@ import type Stripe from 'stripe';
 import EmailCampaignService from '../business/email/EmailCampaignService';
 import * as LedgerService from '../business/ledger/LedgerService';
 import * as MerchOrderService from '../business/merch/MerchOrderService';
-import { getMerchProvider } from '../business/merch/providers/getFulfillmentProvider';
-import { isPrintVariant } from '../business/prodigi/printCatalog';
+import { getPrintProduct } from '../business/prodigi/printCatalog';
 import { PRODIGI_SHIPPING_METHOD_METADATA_KEY } from '../business/prodigi/printShipping';
 import * as UserService from '../business/users/UserService';
 import isProduction from '../business/utils/isProduction';
+import { PrintVariant } from '../entities/MerchCustomizationOptions';
 import MerchInternalVariant from '../enum/MerchInternalVariant';
 import MerchItemState from '../enum/MerchItemState';
-import MerchProvider from '../enum/MerchProvider';
 const router = express.Router();
 
 // A tote bag is customized by the customer after purchase, so each of its copies is one item
-// with no options. A print arrives fully specified from checkout: the variant comes off the
-// product, and the customization choices off the line item's own metadata, since they are per
-// purchase.
+// with no options. Prints arrive fully specified from checkout.
 export function merchLineItemToOrderItems(
   lineItem: Stripe.LineItem
 ): MerchOrderService.NewOrderItem[] {
@@ -30,21 +27,31 @@ export function merchLineItemToOrderItems(
   if (!variant) {
     throw new Error(`Merch line item ${lineItem.id} has no variant`);
   }
-  const copies = lineItem.quantity ?? 1;
-  if (!isPrintVariant(variant)) {
-    return Array.from({ length: copies }, () => ({ variant }));
-  }
+  const quantity = lineItem.quantity ?? 1;
+  return Array.from({ length: quantity }, () => ({ variant }));
+}
+
+// The card details are per purchase, so they ride on the line item's own metadata. The variant
+// comes off the product, which is keyed by variant id.
+export function printLineItemToOrderItems(
+  lineItem: Stripe.LineItem
+): MerchOrderService.NewOrderItem[] {
+  const variant = (
+    (lineItem.price?.product as Stripe.Product).metadata as ProductMetadata
+  )['merch-internal-variant'];
   const purchase = (lineItem.metadata ?? {}) as LineItemMetadata;
   const photoIdentifier = purchase['photo-identifier'];
-  if (!photoIdentifier) {
-    throw new Error(`Print line item ${lineItem.id} has no photo identifier`);
+  if (!variant || !getPrintProduct(variant) || !photoIdentifier) {
+    throw new Error(
+      `Print line item ${lineItem.id} is missing its variant or photo identifier`
+    );
   }
   const customizationOptions = {
-    variant,
+    variant: variant as PrintVariant,
     photoIdentifier,
     colorize: purchase.colorize === 'true',
   };
-  return Array.from({ length: copies }, () => ({
+  return Array.from({ length: lineItem.quantity ?? 1 }, () => ({
     variant,
     customizationOptions,
     state: MerchItemState.CUSTOMIZED,
@@ -52,18 +59,9 @@ export function merchLineItemToOrderItems(
 }
 
 type ProductMetadata = {
-  'product-type'?: 'color-credit' | 'merch' | 'tip';
+  'product-type'?: 'color-credit' | 'merch' | 'print' | 'tip';
   'merch-internal-variant'?: MerchInternalVariant;
 };
-
-const HANDLED_PRODUCT_TYPES: ProductMetadata['product-type'][] = [
-  'color-credit',
-  'merch',
-  'tip',
-];
-
-const productMetadata = (lineItem: Stripe.LineItem): ProductMetadata =>
-  (lineItem.price?.product as Stripe.Product).metadata;
 
 type LineItemMetadata = {
   'photo-identifier'?: string;
@@ -150,32 +148,6 @@ router.post<'/', unknown, unknown, Stripe.Event, unknown>(
             )['product-type']
         );
 
-        // A product tagged with a type this webhook does not know, or a merch product that is not
-        // tagged merch, would otherwise be dropped without an error. Stop before creating anything:
-        // a non-2xx reply asks Stripe to retry, which is safe because nothing was created. An
-        // untagged product that is not merch keeps being handled as it always was.
-        const unhandled = (expandedSession.line_items?.data ?? []).filter(
-          (lineItem) => {
-            const type = productMetadata(lineItem)['product-type'];
-            return type
-              ? !HANDLED_PRODUCT_TYPES.includes(type)
-              : !!productMetadata(lineItem)['merch-internal-variant'];
-          }
-        );
-        if (unhandled.length) {
-          console.error(
-            '[merch-alert] checkout session has line items with a product-type this webhook does not handle; nothing was created',
-            {
-              sessionId: session.id,
-              lineItems: unhandled.map((lineItem) => ({
-                id: lineItem.id,
-                productType: productMetadata(lineItem)['product-type'],
-              })),
-            }
-          );
-          return res.status(500).send();
-        }
-
         const creditsLineItems = byProductType['color-credit'] ?? [];
 
         // fulfill credit purchases
@@ -200,24 +172,20 @@ router.post<'/', unknown, unknown, Stripe.Event, unknown>(
           );
         }
 
-        const newItems = (byProductType['merch'] ?? []).flatMap(
-          merchLineItemToOrderItems
-        );
-        const providers = new Set(
-          newItems.map((item) => getMerchProvider(item.variant))
-        );
-        if (providers.size > 1) {
-          // Our checkouts never mix printers, and the provider choice rejects a mix. Stop before
-          // creating anything: an order made from a mixed basket would take the session's
-          // idempotency key and leave the other items unfulfillable. A non-2xx reply asks Stripe
-          // to retry, which is safe because nothing was created.
+        const merchLineItems = byProductType['merch'] ?? [];
+        const printLineItems = byProductType['print'] ?? [];
+        if (merchLineItems.length && printLineItems.length) {
+          // Our checkouts never mix them (one order has one provider), and the provider choice
+          // rejects a mix. Stop before creating anything: a tote order made from a mixed basket
+          // would take the session's idempotency key and leave the print items unfulfillable.
+          // A non-2xx reply asks Stripe to retry, which is safe because nothing was created.
           console.error(
-            '[merch-alert] checkout session mixes printers; no order was created',
+            '[merch-alert] checkout session mixes tote bags and prints; no order was created',
             { sessionId: session.id }
           );
           return res.status(500).send();
         }
-        if (newItems.length) {
+        if (merchLineItems.length || printLineItems.length) {
           const shippingDetails =
             expandedSession.collected_information?.shipping_details;
           const shippingAddress = {
@@ -230,17 +198,25 @@ router.post<'/', unknown, unknown, Stripe.Event, unknown>(
             countryCode: shippingDetails?.address.country ?? undefined,
           };
 
-          // The tote's fixed rate names no method, so a tote order keeps the field empty.
-          const shippingRate = expandedSession.shipping_cost?.shipping_rate as
-            Stripe.ShippingRate | undefined;
-          let shippingMethod: string | undefined =
-            shippingRate?.metadata?.[PRODIGI_SHIPPING_METHOD_METADATA_KEY];
-          if (!shippingMethod && providers.has(MerchProvider.PRODIGI)) {
-            console.warn(
-              'Print checkout has no Prodigi shipping method; defaulting to Standard',
-              { sessionId: session.id }
-            );
-            shippingMethod = 'Standard';
+          const newItems = [
+            ...merchLineItems.flatMap(merchLineItemToOrderItems),
+            ...printLineItems.flatMap(printLineItemToOrderItems),
+          ];
+          // Only a print checkout picks one of these. A tote order has none, so the field it
+          // names stays empty rather than taking the print default.
+          let prodigiShippingMethod: string | undefined;
+          if (printLineItems.length) {
+            const shippingRate = expandedSession.shipping_cost
+              ?.shipping_rate as Stripe.ShippingRate | undefined;
+            prodigiShippingMethod =
+              shippingRate?.metadata?.[PRODIGI_SHIPPING_METHOD_METADATA_KEY];
+            if (!prodigiShippingMethod) {
+              console.warn(
+                'Print checkout has no Prodigi shipping method; defaulting to Standard',
+                { sessionId: session.id }
+              );
+              prodigiShippingMethod = 'Standard';
+            }
           }
 
           const order = await MerchOrderService.createMerchOrder(
@@ -248,22 +224,14 @@ router.post<'/', unknown, unknown, Stripe.Event, unknown>(
             session.id,
             shippingAddress,
             newItems,
-            shippingMethod
+            prodigiShippingMethod
           );
 
           console.log('Created merch order', order);
         }
 
-        // Print purchases are not tips, so they do not earn credits. They are found from the
-        // products on the session, so a print can never be credited because it was not turned
-        // into an order item.
-        const buysPrint = (expandedSession.line_items?.data ?? []).some(
-          (lineItem) => {
-            const variant = productMetadata(lineItem)['merch-internal-variant'];
-            return !!variant && isPrintVariant(variant);
-          }
-        );
-        if (!creditsLineItems.length && !buysPrint) {
+        // Print purchases are not tips, so they do not earn credits.
+        if (!creditsLineItems.length && !printLineItems.length) {
           // Grant some credits from their non-credit payment, see comment on LedgerService
           if (
             userId &&
