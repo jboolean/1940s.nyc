@@ -13,6 +13,8 @@ export interface CartItem {
   variant: MerchInternalVariant;
   colorize: boolean;
   quantity: number;
+  // Shown for a print that is no longer offered, when its product label cannot be looked up.
+  label?: string;
 }
 
 interface State {

@@ -177,8 +177,8 @@ export default function PrintCartModal(): React.JSX.Element {
                     className={stylesheet.thumbnail}
                   />
                   <div className={stylesheet.details}>
-                    <div>
-                      {product?.label ?? item.variant}
+                    <div className={stylesheet.name}>
+                      {product?.label ?? item.label ?? item.variant}
                       {item.colorize ? ', AI colorized' : ''}
                     </div>
                     {product && (

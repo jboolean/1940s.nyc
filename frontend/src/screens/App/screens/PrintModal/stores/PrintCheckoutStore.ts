@@ -154,6 +154,7 @@ const usePrintCheckoutStore = create(
         variant,
         quantity,
         colorize,
+        label: get().products.find((p) => p.variant === variant)?.label,
       });
       if (!added) {
         set((draft) => {
