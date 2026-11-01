@@ -51,7 +51,9 @@ export class MerchCheckoutController {
 
   @Get('/available-products')
   public async getAvailableProducts(): Promise<MerchProductApiResponse[]> {
-    return await ProductRegistry.getAllAvailableProducts().then((products) =>
+    return await ProductRegistry.getAvailableProducts([
+      MerchInternalVariant.TOTE_BAG_SMALL,
+    ]).then((products) =>
       products.map((product) => ({
         variant: product.variant,
         priceAmount: product.priceAmount,
