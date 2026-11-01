@@ -18,7 +18,7 @@ type Props = {
 
 type ImageFormat = '720-jpg' | '420-jpg' | 'jpg';
 
-const forgeImgSrc = (
+export const forgeImgSrc = (
   photoIdentifier: string,
   format: ImageFormat = '720-jpg'
 ): string => `${PHOTO_BASE}/${format}/${photoIdentifier}.jpg`;

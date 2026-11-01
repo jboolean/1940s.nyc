@@ -1,7 +1,13 @@
 import React from 'react';
 import Button from 'shared/components/Button';
 import TextButton from 'shared/components/TextButton';
-import { MerchItemState, Order, OrderItem } from 'shared/utils/merch/Order';
+import {
+  isPrintOptions,
+  isToteOptions,
+  MerchItemState,
+  Order,
+  OrderItem,
+} from 'shared/utils/merch/Order';
 import stylesheet from './ReviewMerch.less';
 import useReviewMerchStore from './stores/ReviewMerchStore';
 
@@ -32,6 +38,9 @@ function OrderMetadataView({ order }: { order: Order }): React.JSX.Element {
 
 function OrderItemView({ item }: { item: OrderItem }): React.JSX.Element {
   const reviewMerchStore = useReviewMerchStore();
+  const options = item.customizationOptions;
+  const toteOptions = options && isToteOptions(options) ? options : undefined;
+  const printOptions = options && isPrintOptions(options) ? options : undefined;
 
   return (
     <div className={stylesheet.item}>
@@ -51,16 +60,22 @@ function OrderItemView({ item }: { item: OrderItem }): React.JSX.Element {
           </TextButton>
         </div>
       )}
-      {item.customizationOptions && (
+      {toteOptions && (
         <div className={stylesheet.customization}>
           <strong>Customization:</strong>
-          <div>Style: {item.customizationOptions.style}</div>
-          <div>Foreground: {item.customizationOptions.foregroundColor}</div>
-          <div>Background: {item.customizationOptions.backgroundColor}</div>
+          <div>Style: {toteOptions.style}</div>
+          <div>Foreground: {toteOptions.foregroundColor}</div>
+          <div>Background: {toteOptions.backgroundColor}</div>
           <div>
-            Location: {item.customizationOptions.lat},{' '}
-            {item.customizationOptions.lng}
+            Location: {toteOptions.lat}, {toteOptions.lng}
           </div>
+        </div>
+      )}
+      {printOptions && (
+        <div className={stylesheet.customization}>
+          <strong>Customization:</strong>
+          <div>Photo: {printOptions.photoIdentifier}</div>
+          <div>Colorized: {printOptions.colorize ? 'yes' : 'no'}</div>
         </div>
       )}
     </div>

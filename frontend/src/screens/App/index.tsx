@@ -26,6 +26,8 @@ import { OptimizeExperimentsProvider } from 'shared/utils/OptimizeExperiments';
 import 'utils/optimize';
 import AdminRoutes from './screens/Admin/AdminRoutes';
 import Corrections from './screens/Corrections';
+import { useFeatureFlag } from './shared/stores/FeatureFlagsStore';
+import FeatureFlag from './shared/types/FeatureFlag';
 import CreditPurchaseModal, {
   CreditPurchaseSuccessMessage,
   openCreditPurchaseModal,
@@ -35,6 +37,7 @@ import FeatureFlags from './screens/FeatureFlags';
 import Orders from './screens/Merch/screens/Orders';
 import MerchModal, { openMerchModal } from './screens/MerchModal';
 import NewsletterModal from './screens/NewsletterModal';
+import PrintModal, { showPrintOrderPlaced } from './screens/PrintModal';
 import SubmitStoryWizard from './screens/SubmitStoryWizard';
 import TipJar, { useTipJarStore } from './screens/TipJar';
 
@@ -46,6 +49,7 @@ const thankYouInitial = searchParams.has('tipSuccess');
 const creditSuccessInitial = searchParams.has('creditPurchaseSuccess');
 const openTipJarOnLoad = searchParams.has('openTipJar');
 const openMerchOnLoad = searchParams.has('openMerch');
+const printSuccessOnLoad = searchParams.has('printSuccess');
 const noWelcome = searchParams.has('noWelcome');
 const noTipJar = searchParams.has('noTipJar');
 const openCreditPurchaseOnLoad = searchParams.has('openCreditPurchase');
@@ -53,6 +57,7 @@ const openCreditPurchaseOnLoad = searchParams.has('openCreditPurchase');
 if (noWelcome) searchParams.delete('noWelcome');
 if (noTipJar) searchParams.delete('noTipJar');
 if (openMerchOnLoad) searchParams.delete('openMerch');
+if (printSuccessOnLoad) searchParams.delete('printSuccess');
 if (openCreditPurchaseOnLoad) searchParams.delete('openCreditPurchase');
 const currentUrl = new URL(window.location.href);
 currentUrl.search = searchParams.toString();
@@ -75,6 +80,7 @@ function DatadogRouteTracker(): null {
 }
 
 function Modals(): React.JSX.Element {
+  const printOrdersEnabled = useFeatureFlag(FeatureFlag.PRINT_ORDERS);
   const [isThankYouOpen, setThankYouOpen] = React.useState(thankYouInitial);
   const [isCreditPurchaseSuccessOpen, setCreditPurchaseSuccessOpen] =
     React.useState(creditSuccessInitial);
@@ -83,7 +89,8 @@ function Modals(): React.JSX.Element {
       !openTipJarOnLoad &&
       !openMerchOnLoad &&
       !noWelcome &&
-      !openCreditPurchaseOnLoad
+      !openCreditPurchaseOnLoad &&
+      !printSuccessOnLoad
   );
 
   const onMap = useMatch('/map/*');
@@ -103,6 +110,14 @@ function Modals(): React.JSX.Element {
       openMerchModal();
     }
   }, []);
+
+  React.useEffect(() => {
+    // Without the flag there is no checkout to come back from, so the URL should
+    // not be able to show an order confirmation.
+    if (printSuccessOnLoad && printOrdersEnabled) {
+      showPrintOrderPlaced();
+    }
+  }, [printOrdersEnabled]);
 
   React.useEffect(() => {
     if (openCreditPurchaseOnLoad) {
@@ -140,6 +155,7 @@ function Modals(): React.JSX.Element {
         }}
       />
       <MerchModal />
+      <PrintModal />
       <NewsletterModal />
       {noTipJar ? null : <TipJar />}
     </>

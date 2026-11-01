@@ -1,0 +1,99 @@
+@import '../../../../shared/styles/colors.less';
+@import '../../../../shared/styles/viewport.less';
+
+.printModal {
+  text-align: left;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.form {
+  display: flex;
+  gap: 1.5rem;
+  margin: 1rem 0;
+  align-items: flex-start;
+}
+
+.thumbnail {
+  width: 12rem;
+  max-width: 40%;
+  height: auto;
+}
+
+.fields {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: flex-start;
+
+  label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .checkboxLabel {
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  // Wide enough for the longest product label, price included.
+  .productSelect {
+    width: 15rem;
+  }
+}
+
+.error {
+  margin: 1rem 0;
+}
+
+.visuallyHidden {
+  composes: visuallyhidden from '../../../../shared/styles/utils.less';
+}
+
+.quantityInput {
+  width: 4rem;
+}
+
+.finePrint {
+  font-size: 12px;
+}
+
+.archivesCard {
+  display: block;
+  margin-top: auto;
+  padding: 0.75rem 1rem;
+  border: 1px solid fade(@font-color-dark, 30%);
+  border-radius: 4px;
+  font-size: 14px;
+  color: inherit;
+  text-decoration: none;
+
+  .archivesLabel {
+    font-size: 11px;
+    text-transform: uppercase;
+    opacity: 0.7;
+  }
+
+  .archivesTitle {
+    font-weight: bold;
+    margin-bottom: 0.25rem;
+  }
+}
+
+@media screen and (max-width: @modal-width-max) {
+  .form {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .thumbnail {
+    max-width: 60%;
+  }
+}

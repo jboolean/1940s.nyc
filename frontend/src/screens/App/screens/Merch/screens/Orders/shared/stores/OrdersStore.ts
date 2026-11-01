@@ -1,8 +1,9 @@
 import useLoginStore from 'shared/stores/LoginStore';
 import {
-  MerchCustomizationOptions,
+  getToteOptions,
   Order,
   OrderItem,
+  ToteBagCustomizationOptions,
 } from 'shared/utils/merch/Order';
 import * as merchApi from 'shared/utils/merch/merchApi';
 import { create } from 'zustand';
@@ -16,7 +17,7 @@ interface State {
 
   isLoginOpen: boolean;
   customizing: OrderItem | null;
-  draftCustomizationOptions: MerchCustomizationOptions | null;
+  draftCustomizationOptions: ToteBagCustomizationOptions | null;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
@@ -28,7 +29,7 @@ interface Actions {
   closeLogin: () => void;
   openItemForCustomizing: (item: OrderItem) => void;
   dismissCustomizing: () => void;
-  setDraftCustomizationOptions: (options: MerchCustomizationOptions) => void;
+  setDraftCustomizationOptions: (options: ToteBagCustomizationOptions) => void;
   saveCustomization: () => Promise<void>;
   submitForPrinting: () => Promise<void>;
   goToOtherSideOfBag: () => void;
@@ -76,7 +77,7 @@ const useOrdersStore = create(
     openItemForCustomizing: (item: OrderItem) => {
       set((draft) => {
         draft.customizing = item;
-        draft.draftCustomizationOptions = item.customizationOptions;
+        draft.draftCustomizationOptions = getToteOptions(item) ?? null;
         draft.step = 'back';
       });
     },
@@ -90,7 +91,7 @@ const useOrdersStore = create(
         draft.step = draft.step === 'front' ? 'back' : 'front';
       });
     },
-    setDraftCustomizationOptions: (options: MerchCustomizationOptions) => {
+    setDraftCustomizationOptions: (options: ToteBagCustomizationOptions) => {
       set((draft) => {
         draft.draftCustomizationOptions = options;
       });

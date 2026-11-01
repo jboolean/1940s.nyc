@@ -1,0 +1,47 @@
+@import '../../styles/colors.less';
+
+@chevron-color: escape('@{font-color-dark}');
+@chevron: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="8" viewBox="0 0 12 8"><path d="M1 1.5 6 6.5 11 1.5" fill="none" stroke="@{chevron-color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+.select {
+  width: 100%;
+  box-sizing: border-box;
+
+  appearance: none;
+  -webkit-appearance: none;
+
+  outline: none;
+
+  font-size: 100%;
+  font-family: inherit;
+  color: inherit;
+  background-color: transparent;
+
+  border: 1px solid @font-color-dark;
+  vertical-align: bottom;
+
+  padding: (11px/2) 1.5rem (11px/2) 0.5em;
+
+  background-image: url(@chevron);
+  background-repeat: no-repeat;
+  background-position: right 0.5rem center;
+  background-size: 12px 8px;
+
+  cursor: pointer;
+
+  &:focus {
+    background-color: fade(@creme, 10%);
+  }
+
+  // A cream ring is invisible on the modal's cream theme.
+  &:focus-visible {
+    outline: 2px solid @font-color-dark;
+    outline-offset: 1px;
+  }
+
+  &:disabled {
+    background-color: fade(@font-color-dark, 5%);
+    cursor: not-allowed;
+    border-color: fade(@font-color-dark, 50%);
+  }
+}

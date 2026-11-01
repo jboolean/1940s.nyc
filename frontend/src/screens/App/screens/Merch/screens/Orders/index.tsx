@@ -3,11 +3,12 @@ import React, { useEffect } from 'react';
 import { Link } from 'react-router';
 import absurd from 'shared/utils/absurd';
 import {
-  MerchInternalVariant,
+  isPrintOptions,
   MerchItemState,
   MerchOrderFulfillmentState,
   MerchOrderState,
   Order,
+  PrintCustomizationOptions,
 } from 'shared/utils/merch/Order';
 import CustomizeModal from './components/CustomizeModal';
 import LoginModal from './components/LoginModal';
@@ -17,16 +18,23 @@ import Button from 'shared/components/Button';
 import { ColorThemeContext } from 'shared/components/ColorThemeContext';
 import ExternalIcon from 'shared/components/ExternalIcon';
 import TextButton from 'shared/components/TextButton';
+import { forgeImgSrc } from 'screens/App/screens/ViewerPane/components/ImageStack';
 import stylesheet from './Orders.less';
 import ToteBagSmallImage from './assets/tote-bag-small-default.png';
 
-const itemDisplayNames: Record<MerchInternalVariant, string> = {
-  [MerchInternalVariant.TOTE_BAG_SMALL]: 'Tote bag',
-};
+function getPrintOptions(
+  item: Order['items'][0]
+): PrintCustomizationOptions | undefined {
+  const options = item.customizationOptions;
+  return options && isPrintOptions(options) ? options : undefined;
+}
 
-const itemImages: Record<MerchInternalVariant, string> = {
-  [MerchInternalVariant.TOTE_BAG_SMALL]: ToteBagSmallImage,
-};
+function getItemImage(item: Order['items'][0]): string {
+  const printOptions = getPrintOptions(item);
+  return printOptions
+    ? forgeImgSrc(printOptions.photoIdentifier, '420-jpg')
+    : ToteBagSmallImage;
+}
 
 function TrackOrderLink({ order }: { order: Order }): React.JSX.Element {
   if (!order.trackingUrl) {
@@ -91,12 +99,13 @@ function OrderItem({ item }: { item: Order['items'][0] }): React.JSX.Element {
   return (
     <li key={item.id} className={stylesheet.orderItem} data-item-id={item.id}>
       <img
-        src={itemImages[item.internalVariant]}
+        src={getItemImage(item)}
         alt="Product image"
         className={stylesheet.itemImage}
       />
       <h3 className={stylesheet.itemName}>
-        {itemDisplayNames[item.internalVariant]}
+        {item.label}
+        {getPrintOptions(item)?.colorize ? ' (AI colorized)' : ''}
       </h3>
       <div className={stylesheet.itemActions}>
         {item.state === MerchItemState.PURCHASED ? (

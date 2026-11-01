@@ -16,6 +16,7 @@ const MODAL_HEIGHT_MAX = 725; // @modal-height-max
 export type FourtiesModalProps = React.PropsWithChildren<ReactModal.Props> & {
   size: 'large' | 'small' | 'x-large';
   isCloseButtonVisible?: boolean;
+  isContentSized?: boolean;
 };
 
 export default function FourtiesModal({
@@ -24,6 +25,7 @@ export default function FourtiesModal({
   overlayClassName,
   bodyOpenClassName,
   isCloseButtonVisible = true,
+  isContentSized = false,
   onAfterOpen = noop,
   children,
   ...props
@@ -42,6 +44,7 @@ export default function FourtiesModal({
           stylesheet['color-theme-' + theme],
           {
             [stylesheet.fullWidth]: isFullWidthModal,
+            [stylesheet.contentSized]: isContentSized,
           },
           className
         )}

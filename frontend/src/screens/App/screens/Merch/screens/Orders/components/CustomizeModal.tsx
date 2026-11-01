@@ -10,7 +10,11 @@ import {
   setOverlay,
 } from 'screens/App/screens/MapPane/components/MainMap/overlays';
 import Button from 'shared/components/Button';
-import { MerchCustomizationOptions } from 'shared/utils/merch/Order';
+import {
+  getToteOptions,
+  MerchInternalVariant,
+  ToteBagCustomizationOptions,
+} from 'shared/utils/merch/Order';
 import useElementId from 'shared/utils/useElementId';
 import stylesheet from './CustomizeModal.less';
 
@@ -83,8 +87,8 @@ const CustomizeBack = (): React.JSX.Element => {
   const mapContainer = React.useRef<HTMLDivElement>(null);
   const map = React.useRef<maplibregl.Map | null>(null);
 
-  const customizationOptions: MerchCustomizationOptions | undefined =
-    customizing?.customizationOptions;
+  const customizationOptions: ToteBagCustomizationOptions | undefined =
+    customizing ? getToteOptions(customizing) : undefined;
 
   const renderMap = React.useCallback((): void => {
     const startingPosition = [
@@ -131,7 +135,7 @@ const CustomizeBack = (): React.JSX.Element => {
             ...draftCustomizationOptions,
             lng: center.lng,
             lat: center.lat,
-            variant: customizing.internalVariant,
+            variant: MerchInternalVariant.TOTE_BAG_SMALL,
           });
           setOverlay(map.current, 'default-map');
         });
@@ -191,18 +195,19 @@ const CustomizeFront = (): React.JSX.Element => {
     draftCustomizationOptions,
     setDraftCustomizationOptions,
   } = useOrdersStore();
+  const savedOptions = customizing ? getToteOptions(customizing) : undefined;
   const selectedStyle = {
     style:
       draftCustomizationOptions?.style ??
-      customizing?.customizationOptions.style ??
+      savedOptions?.style ??
       STYLE_DEFAULTS.style,
     foregroundColor:
       draftCustomizationOptions?.foregroundColor ??
-      customizing?.customizationOptions.foregroundColor ??
+      savedOptions?.foregroundColor ??
       STYLE_DEFAULTS.foregroundColor,
     backgroundColor:
       draftCustomizationOptions?.backgroundColor ??
-      customizing?.customizationOptions.backgroundColor ??
+      savedOptions?.backgroundColor ??
       STYLE_DEFAULTS.backgroundColor,
   };
 
