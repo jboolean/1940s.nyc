@@ -1,23 +1,19 @@
 import countBy from 'lodash/countBy';
 import MerchCustomizationOptions from '../../entities/MerchCustomizationOptions';
 import MerchInternalVariant from '../../enum/MerchInternalVariant';
-import { getPrintProduct, isPrintVariant } from './printCatalog';
+import { getPrintProduct } from './printCatalog';
 
 function describe(
   variant: MerchInternalVariant,
-  customizationOptions?: MerchCustomizationOptions
+  options?: MerchCustomizationOptions
 ): string {
-  if (!isPrintVariant(variant)) {
-    return variant;
-  }
-  const { label } = getPrintProduct(variant);
-  const colorized =
-    customizationOptions && 'colorize' in customizationOptions
-      ? customizationOptions.colorize
-      : false;
-  return colorized ? `${label} (AI colorized)` : label;
+  const label = getPrintProduct(variant)?.label ?? variant;
+  return options && 'colorize' in options && options.colorize
+    ? `${label} (AI colorized)`
+    : label;
 }
 
+// For example "2 × 8×12 in print (AI colorized)"
 export function summarizeItems(
   items: {
     variant: MerchInternalVariant;

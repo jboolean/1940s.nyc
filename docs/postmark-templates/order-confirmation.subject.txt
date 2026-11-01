@@ -1,1 +1,0 @@
-Your 1940s.nyc order is confirmed (#{{orderId}})

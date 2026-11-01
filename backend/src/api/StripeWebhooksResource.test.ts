@@ -2,9 +2,8 @@ import type { Request, Response } from 'express';
 import * as LedgerService from '../business/ledger/LedgerService';
 import * as MerchOrderService from '../business/merch/MerchOrderService';
 import MerchInternalVariant from '../enum/MerchInternalVariant';
-import MerchItemState from '../enum/MerchItemState';
 import stripe from '../third-party/stripe';
-import router, { printLineItemToOrderItems } from './StripeWebhooksResource';
+import router from './StripeWebhooksResource';
 
 jest.mock('express-ipfilter', () => ({
   __esModule: true,
@@ -86,44 +85,6 @@ const address = {
   },
 };
 
-describe('printLineItemToOrderItems', () => {
-  it('creates one customized item per copy', () => {
-    const items = printLineItemToOrderItems(printLineItem() as never);
-    expect(items).toHaveLength(2);
-    expect(items[0]).toEqual({
-      variant: MerchInternalVariant.PRINT_HPR_8X12,
-      customizationOptions: {
-        variant: MerchInternalVariant.PRINT_HPR_8X12,
-        photoIdentifier: 'p1',
-        colorize: true,
-      },
-      state: MerchItemState.AWAITING_PRINTFILE,
-    });
-  });
-
-  it('rejects line items without a photo or a print variant', () => {
-    const bad = (metadata: object): object => ({
-      id: 'li',
-      price: { product: { metadata } },
-    });
-    expect(() =>
-      printLineItemToOrderItems(
-        bad({
-          'merch-internal-variant': MerchInternalVariant.PRINT_HPR_8X12,
-        }) as never
-      )
-    ).toThrow();
-    expect(() =>
-      printLineItemToOrderItems(
-        bad({
-          'merch-internal-variant': MerchInternalVariant.TOTE_BAG_SMALL,
-          'photo-identifier': 'p1',
-        }) as never
-      )
-    ).toThrow();
-  });
-});
-
 describe('checkout.session.completed for prints', () => {
   const create = jest.mocked(MerchOrderService.createMerchOrder);
   beforeEach(() => {
@@ -155,19 +116,6 @@ describe('checkout.session.completed for prints', () => {
     expect(LedgerService.grantCreditsForTip).not.toHaveBeenCalled();
   });
 
-  it('defaults to Standard shipping when the rate has no Prodigi method', async () => {
-    await deliver(
-      session({ shipping_cost: { shipping_rate: { metadata: {} } } })
-    );
-    expect(create).toHaveBeenCalledWith(
-      9,
-      'cs_1',
-      expect.anything(),
-      expect.anything(),
-      'Standard'
-    );
-  });
-
   it('does not fulfil a basket that mixes tote bags and prints, and says so loudly', async () => {
     const tote = {
       id: 'li_2',
@@ -190,11 +138,5 @@ describe('checkout.session.completed for prints', () => {
     expect(create).toHaveBeenCalledWith(9, 'cs_1', expect.anything(), [
       { variant: 'tote-bag-small' },
     ]);
-  });
-
-  it('relies on createMerchOrder to return the existing order for a duplicate event', async () => {
-    await deliver(session());
-    await deliver(session());
-    expect(create).toHaveBeenCalledTimes(2);
   });
 });

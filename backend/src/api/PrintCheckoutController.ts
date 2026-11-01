@@ -19,7 +19,6 @@ interface PrintSessionRequest {
 interface PrintProductApiResponse {
   variant: MerchInternalVariant;
   label: string;
-  framed: boolean;
   priceAmount: number;
 }
 
