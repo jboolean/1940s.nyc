@@ -427,10 +427,65 @@ export async function getOrdersForReview(): Promise<MerchOrder[]> {
     .getMany();
 }
 
+// Exported so a test can build it against real metadata and read the SQL, which is the only way to
+// catch the empty provider list: written as "in ()" it is a Postgres error, and the branches would
+// otherwise look right.
+export function exceptionClause(
+  stuckBefore: Date,
+  noReview: MerchProvider[]
+): Brackets {
+  return new Brackets((qb) =>
+    qb
+      // Failed or held at the printer
+      .where(
+        new Brackets((q) =>
+          q
+            .where({ state: MerchOrderState.SUBMITTED_FOR_FULFILLMENT })
+            .andWhere('order.fulfillmentState in (:...states)', {
+              states: [
+                MerchOrderFulfillmentState.FAILED,
+                MerchOrderFulfillmentState.ON_HOLD,
+              ],
+            })
+        )
+      )
+      // A print file that could not be created
+      .orWhere('items.state = :printfileFailed', {
+        printfileFailed: MerchItemState.PRINTFILE_FAILED,
+      })
+      // A submitter that died after claiming an order leaves it in submitting, for any provider,
+      // so that is raised whoever printed it. An order that should have submitted itself and did
+      // not can only be a provider that submits without review; the rest wait for a person.
+      // A provider list rendered empty would become "in ()", which Postgres rejects, so the
+      // pending_submission half is left out entirely when no provider submits on its own.
+      .orWhere(
+        new Brackets((q) => {
+          q.where('order.state = :submitting', {
+            submitting: MerchOrderState.SUBMITTING,
+          }).andWhere('order.updatedAt < :stuckBefore', { stuckBefore });
+          if (noReview.length) {
+            q.orWhere(
+              new Brackets((pending) =>
+                pending
+                  .where('order.provider in (:...noReview)', { noReview })
+                  .andWhere('order.state = :pendingSubmission', {
+                    pendingSubmission: MerchOrderState.PENDING_SUBMISSION,
+                  })
+                  .andWhere('order.updatedAt < :stuckBefore', {
+                    stuckBefore,
+                  })
+              )
+            );
+          }
+          return q;
+        })
+      )
+  );
+}
+
 export async function getOrdersWithExceptions(): Promise<MerchOrder[]> {
   const repository = AppDataSource.getRepository(MerchOrder);
   const stuckBefore = new Date(Date.now() - 60 * 60 * 1000);
-  const noReview = getProvidersWithoutReview();
 
   // Find the orders first, so the returned orders include all of their items.
   const matches = await repository
@@ -438,55 +493,7 @@ export async function getOrdersWithExceptions(): Promise<MerchOrder[]> {
     .leftJoin('order.items', 'items')
     .select('order.id')
     .where('order.state != :canceled', { canceled: MerchOrderState.CANCELED })
-    .andWhere(
-      new Brackets((qb) =>
-        qb
-          // Failed or held at the printer
-          .where(
-            new Brackets((q) =>
-              q
-                .where({ state: MerchOrderState.SUBMITTED_FOR_FULFILLMENT })
-                .andWhere('order.fulfillmentState in (:...states)', {
-                  states: [
-                    MerchOrderFulfillmentState.FAILED,
-                    MerchOrderFulfillmentState.ON_HOLD,
-                  ],
-                })
-            )
-          )
-          // A print file that could not be created
-          .orWhere('items.state = :printfileFailed', {
-            printfileFailed: MerchItemState.PRINTFILE_FAILED,
-          })
-          // A submitter that died after claiming an order leaves it in submitting, for any provider,
-          // so that is raised whoever printed it. An order that should have submitted itself and did
-          // not can only be a provider that submits without review; the rest wait for a person.
-          // A provider list rendered empty would become "in ()", which Postgres rejects, so the
-          // pending_submission half is left out entirely when no provider submits on its own.
-          .orWhere(
-            new Brackets((q) => {
-              q.where('order.state = :submitting', {
-                submitting: MerchOrderState.SUBMITTING,
-              }).andWhere('order.updatedAt < :stuckBefore', { stuckBefore });
-              if (noReview.length) {
-                q.orWhere(
-                  new Brackets((pending) =>
-                    pending
-                      .where('order.provider in (:...noReview)', { noReview })
-                      .andWhere('order.state = :pendingSubmission', {
-                        pendingSubmission: MerchOrderState.PENDING_SUBMISSION,
-                      })
-                      .andWhere('order.updatedAt < :stuckBefore', {
-                        stuckBefore,
-                      })
-                  )
-                );
-              }
-              return q;
-            })
-          )
-      )
-    )
+    .andWhere(exceptionClause(stuckBefore, getProvidersWithoutReview()))
     .getMany();
   if (matches.length === 0) {
     return [];
