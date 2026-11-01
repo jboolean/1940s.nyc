@@ -1,6 +1,6 @@
 import type { CreateOrderRequest, ShippingMethod } from 'prodigi-print-api';
 import MerchOrder from '../../entities/MerchOrder';
-import { getPrintJpegDirectUrl } from '../utils/printfileUtils';
+import { getPrintfileDirectUrl } from '../utils/printfileUtils';
 import required from '../utils/required';
 import { createCallbackUrl } from './prodigiCallbackAuth';
 import { getPrintProduct } from './printCatalog';
@@ -59,7 +59,9 @@ export function buildProdigiOrder(
         copies: 1,
         sizing: product.sizing,
         attributes: product.attributes,
-        assets: [{ printArea: 'default', url: getPrintJpegDirectUrl(item.id) }],
+        assets: [
+          { printArea: 'default', url: getPrintfileDirectUrl(item.id, 'jpg') },
+        ],
       };
     }),
   };

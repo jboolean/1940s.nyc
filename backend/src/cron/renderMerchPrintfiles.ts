@@ -46,7 +46,7 @@ export default async function renderMerch(): Promise<void> {
         continue;
     }
 
-    await uploadPrintfile(item.id, buffer);
+    await uploadPrintfile(item.id, 'png', buffer);
 
     await repository.update(item.id, {
       state: MerchItemState.READY_FOR_FULFILLMENT,

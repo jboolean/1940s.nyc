@@ -10,23 +10,33 @@ import isProduction from './isProduction';
 
 const s3 = new S3Client();
 
-function getPrintfileKey(customMerchItemId: number): string {
+// Tote bags are rendered as PNGs and print orders are JPEGs.
+export type PrintfileExtension = 'png' | 'jpg';
+
+const CONTENT_TYPES: Record<PrintfileExtension, string> = {
+  png: 'image/png',
+  jpg: 'image/jpeg',
+};
+
+function getPrintfileKey(
+  merchItemId: number,
+  extension: PrintfileExtension
+): string {
   const destinationDirectory = isProduction() ? 'printfiles' : 'printfiles-dev';
-  return `merch/${destinationDirectory}/${customMerchItemId}.png`;
+  return `merch/${destinationDirectory}/${merchItemId}.${extension}`;
 }
 
 export async function uploadPrintfile(
-  customMerchItemId: number,
+  merchItemId: number,
+  extension: PrintfileExtension,
   buffer: Buffer
 ): Promise<void> {
-  const destinationKey = getPrintfileKey(customMerchItemId);
-
   await s3.send(
     new PutObjectCommand({
       Bucket: 'fourties-photos',
-      Key: destinationKey,
+      Key: getPrintfileKey(merchItemId, extension),
       Body: buffer,
-      ContentType: 'image/png',
+      ContentType: CONTENT_TYPES[extension],
       CacheControl: 'no-cache',
     })
   );
@@ -34,42 +44,27 @@ export async function uploadPrintfile(
 
 // Signed S3 URL for admin review.
 export async function getPrintfileUrl(
-  customMerchItemId: number
+  merchItemId: number,
+  extension: PrintfileExtension
 ): Promise<string> {
   const command = new GetObjectCommand({
     Bucket: 'fourties-photos',
-    Key: getPrintfileKey(customMerchItemId),
+    Key: getPrintfileKey(merchItemId, extension),
   });
 
   return await getSignedUrl(s3, command, { expiresIn: 120 });
 }
 
-// Direct CloudFront URL (bypassing Cloudflare) for Printful's server fetch,
+// Direct CloudFront URL (bypassing Cloudflare) for the printer's server fetch,
 // which does a HEAD check before the GET (signed URLs can't support that).
-export function getPrintfileDirectUrl(customMerchItemId: number): string {
-  return bypassCloudflare(
-    `https://photos.1940s.nyc/${getPrintfileKey(customMerchItemId)}`
-  );
-}
-
-function getPrintJpegKey(merchItemId: number): string {
-  const destinationDirectory = isProduction() ? 'printfiles' : 'printfiles-dev';
-  // Prodigi fetches this without credentials.
-  return `merch/${destinationDirectory}/${merchItemId}.jpg`;
-}
-
-export async function uploadPrintJpeg(
+// Prodigi sends no credentials at all, and going around Cloudflare keeps its bot
+// protection from blocking either printer's fetch.
+export function getPrintfileDirectUrl(
   merchItemId: number,
-  buffer: Buffer
-): Promise<void> {
-  await s3.send(
-    new PutObjectCommand({
-      Bucket: 'fourties-photos',
-      Key: getPrintJpegKey(merchItemId),
-      Body: buffer,
-      ContentType: 'image/jpeg',
-      CacheControl: 'no-cache',
-    })
+  extension: PrintfileExtension
+): string {
+  return bypassCloudflare(
+    `https://photos.1940s.nyc/${getPrintfileKey(merchItemId, extension)}`
   );
 }
 
@@ -82,18 +77,10 @@ export async function copyOriginalToPrintJpeg(
     new CopyObjectCommand({
       Bucket: 'fourties-photos',
       CopySource: `fourties-photos/jpg/${photoIdentifier}.jpg`,
-      Key: getPrintJpegKey(merchItemId),
-      ContentType: 'image/jpeg',
+      Key: getPrintfileKey(merchItemId, 'jpg'),
+      ContentType: CONTENT_TYPES.jpg,
       MetadataDirective: 'REPLACE',
       CacheControl: 'no-cache',
     })
-  );
-}
-
-// Plain unsigned URL on the direct origin. Prodigi fetches it with GET (user agent
-// Prodigi-Fulfilment/1.0), and going around Cloudflare keeps its bot protection from blocking the fetch.
-export function getPrintJpegDirectUrl(merchItemId: number): string {
-  return bypassCloudflare(
-    `https://photos.1940s.nyc/${getPrintJpegKey(merchItemId)}`
   );
 }
