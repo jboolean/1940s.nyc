@@ -4,6 +4,7 @@ import { getPhoto, Photo } from 'shared/utils/photosApi';
 import recordEvent from 'shared/utils/recordEvent';
 import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
+import usePrintCartStore from '../../PrintCart/stores/PrintCartStore';
 import {
   createPrintCheckoutSession,
   getAvailablePrintProducts,
@@ -33,6 +34,7 @@ interface Actions {
   setVariant: (variant: MerchInternalVariant) => void;
   setQuantity: (quantity: number) => void;
   setColorize: (colorize: boolean) => void;
+  addToCart: () => void;
   checkout: () => Promise<void>;
 }
 
@@ -144,6 +146,34 @@ const usePrintCheckoutStore = create(
       });
     },
 
+    addToCart: () => {
+      const { photo, variant, quantity, colorize } = get();
+      if (!photo || !variant) return;
+      if (usePrintCartStore.getState().isCheckingOut) {
+        set((draft) => {
+          draft.errorMessage =
+            'Your cart is being checked out. Please try again in a moment.';
+        });
+        return;
+      }
+      const added = usePrintCartStore.getState().addItem({
+        photoIdentifier: photo.identifier,
+        variant,
+        quantity,
+        colorize,
+        label: get().products.find((p) => p.variant === variant)?.label,
+      });
+      if (!added) {
+        set((draft) => {
+          draft.errorMessage =
+            'Your cart cannot hold any more of this. Check out or remove something first.';
+        });
+        return;
+      }
+      recordEvent({ category: 'Prints', action: 'Click Add To Cart' });
+      get().close();
+    },
+
     checkout: async () => {
       const { isCheckingOut, photo, variant, quantity, colorize, products } =
         get();
@@ -164,7 +194,7 @@ const usePrintCheckoutStore = create(
 
         const base = `${window.location.protocol}//${window.location.host}${window.location.pathname}`;
         const url = await createPrintCheckoutSession(
-          { photoIdentifier: photo.identifier, variant, quantity, colorize },
+          [{ photoIdentifier: photo.identifier, variant, quantity, colorize }],
           `${base}?noWelcome=&printSuccess=${window.location.hash}`,
           `${base}?noWelcome=${window.location.hash}`
         );

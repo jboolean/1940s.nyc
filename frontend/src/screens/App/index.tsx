@@ -37,6 +37,8 @@ import FeatureFlags from './screens/FeatureFlags';
 import Orders from './screens/Merch/screens/Orders';
 import MerchModal, { openMerchModal } from './screens/MerchModal';
 import NewsletterModal from './screens/NewsletterModal';
+import PrintCartModal from './screens/PrintCart';
+import usePrintCartStore from './screens/PrintCart/stores/PrintCartStore';
 import PrintModal, { showPrintOrderPlaced } from './screens/PrintModal';
 import SubmitStoryWizard from './screens/SubmitStoryWizard';
 import TipJar, { useTipJarStore } from './screens/TipJar';
@@ -50,6 +52,7 @@ const creditSuccessInitial = searchParams.has('creditPurchaseSuccess');
 const openTipJarOnLoad = searchParams.has('openTipJar');
 const openMerchOnLoad = searchParams.has('openMerch');
 const printSuccessOnLoad = searchParams.has('printSuccess');
+const printSuccessFromCart = searchParams.get('printSuccess') === 'cart';
 const noWelcome = searchParams.has('noWelcome');
 const noTipJar = searchParams.has('noTipJar');
 const openCreditPurchaseOnLoad = searchParams.has('openCreditPurchase');
@@ -116,6 +119,7 @@ function Modals(): React.JSX.Element {
     // not be able to show an order confirmation.
     if (printSuccessOnLoad && printOrdersEnabled) {
       showPrintOrderPlaced();
+      if (printSuccessFromCart) usePrintCartStore.getState().clear();
     }
   }, [printOrdersEnabled]);
 
@@ -156,6 +160,7 @@ function Modals(): React.JSX.Element {
       />
       <MerchModal />
       <PrintModal />
+      <PrintCartModal />
       <NewsletterModal />
       {noTipJar ? null : <TipJar />}
     </>

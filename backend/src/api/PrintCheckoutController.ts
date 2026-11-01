@@ -9,13 +9,17 @@ import * as ProductRegistry from '../business/merch/ProductRegistry';
 import * as UserService from '../business/users/UserService';
 import MerchInternalVariant from '../enum/MerchInternalVariant';
 
-interface PrintSessionRequest {
-  successUrl: string;
-  cancelUrl: string;
+interface PrintSessionItem {
   photoIdentifier: string;
   variant: MerchInternalVariant;
   quantity: number;
   colorize: boolean;
+}
+
+interface PrintSessionRequest {
+  successUrl: string;
+  cancelUrl: string;
+  items: PrintSessionItem[];
 }
 
 interface PrintProductApiResponse {
@@ -36,13 +40,18 @@ export class PrintCheckoutController {
     const user = await UserService.getUser(userId);
 
     try {
-      const { successUrl, cancelUrl, variant, quantity } = body;
-      const { photoIdentifier, colorize } = body;
+      const { successUrl, cancelUrl, items } = body;
       return await MerchCheckoutService.createMerchCheckoutSession({
         successUrl,
         cancelUrl,
         user,
-        items: [{ variant, quantity, print: { photoIdentifier, colorize } }],
+        items: items.map(
+          ({ variant, quantity, photoIdentifier, colorize }) => ({
+            variant,
+            quantity,
+            print: { photoIdentifier, colorize },
+          })
+        ),
       });
     } catch (err) {
       if (err instanceof HttpError) {

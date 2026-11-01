@@ -23,6 +23,7 @@ const DEFAULT_SHIPPING_RATE = isProduction()
   : 'shr_1QssVnFCLBtNZLVlK1TZpXet';
 
 const MAX_PRINT_QUANTITY = 10;
+export const MAX_CHECKOUT_ITEMS = 20;
 
 export interface CheckoutItem {
   variant: MerchInternalVariant;
@@ -86,6 +87,11 @@ export async function createMerchCheckoutSession({
   user?: User;
   items: CheckoutItem[];
 }): Promise<{ sessionId: string; url: string }> {
+  if (items.length < 1 || items.length > MAX_CHECKOUT_ITEMS) {
+    throw new BadRequest(
+      `A checkout needs between 1 and ${MAX_CHECKOUT_ITEMS} items`
+    );
+  }
   items.forEach(checkItem);
   const providers = new Set(
     items.map((item) => getMerchProvider(item.variant))

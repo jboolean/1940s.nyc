@@ -3,7 +3,10 @@ import Collection from '../../enum/Collection';
 import MerchInternalVariant from '../../enum/MerchInternalVariant';
 import stripe from '../../third-party/stripe';
 import * as ProdigiService from '../prodigi/ProdigiService';
-import { createMerchCheckoutSession } from './MerchCheckoutService';
+import {
+  createMerchCheckoutSession,
+  MAX_CHECKOUT_ITEMS,
+} from './MerchCheckoutService';
 
 const findOne = jest.fn();
 jest.mock('../../createConnection', () => ({
@@ -127,6 +130,58 @@ describe('createMerchCheckoutSession', () => {
       createMerchCheckoutSession({
         ...urls,
         items: [{ variant: MerchInternalVariant.PRINT_HPR_8X12, quantity: 1 }],
+      })
+    ).rejects.toMatchObject({ status: 400 });
+    expect(stripe.checkout.sessions.create).not.toHaveBeenCalled();
+  });
+
+  it('buys several prints of different photos in one session, quoting them together', async () => {
+    findOne.mockImplementation(({ where }: { where: { identifier: string } }) =>
+      Promise.resolve({
+        identifier: where.identifier,
+        collection: Collection.FOURTIES,
+      })
+    );
+    await createMerchCheckoutSession({
+      ...urls,
+      items: [
+        print,
+        {
+          variant: MerchInternalVariant.PRINT_HPR_4X6,
+          quantity: 1,
+          print: { photoIdentifier: 'p2', colorize: false },
+        },
+      ],
+    });
+
+    expect(sessionParams().line_items).toEqual([
+      expect.objectContaining({
+        quantity: 2,
+        metadata: { 'photo-identifier': 'p1', colorize: 'true' },
+      }),
+      expect.objectContaining({
+        quantity: 1,
+        metadata: { 'photo-identifier': 'p2', colorize: 'false' },
+      }),
+    ]);
+    expect(ProdigiService.getQuotes).toHaveBeenCalledWith(
+      expect.objectContaining({
+        items: [
+          expect.objectContaining({ copies: 2 }),
+          expect.objectContaining({ copies: 1 }),
+        ],
+      })
+    );
+  });
+
+  it('rejects an empty checkout and one with too many items', async () => {
+    await expect(
+      createMerchCheckoutSession({ ...urls, items: [] })
+    ).rejects.toMatchObject({ status: 400 });
+    await expect(
+      createMerchCheckoutSession({
+        ...urls,
+        items: Array.from({ length: MAX_CHECKOUT_ITEMS + 1 }, () => print),
       })
     ).rejects.toMatchObject({ status: 400 });
     expect(stripe.checkout.sessions.create).not.toHaveBeenCalled();
