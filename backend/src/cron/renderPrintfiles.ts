@@ -1,15 +1,13 @@
 import { In } from 'typeorm';
 
 import { colorizeForPrint } from '../business/color/ColorService';
+import { PRINT_VARIANTS } from '../business/merch/merchCatalog';
 import { logCountMetric } from '../business/utils/metrics';
 import {
   copyOriginalToPrintJpeg,
   uploadPrintfile,
 } from '../business/utils/printfileUtils';
-import {
-  getPrintProduct,
-  PRINT_PRODUCTS,
-} from '../business/prodigi/printCatalog';
+import { getPrintProduct } from '../business/prodigi/printCatalog';
 import { AppDataSource } from '../createConnection';
 import { PrintCustomizationOptions } from '../entities/MerchCustomizationOptions';
 import MerchOrderItem from '../entities/MerchOrderItem';
@@ -20,8 +18,6 @@ const LIMIT = 2;
 const COLORIZE_TIMEOUT_MS = 90_000;
 export const MAX_PRINTFILE_ATTEMPTS = 5;
 export const METRICS_NAMESPACE = 'fourtiesnyc/merch';
-
-const PRINT_VARIANTS = PRINT_PRODUCTS.map((product) => product.variant);
 
 async function createPrintfile(
   item: MerchOrderItem,

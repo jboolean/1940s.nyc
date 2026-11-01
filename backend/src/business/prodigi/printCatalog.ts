@@ -38,7 +38,3 @@ export function getPrintProduct(
 ): PrintProduct | undefined {
   return PRINT_PRODUCTS.find((p) => p.variant === variant);
 }
-
-export function isPrintVariant(variant: MerchInternalVariant): boolean {
-  return PRINT_PRODUCTS.some((p) => p.variant === variant);
-}
