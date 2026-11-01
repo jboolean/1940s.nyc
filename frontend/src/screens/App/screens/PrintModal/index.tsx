@@ -243,22 +243,24 @@ export default function PrintModal(): React.JSX.Element {
                       <TextButton onClick={logout}>Not me, log out</TextButton>
                     </p>
                   ) : null}
-                  <Button
-                    buttonStyle="secondary"
-                    onClick={addToCart}
-                    disabled={isCheckingOut || !variant || !isQuantityValid}
-                    data-testid="print-add-to-cart-button"
-                  >
-                    Add to cart
-                  </Button>
-                  <Button
-                    buttonStyle="primary"
-                    onClick={() => void checkout()}
-                    disabled={isCheckingOut || !variant || !isQuantityValid}
-                    data-testid="print-checkout-button"
-                  >
-                    Continue to Checkout
-                  </Button>
+                  <div className={stylesheet.buttonRow}>
+                    <Button
+                      buttonStyle="secondary"
+                      onClick={addToCart}
+                      disabled={isCheckingOut || !variant || !isQuantityValid}
+                      data-testid="print-add-to-cart-button"
+                    >
+                      Add to cart
+                    </Button>
+                    <Button
+                      buttonStyle="primary"
+                      onClick={() => void checkout()}
+                      disabled={isCheckingOut || !variant || !isQuantityValid}
+                      data-testid="print-checkout-button"
+                    >
+                      Continue to Checkout
+                    </Button>
+                  </div>
                 </div>
               </div>
             )}

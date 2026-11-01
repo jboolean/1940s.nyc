@@ -49,6 +49,11 @@
   }
 }
 
+.buttonRow {
+  display: flex;
+  flex-wrap: nowrap;
+}
+
 .error {
   margin: 1rem 0;
 }
@@ -88,6 +93,11 @@
 }
 
 @media screen and (max-width: @modal-width-max) {
+  .buttonRow button {
+    padding: 1rem;
+    margin-right: 0.75rem;
+  }
+
   .form {
     flex-direction: column;
     align-items: stretch;
