@@ -27,7 +27,7 @@ jest.mock('../business/color/ColorService', () => ({
 }));
 jest.mock('../business/utils/printfileUtils', () => ({
   copyOriginalToPrintJpeg: jest.fn(),
-  uploadPrintJpeg: jest.fn(),
+  uploadPrintfile: jest.fn(),
 }));
 
 function item(

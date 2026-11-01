@@ -4,7 +4,7 @@ import { colorizeForPrint } from '../business/color/ColorService';
 import { logCountMetric } from '../business/utils/metrics';
 import {
   copyOriginalToPrintJpeg,
-  uploadPrintJpeg,
+  uploadPrintfile,
 } from '../business/utils/printfileUtils';
 import {
   getPrintProduct,
@@ -39,7 +39,7 @@ async function createPrintfile(
           );
         }),
       ]);
-      await uploadPrintJpeg(item.id, image);
+      await uploadPrintfile(item.id, 'jpg', image);
     } finally {
       clearTimeout(timer);
     }
