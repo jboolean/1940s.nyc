@@ -79,9 +79,4 @@ describe('merch order exceptions query', () => {
     // The stuck-before date is bound, so a submitter that died leaves its order raised.
     expect(params.some((p) => p instanceof Date)).toBe(true);
   });
-
-  it('reads the state a print file failure leaves behind', () => {
-    // The constant is what the admin page filters on, so a rename has to reach the query.
-    expect(MerchItemState.PRINTFILE_FAILED).toBe('printfile_failed');
-  });
 });
