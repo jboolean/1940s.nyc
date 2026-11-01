@@ -246,7 +246,31 @@ export async function submitOrderForFulfillment(
     .execute();
   if (!submitted) {
     const settled = await orderRepository.findOneByOrFail({ id: orderId });
-    if (settled.state !== MerchOrderState.SUBMITTED_FOR_FULFILLMENT) {
+    if (
+      settled.state === MerchOrderState.CANCELED &&
+      providerOrder.providerOrderId
+    ) {
+      // The cancel won the race, so the printer has an order nobody asked for. Try to take
+      // it back; if the printer will not or cannot, it needs a human.
+      const cancelSubmittedOrder = getFulfillmentProvider(
+        settled.provider
+      ).cancelSubmittedOrder;
+      if (cancelSubmittedOrder) {
+        try {
+          await cancelSubmittedOrder(settled);
+        } catch (e) {
+          console.error(
+            `[merch-alert] order ${orderId} was canceled while the printer was creating it; canceling printer order ${providerOrder.providerOrderId} failed: ${String(
+              e
+            )}`
+          );
+        }
+      } else {
+        console.error(
+          `[merch-alert] order ${orderId} was canceled while the printer was creating it; order ${providerOrder.providerOrderId} was created at the printer and needs attention`
+        );
+      }
+    } else if (settled.state !== MerchOrderState.SUBMITTED_FOR_FULFILLMENT) {
       console.error(
         `[merch-alert] order ${orderId} was ${settled.state} while the printer was creating it; order ${providerOrder.providerOrderId} was created at the printer and needs attention`
       );

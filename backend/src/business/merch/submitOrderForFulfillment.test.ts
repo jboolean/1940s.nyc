@@ -16,11 +16,13 @@ jest.mock('../users/UserService', () => ({
 jest.mock('../utils/printfulApi', () => ({}));
 
 const submitOrderForFulfillmentToProvider = jest.fn();
+const cancelSubmittedOrderOnProvider = jest.fn();
 
 jest.mock('./providers/getFulfillmentProvider', () => ({
   __esModule: true,
   default: () => ({
     submitOrderForFulfillment: submitOrderForFulfillmentToProvider,
+    cancelSubmittedOrder: cancelSubmittedOrderOnProvider,
   }),
   selectProviderForItems: () => 'prodigi',
 }));
@@ -112,6 +114,8 @@ beforeEach(() => {
   submitOrderForFulfillmentToProvider.mockResolvedValue({
     providerOrderId: 'prodigi_1',
   });
+  cancelSubmittedOrderOnProvider.mockReset();
+  cancelSubmittedOrderOnProvider.mockResolvedValue(undefined);
   jest.spyOn(console, 'log').mockImplementation(() => undefined);
   jest.spyOn(console, 'error').mockImplementation(() => undefined);
 });
@@ -181,7 +185,7 @@ it('releases the claim so a failed submission is retried', async () => {
   expect(order.state).toBe(MerchOrderState.SUBMITTED_FOR_FULFILLMENT);
 });
 
-it('keeps the printer id when the order is canceled mid-submission', async () => {
+it('cancels at the printer when the order is canceled mid-submission', async () => {
   const order = addOrder(MerchOrderState.PENDING_SUBMISSION);
   const error = jest
     .spyOn(console, 'error')
@@ -190,6 +194,25 @@ it('keeps the printer id when the order is canceled mid-submission', async () =>
     order.state = MerchOrderState.CANCELED;
     return Promise.resolve({ providerOrderId: 'prodigi_1' });
   });
+
+  await submitOrderForFulfillment(order.id);
+
+  expect(order.state).toBe(MerchOrderState.CANCELED);
+  expect(order.providerOrderId).toBe('prodigi_1');
+  expect(cancelSubmittedOrderOnProvider).toHaveBeenCalledTimes(1);
+  expect(error).not.toHaveBeenCalled();
+});
+
+it('raises when the printer cannot cancel an order canceled mid-submission', async () => {
+  const order = addOrder(MerchOrderState.PENDING_SUBMISSION);
+  const error = jest
+    .spyOn(console, 'error')
+    .mockImplementation(() => undefined);
+  submitOrderForFulfillmentToProvider.mockImplementation(() => {
+    order.state = MerchOrderState.CANCELED;
+    return Promise.resolve({ providerOrderId: 'prodigi_1' });
+  });
+  cancelSubmittedOrderOnProvider.mockRejectedValue(new Error('too late'));
 
   await submitOrderForFulfillment(order.id);
 
