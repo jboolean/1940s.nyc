@@ -2,7 +2,7 @@ import MerchInternalVariant from '../enum/MerchInternalVariant';
 
 type Color = 'red' | 'green' | 'creme' | 'dark';
 
-interface ToteBagCustomizationOptions {
+export interface ToteBagCustomizationOptions {
   variant: MerchInternalVariant.TOTE_BAG_SMALL;
   lat: number;
   lng: number;
@@ -11,6 +11,9 @@ interface ToteBagCustomizationOptions {
   backgroundColor?: Color;
 }
 
+// Written out rather than derived from the catalog: tsoa cannot resolve the indexed-access type the
+// derivation uses, and route generation aborts on it. merchCatalog.test holds this list to the
+// catalog's, so the prints are still stated in one place.
 export type PrintVariant =
   | MerchInternalVariant.PRINT_HPR_4X6
   | MerchInternalVariant.PRINT_HPR_8X12

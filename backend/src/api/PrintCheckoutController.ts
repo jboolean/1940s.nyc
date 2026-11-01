@@ -3,7 +3,9 @@ import * as express from 'express';
 import { HttpError, InternalServerError } from 'http-errors';
 import { getUserFromRequestOrCreateAndSetCookie } from './auth/userAuthUtils';
 
-import * as PrintCheckoutService from '../business/prodigi/PrintCheckoutService';
+import * as MerchCheckoutService from '../business/merch/MerchCheckoutService';
+import { PRINT_VARIANTS } from '../business/merch/merchCatalog';
+import * as ProductRegistry from '../business/merch/ProductRegistry';
 import * as UserService from '../business/users/UserService';
 import MerchInternalVariant from '../enum/MerchInternalVariant';
 
@@ -34,9 +36,13 @@ export class PrintCheckoutController {
     const user = await UserService.getUser(userId);
 
     try {
-      return await PrintCheckoutService.createPrintCheckoutSession({
-        ...body,
+      const { successUrl, cancelUrl, variant, quantity } = body;
+      const { photoIdentifier, colorize } = body;
+      return await MerchCheckoutService.createMerchCheckoutSession({
+        successUrl,
+        cancelUrl,
         user,
+        items: [{ variant, quantity, print: { photoIdentifier, colorize } }],
       });
     } catch (err) {
       if (err instanceof HttpError) {
@@ -49,6 +55,6 @@ export class PrintCheckoutController {
 
   @Get('/available-products')
   public async getAvailableProducts(): Promise<PrintProductApiResponse[]> {
-    return PrintCheckoutService.getAvailablePrintProducts();
+    return ProductRegistry.getAvailableProducts(PRINT_VARIANTS);
   }
 }

@@ -10,6 +10,10 @@ export interface CreatedProviderOrder {
 }
 
 interface FulfillmentProvider {
+  // True when a person looks the order over before it is submitted. Everything else goes to the
+  // printer as soon as the order is ready.
+  readonly requiresReview: boolean;
+
   createOrder(
     merchOrderId: number,
     shippingAddress: ShippingAddress
@@ -17,7 +21,10 @@ interface FulfillmentProvider {
 
   addItemToOrder(item: MerchOrderItem): Promise<void>;
 
-  submitOrderForFulfillment(order: MerchOrder): Promise<void>;
+  submitOrderForFulfillment(order: MerchOrder): Promise<CreatedProviderOrder>;
+
+  // Cancels an order that was already submitted, for providers that support it. Throws if it cannot be canceled.
+  cancelSubmittedOrder?(order: MerchOrder): Promise<void>;
 }
 
 export default FulfillmentProvider;

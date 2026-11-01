@@ -14,8 +14,12 @@ import * as express from 'express';
 import { BadRequest, NotFound } from 'http-errors';
 import { AppDataSource } from '../../createConnection';
 import * as MerchOrderService from '../../business/merch/MerchOrderService';
+import { getPrintfileExtensionForVariant } from '../../business/merch/merchCatalog';
 import absurd from '../../business/utils/absurd';
-import { getPrintfileUrl } from '../../business/utils/printfileUtils';
+import {
+  getPrintfileUrl,
+  PrintfileExtension,
+} from '../../business/utils/printfileUtils';
 import MerchCustomizationOptions from '../../entities/MerchCustomizationOptions';
 import MerchOrder from '../../entities/MerchOrder';
 import MerchOrderItem from '../../entities/MerchOrderItem';
@@ -85,7 +89,10 @@ export class MerchController extends Controller {
   public async getPrintfileUrl(
     @Path('itemId') itemId: number
   ): Promise<{ url: string }> {
-    const printfileUrl = await getPrintfileUrl(itemId);
+    const printfileUrl = await getPrintfileUrl(
+      itemId,
+      await this.getPrintfileExtension(itemId)
+    );
 
     return { url: printfileUrl };
   }
@@ -96,9 +103,22 @@ export class MerchController extends Controller {
     @Path('itemId') itemId: number,
     @Request() req: express.Request
   ): Promise<void> {
-    const printfileUrl = await getPrintfileUrl(itemId);
+    const printfileUrl = await getPrintfileUrl(
+      itemId,
+      await this.getPrintfileExtension(itemId)
+    );
 
     return req.res?.redirect(302, printfileUrl);
+  }
+
+  // Print orders have a JPEG print file; everything else is a rendered PNG.
+  private async getPrintfileExtension(
+    itemId: number
+  ): Promise<PrintfileExtension> {
+    const item = await AppDataSource.getRepository(
+      MerchOrderItem
+    ).findOneByOrFail({ id: itemId });
+    return getPrintfileExtensionForVariant(item.internalVariant);
   }
 
   @Security('netlify', ['moderator'])
@@ -119,6 +139,7 @@ export class MerchController extends Controller {
             await MerchOrderService.submitOrderForFulfillment(orderId);
             break;
           case MerchOrderState.BUILDING:
+          case MerchOrderState.SUBMITTING:
           case MerchOrderState.SUBMITTED_FOR_FULFILLMENT:
           case MerchOrderState.CANCELED:
             throw new BadRequest('Invalid state transition');

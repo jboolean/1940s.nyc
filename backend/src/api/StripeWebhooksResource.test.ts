@@ -19,11 +19,6 @@ jest.mock('../business/ledger/LedgerService', () => ({
 jest.mock('../business/merch/MerchOrderService', () => ({
   createMerchOrder: jest.fn().mockResolvedValue({ id: 1 }),
 }));
-// Loading the real Printful provider reads PRINTFUL_SK at import time, which tests do not set.
-jest.mock('../business/merch/providers/PrintfulFulfillmentProvider', () => ({
-  __esModule: true,
-  default: {},
-}));
 jest.mock('../business/users/UserService', () => ({
   attachStripeCustomerAndDetermineUserId: jest.fn().mockResolvedValue(9),
 }));

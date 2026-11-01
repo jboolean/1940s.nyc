@@ -96,6 +96,39 @@ describe('createMerchOrder', () => {
     );
   });
 
+  it('records the shipping address when the provider creates its order now', async () => {
+    selectProvider.mockReturnValue(MerchProvider.PRINTFUL);
+    jest.mocked(getFulfillmentProvider).mockReturnValue({
+      createOrder: () => Promise.resolve({ providerOrderId: 'pf_1' }),
+    } as never);
+
+    await createMerchOrder(1, 'cs_4', { line1: '1 Main St' }, [print]);
+
+    const savedOrder = saved[1] as {
+      providerOrderId?: string;
+      shippingAddress?: unknown;
+    };
+    expect(savedOrder.providerOrderId).toBe('pf_1');
+    expect(savedOrder.shippingAddress).toEqual({ line1: '1 Main St' });
+  });
+
+  it('writes nothing and calls no printer when the provider cannot be chosen', async () => {
+    selectProvider.mockImplementationOnce(() => {
+      throw new Error('No provider for variant tote-bag-large');
+    });
+    const provider = { createOrder: jest.fn() };
+    jest.mocked(getFulfillmentProvider).mockReturnValue(provider as never);
+
+    await expect(
+      createMerchOrder(1, 'cs_unknown', {}, [
+        { variant: 'tote-bag-large' as MerchInternalVariant },
+      ])
+    ).rejects.toThrow('No provider for variant tote-bag-large');
+    expect(repo.save).not.toHaveBeenCalled();
+    expect(provider.createOrder).not.toHaveBeenCalled();
+    expect(EmailService.sendTemplateEmail).not.toHaveBeenCalled();
+  });
+
   it('returns the existing order for a checkout session it has already seen', async () => {
     jest.spyOn(console, 'warn').mockImplementation(() => undefined);
     repo.findOneBy.mockResolvedValueOnce({ id: 42 } as never);

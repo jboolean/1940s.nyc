@@ -28,7 +28,7 @@ export function makePrintfulItem(
             layers: [
               {
                 type: 'file',
-                url: getPrintfileDirectUrl(customMerchItemId),
+                url: getPrintfileDirectUrl(customMerchItemId, 'png'),
               },
             ],
           },

@@ -1,6 +1,9 @@
 import EmailService from '../business/email/EmailService';
 import ReviewQueueStaleTemplate from '../business/email/templates/MerchOrdersQueueTemplate';
-import { getOrdersForReview } from '../business/merch/MerchOrderService';
+import {
+  getOrdersForReview,
+  getOrdersWithExceptions,
+} from '../business/merch/MerchOrderService';
 
 function forgeReviewMerchUrl(): string {
   const reviewMerchUrl: URL = new URL(
@@ -12,18 +15,23 @@ function forgeReviewMerchUrl(): string {
 }
 
 export default async function checkMerchQueue(): Promise<void> {
-  const ordersForReview = await getOrdersForReview();
+  const [ordersForReview, ordersWithExceptions] = await Promise.all([
+    getOrdersForReview(),
+    getOrdersWithExceptions(),
+  ]);
 
-  if (ordersForReview.length === 0) {
+  if (ordersForReview.length === 0 && ordersWithExceptions.length === 0) {
     console.log('No orders found');
     return;
   }
 
-  const ordersCount = ordersForReview.length;
-
   const email = ReviewQueueStaleTemplate.createTemplatedEmail({
     templateContext: {
-      ordersCount,
+      ordersCount: ordersForReview.length,
+      orders: ordersForReview.length ? { count: ordersForReview.length } : null,
+      exceptions: ordersWithExceptions.length
+        ? { count: ordersWithExceptions.length }
+        : null,
       reviewMerchUrl: forgeReviewMerchUrl(),
     },
     metadata: {},

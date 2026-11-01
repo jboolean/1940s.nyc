@@ -58,6 +58,7 @@ function OrderStatus({ order }: { order: Order }): React.JSX.Element {
     }
 
     case MerchOrderState.PENDING_SUBMISSION:
+    case MerchOrderState.SUBMITTING:
     case MerchOrderState.SUBMITTED_FOR_FULFILLMENT:
       switch (fulfillmentState) {
         case undefined:

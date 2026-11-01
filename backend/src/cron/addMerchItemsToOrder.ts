@@ -32,7 +32,7 @@ export default async function addMerchItemsToOrder(): Promise<void> {
       (i) => i.state === MerchItemState.ADDED_TO_ORDER
     );
 
-    if (allItemsAdded) {
+    if (allItemsAdded && order.state === MerchOrderState.BUILDING) {
       order.state = MerchOrderState.PENDING_SUBMISSION;
       await orderRepository.save(order);
     }

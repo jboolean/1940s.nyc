@@ -1,4 +1,5 @@
 import { BadRequest } from 'http-errors';
+import { Brackets } from 'typeorm';
 import { AppDataSource } from '../../createConnection';
 import MerchCustomizationOptions from '../../entities/MerchCustomizationOptions';
 import MerchOrder from '../../entities/MerchOrder';
@@ -15,9 +16,12 @@ import OrderCustomizeTemplate from '../email/templates/OrderCustomizeTemplate';
 import { OrderTemplateData } from '../email/templates/OrderEmailTemplateData';
 import OrderShippedTemplate from '../email/templates/OrderShippedTemplate';
 import * as UserService from '../users/UserService';
-import { summarizeItems } from '../prodigi/printOrderSummary';
 import isProduction from '../utils/isProduction';
+import { summarizeItems } from './orderSummary';
+import type { CreatedProviderOrder } from './providers/FulfillmentProvider';
 import getFulfillmentProvider, {
+  getProvidersNeedingReview,
+  getProvidersWithoutReview,
   selectProviderForItems,
 } from './providers/getFulfillmentProvider';
 
@@ -96,6 +100,7 @@ export async function createMerchOrder(
       );
 
       order.providerOrderId = providerOrder.providerOrderId;
+      order.shippingAddress = shippingAddress;
       order.state = MerchOrderState.BUILDING;
       order.fulfillmentState = providerOrder.fulfillmentState;
 
@@ -190,24 +195,112 @@ export async function submitOrderForFulfillment(
   orderId: number
 ): Promise<void> {
   const orderRepository = AppDataSource.getRepository(MerchOrder);
+
+  // Claim the order before the printer is called, so a cancel that lands first wins and no order
+  // the customer was told is canceled gets printed. Only one submitter can hold the claim.
+  // An order left in submitting by a submitter that died mid-call is not retried automatically —
+  // the printer may already have it — so it is raised on the admin exceptions page instead.
+  const { affected: claimed } = await orderRepository
+    .createQueryBuilder()
+    .update(MerchOrder)
+    .set({ state: MerchOrderState.SUBMITTING })
+    .where({ id: orderId, state: MerchOrderState.PENDING_SUBMISSION })
+    .execute();
+  if (!claimed) {
+    console.log('Order was claimed or canceled before submission', orderId);
+    return;
+  }
+
   const order = await orderRepository.findOneByOrFail({ id: orderId });
 
-  await getFulfillmentProvider(order.provider).submitOrderForFulfillment(order);
+  let providerOrder: CreatedProviderOrder;
+  try {
+    providerOrder = await getFulfillmentProvider(
+      order.provider
+    ).submitOrderForFulfillment(order);
+  } catch (e) {
+    // Nothing was sent, so release the claim and leave the order to be retried.
+    await orderRepository
+      .createQueryBuilder()
+      .update(MerchOrder)
+      .set({ state: MerchOrderState.PENDING_SUBMISSION })
+      .where({ id: orderId, state: MerchOrderState.SUBMITTING })
+      .execute();
+    throw e;
+  }
 
-  order.state = MerchOrderState.SUBMITTED_FOR_FULFILLMENT;
-  await orderRepository.save(order);
+  // The printer's id is recorded even if the order has moved on, so its order can still be found.
+  if (providerOrder.providerOrderId) {
+    await orderRepository.update(orderId, {
+      providerOrderId: providerOrder.providerOrderId,
+    });
+  }
+
+  // Still conditional: a cancel or a callback may have won the race while the printer was being
+  // called. A callback that already moved the order on means the submission is recorded anyway.
+  const { affected: submitted } = await orderRepository
+    .createQueryBuilder()
+    .update(MerchOrder)
+    .set({ state: MerchOrderState.SUBMITTED_FOR_FULFILLMENT })
+    .where({ id: orderId, state: MerchOrderState.SUBMITTING })
+    .execute();
+  if (!submitted) {
+    const settled = await orderRepository.findOneByOrFail({ id: orderId });
+    if (
+      settled.state === MerchOrderState.CANCELED &&
+      providerOrder.providerOrderId
+    ) {
+      // The cancel won the race, so the printer has an order nobody asked for. Try to take
+      // it back; if the printer will not or cannot, it needs a human.
+      const cancelSubmittedOrder = getFulfillmentProvider(
+        settled.provider
+      ).cancelSubmittedOrder;
+      if (cancelSubmittedOrder) {
+        try {
+          await cancelSubmittedOrder(settled);
+        } catch (e) {
+          console.error(
+            `[merch-alert] order ${orderId} was canceled while the printer was creating it; canceling printer order ${providerOrder.providerOrderId} failed: ${String(
+              e
+            )}`
+          );
+        }
+      } else {
+        console.error(
+          `[merch-alert] order ${orderId} was canceled while the printer was creating it; order ${providerOrder.providerOrderId} was created at the printer and needs attention`
+        );
+      }
+    } else if (settled.state !== MerchOrderState.SUBMITTED_FOR_FULFILLMENT) {
+      console.error(
+        `[merch-alert] order ${orderId} was ${settled.state} while the printer was creating it; order ${providerOrder.providerOrderId} was created at the printer and needs attention`
+      );
+    }
+  }
 }
 
 export async function cancelOrder(orderId: number): Promise<void> {
   const orderRepository = AppDataSource.getRepository(MerchOrder);
   const order = await orderRepository.findOneByOrFail({ id: orderId });
 
+  const provider = getFulfillmentProvider(order.provider);
   if (
+    provider.cancelSubmittedOrder &&
+    order.state === MerchOrderState.SUBMITTED_FOR_FULFILLMENT &&
+    order.fulfillmentState !== MerchOrderFulfillmentState.CANCELED
+  ) {
+    try {
+      await provider.cancelSubmittedOrder(order);
+    } catch (e) {
+      console.warn('Provider could not cancel order', orderId, e);
+      throw new BadRequest('The printer can no longer cancel this order');
+    }
+    order.fulfillmentState = MerchOrderFulfillmentState.CANCELED;
+  } else if (
     ![
       MerchOrderFulfillmentState.DRAFT,
       MerchOrderFulfillmentState.CANCELED,
       undefined,
-    ].includes(order.fulfillmentState)
+    ].includes(order.fulfillmentState ?? undefined)
   ) {
     // In the future we could support canceling in Printful here.
     // Printful has not built canceling into their v2 API yet.
@@ -246,9 +339,11 @@ export async function onPrinterStatusChanged(
     // If needed, update the order state based on the fulfillment state
     // Generally the order state is updated directly by this app, but if actions are taken directly in the printer, we need to update the state here
     if (
-      [MerchOrderState.BUILDING, MerchOrderState.PENDING_SUBMISSION].includes(
-        order.state
-      )
+      [
+        MerchOrderState.BUILDING,
+        MerchOrderState.PENDING_SUBMISSION,
+        MerchOrderState.SUBMITTING,
+      ].includes(order.state)
     ) {
       if (newFulfillmentState === MerchOrderFulfillmentState.CANCELED) {
         order.state = MerchOrderState.CANCELED;
@@ -267,7 +362,7 @@ export async function onShipmentSent(
   trackingUrl: string
 ): Promise<void> {
   const orderRepository = AppDataSource.getRepository(MerchOrder);
-  let order = await orderRepository.findOneBy({
+  const order = await orderRepository.findOneBy({
     provider,
     providerOrderId,
   });
@@ -277,22 +372,69 @@ export async function onShipmentSent(
     return;
   }
 
+  await orderRepository
+    .createQueryBuilder()
+    .update(MerchOrder)
+    .set({ trackingUrl })
+    .where({ id: order.id })
+    .execute();
   order.trackingUrl = trackingUrl;
-  order = await orderRepository.save(order);
 
   const user = await UserService.getUser(order.userId);
+  if (!user.email) {
+    return;
+  }
 
-  if (user.email) {
-    const orderShippedEmail = OrderShippedTemplate.createTemplatedEmail({
-      to: user.email,
-      templateContext: createOrderEmailTemplateData(order),
-      metadata: {
-        orderId: order.id.toString(),
-        userId: user.id.toString(),
-      },
-    });
+  // Two callers can report the same shipment at once: the Prodigi callback and the submission poller.
+  // The conditional write to emailed_tracking_url is the claim — whichever caller writes it owns the
+  // send — and it doubles as the marker that this shipment has already been emailed about. A caller
+  // whose send fails clears its own claim so a retry can have another go.
+  // Delivery is at-least-once: a send the provider accepted but never acknowledged clears the claim,
+  // and the next retry sends a second copy.
+  // Two gaps are accepted here. A crash between the claim and the send skips this email for good,
+  // since nothing clears a claim left behind. And retries only arrive from Prodigi's callbacks and
+  // the submission poller, which stops revisiting an order once Prodigi calls it complete.
+  const { affected } = await orderRepository
+    .createQueryBuilder()
+    .update(MerchOrder)
+    .set({ emailedTrackingUrl: trackingUrl })
+    .where({ id: order.id })
+    .andWhere('emailedTrackingUrl IS DISTINCT FROM :trackingUrl', {
+      trackingUrl,
+    })
+    .execute();
+  if (!affected) {
+    return;
+  }
 
+  const orderShippedEmail = OrderShippedTemplate.createTemplatedEmail({
+    to: user.email,
+    templateContext: createOrderEmailTemplateData(order),
+    metadata: {
+      orderId: order.id.toString(),
+      userId: user.id.toString(),
+    },
+  });
+
+  try {
     await EmailService.sendTemplateEmail(orderShippedEmail);
+  } catch (e) {
+    // Nothing went out, so release the claim and let the next retry send it.
+    try {
+      await orderRepository
+        .createQueryBuilder()
+        .update(MerchOrder)
+        .set({ emailedTrackingUrl: null })
+        .where({ id: order.id })
+        .andWhere('emailedTrackingUrl = :trackingUrl', { trackingUrl })
+        .execute();
+    } catch (releaseError) {
+      console.error(
+        '[merch] Failed to clear the emailed tracking link',
+        releaseError
+      );
+    }
+    throw e;
   }
 }
 
@@ -302,22 +444,90 @@ export async function getOrdersForReview(): Promise<MerchOrder[]> {
     .innerJoinAndSelect('order.items', 'items')
     .innerJoinAndSelect('order.user', 'user')
     .where({ state: MerchOrderState.PENDING_SUBMISSION })
+    .andWhere('order.provider in (:...providers)', {
+      providers: getProvidersNeedingReview(),
+    })
     .orderBy('order.createdAt', 'DESC')
     .getMany();
 }
 
+// Exported so a test can build it against real metadata and read the SQL, which is the only way to
+// catch the empty provider list: written as "in ()" it is a Postgres error, and the branches would
+// otherwise look right.
+export function exceptionClause(
+  stuckBefore: Date,
+  noReview: MerchProvider[]
+): Brackets {
+  return new Brackets((qb) =>
+    qb
+      // Failed or held at the printer
+      .where(
+        new Brackets((q) =>
+          q
+            .where({ state: MerchOrderState.SUBMITTED_FOR_FULFILLMENT })
+            .andWhere('order.fulfillmentState in (:...states)', {
+              states: [
+                MerchOrderFulfillmentState.FAILED,
+                MerchOrderFulfillmentState.ON_HOLD,
+              ],
+            })
+        )
+      )
+      // A print file that could not be created
+      .orWhere('items.state = :printfileFailed', {
+        printfileFailed: MerchItemState.PRINTFILE_FAILED,
+      })
+      // A submitter that died after claiming an order leaves it in submitting, for any provider,
+      // so that is raised whoever printed it. An order that should have submitted itself and did
+      // not can only be a provider that submits without review; the rest wait for a person.
+      // A provider list rendered empty would become "in ()", which Postgres rejects, so the
+      // pending_submission half is left out entirely when no provider submits on its own.
+      .orWhere(
+        new Brackets((q) => {
+          q.where('order.state = :submitting', {
+            submitting: MerchOrderState.SUBMITTING,
+          }).andWhere('order.updatedAt < :stuckBefore', { stuckBefore });
+          if (noReview.length) {
+            q.orWhere(
+              new Brackets((pending) =>
+                pending
+                  .where('order.provider in (:...noReview)', { noReview })
+                  .andWhere('order.state = :pendingSubmission', {
+                    pendingSubmission: MerchOrderState.PENDING_SUBMISSION,
+                  })
+                  .andWhere('order.updatedAt < :stuckBefore', {
+                    stuckBefore,
+                  })
+              )
+            );
+          }
+          return q;
+        })
+      )
+  );
+}
+
 export async function getOrdersWithExceptions(): Promise<MerchOrder[]> {
-  return await AppDataSource.getRepository(MerchOrder)
+  const repository = AppDataSource.getRepository(MerchOrder);
+  const stuckBefore = new Date(Date.now() - 60 * 60 * 1000);
+
+  // Find the orders first, so the returned orders include all of their items.
+  const matches = await repository
     .createQueryBuilder('order')
-    .innerJoinAndSelect('order.items', 'items')
-    .innerJoinAndSelect('order.user', 'user')
-    .where({ state: MerchOrderState.SUBMITTED_FOR_FULFILLMENT })
-    .andWhere('order.fulfillmentState in (:...states)', {
-      states: [
-        MerchOrderFulfillmentState.FAILED,
-        MerchOrderFulfillmentState.ON_HOLD,
-      ],
-    })
+    .leftJoin('order.items', 'items')
+    .select('order.id')
+    .where('order.state != :canceled', { canceled: MerchOrderState.CANCELED })
+    .andWhere(exceptionClause(stuckBefore, getProvidersWithoutReview()))
+    .getMany();
+  if (matches.length === 0) {
+    return [];
+  }
+
+  return await repository
+    .createQueryBuilder('order')
+    .leftJoinAndSelect('order.items', 'items')
+    .leftJoinAndSelect('order.user', 'user')
+    .where('order.id in (:...ids)', { ids: matches.map((o) => o.id) })
     .orderBy('order.createdAt', 'DESC')
     .getMany();
 }

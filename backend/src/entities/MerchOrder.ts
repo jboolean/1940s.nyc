@@ -11,6 +11,7 @@ import MerchOrderFulfillmentState from '../enum/MerchOrderFulfillmentState';
 import MerchOrderState from '../enum/MerchOrderState';
 import MerchProvider from '../enum/MerchProvider';
 import MerchOrderItem from './MerchOrderItem';
+import ShippingAddress from './ShippingAddress';
 import User from './User';
 
 @Entity('merch_orders')
@@ -48,10 +49,18 @@ export default class MerchOrder {
   @ManyToOne(() => User)
   user: User;
 
+  // The address the order ships to, recorded at checkout.
+  @Column({ type: 'jsonb', nullable: true })
+  shippingAddress?: ShippingAddress | null;
+
   // Provider-specific shipping service chosen at checkout (a Prodigi shippingMethod for Prodigi orders).
   @Column({ type: 'varchar', nullable: true })
   providerShippingMethod?: string | null;
 
   @Column({ nullable: true })
   trackingUrl?: string;
+
+  // The shipment URL the customer has already been emailed about.
+  @Column({ type: 'varchar', nullable: true })
+  emailedTrackingUrl?: string | null;
 }

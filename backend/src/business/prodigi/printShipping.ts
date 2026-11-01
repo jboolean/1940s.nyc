@@ -1,5 +1,9 @@
 import type { Quote, ShippingMethod } from 'prodigi-print-api';
 import type Stripe from 'stripe';
+import MerchInternalVariant from '../../enum/MerchInternalVariant';
+import required from '../utils/required';
+import { getPrintProduct } from './printCatalog';
+import * as ProdigiService from './ProdigiService';
 
 // Approximate business days from order to delivery, including production.
 const OFFERED_METHODS: Partial<
@@ -57,4 +61,34 @@ export function buildShippingOptions(
       },
     };
   });
+}
+
+// Prodigi prices shipping per basket and destination, so the options are quoted for each checkout.
+export async function quotePrintShipping(
+  items: { variant: MerchInternalVariant; quantity: number }[]
+): Promise<Stripe.Checkout.SessionCreateParams.ShippingOption[]> {
+  const products = items.map((item) => ({
+    product: required(
+      getPrintProduct(item.variant),
+      `print product for ${item.variant}`
+    ),
+    copies: item.quantity,
+  }));
+  const options = buildShippingOptions(
+    await ProdigiService.getQuotes({
+      destinationCountryCode: 'US',
+      items: products.map(({ product, copies }) => ({
+        sku: product.sku,
+        copies,
+        attributes: product.attributes,
+        assets: [{ printArea: 'default' }],
+      })),
+    })
+  );
+  if (!options.length) {
+    throw new Error(
+      `Prodigi returned no shipping options for ${products.map((p) => p.product.sku).join(', ')}`
+    );
+  }
+  return options;
 }
