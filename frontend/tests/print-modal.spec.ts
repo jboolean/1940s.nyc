@@ -39,6 +39,15 @@ async function stubPrintApi(page: Page, identifier: string): Promise<void> {
       body: JSON.stringify(PRODUCTS),
     })
   );
+  // The map style fetches this cross-origin and does not handle a failure, so a failed fetch
+  // raises the dev server's error overlay, which blocks every click.
+  await page.route('**/photos-1940s_version.json', (route) =>
+    route.fulfill({
+      contentType: 'application/json',
+      headers: { 'access-control-allow-origin': '*' },
+      body: JSON.stringify({ currentKey: 'photos-1940s.pmtiles' }),
+    })
+  );
   await page.route('**/stories*', (route) =>
     route.fulfill({ contentType: 'application/json', body: '{"items":[]}' })
   );
