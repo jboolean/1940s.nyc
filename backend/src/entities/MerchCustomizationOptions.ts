@@ -1,9 +1,8 @@
-import type { PrintVariant } from '../business/merch/merchCatalog';
 import MerchInternalVariant from '../enum/MerchInternalVariant';
 
 type Color = 'red' | 'green' | 'creme' | 'dark';
 
-interface ToteBagCustomizationOptions {
+export interface ToteBagCustomizationOptions {
   variant: MerchInternalVariant.TOTE_BAG_SMALL;
   lat: number;
   lng: number;
@@ -13,7 +12,10 @@ interface ToteBagCustomizationOptions {
 }
 
 export interface PrintCustomizationOptions {
-  variant: PrintVariant;
+  // The variant is the whole set rather than just the prints because the entity is also the request
+  // body tsoa has to turn into a schema, and it cannot resolve the narrower PrintVariant type.
+  // isPrintVariant is what holds a stored row to the prints.
+  variant: MerchInternalVariant;
   photoIdentifier: string;
   colorize: boolean;
 }
