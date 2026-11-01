@@ -150,13 +150,13 @@ function render(
       }
       return renderPrint(item, options);
     // The readers tolerate a variant this build no longer sells and degrade, so the renderer does
-    // too: an unknown one is a variant nothing here can print, not a bug in the code. Throwing the
-    // variant by name keeps the stored error honest, where asserting it was unreachable would have
-    // the item fail every attempt with no real reason.
-    default:
-      throw new Error(
-        `No renderer for variant ${String(item.internalVariant)}`
-      );
+    // too: an unknown one is a variant nothing here can print, not a bug in the code. Annotating it
+    // `never` keeps the compiler checking that every variant has a case, and the throw below is
+    // what an old row naming a variant this build no longer sells reaches at run time.
+    default: {
+      const unhandled: never = item.internalVariant;
+      throw new Error(`No renderer for variant ${String(unhandled)}`);
+    }
   }
 }
 
