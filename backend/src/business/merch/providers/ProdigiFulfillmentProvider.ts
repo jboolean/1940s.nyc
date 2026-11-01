@@ -10,7 +10,8 @@ import FulfillmentProvider, {
 // Prodigi has no draft orders: creating the order is what submits it. Nothing is sent to Prodigi
 // until every print file is ready and the order is submitted.
 const ProdigiFulfillmentProvider: FulfillmentProvider = {
-  sendsCustomizationEmail: false,
+  // Prodigi fulfills as soon as the order reaches it, so waiting for a person would delay it.
+  requiresReview: false,
 
   createOrder() {
     return Promise.resolve({});

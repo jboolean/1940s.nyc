@@ -9,6 +9,8 @@ import FulfillmentProvider, {
 } from './FulfillmentProvider';
 
 const PrintfulFulfillmentProvider: FulfillmentProvider = {
+  requiresReview: true,
+
   async createOrder(
     merchOrderId: number,
     shippingAddress: ShippingAddress

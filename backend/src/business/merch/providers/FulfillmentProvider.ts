@@ -10,6 +10,10 @@ export interface CreatedProviderOrder {
 }
 
 interface FulfillmentProvider {
+  // True when a person looks the order over before it is submitted. Everything else goes to the
+  // printer as soon as the order is ready.
+  readonly requiresReview: boolean;
+
   createOrder(
     merchOrderId: number,
     shippingAddress: ShippingAddress

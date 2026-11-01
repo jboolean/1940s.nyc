@@ -36,3 +36,17 @@ export default function getFulfillmentProvider(
 ): FulfillmentProvider {
   return PROVIDERS[provider];
 }
+
+// The providers whose orders wait for a person instead of going straight to the printer.
+export function getProvidersNeedingReview(): MerchProvider[] {
+  return (Object.keys(PROVIDERS) as MerchProvider[]).filter(
+    (provider) => PROVIDERS[provider].requiresReview
+  );
+}
+
+// The providers that send an order to the printer without a person looking at it first.
+export function getProvidersWithoutReview(): MerchProvider[] {
+  return (Object.keys(PROVIDERS) as MerchProvider[]).filter(
+    (provider) => !PROVIDERS[provider].requiresReview
+  );
+}

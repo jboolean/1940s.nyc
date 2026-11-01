@@ -1,5 +1,6 @@
 import { In } from 'typeorm';
 import * as MerchOrderService from '../business/merch/MerchOrderService';
+import { getProvidersWithoutReview } from '../business/merch/providers/getFulfillmentProvider';
 import { handleOrderCallback } from '../business/prodigi/ProdigiCallbackService';
 import { AppDataSource } from '../createConnection';
 import MerchOrder from '../entities/MerchOrder';
@@ -9,16 +10,12 @@ import MerchProvider from '../enum/MerchProvider';
 
 const LIMIT = 5;
 
-/**
- * Prodigi orders are fulfilled the moment they are created, so unlike tote bags they are not held
- * for review: once every print file is ready they are sent automatically. A failure leaves the order in
- * pending_submission (where the merch review queue shows it) and is retried on the next run. The
- * idempotency key on the Prodigi order makes a retry after a partial failure safe.
- */
-export async function submitPendingProdigiOrders(): Promise<void> {
+// Providers that do not wait for review submit themselves, so their orders are sent without a
+// person looking at them. A failed order stays pending_submission and is retried on the next run.
+export async function submitPendingOrders(): Promise<void> {
   const orders = await AppDataSource.getRepository(MerchOrder).find({
     where: {
-      provider: MerchProvider.PRODIGI,
+      provider: In(getProvidersWithoutReview()),
       state: MerchOrderState.PENDING_SUBMISSION,
     },
     order: { updatedAt: 'ASC' },
@@ -27,22 +24,17 @@ export async function submitPendingProdigiOrders(): Promise<void> {
 
   for (const order of orders) {
     try {
-      console.log('[prodigi] Submitting order', order.id);
+      console.log('[merch] Submitting order', order.id);
       await MerchOrderService.submitOrderForFulfillment(order.id);
     } catch (e) {
-      console.error(
-        `[merch-alert] failed to submit Prodigi order ${order.id}`,
-        e
-      );
+      console.error(`[merch-alert] failed to submit order ${order.id}`, e);
     }
   }
 }
 
-/**
- * Polls Prodigi for submitted orders. Callbacks normally keep orders current; this covers lost
- * callbacks, orders held in Prodigi's edit window, and environments Prodigi cannot reach.
- */
-export async function syncSubmittedProdigiOrders(): Promise<void> {
+// Backup for callbacks (and the only update path where the printer cannot reach us, such as local
+// development). Prodigi is the only provider that calls us back, so this polls Prodigi orders only.
+export async function syncSubmittedOrders(): Promise<void> {
   const repository = AppDataSource.getRepository(MerchOrder);
   const orders = await repository
     .createQueryBuilder('order')
@@ -71,7 +63,7 @@ export async function syncSubmittedProdigiOrders(): Promise<void> {
       // Touch the row so orders are visited in turn.
       await repository.update(order.id, { updatedAt: new Date() });
     } catch (e) {
-      console.error(`[prodigi] Failed to sync order ${order.id}`, e);
+      console.error(`[merch] Failed to sync order ${order.id}`, e);
     }
   }
 }

@@ -20,6 +20,8 @@ import isProduction from '../utils/isProduction';
 import { summarizeItems } from './orderSummary';
 import type { CreatedProviderOrder } from './providers/FulfillmentProvider';
 import getFulfillmentProvider, {
+  getProvidersNeedingReview,
+  getProvidersWithoutReview,
   selectProviderForItems,
 } from './providers/getFulfillmentProvider';
 
@@ -418,6 +420,9 @@ export async function getOrdersForReview(): Promise<MerchOrder[]> {
     .innerJoinAndSelect('order.items', 'items')
     .innerJoinAndSelect('order.user', 'user')
     .where({ state: MerchOrderState.PENDING_SUBMISSION })
+    .andWhere('order.provider in (:...providers)', {
+      providers: getProvidersNeedingReview(),
+    })
     .orderBy('order.createdAt', 'DESC')
     .getMany();
 }
@@ -452,13 +457,14 @@ export async function getOrdersWithExceptions(): Promise<MerchOrder[]> {
           .orWhere('items.state = :printfileFailed', {
             printfileFailed: MerchItemState.PRINTFILE_FAILED,
           })
-          // A Prodigi order that could not be sent for over an hour, or one whose submitter
-          // died after claiming it and before the printer accepted it.
+          // An order that should have submitted itself and did not, or one whose submitter died
+          // after claiming it and before the printer accepted it. Only the providers that submit
+          // without review reach pending_submission on their own; the rest wait for a person.
           .orWhere(
             new Brackets((q) =>
               q
-                .where('order.provider = :prodigi', {
-                  prodigi: MerchProvider.PRODIGI,
+                .where('order.provider in (:...noReview)', {
+                  noReview: getProvidersWithoutReview(),
                 })
                 .andWhere('order.state in (:...unstuck)', {
                   unstuck: [
