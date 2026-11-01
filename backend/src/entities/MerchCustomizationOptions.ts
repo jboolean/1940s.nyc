@@ -20,10 +20,7 @@ export type PrintVariant =
   | MerchInternalVariant.PRINT_FAP_8X12_FRAMED;
 
 export interface PrintCustomizationOptions {
-  // The variant is the whole set rather than just the prints because the entity is also the request
-  // body tsoa has to turn into a schema, and it cannot resolve the narrower PrintVariant type.
-  // isPrintVariant is what holds a stored row to the prints.
-  variant: MerchInternalVariant;
+  variant: PrintVariant;
   photoIdentifier: string;
   colorize: boolean;
 }
