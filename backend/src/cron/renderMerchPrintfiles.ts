@@ -28,9 +28,10 @@ import MerchOrderState from '../enum/MerchOrderState';
 // one hung render can push a run past it.
 const RENDER_BUDGET_MS = 270_000;
 const COLORIZE_TIMEOUT_MS = 90_000;
-// Above the ~65s a tote takes on puppeteer's defaults, so this catches a hang rather than a slow
-// but working render.
-const ITEM_TIMEOUT_MS = 75_000;
+// A tote can take up to ~65s before puppeteer's own timeouts give up, and a cold Chromium start
+// comes on top of that, so this leaves room for a slow render that is still working and only
+// catches one that has hung.
+const ITEM_TIMEOUT_MS = 90_000;
 export const MAX_COLORIZED_PER_RUN = 2;
 const BATCH_LIMIT =
   MAX_COLORIZED_PER_RUN +
