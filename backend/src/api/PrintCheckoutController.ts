@@ -9,26 +9,17 @@ import * as ProductRegistry from '../business/merch/ProductRegistry';
 import * as UserService from '../business/users/UserService';
 import MerchInternalVariant from '../enum/MerchInternalVariant';
 
+interface PrintSessionItem {
+  photoIdentifier: string;
+  variant: MerchInternalVariant;
+  quantity: number;
+  colorize: boolean;
+}
+
 interface PrintSessionRequest {
   successUrl: string;
   cancelUrl: string;
-  photoIdentifier: string;
-  variant: MerchInternalVariant;
-  quantity: number;
-  colorize: boolean;
-}
-
-interface PrintCartItem {
-  photoIdentifier: string;
-  variant: MerchInternalVariant;
-  quantity: number;
-  colorize: boolean;
-}
-
-interface PrintCartSessionRequest {
-  successUrl: string;
-  cancelUrl: string;
-  items: PrintCartItem[];
+  items: PrintSessionItem[];
 }
 
 interface PrintProductApiResponse {
@@ -43,33 +34,6 @@ export class PrintCheckoutController {
   @Post('/session')
   public async createPrintSession(
     @Body() body: PrintSessionRequest,
-    @Request() req: express.Request
-  ): Promise<{ sessionId: string; url: string }> {
-    const userId = await getUserFromRequestOrCreateAndSetCookie(req);
-    const user = await UserService.getUser(userId);
-
-    try {
-      const { successUrl, cancelUrl, variant, quantity } = body;
-      const { photoIdentifier, colorize } = body;
-      return await MerchCheckoutService.createMerchCheckoutSession({
-        successUrl,
-        cancelUrl,
-        user,
-        items: [{ variant, quantity, print: { photoIdentifier, colorize } }],
-      });
-    } catch (err) {
-      if (err instanceof HttpError) {
-        throw err;
-      }
-      console.error('Failed to create print checkout session', err);
-      throw new InternalServerError('Failed to create session');
-    }
-  }
-
-  @Security('user-token')
-  @Post('/cart-session')
-  public async createPrintCartSession(
-    @Body() body: PrintCartSessionRequest,
     @Request() req: express.Request
   ): Promise<{ sessionId: string; url: string }> {
     const userId = await getUserFromRequestOrCreateAndSetCookie(req);
@@ -93,7 +57,7 @@ export class PrintCheckoutController {
       if (err instanceof HttpError) {
         throw err;
       }
-      console.error('Failed to create print cart checkout session', err);
+      console.error('Failed to create print checkout session', err);
       throw new InternalServerError('Failed to create session');
     }
   }
