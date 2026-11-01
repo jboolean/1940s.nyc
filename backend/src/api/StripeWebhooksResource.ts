@@ -57,6 +57,15 @@ type ProductMetadata = {
   'merch-internal-variant'?: MerchInternalVariant;
 };
 
+const HANDLED_PRODUCT_TYPES: ProductMetadata['product-type'][] = [
+  'color-credit',
+  'merch',
+  'tip',
+];
+
+const productMetadata = (lineItem: Stripe.LineItem): ProductMetadata =>
+  (lineItem.price?.product as Stripe.Product).metadata;
+
 type LineItemMetadata = {
   'photo-identifier'?: string;
   colorize?: 'true' | 'false';
@@ -142,6 +151,32 @@ router.post<'/', unknown, unknown, Stripe.Event, unknown>(
             )['product-type']
         );
 
+        // A product tagged with a type this webhook does not know, or a merch product that is not
+        // tagged merch, would otherwise be dropped without an error. Stop before creating anything:
+        // a non-2xx reply asks Stripe to retry, which is safe because nothing was created. An
+        // untagged product that is not merch keeps being handled as it always was.
+        const unhandled = (expandedSession.line_items?.data ?? []).filter(
+          (lineItem) => {
+            const type = productMetadata(lineItem)['product-type'];
+            return type
+              ? !HANDLED_PRODUCT_TYPES.includes(type)
+              : !!productMetadata(lineItem)['merch-internal-variant'];
+          }
+        );
+        if (unhandled.length) {
+          console.error(
+            '[merch-alert] checkout session has line items with a product-type this webhook does not handle; nothing was created',
+            {
+              sessionId: session.id,
+              lineItems: unhandled.map((lineItem) => ({
+                id: lineItem.id,
+                productType: productMetadata(lineItem)['product-type'],
+              })),
+            }
+          );
+          return res.status(500).send();
+        }
+
         const creditsLineItems = byProductType['color-credit'] ?? [];
 
         // fulfill credit purchases
@@ -220,11 +255,16 @@ router.post<'/', unknown, unknown, Stripe.Event, unknown>(
           console.log('Created merch order', order);
         }
 
-        // Print purchases are not tips, so they do not earn credits.
-        if (
-          !creditsLineItems.length &&
-          !newItems.some((item) => isPrintVariant(item.variant))
-        ) {
+        // Print purchases are not tips, so they do not earn credits. They are found from the
+        // products on the session, so a print can never be credited because it was not turned
+        // into an order item.
+        const buysPrint = (expandedSession.line_items?.data ?? []).some(
+          (lineItem) => {
+            const variant = productMetadata(lineItem)['merch-internal-variant'];
+            return !!variant && isPrintVariant(variant);
+          }
+        );
+        if (!creditsLineItems.length && !buysPrint) {
           // Grant some credits from their non-credit payment, see comment on LedgerService
           if (
             userId &&

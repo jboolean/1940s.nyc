@@ -201,4 +201,51 @@ describe('checkout.session.completed for merch', () => {
     );
     expect(create).not.toHaveBeenCalled();
   });
+
+  it.each([
+    [
+      'tagged with a type the webhook does not handle',
+      { 'product-type': 'print' },
+    ],
+    ['not tagged merch', {}],
+  ])('refuses, creating nothing, a print product %s', async (_name, tag) => {
+    const mistagged = printLineItem({
+      price: {
+        product: {
+          metadata: {
+            ...tag,
+            'merch-internal-variant': MerchInternalVariant.PRINT_HPR_8X12,
+          },
+        },
+      },
+    });
+    const status = await deliver(
+      session({ line_items: { data: [mistagged] } })
+    );
+
+    expect(status).toBe(500);
+    expect(console.error).toHaveBeenCalledWith(
+      expect.stringContaining('[merch-alert]'),
+      expect.anything()
+    );
+    expect(create).not.toHaveBeenCalled();
+    expect(LedgerService.grantCreditsForTip).not.toHaveBeenCalled();
+  });
+
+  it('still treats an untagged product that is not merch as it always has', async () => {
+    const plain = {
+      id: 'li_3',
+      quantity: 1,
+      price: { product: { metadata: {} } },
+    };
+    const status = await deliver(session({ line_items: { data: [plain] } }));
+
+    expect(status).toBe(200);
+    expect(create).not.toHaveBeenCalled();
+    expect(LedgerService.grantCreditsForTip).toHaveBeenCalledWith(
+      9,
+      3800,
+      'pi_1'
+    );
+  });
 });
