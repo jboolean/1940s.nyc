@@ -58,5 +58,5 @@ export function getMerchLabel(variant: MerchInternalVariant): string {
 }
 
 export function getMerchProvider(variant: MerchInternalVariant): MerchProvider {
-  return MERCH_CATALOG[variant].provider;
+  return MERCH_CATALOG[variant]?.provider ?? MerchProvider.PRINTFUL;
 }
