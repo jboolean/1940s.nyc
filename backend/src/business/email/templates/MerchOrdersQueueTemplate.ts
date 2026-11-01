@@ -3,7 +3,9 @@ import EmailStreamType from './EmailStreamType';
 import Senders from './Senders';
 
 type OrdersQueueTemplateData = {
-  // Null when there are none of that kind, so the template can leave that paragraph out.
+  // What the deployed template reads. The two objects below are what the updated template will
+  // use; either is null when there are none of that kind, so its paragraph is left out.
+  ordersCount: number;
   orders: { count: number } | null;
   exceptions: { count: number } | null;
   reviewMerchUrl: string;

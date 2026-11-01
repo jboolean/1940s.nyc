@@ -51,8 +51,22 @@ describe('checkMerchQueue', () => {
 
     expect(EmailService.sendTemplateEmail).toHaveBeenCalledWith('queue-email');
     expect(context()).toMatchObject({
+      ordersCount: 0,
       orders: null,
       exceptions: { count: 2 },
+    });
+  });
+
+  it('sends the order count on its own, with the exceptions paragraph left out', async () => {
+    jest.mocked(getOrdersForReview).mockResolvedValue([{}] as never);
+
+    await checkMerchQueue();
+
+    expect(EmailService.sendTemplateEmail).toHaveBeenCalledWith('queue-email');
+    expect(context()).toMatchObject({
+      ordersCount: 1,
+      orders: { count: 1 },
+      exceptions: null,
     });
   });
 
@@ -63,6 +77,7 @@ describe('checkMerchQueue', () => {
     await checkMerchQueue();
 
     expect(context()).toMatchObject({
+      ordersCount: 1,
       orders: { count: 1 },
       exceptions: { count: 2 },
     });

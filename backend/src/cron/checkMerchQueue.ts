@@ -27,6 +27,7 @@ export default async function checkMerchQueue(): Promise<void> {
 
   const email = ReviewQueueStaleTemplate.createTemplatedEmail({
     templateContext: {
+      ordersCount: ordersForReview.length,
       orders: ordersForReview.length ? { count: ordersForReview.length } : null,
       exceptions: ordersWithExceptions.length
         ? { count: ordersWithExceptions.length }
