@@ -7,11 +7,10 @@ import type Stripe from 'stripe';
 import EmailCampaignService from '../business/email/EmailCampaignService';
 import * as LedgerService from '../business/ledger/LedgerService';
 import * as MerchOrderService from '../business/merch/MerchOrderService';
-import { getPrintProduct } from '../business/prodigi/printCatalog';
+import { isPrintVariant } from '../business/merch/merchCatalog';
 import { PRODIGI_SHIPPING_METHOD_METADATA_KEY } from '../business/prodigi/printShipping';
 import * as UserService from '../business/users/UserService';
 import isProduction from '../business/utils/isProduction';
-import { PrintVariant } from '../entities/MerchCustomizationOptions';
 import MerchInternalVariant from '../enum/MerchInternalVariant';
 import MerchItemState from '../enum/MerchItemState';
 const router = express.Router();
@@ -47,7 +46,7 @@ export function printLineItemToOrderItems(
     );
   }
   const customizationOptions = {
-    variant: variant as PrintVariant,
+    variant,
     photoIdentifier,
     colorize: purchase.colorize === 'true',
   };

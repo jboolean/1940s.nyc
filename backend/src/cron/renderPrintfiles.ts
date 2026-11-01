@@ -1,4 +1,5 @@
 import { colorizeForPrint } from '../business/color/ColorService';
+import { PRINT_VARIANTS } from '../business/merch/merchCatalog';
 import { logCountMetric } from '../business/utils/metrics';
 import {
   copyOriginalToPrintJpeg,

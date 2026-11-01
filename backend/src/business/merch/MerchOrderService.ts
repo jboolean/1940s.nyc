@@ -16,8 +16,8 @@ import OrderCustomizeTemplate from '../email/templates/OrderCustomizeTemplate';
 import { OrderTemplateData } from '../email/templates/OrderEmailTemplateData';
 import OrderShippedTemplate from '../email/templates/OrderShippedTemplate';
 import * as UserService from '../users/UserService';
-import { summarizeItems } from '../prodigi/printOrderSummary';
 import isProduction from '../utils/isProduction';
+import { summarizeItems } from './orderSummary';
 import type { CreatedProviderOrder } from './providers/FulfillmentProvider';
 import getFulfillmentProvider, {
   selectProviderForItems,

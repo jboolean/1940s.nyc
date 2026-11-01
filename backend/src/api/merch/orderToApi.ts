@@ -1,11 +1,13 @@
 import MerchOrder from '../../entities/MerchOrder';
 import MerchOrderItem from '../../entities/MerchOrderItem';
+import { getMerchLabel } from '../../business/merch/merchCatalog';
 import { MerchOrderApiModel, MerchOrderItemApiModel } from './OrderApiModel';
 
 export function orderItemToApi(item: MerchOrderItem): MerchOrderItemApiModel {
   return {
     id: item.id,
     internalVariant: item.internalVariant,
+    label: getMerchLabel(item.internalVariant),
     customizationOptions: item.customizationOptions ?? undefined,
     state: item.state,
   };

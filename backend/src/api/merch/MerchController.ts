@@ -14,7 +14,7 @@ import * as express from 'express';
 import { BadRequest, NotFound } from 'http-errors';
 import { AppDataSource } from '../../createConnection';
 import * as MerchOrderService from '../../business/merch/MerchOrderService';
-import { isPrintVariant } from '../../business/prodigi/printCatalog';
+import { isPrintVariant } from '../../business/merch/merchCatalog';
 import absurd from '../../business/utils/absurd';
 import {
   getPrintfileUrl,

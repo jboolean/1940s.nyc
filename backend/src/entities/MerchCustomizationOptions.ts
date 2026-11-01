@@ -1,3 +1,4 @@
+import type { PrintVariant } from '../business/merch/merchCatalog';
 import MerchInternalVariant from '../enum/MerchInternalVariant';
 
 type Color = 'red' | 'green' | 'creme' | 'dark';
@@ -10,11 +11,6 @@ interface ToteBagCustomizationOptions {
   foregroundColor?: Color;
   backgroundColor?: Color;
 }
-
-export type PrintVariant =
-  | MerchInternalVariant.PRINT_HPR_4X6
-  | MerchInternalVariant.PRINT_HPR_8X12
-  | MerchInternalVariant.PRINT_FAP_8X12_FRAMED;
 
 export interface PrintCustomizationOptions {
   variant: PrintVariant;
