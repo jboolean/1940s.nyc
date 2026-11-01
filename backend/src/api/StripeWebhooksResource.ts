@@ -8,7 +8,7 @@ import type Stripe from 'stripe';
 import EmailCampaignService from '../business/email/EmailCampaignService';
 import * as LedgerService from '../business/ledger/LedgerService';
 import * as MerchOrderService from '../business/merch/MerchOrderService';
-import { isPrintVariant } from '../business/prodigi/printCatalog';
+import { getPrintProduct } from '../business/prodigi/printCatalog';
 import { PRODIGI_SHIPPING_METHOD_METADATA_KEY } from '../business/prodigi/printShipping';
 import * as UserService from '../business/users/UserService';
 import isProduction from '../business/utils/isProduction';
@@ -17,14 +17,17 @@ import MerchInternalVariant from '../enum/MerchInternalVariant';
 import MerchItemState from '../enum/MerchItemState';
 const router = express.Router();
 
+// The per-purchase customization choices ride on the line item's own metadata. The variant
+// comes off the product, which is keyed by variant id.
 export function printLineItemToOrderItems(
   lineItem: Stripe.LineItem
 ): MerchOrderService.NewOrderItem[] {
-  const metadata = (lineItem.price?.product as Stripe.Product)
-    .metadata as ProductMetadata;
-  const variant = metadata['merch-internal-variant'];
-  const photoIdentifier = metadata['photo-identifier'];
-  if (!variant || !isPrintVariant(variant) || !photoIdentifier) {
+  const variant = (
+    (lineItem.price?.product as Stripe.Product).metadata as ProductMetadata
+  )['merch-internal-variant'];
+  const purchase = (lineItem.metadata ?? {}) as LineItemMetadata;
+  const photoIdentifier = purchase['photo-identifier'];
+  if (!variant || !getPrintProduct(variant) || !photoIdentifier) {
     throw new Error(
       `Print line item ${lineItem.id} is missing its variant or photo identifier`
     );
@@ -32,7 +35,7 @@ export function printLineItemToOrderItems(
   const customizationOptions = {
     variant: variant as PrintVariant,
     photoIdentifier,
-    colorize: metadata.colorize === 'true',
+    colorize: purchase.colorize === 'true',
   };
   return Array.from({ length: lineItem.quantity ?? 1 }, () => ({
     variant,
@@ -44,6 +47,9 @@ export function printLineItemToOrderItems(
 type ProductMetadata = {
   'product-type'?: 'color-credit' | 'merch' | 'print' | 'tip';
   'merch-internal-variant'?: MerchInternalVariant;
+};
+
+type LineItemMetadata = {
   'photo-identifier'?: string;
   colorize?: 'true' | 'false';
 };

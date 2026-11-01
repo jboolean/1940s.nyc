@@ -65,11 +65,10 @@ function printLineItem(overrides: object = {}): object {
         metadata: {
           'product-type': 'print',
           'merch-internal-variant': MerchInternalVariant.PRINT_HPR_8X12,
-          'photo-identifier': 'p1',
-          colorize: 'true',
         },
       },
     },
+    metadata: { 'photo-identifier': 'p1', colorize: 'true' },
     ...overrides,
   };
 }

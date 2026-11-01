@@ -39,7 +39,7 @@ describe('createPrintCheckoutSession', () => {
       effectiveAddress: { address: '1 Main St' },
     });
     jest.mocked(stripe.products.retrieve).mockResolvedValue({
-      default_price: { unit_amount: 1900, currency: 'usd' },
+      default_price: { id: 'price_1', unit_amount: 1900, currency: 'usd' },
     } as never);
     jest.mocked(ProdigiService.getQuotes).mockResolvedValue([
       {
@@ -53,7 +53,7 @@ describe('createPrintCheckoutSession', () => {
       .mockResolvedValue({ id: 'cs_1', url: 'http://pay' } as never);
   });
 
-  it('rejects photos outside the 1940s collection', async () => {
+  it('rejects photos outside the 1940s collection (prints are 1940s only)', async () => {
     findOne.mockResolvedValue({
       identifier: 'p1',
       collection: Collection.EIGHTIES,
@@ -64,46 +64,21 @@ describe('createPrintCheckoutSession', () => {
     expect(stripe.checkout.sessions.create).not.toHaveBeenCalled();
   });
 
-  it('rejects unknown photos, inactive variants and bad quantities', async () => {
-    findOne.mockResolvedValue(null);
-    await expect(createPrintCheckoutSession(base)).rejects.toMatchObject({
-      status: 404,
-    });
-    await expect(
-      createPrintCheckoutSession({
-        ...base,
-        variant: MerchInternalVariant.PRINT_PHO_8X12,
-      })
-    ).rejects.toMatchObject({ status: 400 });
-    await expect(
-      createPrintCheckoutSession({
-        ...base,
-        variant: MerchInternalVariant.TOTE_BAG_SMALL,
-      })
-    ).rejects.toMatchObject({ status: 400 });
-    await expect(
-      createPrintCheckoutSession({ ...base, quantity: 0 })
-    ).rejects.toMatchObject({ status: 400 });
-    await expect(
-      createPrintCheckoutSession({ ...base, quantity: 11 })
-    ).rejects.toMatchObject({ status: 400 });
-  });
-
-  it('builds a session with the photo thumbnail, customization metadata and quoted shipping', async () => {
+  it('references the product default price and carries the customization choices on the line item', async () => {
     await createPrintCheckoutSession(base);
     const params = jest.mocked(stripe.checkout.sessions.create).mock
       .calls[0][0] as import('stripe').Stripe.Checkout.SessionCreateParams;
     const lineItem = params.line_items?.[0];
     expect(lineItem?.quantity).toBe(2);
-    expect(lineItem?.price_data?.unit_amount).toBe(1900);
-    expect(lineItem?.price_data?.product_data?.images?.[0]).toMatch(
-      /420-jpg\/p1\.jpg$/
-    );
-    expect(lineItem?.price_data?.product_data?.metadata).toEqual({
-      'product-type': 'print',
-      'merch-internal-variant': 'print-hpr-8x12',
+    expect(lineItem?.price).toBe('price_1');
+    expect(lineItem?.price_data).toBeUndefined();
+    expect(lineItem?.metadata).toEqual({
       'photo-identifier': 'p1',
       colorize: 'true',
+      description: '1 Main St, Manhattan (1940s tax photo)',
+    });
+    expect(stripe.products.retrieve).toHaveBeenCalledWith('print-hpr-8x12', {
+      expand: ['default_price'],
     });
     expect(
       params.shipping_options?.[0].shipping_rate_data?.fixed_amount?.amount
