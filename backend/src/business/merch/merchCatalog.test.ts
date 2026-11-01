@@ -1,4 +1,5 @@
 import MerchInternalVariant from '../../enum/MerchInternalVariant';
+import type { PrintVariant as EntityPrintVariant } from '../../entities/MerchCustomizationOptions';
 import { getPrintProduct, PRINT_PRODUCTS } from '../prodigi/printCatalog';
 import {
   getMerchLabel,
@@ -8,7 +9,23 @@ import {
   PRINT_VARIANTS,
 } from './merchCatalog';
 
+// The entity spells the prints out because tsoa cannot resolve the derived union from the catalog.
+// Requiring each side to be assignable to the other makes this fail to compile if they drift apart,
+// so the prints are still stated in one place.
+type CatalogPrintVariant = (typeof PRINT_VARIANTS)[number];
+const entityUnionMatchesCatalog: [EntityPrintVariant] extends [
+  CatalogPrintVariant,
+]
+  ? [CatalogPrintVariant] extends [EntityPrintVariant]
+    ? true
+    : never
+  : never = true;
+
 describe('merch catalog', () => {
+  it('holds the entity print union level with the catalog', () => {
+    expect(entityUnionMatchesCatalog).toBe(true);
+  });
+
   it('lists every variant we sell', () => {
     expect(Object.keys(MERCH_CATALOG).sort()).toEqual(
       Object.values(MerchInternalVariant).sort()

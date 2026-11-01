@@ -1,5 +1,6 @@
 import MerchInternalVariant from '../../enum/MerchInternalVariant';
 import MerchProvider from '../../enum/MerchProvider';
+import type { PrintfileExtension } from '../utils/printfileUtils';
 
 // How a variant's print file is made, which is what the render cron branches on.
 type MerchKind = 'tote' | 'print';
@@ -8,30 +9,36 @@ interface MerchVariantInfo {
   label: string;
   kind: MerchKind;
   provider: MerchProvider;
+  printfileExtension: PrintfileExtension;
 }
 
-// The one list of what we sell: the name the customer sees, how it is made, and who prints it.
-// Every variant has to appear here, so a new one cannot be sold without a label and a provider.
+// The one list of what we sell: the name the customer sees, how it is made, who prints it and what
+// the render cron writes. Every variant has to appear here, so a new one cannot be sold without all
+// of that.
 export const MERCH_CATALOG = {
   [MerchInternalVariant.TOTE_BAG_SMALL]: {
     label: 'Tote bag',
     kind: 'tote',
     provider: MerchProvider.PRINTFUL,
+    printfileExtension: 'png',
   },
   [MerchInternalVariant.PRINT_HPR_4X6]: {
     label: '4×6 print',
     kind: 'print',
     provider: MerchProvider.PRODIGI,
+    printfileExtension: 'jpg',
   },
   [MerchInternalVariant.PRINT_HPR_8X12]: {
     label: '8×12 print',
     kind: 'print',
     provider: MerchProvider.PRODIGI,
+    printfileExtension: 'jpg',
   },
   [MerchInternalVariant.PRINT_FAP_8X12_FRAMED]: {
     label: '8×12 framed print',
     kind: 'print',
     provider: MerchProvider.PRODIGI,
+    printfileExtension: 'jpg',
   },
 } as const satisfies Record<MerchInternalVariant, MerchVariantInfo>;
 
@@ -59,4 +66,10 @@ export function getMerchLabel(variant: MerchInternalVariant): string {
 
 export function getMerchProvider(variant: MerchInternalVariant): MerchProvider {
   return MERCH_CATALOG[variant]?.provider ?? MerchProvider.PRINTFUL;
+}
+
+export function getPrintfileExtensionForVariant(
+  variant: MerchInternalVariant
+): PrintfileExtension {
+  return MERCH_CATALOG[variant]?.printfileExtension ?? 'png';
 }

@@ -14,7 +14,7 @@ import * as express from 'express';
 import { BadRequest, NotFound } from 'http-errors';
 import { AppDataSource } from '../../createConnection';
 import * as MerchOrderService from '../../business/merch/MerchOrderService';
-import { isPrintVariant } from '../../business/merch/merchCatalog';
+import { getPrintfileExtensionForVariant } from '../../business/merch/merchCatalog';
 import absurd from '../../business/utils/absurd';
 import {
   getPrintfileUrl,
@@ -118,7 +118,7 @@ export class MerchController extends Controller {
     const item = await AppDataSource.getRepository(
       MerchOrderItem
     ).findOneByOrFail({ id: itemId });
-    return isPrintVariant(item.internalVariant) ? 'jpg' : 'png';
+    return getPrintfileExtensionForVariant(item.internalVariant);
   }
 
   @Security('netlify', ['moderator'])

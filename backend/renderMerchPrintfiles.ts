@@ -1,6 +1,5 @@
 import addMerchItemsToOrderImpl from './src/cron/addMerchItemsToOrder';
 import renderMerchPrintfilesImpl from './src/cron/renderMerchPrintfiles';
-import renderPrintfilesImpl from './src/cron/renderPrintfiles';
 import {
   submitPendingOrders,
   syncSubmittedOrders,
@@ -21,7 +20,6 @@ export const handler = withSetup(async () => {
   // Quick steps first, so slow rendering can never keep them from running.
   await runStep('submit orders', submitPendingOrders);
   await runStep('sync submitted orders', syncSubmittedOrders);
-  await runStep('render tote printfiles', renderMerchPrintfilesImpl);
-  await runStep('render print files', renderPrintfilesImpl);
+  await runStep('render printfiles', renderMerchPrintfilesImpl);
   await runStep('add items to orders', addMerchItemsToOrderImpl);
 });
