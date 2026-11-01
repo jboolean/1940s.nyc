@@ -122,6 +122,27 @@ describe('renderMerchPrintfiles', () => {
     expect(renderToteBag).toHaveBeenCalledTimes(1);
   });
 
+  it('gives up an exhausted item without spending a colorize slot on it', async () => {
+    getMany.mockResolvedValue([
+      printItem(1, true, MAX_PRINTFILE_ATTEMPTS),
+      printItem(2, true),
+      toteItem(3),
+    ]);
+    jest.mocked(colorizeForPrint).mockResolvedValue(Buffer.from('jpg'));
+
+    await renderMerchPrintfiles();
+
+    expect(update).toHaveBeenCalledWith(1, {
+      state: MerchItemState.PRINTFILE_FAILED,
+    });
+    // The fresh colorized item gets the slot the exhausted one would have taken.
+    expect(colorizeForPrint).toHaveBeenCalledTimes(1);
+    expect(update).toHaveBeenCalledWith(2, {
+      state: MerchItemState.READY_FOR_FULFILLMENT,
+    });
+    expect(renderToteBag).toHaveBeenCalledTimes(1);
+  });
+
   it('renders a tote and a print, uploading each with its own extension', async () => {
     getMany.mockResolvedValue([toteItem(1), printItem(2, false)]);
     await renderMerchPrintfiles();

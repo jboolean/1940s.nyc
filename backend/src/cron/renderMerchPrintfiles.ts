@@ -193,6 +193,15 @@ export default async function renderMerchPrintfiles(): Promise<void> {
       continue;
     }
 
+    // Count the attempt first, so an item whose call hangs still runs out of attempts.
+    const attempts = (item.printfileAttempts ?? 0) + 1;
+    if (attempts > MAX_PRINTFILE_ATTEMPTS) {
+      await giveUp(`still failing after ${MAX_PRINTFILE_ATTEMPTS} attempts`);
+      continue;
+    }
+
+    // Spend the colorize budget only on an item that will actually render, so an exhausted one
+    // gives up without costing a fresh item its slot.
     if (needsColorizing(item, options)) {
       if (colorizedThisRun >= MAX_COLORIZED_PER_RUN) {
         continue;
@@ -200,12 +209,6 @@ export default async function renderMerchPrintfiles(): Promise<void> {
       colorizedThisRun += 1;
     }
 
-    // Count the attempt first, so an item whose call hangs still runs out of attempts.
-    const attempts = (item.printfileAttempts ?? 0) + 1;
-    if (attempts > MAX_PRINTFILE_ATTEMPTS) {
-      await giveUp(`still failing after ${MAX_PRINTFILE_ATTEMPTS} attempts`);
-      continue;
-    }
     await repository.update(item.id, {
       printfileAttempts: attempts,
     });
