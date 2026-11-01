@@ -11,13 +11,16 @@ jest.mock('./PrintfulFulfillmentProvider', () => ({
 }));
 jest.mock('./ProdigiFulfillmentProvider', () => ({
   __esModule: true,
-  default: { requiresReview: false },
+  default: { requiresReview: true },
 }));
 
 describe('provider capabilities', () => {
-  it('holds every provider back for review except the ones that submit themselves', () => {
-    expect(getProvidersNeedingReview()).toEqual([MerchProvider.PRINTFUL]);
-    expect(getProvidersWithoutReview()).toEqual([MerchProvider.PRODIGI]);
+  it('lists every provider as needing review while none submit on their own', () => {
+    expect(getProvidersNeedingReview()).toEqual([
+      MerchProvider.PRINTFUL,
+      MerchProvider.PRODIGI,
+    ]);
+    expect(getProvidersWithoutReview()).toEqual([]);
   });
 
   it('agrees with each provider on which side it is on', () => {
