@@ -17,8 +17,6 @@ import { buildShippingOptions } from './printShipping';
 
 const MAX_QUANTITY = 10;
 
-export const PRINT_PRODUCT_TYPE = 'print';
-
 export interface AvailablePrintProduct {
   variant: MerchInternalVariant;
   label: string;
