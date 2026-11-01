@@ -69,7 +69,7 @@ function printLineItem(overrides: object = {}): object {
     price: {
       product: {
         metadata: {
-          'product-type': 'print',
+          'product-type': 'merch',
           'merch-internal-variant': MerchInternalVariant.PRINT_HPR_8X12,
         },
       },
@@ -90,7 +90,7 @@ const address = {
   },
 };
 
-describe('checkout.session.completed for prints', () => {
+describe('checkout.session.completed for merch', () => {
   const create = jest.mocked(MerchOrderService.createMerchOrder);
   beforeEach(() => {
     jest.clearAllMocks();
@@ -121,7 +121,28 @@ describe('checkout.session.completed for prints', () => {
     expect(LedgerService.grantCreditsForTip).not.toHaveBeenCalled();
   });
 
-  it('creates a tote order with no shipping method', async () => {
+  it('turns each print copy into a customized item carrying its photo', async () => {
+    await deliver(session());
+    const options = {
+      variant: MerchInternalVariant.PRINT_HPR_8X12,
+      photoIdentifier: 'p1',
+      colorize: true,
+    };
+    expect(create.mock.calls[0][3]).toEqual([
+      {
+        variant: 'print-hpr-8x12',
+        customizationOptions: options,
+        state: 'customized',
+      },
+      {
+        variant: 'print-hpr-8x12',
+        customizationOptions: options,
+        state: 'customized',
+      },
+    ]);
+  });
+
+  it('creates a tote order with no shipping method and grants its tip credits', async () => {
     const tote = {
       id: 'li_2',
       quantity: 2,
@@ -134,8 +155,12 @@ describe('checkout.session.completed for prints', () => {
         },
       },
     };
+    // The tote's fixed shipping rate, which names no shipping method.
     await deliver(
-      session({ line_items: { data: [tote] }, shipping_cost: undefined })
+      session({
+        line_items: { data: [tote] },
+        shipping_cost: { shipping_rate: { metadata: {} } },
+      })
     );
 
     expect(create).toHaveBeenCalledWith(
@@ -144,6 +169,11 @@ describe('checkout.session.completed for prints', () => {
       expect.anything(),
       [{ variant: 'tote-bag-small' }, { variant: 'tote-bag-small' }],
       undefined
+    );
+    expect(LedgerService.grantCreditsForTip).toHaveBeenCalledWith(
+      9,
+      3800,
+      'pi_1'
     );
   });
 
@@ -166,7 +196,7 @@ describe('checkout.session.completed for prints', () => {
 
     expect(status).toBe(500);
     expect(console.error).toHaveBeenCalledWith(
-      expect.stringContaining('mixes tote bags and prints'),
+      expect.stringContaining('mixes printers'),
       expect.anything()
     );
     expect(create).not.toHaveBeenCalled();
