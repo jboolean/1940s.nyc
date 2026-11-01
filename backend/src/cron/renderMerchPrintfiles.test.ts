@@ -6,6 +6,7 @@ import renderToteBag from '../business/merch/renderToteBag';
 import renderMerchPrintfiles, {
   MAX_COLORIZED_PER_RUN,
   MAX_PRINTFILE_ATTEMPTS,
+  withTimeout,
 } from './renderMerchPrintfiles';
 
 const getMany = jest.fn();
@@ -28,14 +29,14 @@ jest.mock('../createConnection', () => ({
   },
 }));
 jest.mock('../business/color/ColorService', () => ({
-  colorizeForPrint: jest.fn(),
+  colorizeForPrint: jest.fn(() => Promise.resolve(Buffer.from('jpg'))),
 }));
 jest.mock('../business/merch/renderToteBag', () => ({
   __esModule: true,
   default: jest.fn(() => Promise.resolve(Buffer.from('png'))),
 }));
 jest.mock('../business/utils/printfileUtils', () => ({
-  copyOriginalToPrintJpeg: jest.fn(),
+  copyOriginalToPrintJpeg: jest.fn(() => Promise.resolve()),
   uploadPrintfile: jest.fn(),
 }));
 
@@ -141,6 +142,47 @@ describe('renderMerchPrintfiles', () => {
       state: MerchItemState.READY_FOR_FULFILLMENT,
     });
     expect(renderToteBag).toHaveBeenCalledTimes(1);
+  });
+
+  it('names the variant it cannot render rather than asserting it is impossible', async () => {
+    const unknown = {
+      ...toteItem(5),
+      internalVariant: 'tote-bag-large' as MerchInternalVariant,
+    };
+    getMany.mockResolvedValue([unknown]);
+
+    await renderMerchPrintfiles();
+
+    expect(renderToteBag).not.toHaveBeenCalled();
+    expect(update).toHaveBeenCalledWith(5, {
+      printfileError: 'Error: No renderer for variant tote-bag-large',
+    });
+  });
+
+  it('rejects with a timeout when the work outlasts its slot', async () => {
+    await expect(
+      withTimeout(0, 'Colorization', new Promise<void>(() => undefined))
+    ).rejects.toThrow('Colorization timed out');
+  });
+
+  it('logs the cause when the work fails after its slot has ended', async () => {
+    let failWork: (e: Error) => void = () => undefined;
+    const work = new Promise<void>((_, reject) => {
+      failWork = reject;
+    });
+
+    await expect(withTimeout(0, 'Colorization', work)).rejects.toThrow(
+      'Colorization timed out'
+    );
+    failWork(new Error('palette down'));
+    // Two ticks: one for the rejection to reach the handler, one for it to run.
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(console.error).toHaveBeenCalledWith(
+      'Colorization failed after its timeout',
+      expect.any(Error)
+    );
   });
 
   it('renders a tote and a print, uploading each with its own extension', async () => {

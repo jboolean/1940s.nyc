@@ -6,12 +6,12 @@ import {
 } from '../business/merch/merchCatalog';
 import renderToteBag from '../business/merch/renderToteBag';
 import { getPrintProduct } from '../business/prodigi/printCatalog';
-import { logCountMetric } from '../business/utils/metrics';
 import {
   copyOriginalToPrintJpeg,
   PrintfileExtension,
   uploadPrintfile,
 } from '../business/utils/printfileUtils';
+import { logCountMetric } from '../business/utils/metrics';
 import MerchOrderItem from '../entities/MerchOrderItem';
 import MerchCustomizationOptions, {
   PrintCustomizationOptions,
@@ -20,7 +20,6 @@ import MerchCustomizationOptions, {
 import MerchInternalVariant from '../enum/MerchInternalVariant';
 import MerchItemState from '../enum/MerchItemState';
 import MerchOrderState from '../enum/MerchOrderState';
-import absurd from '../business/utils/absurd';
 
 // The Lambda allows 300s and the submit and sync steps that run before rendering share it, so
 // rendering keeps to RENDER_BUDGET_MS. Colorizing is the one render that can take a minute, so it is
@@ -50,17 +49,29 @@ interface RenderedPrintfile {
 
 // The work behind the timeout is not cancelled, so a render that is still running when its slot ends
 // keeps running in the background. It is bounded by the batch size and the invocation ends with it.
-async function withTimeout<T>(
+export async function withTimeout<T>(
   ms: number,
   what: string,
   work: Promise<T>
 ): Promise<T> {
   let timer: NodeJS.Timeout | undefined;
+  let timedOut = false;
+  // The work is not cancelled and can still fail after its slot has ended, and the stored error
+  // only says that it timed out, so the cause is logged here rather than lost. Before the timeout
+  // the rejection is the caller's to handle, so it is left alone.
+  void work.catch((e) => {
+    if (timedOut) {
+      console.error(`${what} failed after its timeout`, e);
+    }
+  });
   try {
     return await Promise.race([
       work,
       new Promise<never>((_, reject) => {
-        timer = setTimeout(() => reject(new Error(`${what} timed out`)), ms);
+        timer = setTimeout(() => {
+          timedOut = true;
+          reject(new Error(`${what} timed out`));
+        }, ms);
       }),
     ]);
   } finally {
@@ -138,8 +149,14 @@ function render(
         throw new Error('Print item does not carry print options');
       }
       return renderPrint(item, options);
+    // The readers tolerate a variant this build no longer sells and degrade, so the renderer does
+    // too: an unknown one is a variant nothing here can print, not a bug in the code. Throwing the
+    // variant by name keeps the stored error honest, where asserting it was unreachable would have
+    // the item fail every attempt with no real reason.
     default:
-      absurd(item.internalVariant);
+      throw new Error(
+        `No renderer for variant ${String(item.internalVariant)}`
+      );
   }
 }
 
