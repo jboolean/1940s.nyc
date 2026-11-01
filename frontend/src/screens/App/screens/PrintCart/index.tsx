@@ -3,8 +3,8 @@ import { NumericFormat } from 'react-number-format';
 
 import Button from 'shared/components/Button';
 import FourtiesModal from 'shared/components/Modal';
-import Select from 'shared/components/Select';
 import TextButton from 'shared/components/TextButton';
+import TextInput from 'shared/components/TextInput';
 import recordEvent from 'shared/utils/recordEvent';
 import { useFeatureFlag } from '../../shared/stores/FeatureFlagsStore';
 import FeatureFlag from '../../shared/types/FeatureFlag';
@@ -55,7 +55,41 @@ export function PrintCartButton({
   );
 }
 
-const QUANTITIES = Array.from({ length: MAX_ITEM_QUANTITY }, (_, i) => i + 1);
+// Typed text, so the field can be cleared and retyped; only values in range are applied.
+function QuantityInput({
+  quantity,
+  onChange,
+}: {
+  quantity: number;
+  onChange: (quantity: number) => void;
+}): React.JSX.Element {
+  const [text, setText] = React.useState(String(quantity));
+  React.useEffect(() => setText(String(quantity)), [quantity]);
+  const parse = (value: string): number =>
+    /^\d+$/.test(value) ? parseInt(value, 10) : NaN;
+  return (
+    <TextInput
+      type="number"
+      min={1}
+      max={MAX_ITEM_QUANTITY}
+      step="1"
+      value={text}
+      onChange={(e) => {
+        setText(e.target.value);
+        const n = parse(e.target.value);
+        if (n >= 1 && n <= MAX_ITEM_QUANTITY) onChange(n);
+      }}
+      onBlur={() => {
+        const n = parse(text);
+        const clamped = Math.min(MAX_ITEM_QUANTITY, Math.max(1, n || 1));
+        setText(String(clamped));
+        onChange(clamped);
+      }}
+      className={stylesheet.quantityInput}
+      data-testid="print-cart-quantity"
+    />
+  );
+}
 
 export default function PrintCartModal(): React.JSX.Element {
   const { items, isOpen, close, removeItem, setQuantity } = usePrintCartStore();
@@ -195,20 +229,10 @@ export default function PrintCartModal(): React.JSX.Element {
                         <span className={stylesheet.visuallyHidden}>
                           Quantity
                         </span>
-                        <Select
-                          value={item.quantity}
-                          onChange={(e) =>
-                            setQuantity(item, parseInt(e.target.value, 10))
-                          }
-                          className={stylesheet.quantitySelect}
-                          data-testid="print-cart-quantity"
-                        >
-                          {QUANTITIES.map((q) => (
-                            <option key={q} value={q}>
-                              {q}
-                            </option>
-                          ))}
-                        </Select>
+                        <QuantityInput
+                          quantity={item.quantity}
+                          onChange={(quantity) => setQuantity(item, quantity)}
+                        />
                       </label>
                       <TextButton onClick={() => removeItem(item)}>
                         Remove
