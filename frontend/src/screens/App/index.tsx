@@ -26,7 +26,11 @@ import { OptimizeExperimentsProvider } from 'shared/utils/OptimizeExperiments';
 import 'utils/optimize';
 import AdminRoutes from './screens/Admin/AdminRoutes';
 import Corrections from './screens/Corrections';
-import { usePrintOrdersEnabled } from './shared/stores/FeatureFlagsStore';
+import {
+  useFeatureFlag,
+  usePrintOrdersEnabled,
+} from './shared/stores/FeatureFlagsStore';
+import FeatureFlag from './shared/types/FeatureFlag';
 import CreditPurchaseModal, {
   CreditPurchaseSuccessMessage,
   openCreditPurchaseModal,
@@ -83,6 +87,7 @@ function DatadogRouteTracker(): null {
 
 function Modals(): React.JSX.Element {
   const printOrdersEnabled = usePrintOrdersEnabled();
+  const salesEnabled = useFeatureFlag(FeatureFlag.ENABLE_SALES);
   const [isThankYouOpen, setThankYouOpen] = React.useState(thankYouInitial);
   const [isCreditPurchaseSuccessOpen, setCreditPurchaseSuccessOpen] =
     React.useState(creditSuccessInitial);
@@ -108,10 +113,10 @@ function Modals(): React.JSX.Element {
   }, [openTipJar]);
 
   React.useEffect(() => {
-    if (openMerchOnLoad) {
+    if (openMerchOnLoad && salesEnabled) {
       openMerchModal();
     }
-  }, []);
+  }, [salesEnabled]);
 
   React.useEffect(() => {
     // Without the flag there is no checkout to come back from, so the URL should
