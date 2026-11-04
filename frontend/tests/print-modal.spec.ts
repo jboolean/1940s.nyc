@@ -48,7 +48,10 @@ async function openPrintModal(page: Page, identifier: string): Promise<void> {
   await page.addInitScript(() => {
     localStorage.setItem(
       'featureFlags',
-      JSON.stringify({ state: { 'print-orders': true }, version: 0 })
+      JSON.stringify({
+        state: { 'print-orders': true, 'enable-sales': true },
+        version: 0,
+      })
     );
   });
   await stubPrintApi(page, identifier);
@@ -181,7 +184,10 @@ test('print modal — returning from Stripe shows the order placed screen', asyn
   await page.addInitScript(() => {
     localStorage.setItem(
       'featureFlags',
-      JSON.stringify({ state: { 'print-orders': true }, version: 0 })
+      JSON.stringify({
+        state: { 'print-orders': true, 'enable-sales': true },
+        version: 0,
+      })
     );
   });
   await stubPrintApi(page, PHOTO_1940);

@@ -3,6 +3,12 @@ import { MerchModal } from './pages/MerchModal';
 import { expectStripeRedirect, url } from './helpers';
 
 test('shop modal — checkout → Stripe', async ({ page }) => {
+  await page.addInitScript(() => {
+    localStorage.setItem(
+      'featureFlags',
+      JSON.stringify({ state: { 'enable-sales': true }, version: 0 })
+    );
+  });
   await page.goto(url('/map', { noWelcome: true, noTipJar: true }));
   await page.locator('[data-testid="map-merch-button"]').click();
   const merch = new MerchModal(page);

@@ -26,8 +26,7 @@ import { OptimizeExperimentsProvider } from 'shared/utils/OptimizeExperiments';
 import 'utils/optimize';
 import AdminRoutes from './screens/Admin/AdminRoutes';
 import Corrections from './screens/Corrections';
-import { useFeatureFlag } from './shared/stores/FeatureFlagsStore';
-import FeatureFlag from './shared/types/FeatureFlag';
+import { usePrintOrdersEnabled } from './shared/stores/FeatureFlagsStore';
 import CreditPurchaseModal, {
   CreditPurchaseSuccessMessage,
   openCreditPurchaseModal,
@@ -83,7 +82,7 @@ function DatadogRouteTracker(): null {
 }
 
 function Modals(): React.JSX.Element {
-  const printOrdersEnabled = useFeatureFlag(FeatureFlag.PRINT_ORDERS);
+  const printOrdersEnabled = usePrintOrdersEnabled();
   const [isThankYouOpen, setThankYouOpen] = React.useState(thankYouInitial);
   const [isCreditPurchaseSuccessOpen, setCreditPurchaseSuccessOpen] =
     React.useState(creditSuccessInitial);

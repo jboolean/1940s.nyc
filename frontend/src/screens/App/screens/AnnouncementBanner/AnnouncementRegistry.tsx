@@ -2,6 +2,7 @@ import React from 'react';
 
 import TextButton from 'shared/components/TextButton';
 import recordEvent from 'shared/utils/recordEvent';
+import FeatureFlag from '../../shared/types/FeatureFlag';
 import { openMerchModal } from '../MerchModal';
 import Announcment from './Announcement';
 
@@ -9,6 +10,7 @@ const ANNOUNCEMENTS_REGISTRY: Announcment[] = [
   {
     id: 'tote-2026-08',
     expiresAt: new Date('2026-12-01'),
+    requiresFlag: FeatureFlag.ENABLE_SALES,
     render: () => (
       <>
         Custom tote bags with your neighborhood, now $25{' '}

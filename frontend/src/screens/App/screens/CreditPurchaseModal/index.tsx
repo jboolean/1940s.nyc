@@ -11,6 +11,8 @@ import carouselImages from './carouselImages';
 
 import LoginForm from 'shared/components/LoginForm';
 import useLoginStore from '../../../../shared/stores/LoginStore';
+import { useFeatureFlag } from '../../shared/stores/FeatureFlagsStore';
+import FeatureFlag from '../../shared/types/FeatureFlag';
 import stylesheet from './CreditPurchaseModal.less';
 
 export default function CreditPurchaseModal(): React.JSX.Element {
@@ -27,6 +29,8 @@ export default function CreditPurchaseModal(): React.JSX.Element {
   } = useCreditPurchaseModalStore();
 
   const { isLoginValidated } = useLoginStore();
+  const salesEnabled = useFeatureFlag(FeatureFlag.ENABLE_SALES);
+  const canPurchase = salesEnabled && isLoginValidated;
 
   return (
     <PhotoAsideModal
@@ -62,13 +66,20 @@ export default function CreditPurchaseModal(): React.JSX.Element {
           </p>
         </div>
 
+        {!salesEnabled && (
+          <p data-testid="sales-disabled-notice">
+            <b>Color tokens are temporarily unavailable.</b> Purchases are
+            paused and will return soon.
+          </p>
+        )}
+
         <LoginForm />
       </div>
 
       <div>
         <div
           className={classNames(stylesheet.quantityOptions, {
-            [stylesheet.disabled]: !isLoginValidated,
+            [stylesheet.disabled]: !canPurchase,
           })}
         >
           {unitPrice !== null &&
@@ -77,8 +88,8 @@ export default function CreditPurchaseModal(): React.JSX.Element {
                 buttonStyle="secondary"
                 key={quantity}
                 onClick={() => setQuantity(quantity)}
-                isActive={selectedQuantity === quantity && isLoginValidated}
-                disabled={!isLoginValidated}
+                isActive={selectedQuantity === quantity && canPurchase}
+                disabled={!canPurchase}
               >
                 <NumericFormat
                   displayType="text"
@@ -109,9 +120,9 @@ export default function CreditPurchaseModal(): React.JSX.Element {
 
       <div className={stylesheet.buttonRow}>
         <Button
-          buttonStyle={isLoginValidated ? 'primary' : 'secondary'}
+          buttonStyle={canPurchase ? 'primary' : 'secondary'}
           onClick={() => handleCheckout()}
-          disabled={!isLoginValidated || isCheckingOut}
+          disabled={!canPurchase || isCheckingOut}
         >
           Continue to Checkout
         </Button>

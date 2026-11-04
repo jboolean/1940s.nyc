@@ -41,4 +41,12 @@ export const useFeatureFlag = (feature: FeatureFlag): boolean => {
   return useFeatureFlagsStore((state) => state[feature]);
 };
 
+// Selling prints needs both the print flag and the global sales switch.
+export const usePrintOrdersEnabled = (): boolean => {
+  return useFeatureFlagsStore(
+    (state) =>
+      state[FeatureFlag.PRINT_ORDERS] && state[FeatureFlag.ENABLE_SALES]
+  );
+};
+
 export default useFeatureFlagsStore;

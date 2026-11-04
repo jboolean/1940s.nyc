@@ -20,6 +20,8 @@ import ExternalIcon from 'shared/components/ExternalIcon';
 import recordEvent from 'shared/utils/recordEvent';
 import { openMerchModal } from '../MerchModal';
 import { PrintCartButton } from '../PrintCart';
+import { useFeatureFlag } from '../../shared/stores/FeatureFlagsStore';
+import FeatureFlag from '../../shared/types/FeatureFlag';
 import { openNewsletterModal } from '../NewsletterModal';
 import { useTipJarStore } from '../TipJar';
 import useAmountPresets from '../TipJar/useAmountPresets';
@@ -57,6 +59,31 @@ function withTipJar<P extends TipJarProps, C extends React.ComponentType<P>>(
   }
   return WithTipJar;
 }
+function MerchButton({
+  className,
+}: {
+  className: string;
+}): React.JSX.Element | null {
+  const salesEnabled = useFeatureFlag(FeatureFlag.ENABLE_SALES);
+  if (!salesEnabled) return null;
+  return (
+    <button
+      type="button"
+      className={className}
+      data-testid="map-merch-button"
+      onClick={() => {
+        recordEvent({
+          category: 'Map',
+          action: 'Click Merch',
+        });
+        openMerchModal();
+      }}
+    >
+      Tote 👜
+    </button>
+  );
+}
+
 class MapPane extends React.Component<PropsWithNavigate, State> {
   map?: MapInterface;
   private idPrefix: string;
@@ -141,20 +168,7 @@ class MapPane extends React.Component<PropsWithNavigate, State> {
             <SuggestedTip /> Tip?
           </button>
 
-          <button
-            type="button"
-            className={stylesheet.action}
-            data-testid="map-merch-button"
-            onClick={() => {
-              recordEvent({
-                category: 'Map',
-                action: 'Click Merch',
-              });
-              openMerchModal();
-            }}
-          >
-            Tote 👜
-          </button>
+          <MerchButton className={stylesheet.action} />
 
           <PrintCartButton className={stylesheet.action} />
 

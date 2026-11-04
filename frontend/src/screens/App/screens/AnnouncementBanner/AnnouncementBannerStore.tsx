@@ -4,6 +4,7 @@ import { createJSONStorage, persist } from 'zustand/middleware';
 import ANNOUNCEMENTS_REGISTRY from './AnnouncementRegistry';
 import React from 'react';
 import Announcement from './Announcement';
+import useFeatureFlagsStore from '../../shared/stores/FeatureFlagsStore';
 
 interface State {
   dismissals: string[];
@@ -36,6 +37,7 @@ const useAnnouncementBannerStore = create(
 
 export function useAnnouncementBannerStoreComputeds(): ComputedState {
   const { dismissals } = useAnnouncementBannerStore();
+  const featureFlags = useFeatureFlagsStore();
   const [now, setNow] = React.useState(Date.now());
 
   // Keep the current time up to date
@@ -53,13 +55,15 @@ export function useAnnouncementBannerStoreComputeds(): ComputedState {
       (announcement) => {
         return (
           announcement.expiresAt.getTime() > now &&
-          !dismissals.includes(announcement.id)
+          !dismissals.includes(announcement.id) &&
+          (!announcement.requiresFlag ||
+            featureFlags[announcement.requiresFlag])
         );
       }
     );
 
     return activeAnnouncements[0] || null;
-  }, [dismissals, now]);
+  }, [dismissals, featureFlags, now]);
 
   return {
     announcementToDisplay,
