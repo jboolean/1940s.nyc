@@ -3,6 +3,7 @@ enum FeatureFlag {
   DISABLE_WELCOME_MODAL = 'disable-welcome-modal',
   ALWAYS_SHOW_OVERLAY = 'always-show-overlay',
   PRINT_ORDERS = 'print-orders',
+  ENABLE_SALES = 'enable-sales',
 }
 
 export default FeatureFlag;

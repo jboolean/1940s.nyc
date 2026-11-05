@@ -2,6 +2,8 @@ import React from 'react';
 
 import TextButton from 'shared/components/TextButton';
 import recordEvent from 'shared/utils/recordEvent';
+import useFeatureFlagsStore from '../../shared/stores/FeatureFlagsStore';
+import FeatureFlag from '../../shared/types/FeatureFlag';
 import { openMerchModal } from '../MerchModal';
 import Announcment from './Announcement';
 
@@ -79,4 +81,9 @@ const ANNOUNCEMENTS_REGISTRY: Announcment[] = [
   },
 ];
 
-export default ANNOUNCEMENTS_REGISTRY;
+const salesEnabled = useFeatureFlagsStore.getState()[FeatureFlag.ENABLE_SALES];
+
+// The tote announcement is only shown while sales are enabled.
+export default ANNOUNCEMENTS_REGISTRY.filter(
+  (announcement) => announcement.id !== 'tote-2026-08' || salesEnabled
+);
