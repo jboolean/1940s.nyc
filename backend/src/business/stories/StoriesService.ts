@@ -5,6 +5,11 @@ import StoryState from '../../enum/StoryState';
 import StoryRepository from '../../repositories/StoryRepository';
 import { evaluateStory } from '../moderation/AiStoryModerationService';
 import {
+  AiModerationFlag,
+  combine,
+  MIN_RECAPTCHA_SCORE_TO_APPROVE,
+} from '../moderation/moderationRules';
+import {
   sendPublishedEmail,
   sendSubmittedAgainEmail,
   sendSubmittedEmail,
@@ -25,34 +30,25 @@ async function onStorySubmitted(storyId: Story['id']): Promise<void> {
   const story = await getStoryOrThrow(storyId, StoryState.SUBMITTED);
   const userRepository = AppDataSource.getRepository(User);
 
-  try {
-    await evaluateStory(story);
-  } catch (e) {
-    console.error('Error evaluating story with AI moderation', e);
-  }
-
   const hasSubmittedBefore = story.hasEverSubmitted;
 
+  let ruleProbabilities: Record<AiModerationFlag, number> | null = null;
   try {
-    if (hasSubmittedBefore) {
-      await sendSubmittedAgainEmail(story);
-      return;
-    }
-    await sendSubmittedEmail(story);
+    ({ ruleProbabilities } = await evaluateStory(story));
   } catch (e) {
-    console.error('Error sending story submitted email', e);
+    console.error('Error evaluating story with AI moderation', e);
   }
 
   await StoryRepository().update(story.id, {
     hasEverSubmitted: true,
   });
 
+  let isUserBanned = false;
   try {
-    // If user with this email is banned, reject the story
     const maybeUser = await userRepository.findOneBy({
       email: story.storytellerEmail ?? '',
     });
-    const isUserBanned = maybeUser?.isBanned ?? false;
+    isUserBanned = maybeUser?.isBanned ?? false;
     if (isUserBanned) {
       await StoryRepository().update(story.id, {
         state: StoryState.REJECTED,
@@ -62,6 +58,34 @@ async function onStorySubmitted(storyId: Story['id']): Promise<void> {
   } catch (e) {
     console.error('Error auto-reviewing story', e);
   }
+
+  let isAutoPublished = false;
+  try {
+    if (
+      !isUserBanned &&
+      ruleProbabilities &&
+      story.recaptchaScore >= MIN_RECAPTCHA_SCORE_TO_APPROVE &&
+      combine(ruleProbabilities).approve
+    ) {
+      await StoryRepository().update(story.id, {
+        state: StoryState.PUBLISHED,
+        lastReviewer: 'system',
+      });
+      isAutoPublished = true;
+    }
+  } catch (e) {
+    console.error('Error auto-publishing story', e);
+  }
+
+  try {
+    if (hasSubmittedBefore) {
+      await sendSubmittedAgainEmail(story, isAutoPublished);
+    } else {
+      await sendSubmittedEmail(story, isAutoPublished);
+    }
+  } catch (e) {
+    console.error('Error sending story submitted email', e);
+  }
 }
 
 async function onStoryPublished(storyId: Story['id']): Promise<void> {
@@ -70,7 +94,7 @@ async function onStoryPublished(storyId: Story['id']): Promise<void> {
   try {
     // If we did not send submitted email before, do it now (will occur during rollout of email feature)
     if (!story.lastEmailMessageId) {
-      await sendSubmittedEmail(story);
+      await sendSubmittedEmail(story, false);
     }
     await sendPublishedEmail(story);
   } catch (e) {
@@ -120,7 +144,7 @@ export async function backfillUserStoryEmails(): Promise<void> {
     }
 
     try {
-      await sendSubmittedEmail(story);
+      await sendSubmittedEmail(story, false);
       await StoryRepository().update(story.id, {
         hasEverSubmitted: true,
       });

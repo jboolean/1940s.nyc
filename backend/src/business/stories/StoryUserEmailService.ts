@@ -70,7 +70,10 @@ function forgeImageThumbnailUrl(photo: Story['photo']): string {
   return `https://photos.1940s.nyc/420-jpg/${photo.identifier}.jpg`;
 }
 
-function forgeStoryTemplateContext(story: Story): StoryEmailTemplateData {
+function forgeStoryTemplateContext(
+  story: Story,
+  isPublished: boolean
+): StoryEmailTemplateData {
   return {
     storytellerName: required(story.storytellerName, 'storytellerName'),
     photoDescription: describePhoto(story.photo),
@@ -79,6 +82,7 @@ function forgeStoryTemplateContext(story: Story): StoryEmailTemplateData {
     photoThumbnailUrl: forgeImageThumbnailUrl(story.photo),
     mapImageUrl: null,
     mapImageUrlRetina: null,
+    isPublished,
   };
 }
 
@@ -90,7 +94,8 @@ function forgeStoryMetadata(story: Story): StoryEmailMetadata {
 
 async function sendStoryUserEmail(
   story: Story,
-  Template: EmailTemplate<StoryEmailTemplateData, StoryEmailMetadata>
+  Template: EmailTemplate<StoryEmailTemplateData, StoryEmailMetadata>,
+  isPublished: boolean
 ): Promise<void> {
   if (!story.photo) {
     throw new Error('Expected photo to be resolved');
@@ -98,7 +103,7 @@ async function sendStoryUserEmail(
 
   const email: TemplatedEmailData = Template.createTemplatedEmail({
     to: required(story.storytellerEmail, 'storytellerEmail'),
-    templateContext: forgeStoryTemplateContext(story),
+    templateContext: forgeStoryTemplateContext(story, isPublished),
     metadata: forgeStoryMetadata(story),
     referenceMessageId: story.lastEmailMessageId ?? undefined,
   });
@@ -109,18 +114,24 @@ async function sendStoryUserEmail(
   await StoryRepository().update(story.id, { lastEmailMessageId: messageId });
 }
 
-export async function sendSubmittedEmail(story: Story): Promise<void> {
-  return sendStoryUserEmail(story, StorySubmittedTemplate);
+export async function sendSubmittedEmail(
+  story: Story,
+  isPublished: boolean
+): Promise<void> {
+  return sendStoryUserEmail(story, StorySubmittedTemplate, isPublished);
 }
 
-export async function sendSubmittedAgainEmail(story: Story): Promise<void> {
-  return sendStoryUserEmail(story, StorySubmittedAgainTemplate);
+export async function sendSubmittedAgainEmail(
+  story: Story,
+  isPublished: boolean
+): Promise<void> {
+  return sendStoryUserEmail(story, StorySubmittedAgainTemplate, isPublished);
 }
 
 export async function sendPublishedEmail(story: Story): Promise<void> {
-  return sendStoryUserEmail(story, StoryPublishedTemplate);
+  return sendStoryUserEmail(story, StoryPublishedTemplate, true);
 }
 
 export async function sendUserRemovedEmail(story: Story): Promise<void> {
-  return sendStoryUserEmail(story, StoryUserRemovedTemplate);
+  return sendStoryUserEmail(story, StoryUserRemovedTemplate, false);
 }

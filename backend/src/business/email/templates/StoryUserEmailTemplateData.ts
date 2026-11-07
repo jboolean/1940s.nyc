@@ -6,6 +6,7 @@ export interface StoryEmailTemplateData {
   photoThumbnailUrl: string;
   mapImageUrl: string | null;
   mapImageUrlRetina: string | null;
+  isPublished: boolean;
 }
 
 export interface StoryEmailMetadata {
