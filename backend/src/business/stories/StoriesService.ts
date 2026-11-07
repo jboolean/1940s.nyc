@@ -4,17 +4,17 @@ import User from '../../entities/User';
 import StoryState from '../../enum/StoryState';
 import StoryRepository from '../../repositories/StoryRepository';
 import { evaluateStory } from '../moderation/AiStoryModerationService';
-import { AiModerationFlag, combine } from '../moderation/moderationRules';
+import {
+  AiModerationFlag,
+  combine,
+  MIN_RECAPTCHA_SCORE_TO_APPROVE,
+} from '../moderation/moderationRules';
 import {
   sendPublishedEmail,
   sendSubmittedAgainEmail,
   sendSubmittedEmail,
   sendUserRemovedEmail,
 } from './StoryUserEmailService';
-
-// Matches the "% Human" flag shown in the admin review screen
-// (frontend/.../ReviewStories/index.tsx).
-const MIN_RECAPTCHA_SCORE_TO_AUTO_PUBLISH = 0.7;
 
 function getStoryOrThrow(
   storyId: Story['id'],
@@ -64,7 +64,7 @@ async function onStorySubmitted(storyId: Story['id']): Promise<void> {
     if (
       !isUserBanned &&
       ruleProbabilities &&
-      story.recaptchaScore >= MIN_RECAPTCHA_SCORE_TO_AUTO_PUBLISH &&
+      story.recaptchaScore >= MIN_RECAPTCHA_SCORE_TO_APPROVE &&
       combine(ruleProbabilities).approve
     ) {
       await StoryRepository().update(story.id, {
