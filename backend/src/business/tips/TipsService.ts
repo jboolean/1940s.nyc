@@ -91,7 +91,12 @@ export async function createTipCheckoutSession({
       metadata: {
         userId: userId ?? null,
       },
+      automatic_tax: { enabled: true },
       customer: stripeCustomerId,
+      // Stripe Tax needs an address on the customer, so the ones entered at checkout are saved.
+      customer_update: hasExistingCustomer
+        ? { address: 'auto', shipping: hasGift ? 'auto' : undefined }
+        : undefined,
       // History: Stripe used to always create a customer, then it started creating "guest customers" instead (annoying!). This is to force it to always create a customer which we can attach to the user in the webhook.
       // Not allow to pass parameter in subscription mode
       customer_creation:

@@ -116,7 +116,10 @@ export class ColorizationController extends Controller {
         metadata: {
           userId,
         },
+        automatic_tax: { enabled: true },
         customer: stripeCustomerId,
+        // Stripe Tax needs an address on the customer, so the one entered at checkout is saved.
+        customer_update: hasExistingCustomer ? { address: 'auto' } : undefined,
         customer_creation: hasExistingCustomer ? undefined : 'always',
         customer_email: hasExistingCustomer
           ? undefined

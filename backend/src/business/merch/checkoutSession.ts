@@ -24,6 +24,8 @@ export function buildCheckoutSessionFields({
   | 'customer_email'
   | 'shipping_address_collection'
   | 'metadata'
+  | 'automatic_tax'
+  | 'customer_update'
 > {
   const stripeCustomerId: string | undefined =
     user?.stripeCustomerId ?? undefined;
@@ -38,6 +40,12 @@ export function buildCheckoutSessionFields({
     customer_email: stripeCustomerId ? undefined : (user?.email ?? undefined),
     shipping_address_collection: { allowed_countries: ['US'] },
     metadata: { userId: user?.id ?? null, ...metadata },
+    automatic_tax: { enabled: true },
+    // Stripe Tax needs an address on the customer, so the addresses entered at checkout are saved
+    // to an existing customer.
+    customer_update: stripeCustomerId
+      ? { address: 'auto', shipping: 'auto' }
+      : undefined,
   };
 }
 

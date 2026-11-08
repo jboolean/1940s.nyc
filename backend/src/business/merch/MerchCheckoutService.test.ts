@@ -74,6 +74,8 @@ describe('createMerchCheckoutSession', () => {
       customer_email: 'a@b.c',
       shipping_address_collection: { allowed_countries: ['US'] },
       metadata: { userId: 3 },
+      automatic_tax: { enabled: true },
+      customer_update: undefined,
       mode: 'payment',
       line_items: [{ price: 'price_1', quantity: 2 }],
       payment_intent_data: {},
