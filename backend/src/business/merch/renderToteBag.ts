@@ -2,7 +2,7 @@
 
 import puppeteer from 'puppeteer-core';
 import type SparticuzChromium from '@sparticuz/chromium';
-import { bypassCloudflare } from '../utils/cloudflareOrigins';
+import { bypassCloudflare, getBypassHeaders } from '../utils/cloudflareOrigins';
 
 const IS_LOCAL = !!process.env.IS_LOCAL;
 const FRONTEND_BASE_URL = process.env.FRONTEND_BASE_URL as string;
@@ -74,7 +74,10 @@ export default async function renderToteBag({
     const target = bypassCloudflare(req.url());
     void (target === req.url()
       ? req.continue()
-      : req.continue({ url: target }));
+      : req.continue({
+          url: target,
+          headers: { ...req.headers(), ...getBypassHeaders() },
+        }));
   });
 
   const urlParams = new URLSearchParams();
