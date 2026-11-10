@@ -43,6 +43,7 @@ provider:
     FRONTEND_BASE_URL: ${ssm:/${self:service}-${sls:stage}-frontend-base-url}
     # See src/business/utils/cloudflareOrigins.ts
     CLOUDFLARE_BYPASS_ORIGINS: ${ssm:/${self:service}-${sls:stage}-cloudflare-bypass-origins}
+    CLOUDFLARE_ORIGIN_VERIFY: ${ssm:/${self:service}-${sls:stage}-cloudflare-origin-verify}
     JWT_SECRET: ${ssm:/${self:service}-${sls:stage}-jwt-secret}
     MODERATORS_TO_EMAIL: ${ssm:/${self:service}-${sls:stage}-moderators-to-email}
     MERCH_REVIEWER_EMAILS: ${ssm:/${self:service}-${sls:stage}-merch-reviewer-emails}
