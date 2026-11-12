@@ -207,7 +207,7 @@ router.post<'/', unknown, unknown, Stripe.Event, unknown>(
         );
         let provider: MerchProvider | undefined;
         try {
-          // Sessions created before the provider was stamped on them have none.
+          // Older sessions have no provider.
           const stamped =
             expandedSession.metadata?.[MERCH_PROVIDER_METADATA_KEY];
           provider = !newItems.length

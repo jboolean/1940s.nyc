@@ -10,21 +10,20 @@ import * as WhccClient from './whccApi';
 
 export const WHCC_SHIPPING_METHOD_METADATA_KEY = 'whcc-shipping-priority';
 
-// Checkout has not collected an address when shipping is quoted, and calculate offers no shipping
-// methods without one. State and country alone return the same methods and prices as a full New
-// York address; a ZIP alone adds Alaska and Hawaii methods.
+// No address exists yet when shipping is quoted, and WHCC needs one. State and country alone give
+// the same methods and prices as a full New York address. A ZIP would add Alaska and Hawaii methods.
 const WHCC_QUOTE_ADDRESS = { state: 'NY', country: 'US' };
 
-// Stripe allows at most five shipping options on a session.
+// Stripe allows five shipping options per session.
 const MAX_SHIPPING_OPTIONS = 5;
 
-// Checkout creation runs inside a request with a 20 second limit.
+// Checkout creation runs in a request with a 20 second limit.
 const WHCC_QUOTE_BUDGET_MS = 12_000;
 
 export function buildWhccShippingOptions(
   calculation: WhccClient.Calculation
 ): Stripe.Checkout.SessionCreateParams.ShippingOption[] {
-  // A shipment without tracking would leave the customer with no tracking link or shipped email.
+  // Without tracking the customer gets no link or shipped email.
   return (calculation.options?.shipping ?? [])
     .filter((o) => !o.priority.endsWith('_no_tracking'))
     .slice(0, MAX_SHIPPING_OPTIONS)
@@ -43,8 +42,8 @@ export function buildWhccShippingOptions(
     });
 }
 
-// One configured product is built per variant, from the first photo bought in it, because shipping
-// depends on the product and quantity and not on the image.
+// One product per variant, built from its first photo.
+// Shipping depends on product and quantity, not the image.
 export async function quoteWhccShipping(
   items: ShippingQuoteItem[]
 ): Promise<Stripe.Checkout.SessionCreateParams.ShippingOption[]> {
@@ -66,7 +65,7 @@ export async function quoteWhccShipping(
   }
   const lines = [...byVariant].map(([variant, line]) => {
     return {
-      // The plain URL: original photos are not served through the Cloudflare bypass origin.
+      // Originals are not served through the Cloudflare bypass origin.
       request: buildWhccConfiguredProduct(
         variant,
         getOriginalPublicUrl(line.photoIdentifier)

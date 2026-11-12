@@ -1,6 +1,6 @@
 export interface WhccProduct {
-  // The catalog ref, case-sensitive.
+  // Case-sensitive catalog ref.
   productRef: string;
-  // Field name to the id of the chosen value, for every field that applies to the product.
+  // Field name to chosen value id, for every field the product has.
   selections: Record<string, string>;
 }

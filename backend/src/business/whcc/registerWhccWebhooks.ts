@@ -6,7 +6,7 @@ import {
   listEventSubscriptions,
 } from './whccApi';
 
-// WHCC delivers to the staging API, so only the staging stage registers.
+// Only staging registers.
 const API_BASE = 'https://api.staging.1940s.nyc';
 
 const EVENT_TYPES = [
@@ -16,8 +16,7 @@ const EVENT_TYPES = [
   'order.cancelled',
 ] as const;
 
-// A subscription belongs to the account, so one that already points at this URL with the events we
-// need is reused instead of making a second.
+// Subscriptions belong to the account. Reuse one that already matches.
 export default async function registerWhccWebhooks(): Promise<void> {
   if (process.env.STAGE !== 'staging') {
     console.log('Not registering WHCC webhooks outside the staging stage');
@@ -46,7 +45,7 @@ export default async function registerWhccWebhooks(): Promise<void> {
       eventTypes: [...EVENT_TYPES],
       description: 'fourtiesnyc',
       signingSecret: required(
-        process.env.WHCC_SIGNING_SECRET,
+        process.env.WHCC_SIGNING_SECRET || undefined,
         'WHCC_SIGNING_SECRET'
       ),
     },

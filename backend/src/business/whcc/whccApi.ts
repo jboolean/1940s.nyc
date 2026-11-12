@@ -35,7 +35,7 @@ import isProduction from '../utils/isProduction';
 
 const REQUEST_TIMEOUT_MS = 4_000;
 
-// Every request is refused in production and carries the key, both decided when it is sent.
+// Refuses production and adds the key to every request.
 function authorize<
   T extends { headers: { set: (k: string, v: string) => unknown } },
 >(config: T): T {
@@ -48,15 +48,12 @@ function authorize<
 client.instance.interceptors.request.use(authorize);
 fulfillmentClient.instance.interceptors.request.use(authorize);
 
-// The generated commerce types require an authorization header on every call. The interceptor above
-// sets the real one.
+// The generated types require this header. The interceptor sets the real one.
 const AUTHORIZED = { authorization: '' };
 
-// The generated clients join a path onto their base URL, so an action link is followed by its path
-// and query, after checking it points at the host we call and sits under the part of the API the
-// client covers. A path that starts with "//" would be read as another host, so no "//" is allowed.
-// `apiPrefix` is the path every link must start with; `basePath` is the part of it that the client's
-// base URL already carries.
+// Turns an action link into a path and query for the client. Throws unless the link is on our host
+// and under `apiPrefix` (no "//", which can read as another host). `basePath` is the part of the
+// prefix the client's base URL already has.
 export function linkPath(
   link: string,
   apiPrefix: string,
@@ -96,8 +93,7 @@ export interface ConfiguredProducts {
   pollUrl?: string;
 }
 
-// The spec types the submission and calculate responses as plain strings, so the shapes the docs
-// describe are declared here.
+// The spec types these responses as strings, so the documented shapes are declared here.
 export interface Submission {
   id: string;
   status: NonNullable<
@@ -120,8 +116,8 @@ export interface Calculation {
   };
 }
 
-// A 401, or a 403 with a { message } body, comes from the gateway: the key was rejected before the
-// API saw the request. Everything else with a body is Problem Details.
+// A 401, or a 403 with a { message } body, comes from the gateway (bad key). Any other body is
+// Problem Details.
 export class WhccApiError extends Error {
   constructor(
     readonly status: number,
@@ -140,7 +136,7 @@ export class WhccApiError extends Error {
   }
 }
 
-// `deadline` is epoch milliseconds by which the caller's whole operation must be done.
+// `deadline` is epoch milliseconds for the caller's whole operation.
 async function call<T extends { data: unknown }>(
   deadline: number | undefined,
   send: (options: { throwOnError: true; timeout: number }) => Promise<T>
@@ -156,7 +152,7 @@ async function call<T extends { data: unknown }>(
     });
     return data;
   } catch (e) {
-    // Axios errors carry the request config, Authorization header included, so none is rethrown.
+    // Axios errors include the Authorization header, so they are not rethrown.
     if (isAxiosError(e) && !e.response) {
       throw new WhccApiError(0, { title: e.code ?? 'no response' });
     }
@@ -185,7 +181,7 @@ function toConfiguredProducts(data: {
   };
 }
 
-// Every call builds new configured products, so this is never repeated to check on progress.
+// Not retried: every call builds new configured products.
 export async function createConfiguredProducts(
   configuredProducts: ConfiguredProductRequest[],
   deadline?: number
@@ -201,7 +197,7 @@ export async function createConfiguredProducts(
   );
 }
 
-// Follows the actions.poll link of a create response.
+// Follows the create response's actions.poll link.
 export async function pollConfiguredProducts(
   pollUrl: string,
   deadline?: number
@@ -216,7 +212,7 @@ export async function pollConfiguredProducts(
   );
 }
 
-// Calculate takes no Idempotency-Key.
+// Unlike submit, calculate takes no idempotency key.
 export async function calculate(
   body: CalculateRequest,
   deadline?: number
@@ -226,8 +222,7 @@ export async function calculate(
   )) as unknown as Calculation;
 }
 
-// The same key with the same body returns the original submission; the same key with a different
-// body is a 409.
+// The same key and body return the original submission. The same key with another body is a 409.
 export async function submit(
   body: SubmissionRequest,
   idempotencyKey: string,
@@ -255,7 +250,7 @@ export async function getSubmission(
   )) as unknown as Submission;
 }
 
-// Filters match an exact value and return a page, possibly empty, never a 404.
+// Filters match exactly. No match gives an empty page, not a 404.
 export async function listSubmissions(
   filter: { reference: string } | { confirmationId: string },
   deadline?: number
@@ -269,7 +264,7 @@ export async function listSubmissions(
   };
 }
 
-// Follows the actions.fulfillment link of a submission or one of its orders.
+// Follows actions.fulfillment on a submission or order.
 export function listFulfillmentOrders(
   fulfillmentUrl: string
 ): Promise<ListOrdersResponses[200]> {
@@ -281,7 +276,7 @@ export function listFulfillmentOrders(
   );
 }
 
-// Cancelling is irreversible and takes two calls: the token from the first completes the second.
+// Cancel is irreversible and takes two calls. The first returns the token for the second.
 export async function cancelFulfillmentOrder(id: string): Promise<void> {
   const { token } = await call(undefined, (o) =>
     mintOrderCancelActions({ ...o, path: { id } })

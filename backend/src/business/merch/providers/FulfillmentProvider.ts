@@ -22,14 +22,11 @@ interface FulfillmentProvider {
   // printer as soon as the order is ready.
   readonly requiresReview: boolean;
 
-  // Prices shipping for a basket as Checkout shipping options. Providers without it use the flat
-  // default rate.
+  // Providers without this use the flat default rate.
   quoteShippingOptions?(
     items: ShippingQuoteItem[]
   ): Promise<Stripe.Checkout.SessionCreateParams.ShippingOption[]>;
 
-  // The key on a shipping rate's metadata that carries the method chosen at checkout, and the method
-  // an order falls back to when the rate names none.
   readonly shippingMethodMetadataKey?: string;
   readonly defaultShippingMethod?: string;
 
@@ -42,8 +39,7 @@ interface FulfillmentProvider {
 
   submitOrderForFulfillment(order: MerchOrder): Promise<CreatedProviderOrder>;
 
-  // Re-reads a submitted order from the provider and applies its status. Only for providers that
-  // report status changes by callback, which the order sync cron backs up.
+  // For providers that report status by callback. The sync cron covers missed callbacks.
   syncSubmittedOrder?(providerOrderId: string): Promise<void>;
 
   // Cancels an order that was already submitted, for providers that support it. Throws if it cannot be canceled.

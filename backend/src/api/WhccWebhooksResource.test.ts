@@ -72,3 +72,16 @@ it('re-reads the order named by a correctly signed event', async () => {
     sequenceNumber: '',
   });
 });
+
+it('returns 503 without acting when the signing secret is empty', async () => {
+  const secret = process.env.WHCC_SIGNING_SECRET;
+  process.env.WHCC_SIGNING_SECRET = '';
+  try {
+    await expect(post(sign(Math.floor(Date.now() / 1000), ''))).resolves.toBe(
+      503
+    );
+  } finally {
+    process.env.WHCC_SIGNING_SECRET = secret;
+  }
+  expect(handleEvent).not.toHaveBeenCalled();
+});

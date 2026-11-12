@@ -47,7 +47,7 @@ export function getProvidersWithoutReview(): MerchProvider[] {
   );
 }
 
-// The providers whose submitted orders can be re-read to catch up on a missed callback.
+// Providers whose submitted orders can be re-read.
 export function getProvidersWithStatusSync(): MerchProvider[] {
   return (Object.keys(PROVIDERS) as MerchProvider[]).filter(
     (provider) => PROVIDERS[provider].syncSubmittedOrder

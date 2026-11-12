@@ -3,7 +3,7 @@ import * as MerchOrderService from '../merch/MerchOrderService';
 import * as WhccClient from './whccApi';
 import whccSubmissionToFulfillmentState from './WhccToMerchOrderStatusMap';
 
-// Re-reads a submission from WHCC with our API key and applies what it says.
+// Re-reads the submission from WHCC and applies its status.
 export async function syncSubmission(submissionId: string): Promise<void> {
   const submission = await WhccClient.getSubmission(submissionId);
 
@@ -13,7 +13,7 @@ export async function syncSubmission(submissionId: string): Promise<void> {
     whccSubmissionToFulfillmentState(submission)
   );
 
-  // A shipment with no tracking URL sends no shipped email.
+  // No tracking URL, no shipped email.
   const trackingUrl = (submission.orders ?? [])
     .flatMap((o) => o.shippingInfo ?? [])
     .map((s) => s.trackingUrl)
@@ -28,8 +28,7 @@ export async function syncSubmission(submissionId: string): Promise<void> {
   }
 }
 
-// The webhook route verifies the delivery's signature. Only its ConfirmationId is used, to find the
-// submission again from WHCC with our API key; the state applied comes from that read.
+// The webhook route checks the signature. Only the ConfirmationId is used.
 export async function handleEvent(event: {
   eventType: string;
   confirmationId: string;

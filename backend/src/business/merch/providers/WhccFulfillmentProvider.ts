@@ -17,10 +17,10 @@ import FulfillmentProvider, {
   CreatedProviderOrder,
 } from './FulfillmentProvider';
 
-// Approving an order runs this inside a request with a 20 second limit.
+// Approving an order runs in a request with a 20 second limit.
 const SUBMIT_BUDGET_MS = 15_000;
 
-// WHCC has no draft orders, so nothing is created there until the order is submitted.
+// WHCC has no draft orders. Nothing is created until submit.
 const WhccFulfillmentProvider: FulfillmentProvider = {
   requiresReview: true,
 
@@ -42,16 +42,14 @@ const WhccFulfillmentProvider: FulfillmentProvider = {
     if (order.providerOrderId) {
       return {};
     }
-    // Orders on the live API cost real money.
     if (isProduction() && process.env.WHCC_LIVE_ORDERS_ENABLED !== 'true') {
       throw new Error(
         'Refusing to create a WHCC submission on the live API: WHCC_LIVE_ORDERS_ENABLED is not true'
       );
     }
 
-    // A retry builds new configured products, so its body differs from an earlier submit and the
-    // idempotency key cannot recognise it. The reference can: use it to find a submission whose
-    // response was lost.
+    // A retry has a different body, so the idempotency key does not match. Look up the earlier
+    // submission by reference instead.
     const deadline = Date.now() + SUBMIT_BUDGET_MS;
     const { submissions } = await WhccClient.listSubmissions(
       { reference: getWhccReference(order.id) },

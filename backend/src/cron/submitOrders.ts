@@ -34,8 +34,7 @@ export async function submitPendingOrders(): Promise<void> {
   }
 }
 
-// Backup for callbacks (and the only update path where the printer cannot reach us, such as local
-// development). It covers the providers that can re-read a submitted order.
+// Catches missed callbacks. Also the only status update when the printer cannot reach us (local dev).
 export async function syncSubmittedOrders(): Promise<void> {
   const repository = AppDataSource.getRepository(MerchOrder);
   const orders = await repository

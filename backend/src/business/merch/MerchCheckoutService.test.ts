@@ -30,7 +30,7 @@ jest.mock('./providers/WhccFulfillmentProvider', () => ({
 }));
 jest.mock('./merchCatalog', () => ({
   ...jest.requireActual<typeof import('./merchCatalog')>('./merchCatalog'),
-  // Prints go to WHCC; these tests cover the Prodigi path.
+  // Force prints to Prodigi so these tests cover that path.
   getMerchProvider: (variant: string) =>
     variant === 'tote-bag-small' ? 'printful' : 'prodigi',
 }));

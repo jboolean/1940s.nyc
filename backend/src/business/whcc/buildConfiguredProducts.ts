@@ -4,9 +4,8 @@ import * as WhccClient from './whccApi';
 const POLL_START_MS = 1_000;
 const POLL_MAX_MS = 3_000;
 
-// Builds the products and waits until each is ready, giving up at the deadline (epoch milliseconds)
-// so a caller inside a request fails and retries instead of running out of time. Returns them in
-// the order given.
+// Builds the products and waits until each is ready. Throws at the deadline (epoch milliseconds).
+// Results keep the input order.
 export async function buildConfiguredProducts(
   products: WhccClient.ConfiguredProductRequest[],
   deadline: number

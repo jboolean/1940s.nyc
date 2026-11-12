@@ -10,15 +10,14 @@ import type {
   SubmissionRequest,
 } from './whccApi';
 
-// Also the idempotency key, and how a submission is found again after a lost response. The stage
-// keeps environments that share one WHCC account apart. At most 32 ASCII characters.
+// Used as the idempotency key and to find a submission after a lost response. The stage keeps
+// environments on one WHCC account apart. Max 32 ASCII characters.
 export function getWhccReference(orderId: number): string {
   const stage = (process.env.STAGE ?? 'dev').slice(0, 10);
   return `${stage}-merch-order-${orderId}`;
 }
 
-// The product WHCC builds for a print variant from one image, in quantity 1; quantities are set on
-// the submission.
+// One product for a print variant and image. Quantity is set on the submission.
 export function buildWhccConfiguredProduct(
   variant: MerchInternalVariant,
   imageUrl: string
@@ -58,7 +57,7 @@ function buildAddress(order: MerchOrder): ShippingAddress {
   };
 }
 
-// configuredProductIds are in the same order as order.items.
+// configuredProductIds match order.items by position.
 export function buildWhccSubmission(
   order: MerchOrder,
   configuredProductIds: string[]

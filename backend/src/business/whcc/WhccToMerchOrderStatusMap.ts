@@ -1,7 +1,7 @@
 import MerchOrderFulfillmentState from '../../enum/MerchOrderFulfillmentState';
 import type { Submission } from './whccApi';
 
-// A submission can split into several WHCC orders, each reported in orders[].
+// A submission can split into several WHCC orders (orders[]).
 export default function whccSubmissionToFulfillmentState(
   submission: Submission
 ): MerchOrderFulfillmentState {

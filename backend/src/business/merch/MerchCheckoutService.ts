@@ -24,7 +24,7 @@ const DEFAULT_SHIPPING_RATE = isProduction()
   ? 'shr_1SWhRLFCLBtNZLVlvrC9UTEd'
   : 'shr_1QssVnFCLBtNZLVlK1TZpXet';
 
-// The provider chosen for the basket, so the order is created for the printer that was quoted.
+// The order uses the provider that quoted the shipping.
 export const MERCH_PROVIDER_METADATA_KEY = 'merch-provider';
 
 const MAX_PRINT_QUANTITY = 10;

@@ -68,8 +68,7 @@ export function getPrintfileDirectUrl(
   );
 }
 
-// Public URL of the full-resolution original, for printers that need an image before the print
-// file exists (shipping quotes).
+// Public URL of the original photo. Used for shipping quotes, before a print file exists.
 export function getOriginalPublicUrl(photoIdentifier: string): string {
   return `https://photos.1940s.nyc/jpg/${photoIdentifier}.jpg`;
 }

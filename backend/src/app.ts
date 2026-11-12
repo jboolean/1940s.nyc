@@ -60,7 +60,7 @@ app.use(
 // TracingHandler creates a trace for every incoming request
 app.use(Sentry.Handlers.tracingHandler());
 
-// WHCC signs the exact bytes it sends, so its route keeps the body raw.
+// The WHCC signature check needs the raw body.
 app.use('/whcc-webhooks', express.raw({ type: () => true }));
 app.use(express.json());
 app.use(cookieParser());
