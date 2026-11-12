@@ -72,6 +72,7 @@ export async function quoteWhccShipping(
   }
   const lines = [...byVariant].map(([variant, line]) => {
     return {
+      // The plain URL: original photos are not served through the Cloudflare bypass origin.
       request: buildWhccConfiguredProduct(
         variant,
         getOriginalPublicUrl(line.photoIdentifier)

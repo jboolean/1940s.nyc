@@ -2,7 +2,7 @@ import MerchOrder from '../../entities/MerchOrder';
 import MerchInternalVariant from '../../enum/MerchInternalVariant';
 import MerchProvider from '../../enum/MerchProvider';
 import { getPrintProduct } from '../merch/printCatalog';
-import { getPrintfilePublicUrl } from '../utils/printfileUtils';
+import { getPrintfileDirectUrl } from '../utils/printfileUtils';
 import required from '../utils/required';
 import type {
   ConfiguredProductRequest,
@@ -40,7 +40,7 @@ export function buildWhccConfiguredProducts(
   return order.items.map((item) =>
     buildWhccConfiguredProduct(
       item.internalVariant,
-      getPrintfilePublicUrl(item.id, 'jpg')
+      getPrintfileDirectUrl(item.id, 'jpg')
     )
   );
 }
