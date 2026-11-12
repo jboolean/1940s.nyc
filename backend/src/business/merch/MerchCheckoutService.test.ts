@@ -28,6 +28,12 @@ jest.mock('./providers/WhccFulfillmentProvider', () => ({
   __esModule: true,
   default: {},
 }));
+jest.mock('./merchCatalog', () => ({
+  ...jest.requireActual<typeof import('./merchCatalog')>('./merchCatalog'),
+  // Prints go to WHCC; these tests cover the Prodigi path.
+  getMerchProvider: (variant: string) =>
+    variant === 'tote-bag-small' ? 'printful' : 'prodigi',
+}));
 jest.mock('../prodigi/ProdigiService', () => ({ getQuotes: jest.fn() }));
 jest.mock('../../third-party/stripe', () => ({
   __esModule: true,

@@ -50,7 +50,7 @@ describe('selectProviderForItems', () => {
         MerchInternalVariant.PRINT_HPR_4X6,
         MerchInternalVariant.PRINT_FAP_8X12_FRAMED,
       ])
-    ).toBe(MerchProvider.PRODIGI);
+    ).toBe(MerchProvider.WHCC);
   });
 
   it('refuses a variant the catalog does not sell rather than guessing a printer', () => {

@@ -37,6 +37,14 @@ jest.mock('../business/merch/providers/WhccFulfillmentProvider', () => ({
     defaultShippingMethod: 'dropship_lowest_cost',
   },
 }));
+jest.mock('../business/merch/merchCatalog', () => ({
+  ...jest.requireActual<typeof import('../business/merch/merchCatalog')>(
+    '../business/merch/merchCatalog'
+  ),
+  // Prints go to WHCC; these tests cover the Prodigi path.
+  getMerchProvider: (variant: string) =>
+    variant === 'tote-bag-small' ? 'printful' : 'prodigi',
+}));
 jest.mock('../business/users/UserService', () => ({
   attachStripeCustomerAndDetermineUserId: jest.fn().mockResolvedValue(9),
 }));
