@@ -1,7 +1,7 @@
 import type Stripe from 'stripe';
 import MerchInternalVariant from '../../enum/MerchInternalVariant';
 import type { ShippingQuoteItem } from '../merch/providers/FulfillmentProvider';
-import { getOriginalDirectUrl } from '../utils/printfileUtils';
+import { getOriginalPublicUrl } from '../utils/printfileUtils';
 import required from '../utils/required';
 import toCents from '../utils/toCents';
 import { buildConfiguredProducts } from './buildConfiguredProducts';
@@ -74,7 +74,7 @@ export async function quoteWhccShipping(
     return {
       request: buildWhccConfiguredProduct(
         variant,
-        getOriginalDirectUrl(line.photoIdentifier)
+        getOriginalPublicUrl(line.photoIdentifier)
       ),
       quantity: line.quantity,
     };

@@ -55,6 +55,14 @@ export async function getPrintfileUrl(
   return await getSignedUrl(s3, command, { expiresIn: 120 });
 }
 
+// The public URL of a print file, for printers that fetch it through Cloudflare.
+export function getPrintfilePublicUrl(
+  merchItemId: number,
+  extension: PrintfileExtension
+): string {
+  return `https://photos.1940s.nyc/${getPrintfileKey(merchItemId, extension)}`;
+}
+
 // Direct CloudFront URL (bypassing Cloudflare) for the printer's server fetch,
 // which does a HEAD check before the GET (signed URLs can't support that).
 // Prodigi sends no credentials at all, and going around Cloudflare keeps its bot
@@ -63,17 +71,13 @@ export function getPrintfileDirectUrl(
   merchItemId: number,
   extension: PrintfileExtension
 ): string {
-  return bypassCloudflare(
-    `https://photos.1940s.nyc/${getPrintfileKey(merchItemId, extension)}`
-  );
+  return bypassCloudflare(getPrintfilePublicUrl(merchItemId, extension));
 }
 
-// Direct URL of the full-resolution original, for printers that need an image before the print
+// Public URL of the full-resolution original, for printers that need an image before the print
 // file exists (shipping quotes).
-export function getOriginalDirectUrl(photoIdentifier: string): string {
-  return bypassCloudflare(
-    `https://photos.1940s.nyc/jpg/${photoIdentifier}.jpg`
-  );
+export function getOriginalPublicUrl(photoIdentifier: string): string {
+  return `https://photos.1940s.nyc/jpg/${photoIdentifier}.jpg`;
 }
 
 // Server-side copy of the full-resolution original, without downloading it.
