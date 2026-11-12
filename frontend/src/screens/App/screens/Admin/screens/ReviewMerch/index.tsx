@@ -104,35 +104,41 @@ export default function ReviewMerch(): React.JSX.Element {
       <h1>Review Merch Orders</h1>
 
       <div className={stylesheet.orders}>
-        {reviewMerchStore.orders.map((order) => (
-          <div key={order.id} className={stylesheet.order}>
-            <div className={stylesheet.orderHeader}>
-              <OrderMetadataView order={order} />
+        {reviewMerchStore.orders.map((order) => {
+          const isPending = reviewMerchStore.pendingOrderIds.includes(order.id);
+          return (
+            <div key={order.id} className={stylesheet.order}>
+              <div className={stylesheet.orderHeader}>
+                <OrderMetadataView order={order} />
 
-              <div className={stylesheet.buttons}>
-                <Button
-                  onClick={() => reviewMerchStore.fulfillOrder(order.id)}
-                  buttonStyle={'primary'}
-                >
-                  Fulfill
-                </Button>
-                <Button
-                  onClick={() => reviewMerchStore.cancelOrder(order.id)}
-                  buttonStyle={'secondary'}
-                >
-                  Cancel
-                </Button>
+                <div className={stylesheet.buttons}>
+                  <Button
+                    onClick={() => reviewMerchStore.fulfillOrder(order.id)}
+                    disabled={isPending}
+                    buttonStyle={'primary'}
+                  >
+                    Fulfill
+                  </Button>
+                  <Button
+                    onClick={() => reviewMerchStore.cancelOrder(order.id)}
+                    disabled={isPending}
+                    buttonStyle={'secondary'}
+                  >
+                    Cancel
+                  </Button>
+                  {isPending ? <p>Loading&hellip;</p> : null}
+                </div>
+              </div>
+
+              <div className={stylesheet.items}>
+                <h3>Items ({order.items.length})</h3>
+                {order.items.map((item) => (
+                  <OrderItemView key={item.id} item={item} />
+                ))}
               </div>
             </div>
-
-            <div className={stylesheet.items}>
-              <h3>Items ({order.items.length})</h3>
-              {order.items.map((item) => (
-                <OrderItemView key={item.id} item={item} />
-              ))}
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {reviewMerchStore.ordersNeedingAttention.length > 0 && (
