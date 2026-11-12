@@ -238,7 +238,7 @@ router.post<'/', unknown, unknown, Stripe.Event, unknown>(
             countryCode: shippingDetails?.address.country ?? undefined,
           };
 
-          // The tote's fixed rate names no method, so a tote order keeps the field empty.
+          // Sessions made before shipping was quoted carry a fixed rate that names no method.
           const shippingRate = expandedSession.shipping_cost?.shipping_rate as
             Stripe.ShippingRate | undefined;
           const {
@@ -249,7 +249,7 @@ router.post<'/', unknown, unknown, Stripe.Event, unknown>(
             metadataKey && shippingRate?.metadata?.[metadataKey];
           if (!shippingMethod && fallback) {
             console.warn(
-              `Print checkout has no ${provider} shipping method; defaulting to ${fallback}`,
+              `Checkout has no ${provider} shipping method; defaulting to ${fallback}`,
               { sessionId: session.id }
             );
             shippingMethod = fallback;

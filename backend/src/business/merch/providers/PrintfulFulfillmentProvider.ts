@@ -3,6 +3,10 @@ import MerchOrderItem from '../../../entities/MerchOrderItem';
 import ShippingAddress from '../../../entities/ShippingAddress';
 import MerchOrderFulfillmentState from '../../../enum/MerchOrderFulfillmentState';
 import required from '../../utils/required';
+import {
+  PRINTFUL_SHIPPING_METHOD_METADATA_KEY,
+  quotePrintfulShipping,
+} from '../printfulShipping';
 import * as PrintfulService from '../PrintfulService';
 import FulfillmentProvider, {
   CreatedProviderOrder,
@@ -11,13 +15,19 @@ import FulfillmentProvider, {
 const PrintfulFulfillmentProvider: FulfillmentProvider = {
   requiresReview: true,
 
+  quoteShippingOptions: quotePrintfulShipping,
+  shippingMethodMetadataKey: PRINTFUL_SHIPPING_METHOD_METADATA_KEY,
+  defaultShippingMethod: 'STANDARD',
+
   async createOrder(
     merchOrderId: number,
-    shippingAddress: ShippingAddress
+    shippingAddress: ShippingAddress,
+    shippingMethod?: string
   ): Promise<CreatedProviderOrder> {
     const printfulOrder = await PrintfulService.createEmptyOrder(
       merchOrderId,
-      shippingAddress
+      shippingAddress,
+      shippingMethod
     );
     return {
       providerOrderId: String(printfulOrder.id),

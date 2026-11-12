@@ -2,7 +2,7 @@ import MerchInternalVariant from '../../enum/MerchInternalVariant';
 import { getPrintfileDirectUrl } from '../utils/printfileUtils';
 import { CatalogItemWritable as PrintfulCatalogItemWritable } from '../utils/printfulApi';
 
-const INTERNAL_VARIANT_TO_PRINTFUL_VARIANT: Record<
+export const INTERNAL_VARIANT_TO_PRINTFUL_VARIANT: Record<
   MerchInternalVariant.TOTE_BAG_SMALL,
   number
 > = {

@@ -93,7 +93,8 @@ export async function createMerchOrder(
 
       const providerOrder = await fulfillmentProvider.createOrder(
         order.id,
-        shippingAddress
+        shippingAddress,
+        providerShippingMethod
       );
 
       order.providerOrderId = providerOrder.providerOrderId;
