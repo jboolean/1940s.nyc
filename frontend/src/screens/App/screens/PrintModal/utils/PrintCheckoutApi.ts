@@ -30,7 +30,7 @@ export async function createPrintCheckoutSession(
   const resp = await api.post<{ sessionId: string; url: string }>(
     '/print-checkout/session',
     { items, successUrl, cancelUrl },
-    { timeout: 10000 }
+    { timeout: 20000 }
   );
   return resp.data.url;
 }
