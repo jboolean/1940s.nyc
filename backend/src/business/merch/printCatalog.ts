@@ -51,7 +51,7 @@ export const PRINT_PRODUCTS: PrintProduct[] = [
       productRef: 'framed-print',
       selections: {
         size: '8x12',
-        moulding: 'slim_black',
+        moulding: 'gallery_fine_black',
         surface: 'photo_print',
         photo_print: 'lustre_photo_print',
         lamination: 'no',
