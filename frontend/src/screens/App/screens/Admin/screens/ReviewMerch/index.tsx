@@ -5,11 +5,18 @@ import {
   isPrintOptions,
   isToteOptions,
   MerchItemState,
+  MerchProvider,
   Order,
   OrderItem,
 } from 'shared/utils/merch/Order';
 import stylesheet from './ReviewMerch.less';
 import useReviewMerchStore from './stores/ReviewMerchStore';
+
+const PROVIDER_LABELS: Record<MerchProvider, string> = {
+  [MerchProvider.PRINTFUL]: 'Printful',
+  [MerchProvider.PRODIGI]: 'Prodigi',
+  [MerchProvider.WHCC]: 'WHCC',
+};
 
 const DATE_FORMATTER = new Intl.DateTimeFormat('en-US', {
   dateStyle: 'full',
@@ -28,6 +35,7 @@ function OrderMetadataView({ order }: { order: Order }): React.JSX.Element {
         </time>
       </div>
       {order.email && <div>Email: {order.email}</div>}
+      <div>Printer: {PROVIDER_LABELS[order.provider]}</div>
       <div>State: {order.state}</div>
       {order.fulfillmentState && (
         <div>Fulfillment: {order.fulfillmentState}</div>

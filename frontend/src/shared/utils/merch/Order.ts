@@ -72,6 +72,12 @@ export enum MerchOrderFulfillmentState {
   FULFILLED = 'fulfilled', // Entire order has shipped
 }
 
+export enum MerchProvider {
+  PRINTFUL = 'printful',
+  PRODIGI = 'prodigi',
+  WHCC = 'whcc',
+}
+
 export interface OrderItem {
   id: number;
   internalVariant: MerchInternalVariant;
@@ -87,6 +93,7 @@ export interface Order {
   userId: number;
   email?: string;
   state: MerchOrderState;
+  provider: MerchProvider;
   fulfillmentState?: MerchOrderFulfillmentState;
   items: OrderItem[];
   trackingUrl?: string;

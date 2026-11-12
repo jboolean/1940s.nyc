@@ -11,15 +11,9 @@ import * as WhccClient from './whccApi';
 export const WHCC_SHIPPING_METHOD_METADATA_KEY = 'whcc-shipping-priority';
 
 // Checkout has not collected an address when shipping is quoted, and calculate offers no shipping
-// methods without one, so quotes use a representative US address.
-const WHCC_QUOTE_ADDRESS: WhccClient.ShippingAddress = {
-  name: 'Shipping quote',
-  addr1: '350 5th Ave',
-  city: 'New York',
-  state: 'NY',
-  zip: '10118',
-  country: 'US',
-};
+// methods without one. State and country alone return the same methods and prices as a full New
+// York address; a ZIP alone adds Alaska and Hawaii methods.
+const WHCC_QUOTE_ADDRESS = { state: 'NY', country: 'US' };
 
 // Stripe allows at most five shipping options on a session.
 const MAX_SHIPPING_OPTIONS = 5;
