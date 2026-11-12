@@ -6,7 +6,7 @@ const rate = (
   overrides = {}
 ): Parameters<typeof buildPrintfulShippingOptions>[0][number] => ({
   shipping: 'STANDARD',
-  shipping_method_name: 'Flat Rate (3-4 business days)',
+  shipping_method_name: 'Flat Rate (Estimated delivery: Nov 19⁠–21) ',
   rate: '4.99',
   currency: 'USD',
   min_delivery_days: 3,
@@ -19,7 +19,7 @@ describe('buildPrintfulShippingOptions', () => {
   it('charges exactly the quoted rate and records the method', () => {
     const [option] = buildPrintfulShippingOptions([rate()]);
     expect(option.shipping_rate_data).toMatchObject({
-      display_name: 'Flat Rate (3-4 business days)',
+      display_name: 'Flat Rate',
       fixed_amount: { amount: 499, currency: 'usd' },
       delivery_estimate: {
         minimum: { unit: 'business_day', value: 3 },

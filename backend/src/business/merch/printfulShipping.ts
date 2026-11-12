@@ -8,6 +8,7 @@ import type { ShippingQuoteItem } from './providers/FulfillmentProvider';
 export const PRINTFUL_SHIPPING_METHOD_METADATA_KEY = 'printful-shipping-method';
 
 // Checkout has not collected an address when shipping is quoted, so quotes use a representative US address.
+// Printful rejects a quote without a state; it prices the same across the US for the products sold.
 const QUOTE_ADDRESS = {
   address1: '350 5th Ave',
   city: 'New York',
@@ -33,7 +34,9 @@ export function buildPrintfulShippingOptions(
     return {
       shipping_rate_data: {
         type: 'fixed_amount',
-        display_name: rate.shipping_method_name,
+        display_name: rate.shipping_method_name
+          .replace(/\s*\(Estimated delivery:.*\)\s*$/, '')
+          .trim(),
         fixed_amount: { amount: toCents(rate.rate), currency: 'usd' },
         ...(rate.min_delivery_days !== undefined &&
         rate.max_delivery_days !== undefined
