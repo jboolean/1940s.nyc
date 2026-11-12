@@ -1,9 +1,15 @@
-import { createHmac } from 'crypto';
 import express from 'express';
 import type { AddressInfo } from 'node:net';
+import stripe from '../third-party/stripe';
 import * as WhccCallbackService from '../business/whcc/WhccCallbackService';
 import router from './WhccWebhooksResource';
 
+jest.mock('../third-party/stripe', () => ({
+  __esModule: true,
+  default: new (jest.requireActual<typeof import('stripe')>('stripe').default)(
+    'sk_test_unused'
+  ),
+}));
 jest.mock('../business/whcc/WhccCallbackService', () => ({
   handleEvent: jest.fn(),
 }));
@@ -26,7 +32,11 @@ function sign(
   timestamp: number,
   secret = process.env.WHCC_SIGNING_SECRET as string
 ): string {
-  return `t=${timestamp},v1=${createHmac('sha256', secret).update(`${timestamp}.${body}`).digest('hex').toUpperCase()}`;
+  return stripe.webhooks
+    .generateTestHeaderString({ payload: body, secret, timestamp })
+    .toUpperCase()
+    .replace(/^T=/, 't=')
+    .replace(',V1=', ',v1=');
 }
 
 async function post(signature: string): Promise<number> {

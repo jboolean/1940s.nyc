@@ -1,11 +1,8 @@
+import { setTimeout } from 'node:timers/promises';
 import * as WhccClient from './whccApi';
 
 const POLL_START_MS = 1_000;
 const POLL_MAX_MS = 3_000;
-
-function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
 
 // Builds the products and waits until each is ready, giving up at the deadline (epoch milliseconds)
 // so a caller inside a request fails and retries instead of running out of time. Returns them in
@@ -24,7 +21,7 @@ export async function buildConfiguredProducts(
     if (!pollUrl || Date.now() + delay > deadline) {
       throw new Error(`WHCC did not finish building ${ids.join(',')} in time`);
     }
-    await sleep(delay);
+    await setTimeout(delay);
     delay = Math.min(delay * 2, POLL_MAX_MS);
     const polled = await WhccClient.pollConfiguredProducts(pollUrl, deadline);
     items = polled.items;

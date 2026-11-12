@@ -9,6 +9,8 @@ import {
 } from '../../third-party/whcc/client/sdk.gen';
 import type {
   GetV1CommerceConfiguredproductsResponses,
+  GetV1CommerceSubmissionsData,
+  Model38,
   PostV1CommerceConfiguredproductsData,
   PostV1CommerceSubmissionsCalculateData,
   PostV1CommerceSubmissionsData,
@@ -98,20 +100,13 @@ export interface ConfiguredProducts {
 // describe are declared here.
 export interface Submission {
   id: string;
-  status:
-    | 'staged'
-    | 'submitting'
-    | 'placed'
-    | 'shipped'
-    | 'failed'
-    | 'canceled'
-    | 'partially_failed';
-  orders?: {
-    confirmationId?: string;
+  status: NonNullable<
+    NonNullable<GetV1CommerceSubmissionsData['query']>['status']
+  >;
+  orders?: (Omit<Model38, 'status'> & {
     status: string;
-    shippingInfo?: { trackingUrl?: string }[];
     actions?: { fulfillment?: { url?: string } };
-  }[];
+  })[];
 }
 
 export interface Calculation {
