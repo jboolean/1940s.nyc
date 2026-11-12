@@ -12,6 +12,22 @@ const findOne = jest.fn();
 jest.mock('../../createConnection', () => ({
   AppDataSource: { getRepository: () => ({ findOne }) },
 }));
+jest.mock('./providers/PrintfulFulfillmentProvider', () => ({
+  __esModule: true,
+  default: {},
+}));
+jest.mock('./providers/ProdigiFulfillmentProvider', () => ({
+  __esModule: true,
+  default: {
+    quoteShippingOptions: jest.requireActual<
+      typeof import('../prodigi/printShipping')
+    >('../prodigi/printShipping').quotePrintShipping,
+  },
+}));
+jest.mock('./providers/WhccFulfillmentProvider', () => ({
+  __esModule: true,
+  default: {},
+}));
 jest.mock('../prodigi/ProdigiService', () => ({ getQuotes: jest.fn() }));
 jest.mock('../../third-party/stripe', () => ({
   __esModule: true,
@@ -73,7 +89,7 @@ describe('createMerchCheckoutSession', () => {
       customer_creation: 'always',
       customer_email: 'a@b.c',
       shipping_address_collection: { allowed_countries: ['US'] },
-      metadata: { userId: 3 },
+      metadata: { userId: 3, 'merch-provider': 'printful' },
       automatic_tax: { enabled: true },
       customer_update: undefined,
       mode: 'payment',

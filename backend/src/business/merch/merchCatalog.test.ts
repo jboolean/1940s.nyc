@@ -1,6 +1,6 @@
 import MerchInternalVariant from '../../enum/MerchInternalVariant';
 import type { PrintVariant as EntityPrintVariant } from '../../entities/MerchCustomizationOptions';
-import { getPrintProduct, PRINT_PRODUCTS } from '../prodigi/printCatalog';
+import { getPrintProduct, PRINT_PRODUCTS } from './printCatalog';
 import {
   getMerchLabel,
   getMerchProvider,

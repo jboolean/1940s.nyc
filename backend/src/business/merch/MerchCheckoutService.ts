@@ -7,13 +7,15 @@ import Collection from '../../enum/Collection';
 import MerchInternalVariant from '../../enum/MerchInternalVariant';
 import MerchProvider from '../../enum/MerchProvider';
 import stripe from '../../third-party/stripe';
-import { quotePrintShipping } from '../prodigi/printShipping';
 import isProduction from '../utils/isProduction';
 import {
   buildCheckoutSessionFields,
   getCatalogDefaultPrice,
 } from './checkoutSession';
-import { getMerchProvider, isPrintVariant } from './merchCatalog';
+import { isPrintVariant } from './merchCatalog';
+import getFulfillmentProvider, {
+  selectProviderForItems,
+} from './providers/getFulfillmentProvider';
 import { getMerchProductId, hasMerchProduct } from './ProductRegistry';
 
 // This is the tote bag US price.
@@ -21,6 +23,9 @@ import { getMerchProductId, hasMerchProduct } from './ProductRegistry';
 const DEFAULT_SHIPPING_RATE = isProduction()
   ? 'shr_1SWhRLFCLBtNZLVlvrC9UTEd'
   : 'shr_1QssVnFCLBtNZLVlK1TZpXet';
+
+// The provider chosen for the basket, so the order is created for the printer that was quoted.
+export const MERCH_PROVIDER_METADATA_KEY = 'merch-provider';
 
 const MAX_PRINT_QUANTITY = 10;
 export const MAX_CHECKOUT_ITEMS = 20;
@@ -93,12 +98,14 @@ export async function createMerchCheckoutSession({
     );
   }
   items.forEach(checkItem);
-  const providers = new Set(
-    items.map((item) => getMerchProvider(item.variant))
-  );
-  if (providers.size > 1) {
+  let provider: MerchProvider;
+  try {
+    provider = selectProviderForItems(items.map((item) => item.variant));
+  } catch {
     throw new BadRequest('One checkout can only buy from one printer');
   }
+
+  const { quoteShippingOptions } = getFulfillmentProvider(provider);
 
   // The prices come from Stripe; they are read here so a missing or non-USD price fails now, not
   // at the webhook.
@@ -115,14 +122,19 @@ export async function createMerchCheckoutSession({
         })
       )
     ),
-    providers.has(MerchProvider.PRODIGI)
-      ? quotePrintShipping(items)
+    quoteShippingOptions
+      ? quoteShippingOptions(items)
       : [{ shipping_rate: DEFAULT_SHIPPING_RATE }],
   ]);
 
   const session = await stripe.checkout.sessions.create(
     {
-      ...buildCheckoutSessionFields({ successUrl, cancelUrl, user }),
+      ...buildCheckoutSessionFields({
+        successUrl,
+        cancelUrl,
+        user,
+        metadata: { [MERCH_PROVIDER_METADATA_KEY]: provider },
+      }),
       mode: 'payment',
       line_items: lineItems,
       payment_intent_data: {},

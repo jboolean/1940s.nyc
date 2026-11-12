@@ -68,6 +68,14 @@ export function getPrintfileDirectUrl(
   );
 }
 
+// Direct URL of the full-resolution original, for printers that need an image before the print
+// file exists (shipping quotes).
+export function getOriginalDirectUrl(photoIdentifier: string): string {
+  return bypassCloudflare(
+    `https://photos.1940s.nyc/jpg/${photoIdentifier}.jpg`
+  );
+}
+
 // Server-side copy of the full-resolution original, without downloading it.
 export async function copyOriginalToPrintJpeg(
   merchItemId: number,

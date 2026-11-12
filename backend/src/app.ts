@@ -24,6 +24,7 @@ import { IpDeniedError } from 'express-ipfilter';
 import PostmarkWebhooksResource from './api/PostmarkWebhooksResource';
 import PrintfulWebhooksResource from './api/PrintfulWebhooksResource';
 import ProdigiWebhooksResource from './api/ProdigiWebhooksResource';
+import WhccWebhooksResource from './api/WhccWebhooksResource';
 import StripeWebhooksResource from './api/StripeWebhooksResource';
 
 // Cloudflare -> CloudFront (edge-optimized API Gateway) -> API Gateway
@@ -59,6 +60,8 @@ app.use(
 // TracingHandler creates a trace for every incoming request
 app.use(Sentry.Handlers.tracingHandler());
 
+// WHCC signs the exact bytes it sends, so its route keeps the body raw.
+app.use('/whcc-webhooks', express.raw({ type: () => true }));
 app.use(express.json());
 app.use(cookieParser());
 
@@ -84,6 +87,7 @@ app.use('/stripe-webhooks', StripeWebhooksResource);
 app.use('/postmark-webhooks', PostmarkWebhooksResource);
 app.use('/printful-webhooks', PrintfulWebhooksResource);
 app.use('/prodigi-webhooks', ProdigiWebhooksResource);
+app.use('/whcc-webhooks', WhccWebhooksResource);
 
 // Tsoa
 // eslint-disable-next-line @typescript-eslint/no-unsafe-call

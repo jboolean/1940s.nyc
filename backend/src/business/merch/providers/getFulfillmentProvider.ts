@@ -4,10 +4,12 @@ import { getMerchProvider } from '../merchCatalog';
 import FulfillmentProvider from './FulfillmentProvider';
 import PrintfulFulfillmentProvider from './PrintfulFulfillmentProvider';
 import ProdigiFulfillmentProvider from './ProdigiFulfillmentProvider';
+import WhccFulfillmentProvider from './WhccFulfillmentProvider';
 
 const PROVIDERS: Record<MerchProvider, FulfillmentProvider> = {
   [MerchProvider.PRINTFUL]: PrintfulFulfillmentProvider,
   [MerchProvider.PRODIGI]: ProdigiFulfillmentProvider,
+  [MerchProvider.WHCC]: WhccFulfillmentProvider,
 };
 
 export function selectProviderForItems(
@@ -42,5 +44,12 @@ export function getProvidersNeedingReview(): MerchProvider[] {
 export function getProvidersWithoutReview(): MerchProvider[] {
   return (Object.keys(PROVIDERS) as MerchProvider[]).filter(
     (provider) => !PROVIDERS[provider].requiresReview
+  );
+}
+
+// The providers whose submitted orders can be re-read to catch up on a missed callback.
+export function getProvidersWithStatusSync(): MerchProvider[] {
+  return (Object.keys(PROVIDERS) as MerchProvider[]).filter(
+    (provider) => PROVIDERS[provider].syncSubmittedOrder
   );
 }

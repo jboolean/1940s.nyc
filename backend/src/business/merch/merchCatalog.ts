@@ -26,7 +26,11 @@ export const MERCH_CATALOG = {
   [MerchInternalVariant.PRINT_HPR_4X6]: {
     label: '4×6 print',
     kind: 'print',
-    provider: MerchProvider.PRODIGI,
+    // Staging-only test routing to WHCC; remove before merge.
+    provider:
+      process.env.STAGE === 'staging'
+        ? MerchProvider.WHCC
+        : MerchProvider.PRODIGI,
     printfileExtension: 'jpg',
   },
   [MerchInternalVariant.PRINT_HPR_8X12]: {

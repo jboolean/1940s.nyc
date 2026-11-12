@@ -19,6 +19,24 @@ jest.mock('../business/ledger/LedgerService', () => ({
 jest.mock('../business/merch/MerchOrderService', () => ({
   createMerchOrder: jest.fn().mockResolvedValue({ id: 1 }),
 }));
+jest.mock('../business/merch/providers/PrintfulFulfillmentProvider', () => ({
+  __esModule: true,
+  default: {},
+}));
+jest.mock('../business/merch/providers/ProdigiFulfillmentProvider', () => ({
+  __esModule: true,
+  default: {
+    shippingMethodMetadataKey: 'prodigi-shipping-method',
+    defaultShippingMethod: 'Standard',
+  },
+}));
+jest.mock('../business/merch/providers/WhccFulfillmentProvider', () => ({
+  __esModule: true,
+  default: {
+    shippingMethodMetadataKey: 'whcc-shipping-priority',
+    defaultShippingMethod: 'dropship_lowest_cost',
+  },
+}));
 jest.mock('../business/users/UserService', () => ({
   attachStripeCustomerAndDetermineUserId: jest.fn().mockResolvedValue(9),
 }));
@@ -115,9 +133,31 @@ describe('checkout.session.completed for merch', () => {
       'cs_1',
       expect.objectContaining({ line1: '1 Main', postalCode: '10007' }),
       expect.any(Array),
+      'prodigi',
       'Express'
     );
     expect(LedgerService.grantCreditsForTip).not.toHaveBeenCalled();
+  });
+
+  it('uses the provider stamped on the session over the catalog default', async () => {
+    await deliver(
+      session({
+        metadata: { 'merch-provider': 'whcc' },
+        shipping_cost: {
+          shipping_rate: {
+            metadata: { 'whcc-shipping-priority': 'dropship_expedited' },
+          },
+        },
+      })
+    );
+    expect(create).toHaveBeenCalledWith(
+      9,
+      'cs_1',
+      expect.anything(),
+      expect.any(Array),
+      'whcc',
+      'dropship_expedited'
+    );
   });
 
   it('turns each print copy into a customized item carrying its photo', async () => {
@@ -167,6 +207,7 @@ describe('checkout.session.completed for merch', () => {
       'cs_1',
       expect.anything(),
       [{ variant: 'tote-bag-small' }, { variant: 'tote-bag-small' }],
+      'printful',
       undefined
     );
     expect(LedgerService.grantCreditsForTip).toHaveBeenCalledWith(

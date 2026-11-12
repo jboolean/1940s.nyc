@@ -20,6 +20,7 @@ jest.mock('../users/UserService', () => ({
 
 // Pulled in by the fulfillment providers, neither is used by onShipmentSent.
 jest.mock('../utils/printfulApi', () => ({}));
+jest.mock('../whcc/whccApi', () => ({}));
 
 interface FakeOrder {
   id: number;

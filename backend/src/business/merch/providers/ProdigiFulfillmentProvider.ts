@@ -1,5 +1,10 @@
 import MerchOrder from '../../../entities/MerchOrder';
+import { handleOrderCallback } from '../../prodigi/ProdigiCallbackService';
 import { buildProdigiOrder } from '../../prodigi/buildProdigiOrder';
+import {
+  PRODIGI_SHIPPING_METHOD_METADATA_KEY,
+  quotePrintShipping,
+} from '../../prodigi/printShipping';
 import * as ProdigiService from '../../prodigi/ProdigiService';
 import * as UserService from '../../users/UserService';
 import required from '../../utils/required';
@@ -11,6 +16,10 @@ import FulfillmentProvider, {
 const ProdigiFulfillmentProvider: FulfillmentProvider = {
   // Every order waits for a person to look it over, Prodigi's included.
   requiresReview: true,
+
+  quoteShippingOptions: quotePrintShipping,
+  shippingMethodMetadataKey: PRODIGI_SHIPPING_METHOD_METADATA_KEY,
+  defaultShippingMethod: 'Standard',
 
   createOrder() {
     return Promise.resolve({});
@@ -31,6 +40,10 @@ const ProdigiFulfillmentProvider: FulfillmentProvider = {
       buildProdigiOrder(order, user.email ?? undefined)
     );
     return { providerOrderId: prodigiOrder.id };
+  },
+
+  async syncSubmittedOrder(providerOrderId: string): Promise<void> {
+    await handleOrderCallback(providerOrderId, true);
   },
 
   async cancelSubmittedOrder(order: MerchOrder): Promise<void> {

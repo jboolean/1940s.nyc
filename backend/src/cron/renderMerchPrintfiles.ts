@@ -5,7 +5,7 @@ import {
   getPrintfileExtensionForVariant,
 } from '../business/merch/merchCatalog';
 import renderToteBag from '../business/merch/renderToteBag';
-import { getPrintProduct } from '../business/prodigi/printCatalog';
+import { getPrintProduct } from '../business/merch/printCatalog';
 import {
   copyOriginalToPrintJpeg,
   PrintfileExtension,

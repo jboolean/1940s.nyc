@@ -7,11 +7,11 @@ import type Stripe from 'stripe';
 import EmailCampaignService from '../business/email/EmailCampaignService';
 import * as LedgerService from '../business/ledger/LedgerService';
 import * as MerchOrderService from '../business/merch/MerchOrderService';
-import {
-  getMerchProvider,
-  isPrintVariant,
-} from '../business/merch/merchCatalog';
-import { PRODIGI_SHIPPING_METHOD_METADATA_KEY } from '../business/prodigi/printShipping';
+import { MERCH_PROVIDER_METADATA_KEY } from '../business/merch/MerchCheckoutService';
+import { isPrintVariant } from '../business/merch/merchCatalog';
+import getFulfillmentProvider, {
+  selectProviderForItems,
+} from '../business/merch/providers/getFulfillmentProvider';
 import * as UserService from '../business/users/UserService';
 import isProduction from '../business/utils/isProduction';
 import MerchInternalVariant from '../enum/MerchInternalVariant';
@@ -205,21 +205,27 @@ router.post<'/', unknown, unknown, Stripe.Event, unknown>(
         const newItems = (byProductType['merch'] ?? []).flatMap(
           merchLineItemToOrderItems
         );
-        const providers = new Set(
-          newItems.map((item) => getMerchProvider(item.variant))
-        );
-        if (providers.size > 1) {
+        let provider: MerchProvider | undefined;
+        try {
+          // Sessions created before the provider was stamped on them have none.
+          const stamped =
+            expandedSession.metadata?.[MERCH_PROVIDER_METADATA_KEY];
+          provider = !newItems.length
+            ? undefined
+            : (Object.values(MerchProvider).find((p) => p === stamped) ??
+              selectProviderForItems(newItems.map((item) => item.variant)));
+        } catch (e) {
           // Our checkouts never mix printers, and the provider choice rejects a mix. Stop before
           // creating anything: an order made from a mixed basket would take the session's
           // idempotency key and leave the other items unfulfillable. A non-2xx reply asks Stripe
           // to retry, which is safe because nothing was created.
           console.error(
             '[merch-alert] checkout session mixes printers; no order was created',
-            { sessionId: session.id }
+            { sessionId: session.id, error: String(e) }
           );
           return res.status(500).send();
         }
-        if (newItems.length) {
+        if (provider) {
           const shippingDetails =
             expandedSession.collected_information?.shipping_details;
           const shippingAddress = {
@@ -235,14 +241,18 @@ router.post<'/', unknown, unknown, Stripe.Event, unknown>(
           // The tote's fixed rate names no method, so a tote order keeps the field empty.
           const shippingRate = expandedSession.shipping_cost?.shipping_rate as
             Stripe.ShippingRate | undefined;
+          const {
+            shippingMethodMetadataKey: metadataKey,
+            defaultShippingMethod: fallback,
+          } = getFulfillmentProvider(provider);
           let shippingMethod: string | undefined =
-            shippingRate?.metadata?.[PRODIGI_SHIPPING_METHOD_METADATA_KEY];
-          if (!shippingMethod && providers.has(MerchProvider.PRODIGI)) {
+            metadataKey && shippingRate?.metadata?.[metadataKey];
+          if (!shippingMethod && fallback) {
             console.warn(
-              'Print checkout has no Prodigi shipping method; defaulting to Standard',
+              `Print checkout has no ${provider} shipping method; defaulting to ${fallback}`,
               { sessionId: session.id }
             );
-            shippingMethod = 'Standard';
+            shippingMethod = fallback;
           }
 
           const order = await MerchOrderService.createMerchOrder(
@@ -250,6 +260,7 @@ router.post<'/', unknown, unknown, Stripe.Event, unknown>(
             session.id,
             shippingAddress,
             newItems,
+            provider,
             shippingMethod
           );
 

@@ -20,6 +20,7 @@ jest.mock('../users/UserService', () => ({
   getUser: jest.fn(),
 }));
 jest.mock('../utils/printfulApi', () => ({}));
+jest.mock('../whcc/whccApi', () => ({}));
 
 // The clause puts a provider list into raw SQL, and an empty list written that way renders
 // "in ()", which is a Postgres error rather than an empty match. Building the clause against real

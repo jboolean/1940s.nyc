@@ -22,7 +22,6 @@ import type { CreatedProviderOrder } from './providers/FulfillmentProvider';
 import getFulfillmentProvider, {
   getProvidersNeedingReview,
   getProvidersWithoutReview,
-  selectProviderForItems,
 } from './providers/getFulfillmentProvider';
 
 const API_BASE = isProduction()
@@ -62,10 +61,9 @@ export async function createMerchOrder(
   stripeCheckoutSessionId: string,
   shippingAddress: ShippingAddress,
   newItems: NewOrderItem[],
+  provider: MerchProvider,
   providerShippingMethod?: string
 ): Promise<MerchOrder> {
-  const itemTypes = newItems.map((i) => i.variant);
-
   // Stripe can deliver the same completed session more than once.
   const existing = await AppDataSource.getRepository(MerchOrder).findOneBy({
     stripeCheckoutSessionId,
@@ -78,7 +76,6 @@ export async function createMerchOrder(
     return existing;
   }
 
-  const provider = selectProviderForItems(itemTypes);
   const fulfillmentProvider = getFulfillmentProvider(provider);
   const sendsCustomizationEmail = needsCustomization(newItems);
 
