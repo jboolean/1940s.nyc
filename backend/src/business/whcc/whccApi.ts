@@ -259,10 +259,14 @@ export async function getSubmission(
 export async function listSubmissions(
   filter: { reference: string } | { confirmationId: string },
   deadline?: number
-): Promise<{ submissions: Pick<Submission, 'id'>[] }> {
+): Promise<{
+  submissions: (Pick<Submission, 'id'> & { reference?: string })[];
+}> {
   return (await call(deadline, (o) =>
     getV1CommerceSubmissions({ ...o, headers: AUTHORIZED, query: filter })
-  )) as unknown as { submissions: Pick<Submission, 'id'>[] };
+  )) as unknown as {
+    submissions: (Pick<Submission, 'id'> & { reference?: string })[];
+  };
 }
 
 // Follows the actions.fulfillment link of a submission or one of its orders.

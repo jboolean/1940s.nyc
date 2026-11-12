@@ -35,23 +35,27 @@ router.post('/', async (req, res) => {
     res.status(401).send();
     return;
   }
-  let confirmationId: unknown;
+  let event: {
+    ConfirmationId?: unknown;
+    EventType?: string;
+    SequenceNumber?: string;
+  };
   try {
-    confirmationId = (
-      JSON.parse(rawBody.toString('utf8')) as {
-        ConfirmationId?: unknown;
-      }
-    ).ConfirmationId;
+    event = JSON.parse(rawBody.toString('utf8')) as typeof event;
   } catch {
-    confirmationId = undefined;
+    event = {};
   }
-  if (typeof confirmationId !== 'string') {
+  if (typeof event.ConfirmationId !== 'string') {
     console.error('[WHCC webhook] Ignoring an event we cannot parse');
     res.status(400).send();
     return;
   }
   try {
-    await WhccCallbackService.handleEvent(confirmationId);
+    await WhccCallbackService.handleEvent({
+      eventType: event.EventType ?? '',
+      confirmationId: event.ConfirmationId,
+      sequenceNumber: event.SequenceNumber ?? '',
+    });
     res.status(200).send();
   } catch (e) {
     console.error('[WHCC webhook] Failed to process event', e);

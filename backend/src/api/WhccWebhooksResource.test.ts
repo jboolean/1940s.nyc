@@ -66,5 +66,9 @@ it('rejects a wrong or stale signature without acting', async () => {
 
 it('re-reads the order named by a correctly signed event', async () => {
   await expect(post(sign(Math.floor(Date.now() / 1000)))).resolves.toBe(200);
-  expect(handleEvent).toHaveBeenCalledWith('c1');
+  expect(handleEvent).toHaveBeenCalledWith({
+    eventType: 'order.shipped',
+    confirmationId: 'c1',
+    sequenceNumber: '',
+  });
 });

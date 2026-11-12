@@ -30,10 +30,25 @@ export async function syncSubmission(submissionId: string): Promise<void> {
 
 // The webhook route verifies the delivery's signature. Only its ConfirmationId is used, to find the
 // submission again from WHCC with our API key; the state applied comes from that read.
-export async function handleEvent(confirmationId: string): Promise<void> {
-  const { submissions } = await WhccClient.listSubmissions({ confirmationId });
+export async function handleEvent(event: {
+  eventType: string;
+  confirmationId: string;
+  sequenceNumber: string;
+}): Promise<void> {
+  const { submissions } = await WhccClient.listSubmissions({
+    confirmationId: event.confirmationId,
+  });
+  console.log(
+    `WHCC event ${event.eventType} ${event.confirmationId} ${event.sequenceNumber} ->`,
+    submissions.length
+      ? submissions.map((s) => s.reference ?? s.id).join(', ')
+      : 'no matching order'
+  );
   if (!submissions.length) {
-    console.warn('WHCC event for an order we do not know', confirmationId);
+    console.warn(
+      'WHCC event for an order we do not know',
+      event.confirmationId
+    );
     return;
   }
   for (const { id } of submissions) {
