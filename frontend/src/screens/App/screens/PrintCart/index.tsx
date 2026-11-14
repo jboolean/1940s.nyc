@@ -6,7 +6,8 @@ import FourtiesModal from 'shared/components/Modal';
 import TextButton from 'shared/components/TextButton';
 import TextInput from 'shared/components/TextInput';
 import recordEvent from 'shared/utils/recordEvent';
-import { usePrintOrdersEnabled } from '../../shared/stores/FeatureFlagsStore';
+import { useFeatureFlag } from '../../shared/stores/FeatureFlagsStore';
+import FeatureFlag from '../../shared/types/FeatureFlag';
 import { forgeImgSrc } from '../ViewerPane/components/ImageStack';
 import {
   createPrintCheckoutSession,
@@ -28,7 +29,7 @@ export function PrintCartButton({
     state.items.reduce((sum, item) => sum + item.quantity, 0)
   );
   const open = usePrintCartStore((state) => state.open);
-  const printOrdersEnabled = usePrintOrdersEnabled();
+  const printOrdersEnabled = useFeatureFlag(FeatureFlag.PRINT_ORDERS);
   if (!printOrdersEnabled || count === 0) return null;
   return (
     <button
