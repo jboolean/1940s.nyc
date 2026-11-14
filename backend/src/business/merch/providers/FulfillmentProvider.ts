@@ -32,7 +32,8 @@ interface FulfillmentProvider {
 
   createOrder(
     merchOrderId: number,
-    shippingAddress: ShippingAddress
+    shippingAddress: ShippingAddress,
+    shippingMethod?: string
   ): Promise<CreatedProviderOrder>;
 
   addItemToOrder(item: MerchOrderItem): Promise<void>;

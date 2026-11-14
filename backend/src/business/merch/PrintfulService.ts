@@ -38,10 +38,12 @@ function toPrintfulRecipient(address: ShippingAddress): PrintfulRecipient {
 
 export async function createEmptyOrder(
   merchOrderId: number,
-  shippingAddress: ShippingAddress
+  shippingAddress: ShippingAddress,
+  shippingMethod?: string
 ): Promise<PrintfulOrder> {
   const orderResp = await createOrder({
     body: {
+      shipping: shippingMethod,
       recipient: toPrintfulRecipient(shippingAddress),
       external_id: merchOrderId.toString(),
       order_items: [],
