@@ -11,6 +11,8 @@ import { immer } from 'zustand/middleware/immer';
 interface State {
   orders: Order[];
   ordersNeedingAttention: Order[];
+  // Orders whose approve or cancel request is in flight.
+  pendingOrderIds: number[];
 }
 
 interface Actions {
@@ -21,10 +23,35 @@ interface Actions {
   viewPrintfile(itemId: number): void;
 }
 
+type Set = (fn: (state: State) => void) => void;
+
+async function updatePendingOrder(
+  set: Set,
+  orderId: number,
+  newState: MerchOrderState
+): Promise<void> {
+  set((state) => {
+    state.pendingOrderIds.push(orderId);
+  });
+  try {
+    await updateOrderState(orderId, newState);
+    set((state) => {
+      state.orders = state.orders.filter((order) => order.id !== orderId);
+    });
+  } finally {
+    set((state) => {
+      state.pendingOrderIds = state.pendingOrderIds.filter(
+        (id) => id !== orderId
+      );
+    });
+  }
+}
+
 const useReviewMerchStore = create(
   immer<State & Actions>((set) => ({
     orders: [],
     ordersNeedingAttention: [],
+    pendingOrderIds: [],
     loadOrders: async () => {
       const orders = await getOrdersForReview();
       set((state) => {
@@ -38,19 +65,14 @@ const useReviewMerchStore = create(
       });
     },
     fulfillOrder: async (orderId: number) => {
-      await updateOrderState(
+      await updatePendingOrder(
+        set,
         orderId,
         MerchOrderState.SUBMITTED_FOR_FULFILLMENT
       );
-      set((state) => {
-        state.orders = state.orders.filter((order) => order.id !== orderId);
-      });
     },
     cancelOrder: async (orderId: number) => {
-      await updateOrderState(orderId, MerchOrderState.CANCELED);
-      set((state) => {
-        state.orders = state.orders.filter((order) => order.id !== orderId);
-      });
+      await updatePendingOrder(set, orderId, MerchOrderState.CANCELED);
     },
     viewPrintfile: async (itemId: number) => {
       const url = await getPrintfileUrl(itemId);

@@ -1,8 +1,9 @@
 import type { CreateOrderRequest, ShippingMethod } from 'prodigi-print-api';
 import MerchOrder from '../../entities/MerchOrder';
+import MerchProvider from '../../enum/MerchProvider';
 import { getPrintfileDirectUrl } from '../utils/printfileUtils';
 import required from '../utils/required';
-import { getPrintProduct } from './printCatalog';
+import { getPrintProduct } from '../merch/printCatalog';
 
 const SHIPPING_METHODS: ShippingMethod[] = [
   'Budget',
@@ -53,7 +54,7 @@ export function buildProdigiOrder(
       const product = required(
         getPrintProduct(item.internalVariant),
         `print product for ${item.internalVariant}`
-      );
+      )[MerchProvider.PRODIGI];
       return {
         merchantReference: `item-${item.id}`,
         sku: product.sku,

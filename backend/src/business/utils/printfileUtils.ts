@@ -68,6 +68,11 @@ export function getPrintfileDirectUrl(
   );
 }
 
+// Public URL of the original photo. Used for shipping quotes, before a print file exists.
+export function getOriginalPublicUrl(photoIdentifier: string): string {
+  return `https://photos.1940s.nyc/jpg/${photoIdentifier}.jpg`;
+}
+
 // Server-side copy of the full-resolution original, without downloading it.
 export async function copyOriginalToPrintJpeg(
   merchItemId: number,

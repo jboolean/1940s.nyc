@@ -15,12 +15,17 @@ jest.mock('./ProdigiFulfillmentProvider', () => ({
   __esModule: true,
   default: { requiresReview: true },
 }));
+jest.mock('./WhccFulfillmentProvider', () => ({
+  __esModule: true,
+  default: { requiresReview: true },
+}));
 
 describe('provider capabilities', () => {
   it('lists every provider as needing review while none submit on their own', () => {
     expect(getProvidersNeedingReview()).toEqual([
       MerchProvider.PRINTFUL,
       MerchProvider.PRODIGI,
+      MerchProvider.WHCC,
     ]);
     expect(getProvidersWithoutReview()).toEqual([]);
   });
@@ -45,7 +50,7 @@ describe('selectProviderForItems', () => {
         MerchInternalVariant.PRINT_HPR_4X6,
         MerchInternalVariant.PRINT_FAP_8X12_FRAMED,
       ])
-    ).toBe(MerchProvider.PRODIGI);
+    ).toBe(MerchProvider.WHCC);
   });
 
   it('refuses a variant the catalog does not sell rather than guessing a printer', () => {

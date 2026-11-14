@@ -19,6 +19,7 @@ module.exports = {
     sendEmailCampaigns: './sendEmailCampaigns.ts',
     renderMerchPrintfiles: './renderMerchPrintfiles.ts',
     registerPrintfulWebhooks: './registerPrintfulWebhooks.ts',
+    registerWhccWebhooks: './registerWhccWebhooks.ts',
   },
   resolve: {
     extensions: ['.ts', '.js'],

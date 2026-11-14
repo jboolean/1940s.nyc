@@ -3,6 +3,7 @@ import MerchInternalVariant from '../../enum/MerchInternalVariant';
 import MerchItemState from '../../enum/MerchItemState';
 import MerchOrderFulfillmentState from '../../enum/MerchOrderFulfillmentState';
 import MerchOrderState from '../../enum/MerchOrderState';
+import MerchProvider from '../../enum/MerchProvider';
 
 export interface MerchOrderItemApiModel {
   id: number;
@@ -19,6 +20,7 @@ export interface MerchOrderApiModel {
   userId: number;
   email?: string;
   state: MerchOrderState;
+  provider: MerchProvider;
   fulfillmentState?: MerchOrderFulfillmentState;
   items: MerchOrderItemApiModel[];
   trackingUrl?: string;

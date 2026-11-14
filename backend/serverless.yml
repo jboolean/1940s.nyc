@@ -53,6 +53,11 @@ provider:
     PRODIGI_SK: ${ssm:/${self:service}-${sls:stage}-prodigi-sk}
     # See src/business/prodigi/ProdigiService.ts
     PRODIGI_LIVE_ORDERS_ENABLED: ${self:custom.prodigiLiveOrdersEnabled.${sls:stage}}
+    # The '' fallbacks let deploys pass before production WHCC is set up; remove them at go-live.
+    WHCC_SK: ${ssm:/${self:service}-${sls:stage}-whcc-sk, ''}
+    WHCC_SIGNING_SECRET: ${ssm:/${self:service}-${sls:stage}-whcc-signing-secret, ''}
+    # See src/business/merch/providers/WhccFulfillmentProvider.ts
+    WHCC_LIVE_ORDERS_ENABLED: ${self:custom.whccLiveOrdersEnabled.${sls:stage}}
 plugins:
   - serverless-plugin-conditional-functions
   - serverless-webpack
@@ -143,11 +148,18 @@ functions:
   registerPrintfulWebhooks:
     handler: registerPrintfulWebhooks.handler
     # Invoked manually
+  registerWhccWebhooks:
+    handler: registerWhccWebhooks.handler
+    # Invoked by the deploy workflow
 custom:
   webpack:
     webpackConfig: "webpack.config.js"
   bucket: fourties-photos
   prodigiLiveOrdersEnabled:
+    production: 'false'
+    staging: 'false'
+    dev: 'false'
+  whccLiveOrdersEnabled:
     production: 'false'
     staging: 'false'
     dev: 'false'

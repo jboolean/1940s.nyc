@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "postinstall": "patch-package",
-    "start": "npm run generate-printful-api && npm run routes && serverless offline start --stage dev --host dev.1940s.nyc --noPrependStageInUrl",
+    "start": "npm run generate-printful-api && npm run generate-whcc-api && npm run routes && serverless offline start --stage dev --host dev.1940s.nyc --noPrependStageInUrl",
     "debug": "export SLS_DEBUG=* && node --inspect ./node_modules/.bin/serverless offline --stage dev --host dev.1940s.nyc --noPrependStageInUrl",
     "routes": "tsoa routes",
     "deploy:dry": "serverless package --stage production",
@@ -17,6 +17,7 @@
     "install-aws-sharp": "rm -rf node_modules/sharp && SHARP_IGNORE_GLOBAL_LIBVIPS=1 npm install --arch=x64 --platform=linux sharp",
     "types": "tsc",
     "generate-printful-api": "cd src/third-party/printful/ && openapi-ts --file openapi-ts.config.json",
+    "generate-whcc-api": "cd src/third-party/whcc/ && openapi-ts --file openapi-ts.config.ts",
     "experiment": "bash moderation-experiment/run.sh",
     "experiment:ui": "node moderation-experiment/viewer/serve.mjs"
   },
@@ -115,7 +116,7 @@
     }
   },
   "lint-staged": {
-    "src/**/*.{js,jsx,ts,tsx}": [
+    "src/**/!(createClientConfig|createFulfillmentClientConfig).{js,jsx,ts,tsx}": [
       "eslint --fix --max-warnings 0"
     ]
   },

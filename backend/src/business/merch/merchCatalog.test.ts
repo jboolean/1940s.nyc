@@ -1,6 +1,6 @@
 import MerchInternalVariant from '../../enum/MerchInternalVariant';
 import type { PrintVariant as EntityPrintVariant } from '../../entities/MerchCustomizationOptions';
-import { getPrintProduct, PRINT_PRODUCTS } from '../prodigi/printCatalog';
+import { getPrintProduct, PRINT_PRODUCTS } from './printCatalog';
 import {
   getMerchLabel,
   getMerchProvider,
@@ -46,12 +46,12 @@ describe('merch catalog', () => {
     expect(isPrintVariant(MerchInternalVariant.TOTE_BAG_SMALL)).toBe(false);
   });
 
-  it('sends every print to Prodigi and the tote to Printful', () => {
+  it('sends every print to WHCC and the tote to Printful', () => {
     expect(getMerchProvider(MerchInternalVariant.TOTE_BAG_SMALL)).toBe(
       'printful'
     );
     for (const variant of PRINT_VARIANTS) {
-      expect(getMerchProvider(variant)).toBe('prodigi');
+      expect(getMerchProvider(variant)).toBe('whcc');
     }
   });
 });

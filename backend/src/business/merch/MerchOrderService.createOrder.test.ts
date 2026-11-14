@@ -3,9 +3,7 @@ import MerchItemState from '../../enum/MerchItemState';
 import MerchProvider from '../../enum/MerchProvider';
 import EmailService from '../email/EmailService';
 import { createMerchOrder, NewOrderItem } from './MerchOrderService';
-import getFulfillmentProvider, {
-  selectProviderForItems,
-} from './providers/getFulfillmentProvider';
+import getFulfillmentProvider from './providers/getFulfillmentProvider';
 
 const saved: unknown[] = [];
 const repo = {
@@ -27,7 +25,6 @@ jest.mock('../../createConnection', () => ({
 jest.mock('./providers/getFulfillmentProvider', () => ({
   __esModule: true,
   default: jest.fn(),
-  selectProviderForItems: jest.fn(),
 }));
 jest.mock('../users/UserService', () => ({
   getUser: jest.fn().mockResolvedValue({ id: 1, email: 'a@b.c' }),
@@ -46,8 +43,6 @@ jest.mock('../email/templates/OrderConfirmationTemplate', () => ({
   __esModule: true,
   default: { createTemplatedEmail: jest.fn(() => 'confirmation-email') },
 }));
-
-const selectProvider = jest.mocked(selectProviderForItems);
 
 const print: NewOrderItem = {
   variant: MerchInternalVariant.PRINT_HPR_8X12,
@@ -68,7 +63,6 @@ describe('createMerchOrder', () => {
 
   it('does not fail or roll back the order when the confirmation email fails', async () => {
     jest.spyOn(console, 'error').mockImplementation(() => undefined);
-    selectProvider.mockReturnValue(MerchProvider.PRODIGI);
     jest.mocked(getFulfillmentProvider).mockReturnValue({
       createOrder: () => Promise.resolve({}),
     } as never);
@@ -77,19 +71,29 @@ describe('createMerchOrder', () => {
       .mockRejectedValueOnce(new Error('postmark'));
 
     await expect(
-      createMerchOrder(1, 'cs_3', {}, [print], 'Standard')
+      createMerchOrder(
+        1,
+        'cs_3',
+        {},
+        [print],
+        MerchProvider.PRODIGI,
+        'Standard'
+      )
     ).resolves.toMatchObject({ id: 7 });
   });
 
   it('sends the customization email, not the confirmation, for an item bought uncustomized', async () => {
-    selectProvider.mockReturnValue(MerchProvider.PRINTFUL);
     jest.mocked(getFulfillmentProvider).mockReturnValue({
       createOrder: () => Promise.resolve({ providerOrderId: 'pf_1' }),
     } as never);
 
-    await createMerchOrder(1, 'cs_5', {}, [
-      { variant: MerchInternalVariant.TOTE_BAG_SMALL },
-    ]);
+    await createMerchOrder(
+      1,
+      'cs_5',
+      {},
+      [{ variant: MerchInternalVariant.TOTE_BAG_SMALL }],
+      MerchProvider.PRINTFUL
+    );
 
     expect(EmailService.sendTemplateEmail).toHaveBeenCalledWith(
       'customize-email'
@@ -97,12 +101,17 @@ describe('createMerchOrder', () => {
   });
 
   it('records the shipping address when the provider creates its order now', async () => {
-    selectProvider.mockReturnValue(MerchProvider.PRINTFUL);
     jest.mocked(getFulfillmentProvider).mockReturnValue({
       createOrder: () => Promise.resolve({ providerOrderId: 'pf_1' }),
     } as never);
 
-    await createMerchOrder(1, 'cs_4', { line1: '1 Main St' }, [print]);
+    await createMerchOrder(
+      1,
+      'cs_4',
+      { line1: '1 Main St' },
+      [print],
+      MerchProvider.PRINTFUL
+    );
 
     const savedOrder = saved[1] as {
       providerOrderId?: string;
@@ -112,23 +121,6 @@ describe('createMerchOrder', () => {
     expect(savedOrder.shippingAddress).toEqual({ line1: '1 Main St' });
   });
 
-  it('writes nothing and calls no printer when the provider cannot be chosen', async () => {
-    selectProvider.mockImplementationOnce(() => {
-      throw new Error('No provider for variant tote-bag-large');
-    });
-    const provider = { createOrder: jest.fn() };
-    jest.mocked(getFulfillmentProvider).mockReturnValue(provider as never);
-
-    await expect(
-      createMerchOrder(1, 'cs_unknown', {}, [
-        { variant: 'tote-bag-large' as MerchInternalVariant },
-      ])
-    ).rejects.toThrow('No provider for variant tote-bag-large');
-    expect(repo.save).not.toHaveBeenCalled();
-    expect(provider.createOrder).not.toHaveBeenCalled();
-    expect(EmailService.sendTemplateEmail).not.toHaveBeenCalled();
-  });
-
   it('returns the existing order for a checkout session it has already seen', async () => {
     jest.spyOn(console, 'warn').mockImplementation(() => undefined);
     repo.findOneBy.mockResolvedValueOnce({ id: 42 } as never);
@@ -136,7 +128,13 @@ describe('createMerchOrder', () => {
     jest.mocked(getFulfillmentProvider).mockReturnValue(provider as never);
 
     await expect(
-      createMerchOrder(1, 'cs_dup', {}, [{ variant: print.variant }])
+      createMerchOrder(
+        1,
+        'cs_dup',
+        {},
+        [{ variant: print.variant }],
+        MerchProvider.PRODIGI
+      )
     ).resolves.toEqual({ id: 42 });
     expect(provider.createOrder).not.toHaveBeenCalled();
   });

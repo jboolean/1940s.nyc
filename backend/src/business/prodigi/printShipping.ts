@@ -1,8 +1,10 @@
 import type { Quote, ShippingMethod } from 'prodigi-print-api';
 import type Stripe from 'stripe';
 import MerchInternalVariant from '../../enum/MerchInternalVariant';
+import MerchProvider from '../../enum/MerchProvider';
+import { getPrintProduct } from '../merch/printCatalog';
 import required from '../utils/required';
-import { getPrintProduct } from './printCatalog';
+import toCents from '../utils/toCents';
 import * as ProdigiService from './ProdigiService';
 
 // Approximate business days from order to delivery, including production.
@@ -15,10 +17,6 @@ const OFFERED_METHODS: Partial<
 };
 
 export const PRODIGI_SHIPPING_METHOD_METADATA_KEY = 'prodigi-shipping-method';
-
-function toCents(amount: string): number {
-  return Math.round(parseFloat(amount) * 100);
-}
 
 // Turns Prodigi quotes into Checkout shipping options that charge exactly the quoted cost.
 // Budget is dropped when it costs no less than Standard (they are the same service for some products).
@@ -71,7 +69,7 @@ export async function quotePrintShipping(
     product: required(
       getPrintProduct(item.variant),
       `print product for ${item.variant}`
-    ),
+    )[MerchProvider.PRODIGI],
     copies: item.quantity,
   }));
   const options = buildShippingOptions(

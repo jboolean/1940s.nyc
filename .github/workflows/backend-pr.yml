@@ -18,6 +18,8 @@ jobs:
       - run: npm ci
       - name: Generate Printful API
         run: npm run generate-printful-api
+      - name: Generate WHCC API
+        run: npm run generate-whcc-api
       - name: Generate routes
         run: npm run routes
       - name: Deploy dry run
@@ -36,6 +38,8 @@ jobs:
       - run: npm ci
       - name: Generate Printful API
         run: npm run generate-printful-api
+      - name: Generate WHCC API
+        run: npm run generate-whcc-api
       - name: Generate routes
         run: npm run routes
       - run: npm run lint:strict
@@ -49,6 +53,8 @@ jobs:
       - run: npm ci
       - name: Generate Printful API
         run: npm run generate-printful-api
+      - name: Generate WHCC API
+        run: npm run generate-whcc-api
       - name: Generate routes
         run: npm run routes
       - run: npm run types
@@ -62,6 +68,8 @@ jobs:
       - run: npm ci
       - name: Generate Printful API
         run: npm run generate-printful-api
+      - name: Generate WHCC API
+        run: npm run generate-whcc-api
       - name: Generate routes
         run: npm run routes
       - run: npm test

@@ -20,6 +20,7 @@ export function orderToApi(order: MerchOrder): MerchOrderApiModel {
     userId: order.userId,
     email: order.user.email ?? undefined,
     state: order.state,
+    provider: order.provider,
     fulfillmentState: order.fulfillmentState,
     items: order.items.map(orderItemToApi),
     trackingUrl: order.trackingUrl ?? undefined,

@@ -5,11 +5,18 @@ import {
   isPrintOptions,
   isToteOptions,
   MerchItemState,
+  MerchProvider,
   Order,
   OrderItem,
 } from 'shared/utils/merch/Order';
 import stylesheet from './ReviewMerch.less';
 import useReviewMerchStore from './stores/ReviewMerchStore';
+
+const PROVIDER_LABELS: Record<MerchProvider, string> = {
+  [MerchProvider.PRINTFUL]: 'Printful',
+  [MerchProvider.PRODIGI]: 'Prodigi',
+  [MerchProvider.WHCC]: 'WHCC',
+};
 
 const DATE_FORMATTER = new Intl.DateTimeFormat('en-US', {
   dateStyle: 'full',
@@ -28,6 +35,7 @@ function OrderMetadataView({ order }: { order: Order }): React.JSX.Element {
         </time>
       </div>
       {order.email && <div>Email: {order.email}</div>}
+      <div>Printer: {PROVIDER_LABELS[order.provider]}</div>
       <div>State: {order.state}</div>
       {order.fulfillmentState && (
         <div>Fulfillment: {order.fulfillmentState}</div>
@@ -96,35 +104,41 @@ export default function ReviewMerch(): React.JSX.Element {
       <h1>Review Merch Orders</h1>
 
       <div className={stylesheet.orders}>
-        {reviewMerchStore.orders.map((order) => (
-          <div key={order.id} className={stylesheet.order}>
-            <div className={stylesheet.orderHeader}>
-              <OrderMetadataView order={order} />
+        {reviewMerchStore.orders.map((order) => {
+          const isPending = reviewMerchStore.pendingOrderIds.includes(order.id);
+          return (
+            <div key={order.id} className={stylesheet.order}>
+              <div className={stylesheet.orderHeader}>
+                <OrderMetadataView order={order} />
 
-              <div className={stylesheet.buttons}>
-                <Button
-                  onClick={() => reviewMerchStore.fulfillOrder(order.id)}
-                  buttonStyle={'primary'}
-                >
-                  Fulfill
-                </Button>
-                <Button
-                  onClick={() => reviewMerchStore.cancelOrder(order.id)}
-                  buttonStyle={'secondary'}
-                >
-                  Cancel
-                </Button>
+                <div className={stylesheet.buttons}>
+                  <Button
+                    onClick={() => reviewMerchStore.fulfillOrder(order.id)}
+                    disabled={isPending}
+                    buttonStyle={'primary'}
+                  >
+                    Fulfill
+                  </Button>
+                  <Button
+                    onClick={() => reviewMerchStore.cancelOrder(order.id)}
+                    disabled={isPending}
+                    buttonStyle={'secondary'}
+                  >
+                    Cancel
+                  </Button>
+                  {isPending ? <p>Loading&hellip;</p> : null}
+                </div>
+              </div>
+
+              <div className={stylesheet.items}>
+                <h3>Items ({order.items.length})</h3>
+                {order.items.map((item) => (
+                  <OrderItemView key={item.id} item={item} />
+                ))}
               </div>
             </div>
-
-            <div className={stylesheet.items}>
-              <h3>Items ({order.items.length})</h3>
-              {order.items.map((item) => (
-                <OrderItemView key={item.id} item={item} />
-              ))}
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {reviewMerchStore.ordersNeedingAttention.length > 0 && (

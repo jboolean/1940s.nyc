@@ -7,6 +7,8 @@
   },
   "ignorePatterns": [
     "src/third-party/*/client",
-    "src/third-party/*/createClientConfig.ts"
+    "src/third-party/*/fulfillmentClient",
+    "src/third-party/*/createClientConfig.ts",
+    "src/third-party/*/createFulfillmentClientConfig.ts"
   ]
 }
