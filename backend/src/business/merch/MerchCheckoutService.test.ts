@@ -228,18 +228,27 @@ describe('createMerchCheckoutSession', () => {
     expect(stripe.checkout.sessions.create).not.toHaveBeenCalled();
   });
 
-  it('refuses a live print until its live product id has been filled in', async () => {
+  it('resolves a distinct live Stripe product for every print in production', () => {
     jest.resetModules();
     jest.doMock('../utils/isProduction', () => ({
       __esModule: true,
       default: () => true,
     }));
-    const live = jest.requireActual<typeof import('./MerchCheckoutService')>(
-      './MerchCheckoutService'
+    const live =
+      jest.requireActual<typeof import('./ProductRegistry')>(
+        './ProductRegistry'
+      );
+    const prints = [
+      MerchInternalVariant.PRINT_4X6,
+      MerchInternalVariant.PRINT_8X12,
+      MerchInternalVariant.FRAMED_PRINT_8X12_WALL,
+      MerchInternalVariant.FRAMED_PRINT_5X7_EASEL,
+    ];
+    const ids = prints.map((variant) => live.getMerchProductId(variant));
+    expect(new Set(ids).size).toBe(prints.length);
+    expect(ids).not.toContain(
+      getMerchProductId(MerchInternalVariant.PRINT_4X6)
     );
-    await expect(
-      live.createMerchCheckoutSession({ ...urls, items: [print] })
-    ).rejects.toMatchObject({ status: 400 });
     jest.dontMock('../utils/isProduction');
   });
 });
