@@ -135,6 +135,7 @@ function render(
     case MerchInternalVariant.PRINT_HPR_4X6:
     case MerchInternalVariant.PRINT_HPR_8X12:
     case MerchInternalVariant.PRINT_FAP_8X12_FRAMED:
+    case MerchInternalVariant.PRINT_FAP_5X7_EASEL:
       if (options.variant === MerchInternalVariant.TOTE_BAG_SMALL) {
         throw new Error('Print item does not carry print options');
       }

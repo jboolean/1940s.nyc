@@ -49,6 +49,7 @@ describe('selectProviderForItems', () => {
       selectProviderForItems([
         MerchInternalVariant.PRINT_HPR_4X6,
         MerchInternalVariant.PRINT_FAP_8X12_FRAMED,
+        MerchInternalVariant.PRINT_FAP_5X7_EASEL,
       ])
     ).toBe(MerchProvider.WHCC);
   });
