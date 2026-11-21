@@ -5,13 +5,22 @@ describe('whccApi', () => {
     jest.resetModules();
   });
 
-  it('loads in production without a key and refuses a call when it is made', async () => {
+  it('loads in production without a key and refuses a call without one', async () => {
     process.env.STAGE = 'production';
     delete process.env.WHCC_SK;
     const { getSubmission } = await import('./whccApi');
-    await expect(getSubmission('s')).rejects.toThrow(
-      'production base URL is not configured'
-    );
+    await expect(getSubmission('s')).rejects.toThrow('WHCC_SK');
+  });
+
+  it('follows action links only on the live host in production', async () => {
+    process.env.STAGE = 'production';
+    const { linkPath } = await import('./whccApi');
+    expect(
+      linkPath('https://apis.whcc.com/api/v1/commerce/x?ids=a', ...COMMERCE)
+    ).toBe('/v1/commerce/x?ids=a');
+    expect(() =>
+      linkPath('https://apis-stage.whcc.com/api/v1/x', ...COMMERCE)
+    ).toThrow('another host');
   });
 
   it('follows action links only on the sandbox host and under the expected path', async () => {

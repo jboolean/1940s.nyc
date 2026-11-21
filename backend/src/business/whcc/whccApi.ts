@@ -17,7 +17,7 @@ import type {
 } from '../../third-party/whcc/client/types.gen';
 import {
   getAuthorizationHeader,
-  WHCC_BASE_URL,
+  getWhccBaseUrl,
 } from '../../third-party/whcc/createClientConfig';
 import { client as fulfillmentClient } from '../../third-party/whcc/fulfillmentClient/client.gen';
 import {
@@ -31,17 +31,13 @@ import type {
   CreateEventSubscriptionData,
   ListOrdersResponses,
 } from '../../third-party/whcc/fulfillmentClient/types.gen';
-import isProduction from '../utils/isProduction';
 
 const REQUEST_TIMEOUT_MS = 4_000;
 
-// Refuses production and adds the key to every request.
+// Adds the key to every request.
 function authorize<
   T extends { headers: { set: (k: string, v: string) => unknown } },
 >(config: T): T {
-  if (isProduction()) {
-    throw new Error('The WHCC production base URL is not configured');
-  }
   config.headers.set('Authorization', getAuthorizationHeader());
   return config;
 }
@@ -60,7 +56,7 @@ export function linkPath(
   basePath: string
 ): string {
   const url = new URL(link);
-  if (url.origin !== new URL(WHCC_BASE_URL).origin) {
+  if (url.origin !== new URL(getWhccBaseUrl()).origin) {
     throw new Error(`WHCC action link points at another host: ${url.origin}`);
   }
   if (!url.pathname.startsWith(apiPrefix) || url.pathname.includes('//')) {
