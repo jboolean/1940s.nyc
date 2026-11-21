@@ -113,12 +113,12 @@ describe('PrintCheckoutController.getAvailableProducts', () => {
       },
       {
         variant: MerchInternalVariant.PRINT_FAP_8X12_FRAMED,
-        label: '8×12 framed print',
+        label: '8×12 framed wall print',
         priceAmount: 5900,
       },
       {
         variant: MerchInternalVariant.PRINT_FAP_5X7_EASEL,
-        label: '5×7 tabletop framed print',
+        label: '5×7 framed tabletop print',
         priceAmount: 3900,
       },
     ]);
