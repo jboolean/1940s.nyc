@@ -3,13 +3,15 @@ import { immer } from 'zustand/middleware/immer';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import FeatureFlag from '../types/FeatureFlag';
 
-// Map all FeatureFlags to false
-const initialFeatureFlags = Object.keys(FeatureFlag).reduce<
-  Partial<Record<FeatureFlag, false>>
+const DEFAULTS_ON: FeatureFlag[] = [FeatureFlag.PRINT_ORDERS];
+
+// Map all FeatureFlags to false, except those that are on by default
+const initialFeatureFlags = Object.values(FeatureFlag).reduce<
+  Partial<Record<FeatureFlag, boolean>>
 >((acc, key: FeatureFlag) => {
-  acc[key] = false;
+  acc[key] = DEFAULTS_ON.includes(key);
   return acc;
-}, {}) as Record<FeatureFlag, false>;
+}, {}) as Record<FeatureFlag, boolean>;
 
 type State = {
   [feature in FeatureFlag]: boolean;
@@ -33,6 +35,16 @@ const useFeatureFlagsStore = create(
     {
       name: 'featureFlags',
       storage: createJSONStorage(() => localStorage),
+      version: 1,
+      // Visitors saved print-orders:false before it defaulted on; turn it on
+      // once for them. Later explicit choices are stored at the new version.
+      migrate: (persisted, version) => {
+        const state = persisted as State & Actions;
+        if (version < 1) {
+          return { ...state, [FeatureFlag.PRINT_ORDERS]: true };
+        }
+        return state;
+      },
     }
   )
 );
@@ -41,12 +53,8 @@ export const useFeatureFlag = (feature: FeatureFlag): boolean => {
   return useFeatureFlagsStore((state) => state[feature]);
 };
 
-// Selling prints needs both the print flag and the global sales switch.
 export const usePrintOrdersEnabled = (): boolean => {
-  return useFeatureFlagsStore(
-    (state) =>
-      state[FeatureFlag.PRINT_ORDERS] && state[FeatureFlag.ENABLE_SALES]
-  );
+  return useFeatureFlagsStore((state) => state[FeatureFlag.PRINT_ORDERS]);
 };
 
 export default useFeatureFlagsStore;
