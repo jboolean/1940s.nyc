@@ -12,6 +12,12 @@ const PRODUCTS = [
     variant: 'print-fap-8x12-framed',
     label: '8×12 framed print',
     priceAmount: 5900,
+    description: 'Framed in gallery fine black moulding.',
+    frame: {
+      moulding: 'gallery_fine_black',
+      printShortSideInches: 8,
+      printLongSideInches: 12,
+    },
   },
 ];
 
@@ -115,6 +121,39 @@ test('print modal — the product select fits the longest label and shows keyboa
     (el) => getComputedStyle(el).outlineWidth
   );
   expect(outlineWidth).not.toBe('0px');
+});
+
+test('print modal — the framed print shows its description and the photo in a frame', async ({
+  page,
+}) => {
+  await openPrintModal(page, PHOTO_1940);
+
+  const select = page.locator('[data-testid="print-product-select"]');
+  const preview = page.locator('[data-testid="framed-photo-preview"]');
+  const description = page.locator('[data-testid="print-product-description"]');
+  await select.selectOption('print-hpr-8x12');
+  await expect(preview).toHaveCount(0);
+  await expect(description).toHaveCount(0);
+
+  await select.selectOption('print-fap-8x12-framed');
+  await expect(description).toHaveText(
+    'Framed in gallery fine black moulding.'
+  );
+  await expect(preview).toBeVisible();
+
+  // The photo is the whole 8-inch-wide print. The frame reaches 9/16 inch past it on each side,
+  // and its 3/4-inch face covers the last 3/16 inch of the print.
+  const thumbnail = page.locator('[data-testid="print-thumbnail"]');
+  await expect(thumbnail).toBeVisible();
+  const img = (await thumbnail.boundingBox())!;
+  const framed = (await preview.boundingBox())!;
+  const inch = Math.min(img.width, img.height) / 8;
+  expect(framed.width - img.width).toBeCloseTo(2 * (9 / 16) * inch, 0);
+  expect(framed.height - img.height).toBeCloseTo(2 * (9 / 16) * inch, 0);
+  const topSide = (await page
+    .locator('[data-testid="framed-photo-side-top"]')
+    .boundingBox())!;
+  expect(topSide.height).toBeCloseTo((3 / 4) * inch, 0);
 });
 
 test('print modal — a 1980s photo sizes the modal to its content', async ({

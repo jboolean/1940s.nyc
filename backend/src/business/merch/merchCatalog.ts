@@ -8,14 +8,18 @@ type MerchKind = 'tote' | 'print';
 
 interface MerchVariantInfo {
   label: string;
+  description?: string;
   kind: MerchKind;
   provider: MerchProvider;
   printfileExtension: PrintfileExtension;
 }
 
-// The one list of what we sell: the name the customer sees, how it is made, who prints it and what
-// the render cron writes. Every variant has to appear here, so a new one cannot be sold without all
-// of that.
+const lustrePhotoPrintDescription = (width: number, height: number): string =>
+  `${width == 8 ? 'An' : 'A'} ${width}x${height}" paper print, professionally printed on archival semi-gloss lustre paper using a silver halide chemical process.`;
+
+// The one list of what we sell: the name and description the customer sees, how it is made, who
+// prints it and what the render cron writes. Every variant has to appear here, so a new one cannot
+// be sold without all of that.
 export const MERCH_CATALOG = {
   [MerchInternalVariant.TOTE_BAG_SMALL]: {
     label: 'Tote bag',
@@ -25,18 +29,23 @@ export const MERCH_CATALOG = {
   },
   [MerchInternalVariant.PRINT_HPR_4X6]: {
     label: '4×6 print',
+    description: lustrePhotoPrintDescription(4, 6),
     kind: 'print',
     provider: MerchProvider.WHCC,
     printfileExtension: 'jpg',
   },
   [MerchInternalVariant.PRINT_HPR_8X12]: {
     label: '8×12 print',
+    description: lustrePhotoPrintDescription(8, 12),
     kind: 'print',
     provider: MerchProvider.WHCC,
     printfileExtension: 'jpg',
   },
   [MerchInternalVariant.PRINT_FAP_8X12_FRAMED]: {
     label: '8×12 framed print',
+    // Note this does not describe the prodigi one accurately, only use when whcc is active
+    description:
+      'An 8×12 inch lustre print in a ¾" wide smooth matte black MDF frame. No mat. Arrives with a wire hanger, ready to hang.',
     kind: 'print',
     provider: MerchProvider.WHCC,
     printfileExtension: 'jpg',
@@ -63,6 +72,13 @@ export const PRINT_VARIANTS: PrintVariant[] = (
 
 export function getMerchLabel(variant: MerchInternalVariant): string {
   return MERCH_CATALOG[variant]?.label ?? variant;
+}
+
+export function getMerchDescription(
+  variant: MerchInternalVariant
+): string | undefined {
+  const info: MerchVariantInfo | undefined = MERCH_CATALOG[variant];
+  return info?.description;
 }
 
 // Unlike the display lookups, this has no fallback: the provider prints and charges for the order,

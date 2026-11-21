@@ -133,7 +133,7 @@ describe('createMerchCheckoutSession', () => {
     expect(ProdigiService.getQuotes).toHaveBeenCalledWith(
       expect.objectContaining({
         destinationCountryCode: 'US',
-        items: [expect.objectContaining({ sku: 'GLOBAL-HPR-8X12', copies: 2 })],
+        items: [expect.objectContaining({ sku: 'GLOBAL-PHO-8X12', copies: 2 })],
       })
     );
   });

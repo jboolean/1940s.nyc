@@ -3,7 +3,7 @@ import MerchInternalVariant from '../../enum/MerchInternalVariant';
 import MerchProvider from '../../enum/MerchProvider';
 import type { ProdigiProduct } from '../prodigi/ProdigiProduct';
 import type { WhccProduct } from '../whcc/WhccProduct';
-import type { PrintVariant } from './merchCatalog';
+import { getMerchProvider, type PrintVariant } from './merchCatalog';
 
 // What each provider needs to print a variant.
 export interface PrintProduct {
@@ -32,7 +32,7 @@ export const PRINT_PRODUCTS: PrintProduct[] = [
   {
     variant: MerchInternalVariant.PRINT_HPR_4X6,
     [MerchProvider.PRODIGI]: {
-      sku: 'GLOBAL-HPR-4X6',
+      sku: 'GLOBAL-PHO-4X6',
       attributes: {},
       sizing: prodigiSizing,
     },
@@ -41,7 +41,7 @@ export const PRINT_PRODUCTS: PrintProduct[] = [
   {
     variant: MerchInternalVariant.PRINT_HPR_8X12,
     [MerchProvider.PRODIGI]: {
-      sku: 'GLOBAL-HPR-8X12',
+      sku: 'GLOBAL-PHO-8X12',
       attributes: {},
       sizing: prodigiSizing,
     },
@@ -76,4 +76,36 @@ export function getPrintProduct(
   variant: MerchInternalVariant
 ): PrintProduct | undefined {
   return PRINT_PRODUCTS.find((p) => p.variant === variant);
+}
+
+export interface PrintFrame {
+  // WHCC's moulding id, such as gallery_fine_black.
+  moulding: string;
+  // The size of the print the frame holds, so a preview can draw the frame and opening to scale.
+  printShortSideInches: number;
+  printLongSideInches: number;
+}
+
+// The frame WHCC puts around the variant, when WHCC is the one printing it and it is framed.
+export function getWhccFrame(
+  variant: MerchInternalVariant
+): PrintFrame | undefined {
+  if (getMerchProvider(variant) !== MerchProvider.WHCC) {
+    return undefined;
+  }
+  const { moulding, size } =
+    getPrintProduct(variant)?.[MerchProvider.WHCC].selections ?? {};
+  if (!moulding || !size) {
+    return undefined;
+  }
+  // WHCC sizes are inches, written like 8x12.
+  const sides = size.split('x').map(Number);
+  if (sides.length !== 2 || !sides.every((side) => side > 0)) {
+    return undefined;
+  }
+  return {
+    moulding,
+    printShortSideInches: Math.min(...sides),
+    printLongSideInches: Math.max(...sides),
+  };
 }

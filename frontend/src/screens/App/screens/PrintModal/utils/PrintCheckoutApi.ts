@@ -1,10 +1,19 @@
 import { MerchInternalVariant } from 'shared/utils/merch/Order';
 import api from 'utils/api';
 
+export interface PrintFrame {
+  // WHCC's moulding id, such as gallery_fine_black.
+  moulding: string;
+  printShortSideInches: number;
+  printLongSideInches: number;
+}
+
 export interface PrintProductApiResponse {
   variant: MerchInternalVariant;
   label: string;
   priceAmount: number;
+  description?: string;
+  frame?: PrintFrame;
 }
 
 export function getAvailablePrintProducts(): Promise<
