@@ -4,12 +4,12 @@ import { createJSONStorage, persist } from 'zustand/middleware';
 import FeatureFlag from '../types/FeatureFlag';
 
 // Map all FeatureFlags to false
-const initialFeatureFlags = Object.values(FeatureFlag).reduce<
-  Partial<Record<FeatureFlag, boolean>>
+const initialFeatureFlags = Object.keys(FeatureFlag).reduce<
+  Partial<Record<FeatureFlag, false>>
 >((acc, key: FeatureFlag) => {
   acc[key] = false;
   return acc;
-}, {}) as Record<FeatureFlag, boolean>;
+}, {}) as Record<FeatureFlag, false>;
 
 type State = {
   [feature in FeatureFlag]: boolean;
@@ -39,6 +39,14 @@ const useFeatureFlagsStore = create(
 
 export const useFeatureFlag = (feature: FeatureFlag): boolean => {
   return useFeatureFlagsStore((state) => state[feature]);
+};
+
+// Selling prints needs both the print flag and the global sales switch.
+export const usePrintOrdersEnabled = (): boolean => {
+  return useFeatureFlagsStore(
+    (state) =>
+      state[FeatureFlag.PRINT_ORDERS] && state[FeatureFlag.ENABLE_SALES]
+  );
 };
 
 export default useFeatureFlagsStore;
