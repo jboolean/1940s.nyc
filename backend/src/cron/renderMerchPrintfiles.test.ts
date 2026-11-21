@@ -251,6 +251,24 @@ describe('renderMerchPrintfiles', () => {
     });
   });
 
+  it('fails a print whose options name a variant that is not a print', async () => {
+    const mismatched = {
+      ...printItem(6, false),
+      customizationOptions: {
+        variant: 'mug-large',
+        photoIdentifier: 'p6',
+        colorize: false,
+      },
+    };
+    getMany.mockResolvedValue([mismatched]);
+
+    await renderMerchPrintfiles();
+
+    expect(update).toHaveBeenCalledWith(6, {
+      printfileError: 'Error: Print item does not carry print options',
+    });
+  });
+
   it('queries only customized items from orders that are not canceled', async () => {
     getMany.mockResolvedValue([]);
     await renderMerchPrintfiles();

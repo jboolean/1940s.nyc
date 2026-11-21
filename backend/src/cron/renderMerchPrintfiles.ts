@@ -3,6 +3,7 @@ import { colorizeForPrint } from '../business/color/ColorService';
 import {
   getMerchLabel,
   getPrintfileExtensionForVariant,
+  isPrintVariant,
 } from '../business/merch/merchCatalog';
 import renderToteBag from '../business/merch/renderToteBag';
 import { getPrintProduct } from '../business/merch/printCatalog';
@@ -122,6 +123,12 @@ async function renderPrint(
   return { extension };
 }
 
+function isPrintOptions(
+  options: MerchCustomizationOptions
+): options is PrintCustomizationOptions {
+  return isPrintVariant(options.variant);
+}
+
 function render(
   item: MerchOrderItem,
   options: MerchCustomizationOptions
@@ -136,7 +143,7 @@ function render(
     case MerchInternalVariant.PRINT_HPR_8X12:
     case MerchInternalVariant.PRINT_FAP_8X12_FRAMED:
     case MerchInternalVariant.PRINT_FAP_5X7_EASEL:
-      if (options.variant === MerchInternalVariant.TOTE_BAG_SMALL) {
+      if (!isPrintOptions(options)) {
         throw new Error('Print item does not carry print options');
       }
       return renderPrint(item, options);

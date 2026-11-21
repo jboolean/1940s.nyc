@@ -10,7 +10,7 @@ const PRODUCTS = [
   { variant: 'print-hpr-8x12', label: '8×12 print', priceAmount: 1900 },
   {
     variant: 'print-fap-8x12-framed',
-    label: '8×12 framed print',
+    label: '8×12 framed wall print',
     priceAmount: 5900,
     description: 'Framed in gallery fine black moulding.',
     frame: {
@@ -21,7 +21,7 @@ const PRODUCTS = [
   },
   {
     variant: 'print-fap-5x7-easel',
-    label: '5×7 tabletop framed print',
+    label: '5×7 framed tabletop print',
     priceAmount: 3900,
     description: 'Stands on a desk or table.',
     frame: {
