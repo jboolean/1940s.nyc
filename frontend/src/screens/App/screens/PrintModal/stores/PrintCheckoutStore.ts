@@ -196,6 +196,7 @@ const usePrintCheckoutStore = create(
         recordEvent({
           category: 'Prints',
           action: 'Click Checkout',
+          label: 'modal',
           value: price ? price * quantity : undefined,
         });
 

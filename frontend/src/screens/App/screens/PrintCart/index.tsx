@@ -152,6 +152,7 @@ export default function PrintCartModal(): React.JSX.Element {
       recordEvent({
         category: 'Prints',
         action: 'Click Cart Checkout',
+        label: 'cart',
         value: total || undefined,
       });
       const base = `${window.location.protocol}//${window.location.host}${window.location.pathname}`;
