@@ -55,8 +55,6 @@ provider:
     PRODIGI_LIVE_ORDERS_ENABLED: ${self:custom.prodigiLiveOrdersEnabled.${sls:stage}}
     WHCC_SK: ${ssm:/${self:service}-${sls:stage}-whcc-sk}
     WHCC_SIGNING_SECRET: ${ssm:/${self:service}-${sls:stage}-whcc-signing-secret}
-    # See src/business/merch/providers/WhccFulfillmentProvider.ts
-    WHCC_LIVE_ORDERS_ENABLED: ${self:custom.whccLiveOrdersEnabled.${sls:stage}}
 plugins:
   - serverless-plugin-conditional-functions
   - serverless-webpack
@@ -155,10 +153,6 @@ custom:
     webpackConfig: "webpack.config.js"
   bucket: fourties-photos
   prodigiLiveOrdersEnabled:
-    production: 'false'
-    staging: 'false'
-    dev: 'false'
-  whccLiveOrdersEnabled:
     production: 'false'
     staging: 'false'
     dev: 'false'
