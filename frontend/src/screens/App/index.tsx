@@ -26,8 +26,6 @@ import { OptimizeExperimentsProvider } from 'shared/utils/OptimizeExperiments';
 import 'utils/optimize';
 import AdminRoutes from './screens/Admin/AdminRoutes';
 import Corrections from './screens/Corrections';
-import { useFeatureFlag } from './shared/stores/FeatureFlagsStore';
-import FeatureFlag from './shared/types/FeatureFlag';
 import CreditPurchaseModal, {
   CreditPurchaseSuccessMessage,
   openCreditPurchaseModal,
@@ -83,7 +81,6 @@ function DatadogRouteTracker(): null {
 }
 
 function Modals(): React.JSX.Element {
-  const printOrdersEnabled = useFeatureFlag(FeatureFlag.PRINT_ORDERS);
   const [isThankYouOpen, setThankYouOpen] = React.useState(thankYouInitial);
   const [isCreditPurchaseSuccessOpen, setCreditPurchaseSuccessOpen] =
     React.useState(creditSuccessInitial);
@@ -115,13 +112,11 @@ function Modals(): React.JSX.Element {
   }, []);
 
   React.useEffect(() => {
-    // Without the flag there is no checkout to come back from, so the URL should
-    // not be able to show an order confirmation.
-    if (printSuccessOnLoad && printOrdersEnabled) {
+    if (printSuccessOnLoad) {
       showPrintOrderPlaced();
       if (printSuccessFromCart) usePrintCartStore.getState().clear();
     }
-  }, [printOrdersEnabled]);
+  }, []);
 
   React.useEffect(() => {
     if (openCreditPurchaseOnLoad) {
