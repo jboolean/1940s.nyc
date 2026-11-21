@@ -52,7 +52,7 @@ test('stories shown on hover', async ({ page }) => {
   await expect(viewer.stories()).toBeVisible();
 });
 
-test('order prints opens new tab and pre-fills DORIS order form', async ({ page, context }) => {
+test('order prints opens the print modal', async ({ page }) => {
   await page.goto(
     url(`/map/photo/${DEFAULT_PHOTO}`, {
       noWelcome: true,
@@ -62,18 +62,6 @@ test('order prints opens new tab and pre-fills DORIS order form', async ({ page,
   );
   const viewer = new PhotoViewerPage(page);
   await viewer.revealOverlay();
-  page.on('dialog', (dialog) => dialog.accept());
-  const [newPage] = await Promise.all([
-    context.waitForEvent('page'),
-    viewer.clickOrderPrint(),
-  ]);
-  await newPage.waitForLoadState('networkidle');
-  expect(newPage.url()).toContain('dorisorders.nyc.gov');
-
-  await expect(newPage.locator('#image-identifier-key')).toHaveValue(DEFAULT_PHOTO);
-  await expect(newPage.locator('#buildingNumber')).toHaveValue('207');
-  await expect(newPage.locator('#streetName')).toHaveValue('Varick Street');
-  await expect(newPage.locator('#block')).toHaveValue('581');
-  await expect(newPage.locator('#lot')).toHaveValue('63');
-  await expect(newPage.locator('#select-borough')).toHaveValue('MANHATTAN');
+  await viewer.clickOrderPrint();
+  await expect(page.locator('[data-testid="print-modal"]')).toBeVisible();
 });
