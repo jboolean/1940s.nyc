@@ -18,13 +18,6 @@ async function openWithCart(page: Page, extra: string): Promise<void> {
     if (sessionStorage.getItem('seeded')) return;
     sessionStorage.setItem('seeded', '1');
     localStorage.setItem(
-      'featureFlags',
-      JSON.stringify({
-        state: { 'print-orders': true, 'enable-sales': true },
-        version: 0,
-      })
-    );
-    localStorage.setItem(
       'print-cart',
       JSON.stringify({ state: { items, savedAt: Date.now() }, version: 0 })
     );

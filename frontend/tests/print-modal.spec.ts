@@ -62,15 +62,6 @@ async function stubPrintApi(page: Page, identifier: string): Promise<void> {
 }
 
 async function openPrintModal(page: Page, identifier: string): Promise<void> {
-  await page.addInitScript(() => {
-    localStorage.setItem(
-      'featureFlags',
-      JSON.stringify({
-        state: { 'print-orders': true, 'enable-sales': true },
-        version: 0,
-      })
-    );
-  });
   await stubPrintApi(page, identifier);
   await page.goto(
     url(`/map/photo/${identifier}`, {
@@ -269,15 +260,6 @@ test('print modal — closing while the session is created does not go to Stripe
 test('print modal — returning from Stripe shows the order placed screen', async ({
   page,
 }) => {
-  await page.addInitScript(() => {
-    localStorage.setItem(
-      'featureFlags',
-      JSON.stringify({
-        state: { 'print-orders': true, 'enable-sales': true },
-        version: 0,
-      })
-    );
-  });
   await stubPrintApi(page, PHOTO_1940);
   await page.goto(
     url(`/map/photo/${PHOTO_1940}`, {
@@ -291,22 +273,4 @@ test('print modal — returning from Stripe shows the order placed screen', asyn
   await expect(
     page.locator('[data-testid="print-order-placed"]')
   ).toBeVisible();
-});
-
-test('print modal — the order placed screen needs print orders to be enabled', async ({
-  page,
-}) => {
-  await stubPrintApi(page, PHOTO_1940);
-  await page.goto(
-    url(`/map/photo/${PHOTO_1940}`, {
-      noWelcome: true,
-      noTipJar: true,
-      extra: `printSuccess=${encodeURIComponent(PHOTO_HASH)}`,
-      hash: PHOTO_HASH,
-    })
-  );
-
-  await expect(page.locator('[data-testid="print-order-placed"]')).toHaveCount(
-    0
-  );
 });
