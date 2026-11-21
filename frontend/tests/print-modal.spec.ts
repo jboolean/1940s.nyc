@@ -6,10 +6,10 @@ const PHOTO_1980 = 'nynyma_rec0040_1_00581_0064';
 const PHOTO_HASH = '#17.5/40.729011/-74.005661';
 
 const PRODUCTS = [
-  { variant: 'print-hpr-4x6', label: '4×6 print', priceAmount: 900 },
-  { variant: 'print-hpr-8x12', label: '8×12 print', priceAmount: 1900 },
+  { variant: 'print-4x6', label: '4×6 print', priceAmount: 900 },
+  { variant: 'print-8x12', label: '8×12 print', priceAmount: 1900 },
   {
-    variant: 'print-fap-8x12-framed',
+    variant: 'framed-print-8x12-wall',
     label: '8×12 framed wall print',
     priceAmount: 5900,
     description: 'Framed in gallery fine black moulding.',
@@ -20,7 +20,7 @@ const PRODUCTS = [
     },
   },
   {
-    variant: 'print-fap-5x7-easel',
+    variant: 'framed-print-5x7-easel',
     label: '5×7 framed tabletop print',
     priceAmount: 3900,
     description: 'Stands on a desk or table.',
@@ -102,7 +102,7 @@ test('print modal — the product select fits the longest label and shows keyboa
   await openPrintModal(page, PHOTO_1940);
 
   const select = page.locator('[data-testid="print-product-select"]');
-  await select.selectOption('print-fap-8x12-framed');
+  await select.selectOption('framed-print-8x12-wall');
   const widestLabelFits = await select.evaluate((element) => {
     const el = element as HTMLSelectElement;
     const style = getComputedStyle(el);
@@ -142,11 +142,11 @@ test('print modal — the framed print shows its description and the photo in a 
   const select = page.locator('[data-testid="print-product-select"]');
   const preview = page.locator('[data-testid="framed-photo-preview"]');
   const description = page.locator('[data-testid="print-product-description"]');
-  await select.selectOption('print-hpr-8x12');
+  await select.selectOption('print-8x12');
   await expect(preview).toHaveCount(0);
   await expect(description).toHaveCount(0);
 
-  await select.selectOption('print-fap-8x12-framed');
+  await select.selectOption('framed-print-8x12-wall');
   await expect(description).toHaveText(
     'Framed in gallery fine black moulding.'
   );
@@ -174,7 +174,7 @@ test('print modal — the tabletop print draws the same moulding to the scale of
 
   const select = page.locator('[data-testid="print-product-select"]');
   const preview = page.locator('[data-testid="framed-photo-preview"]');
-  await select.selectOption('print-fap-5x7-easel');
+  await select.selectOption('framed-print-5x7-easel');
   await expect(
     page.locator('[data-testid="print-product-description"]')
   ).toHaveText('Stands on a desk or table.');
@@ -220,7 +220,7 @@ test('print modal — the product, quantity and colorize options set the order',
 
   await page
     .locator('[data-testid="print-product-select"]')
-    .selectOption('print-fap-8x12-framed');
+    .selectOption('framed-print-8x12-wall');
   await expect(total).toHaveText('$59');
 
   await page.locator('[data-testid="print-quantity-input"]').fill('3');

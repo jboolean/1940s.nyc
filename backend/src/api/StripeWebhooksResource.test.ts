@@ -95,7 +95,7 @@ function printLineItem(overrides: object = {}): object {
       product: {
         metadata: {
           'product-type': 'merch',
-          'merch-internal-variant': MerchInternalVariant.PRINT_HPR_8X12,
+          'merch-internal-variant': MerchInternalVariant.PRINT_8X12,
         },
       },
     },
@@ -171,18 +171,18 @@ describe('checkout.session.completed for merch', () => {
   it('turns each print copy into a customized item carrying its photo', async () => {
     await deliver(session());
     const options = {
-      variant: MerchInternalVariant.PRINT_HPR_8X12,
+      variant: MerchInternalVariant.PRINT_8X12,
       photoIdentifier: 'p1',
       colorize: true,
     };
     expect(create.mock.calls[0][3]).toEqual([
       {
-        variant: 'print-hpr-8x12',
+        variant: 'print-8x12',
         customizationOptions: options,
         state: 'customized',
       },
       {
-        variant: 'print-hpr-8x12',
+        variant: 'print-8x12',
         customizationOptions: options,
         state: 'customized',
       },
@@ -262,7 +262,7 @@ describe('checkout.session.completed for merch', () => {
         product: {
           metadata: {
             ...tag,
-            'merch-internal-variant': MerchInternalVariant.PRINT_HPR_8X12,
+            'merch-internal-variant': MerchInternalVariant.PRINT_8X12,
           },
         },
       },

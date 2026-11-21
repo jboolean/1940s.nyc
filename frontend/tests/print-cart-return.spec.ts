@@ -6,7 +6,7 @@ const HASH = '#17.5/40.729011/-74.005661';
 const CART = [
   {
     photoIdentifier: 'nynyma_rec0040_1_00581_0063',
-    variant: 'print-hpr-4x6',
+    variant: 'print-4x6',
     colorize: false,
     quantity: 2,
   },

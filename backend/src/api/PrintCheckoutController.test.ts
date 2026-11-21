@@ -38,7 +38,7 @@ describe('PrintCheckoutController.createPrintSession', () => {
         items: [
           {
             photoIdentifier: 'p1',
-            variant: MerchInternalVariant.PRINT_HPR_8X12,
+            variant: MerchInternalVariant.PRINT_8X12,
             quantity: 2,
             colorize: true,
           },
@@ -55,7 +55,7 @@ describe('PrintCheckoutController.createPrintSession', () => {
       user: { id: 7, email: 'a@b.c' },
       items: [
         {
-          variant: MerchInternalVariant.PRINT_HPR_8X12,
+          variant: MerchInternalVariant.PRINT_8X12,
           quantity: 2,
           print: { photoIdentifier: 'p1', colorize: true },
         },
@@ -70,13 +70,13 @@ describe('PrintCheckoutController.createPrintSession', () => {
         items: [
           {
             photoIdentifier: 'p1',
-            variant: MerchInternalVariant.PRINT_HPR_8X12,
+            variant: MerchInternalVariant.PRINT_8X12,
             quantity: 2,
             colorize: true,
           },
           {
             photoIdentifier: 'p2',
-            variant: MerchInternalVariant.PRINT_HPR_4X6,
+            variant: MerchInternalVariant.PRINT_4X6,
             quantity: 1,
             colorize: false,
           },
@@ -90,12 +90,12 @@ describe('PrintCheckoutController.createPrintSession', () => {
         .calls[0][0].items
     ).toEqual([
       {
-        variant: MerchInternalVariant.PRINT_HPR_8X12,
+        variant: MerchInternalVariant.PRINT_8X12,
         quantity: 2,
         print: { photoIdentifier: 'p1', colorize: true },
       },
       {
-        variant: MerchInternalVariant.PRINT_HPR_4X6,
+        variant: MerchInternalVariant.PRINT_4X6,
         quantity: 1,
         print: { photoIdentifier: 'p2', colorize: false },
       },
@@ -107,17 +107,17 @@ describe('PrintCheckoutController.getAvailableProducts', () => {
   it('adds each print description, and the frame of the WHCC framed prints only', async () => {
     jest.mocked(ProductRegistry.getAvailableProducts).mockResolvedValue([
       {
-        variant: MerchInternalVariant.PRINT_HPR_8X12,
+        variant: MerchInternalVariant.PRINT_8X12,
         label: '8×12 print',
         priceAmount: 1900,
       },
       {
-        variant: MerchInternalVariant.PRINT_FAP_8X12_FRAMED,
+        variant: MerchInternalVariant.FRAMED_PRINT_8X12_WALL,
         label: '8×12 framed wall print',
         priceAmount: 5900,
       },
       {
-        variant: MerchInternalVariant.PRINT_FAP_5X7_EASEL,
+        variant: MerchInternalVariant.FRAMED_PRINT_5X7_EASEL,
         label: '5×7 framed tabletop print',
         priceAmount: 3900,
       },
@@ -126,9 +126,9 @@ describe('PrintCheckoutController.getAvailableProducts', () => {
     const products = await new PrintCheckoutController().getAvailableProducts();
 
     expect(products.map((p) => p.description)).toEqual([
-      `About ${MerchInternalVariant.PRINT_HPR_8X12}`,
-      `About ${MerchInternalVariant.PRINT_FAP_8X12_FRAMED}`,
-      `About ${MerchInternalVariant.PRINT_FAP_5X7_EASEL}`,
+      `About ${MerchInternalVariant.PRINT_8X12}`,
+      `About ${MerchInternalVariant.FRAMED_PRINT_8X12_WALL}`,
+      `About ${MerchInternalVariant.FRAMED_PRINT_5X7_EASEL}`,
     ]);
     expect(products.map((p) => p.frame)).toEqual([
       undefined,

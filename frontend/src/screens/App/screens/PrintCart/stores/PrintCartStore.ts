@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist, StateStorage } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
+import { isPrintVariant } from '../../../../../shared/utils/merch/Order';
 import type { MerchInternalVariant } from 'shared/utils/merch/Order';
 
 export const CART_STORAGE_KEY = 'print-cart';
@@ -53,6 +54,7 @@ function isCartItem(value: unknown): value is CartItem {
     !!item &&
     typeof item.photoIdentifier === 'string' &&
     typeof item.variant === 'string' &&
+    isPrintVariant(item.variant) &&
     typeof item.colorize === 'boolean' &&
     Number.isInteger(item.quantity) &&
     item.quantity >= 1 &&

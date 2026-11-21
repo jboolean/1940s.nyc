@@ -13,18 +13,18 @@ const MERCH_PRODUCT_IDS: Record<MerchInternalVariant, string | undefined> = {
   [MerchInternalVariant.TOTE_BAG_SMALL]: isProduction()
     ? 'prod_RmpsQvWdhK6uZf'
     : 'prod_RjkZ81n7LrxUnl',
-  [MerchInternalVariant.PRINT_HPR_4X6]: isProduction()
+  [MerchInternalVariant.PRINT_4X6]: isProduction()
     ? LIVE_PRODUCT_NOT_CREATED_YET
-    : 'print-hpr-4x6',
-  [MerchInternalVariant.PRINT_HPR_8X12]: isProduction()
+    : 'prod_VfbmKx4y2G7RZ6',
+  [MerchInternalVariant.PRINT_8X12]: isProduction()
     ? LIVE_PRODUCT_NOT_CREATED_YET
-    : 'print-hpr-8x12',
-  [MerchInternalVariant.PRINT_FAP_8X12_FRAMED]: isProduction()
+    : 'prod_Vfbm7xcuGExM5a',
+  [MerchInternalVariant.FRAMED_PRINT_8X12_WALL]: isProduction()
     ? LIVE_PRODUCT_NOT_CREATED_YET
-    : 'print-fap-8x12-framed',
-  [MerchInternalVariant.PRINT_FAP_5X7_EASEL]: isProduction()
+    : 'prod_Vfbmgj1EFyu4Fp',
+  [MerchInternalVariant.FRAMED_PRINT_5X7_EASEL]: isProduction()
     ? LIVE_PRODUCT_NOT_CREATED_YET
-    : 'print-fap-5x7-easel',
+    : 'prod_VfbmFYcvZM6TrL',
 };
 
 export function hasMerchProduct(variant: MerchInternalVariant): boolean {

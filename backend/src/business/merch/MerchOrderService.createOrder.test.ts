@@ -45,9 +45,9 @@ jest.mock('../email/templates/OrderConfirmationTemplate', () => ({
 }));
 
 const print: NewOrderItem = {
-  variant: MerchInternalVariant.PRINT_HPR_8X12,
+  variant: MerchInternalVariant.PRINT_8X12,
   customizationOptions: {
-    variant: MerchInternalVariant.PRINT_HPR_8X12,
+    variant: MerchInternalVariant.PRINT_8X12,
     photoIdentifier: 'p1',
     colorize: true,
   },

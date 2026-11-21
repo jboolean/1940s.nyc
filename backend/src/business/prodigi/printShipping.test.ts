@@ -37,9 +37,9 @@ describe('quotePrintShipping', () => {
   it('refuses a print Prodigi has no product for, naming the variant', async () => {
     await expect(
       quotePrintShipping([
-        { variant: MerchInternalVariant.PRINT_FAP_5X7_EASEL, quantity: 1 },
+        { variant: MerchInternalVariant.FRAMED_PRINT_5X7_EASEL, quantity: 1 },
       ])
-    ).rejects.toThrow('Prodigi product for print-fap-5x7-easel');
+    ).rejects.toThrow('Prodigi product for framed-print-5x7-easel');
     expect(ProdigiService.getQuotes).not.toHaveBeenCalled();
   });
 });

@@ -19,7 +19,7 @@ const order = (internalVariant: MerchInternalVariant): MerchOrder =>
 
 it('sends the Prodigi product for each print', () => {
   expect(
-    buildProdigiOrder(order(MerchInternalVariant.PRINT_FAP_8X12_FRAMED)).items
+    buildProdigiOrder(order(MerchInternalVariant.FRAMED_PRINT_8X12_WALL)).items
   ).toMatchObject([
     {
       merchantReference: 'item-3',
@@ -31,6 +31,6 @@ it('sends the Prodigi product for each print', () => {
 
 it('refuses a print Prodigi has no product for, naming the variant', () => {
   expect(() =>
-    buildProdigiOrder(order(MerchInternalVariant.PRINT_FAP_5X7_EASEL))
-  ).toThrow('Prodigi product for print-fap-5x7-easel');
+    buildProdigiOrder(order(MerchInternalVariant.FRAMED_PRINT_5X7_EASEL))
+  ).toThrow('Prodigi product for framed-print-5x7-easel');
 });

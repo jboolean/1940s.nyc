@@ -15,7 +15,7 @@ function cartOf(count: number): object[] {
     const quantity = Math.min(10, left);
     items.push({
       photoIdentifier: `photo-${i}`,
-      variant: 'print-hpr-4x6',
+      variant: 'print-4x6',
       colorize: false,
       quantity,
     });

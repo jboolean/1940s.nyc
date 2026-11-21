@@ -47,9 +47,9 @@ describe('selectProviderForItems', () => {
   it('picks the one provider every item shares', () => {
     expect(
       selectProviderForItems([
-        MerchInternalVariant.PRINT_HPR_4X6,
-        MerchInternalVariant.PRINT_FAP_8X12_FRAMED,
-        MerchInternalVariant.PRINT_FAP_5X7_EASEL,
+        MerchInternalVariant.PRINT_4X6,
+        MerchInternalVariant.FRAMED_PRINT_8X12_WALL,
+        MerchInternalVariant.FRAMED_PRINT_5X7_EASEL,
       ])
     ).toBe(MerchProvider.WHCC);
   });
