@@ -1,5 +1,9 @@
 import type { Quote } from 'prodigi-print-api';
-import { buildShippingOptions } from './printShipping';
+import MerchInternalVariant from '../../enum/MerchInternalVariant';
+import * as ProdigiService from './ProdigiService';
+import { buildShippingOptions, quotePrintShipping } from './printShipping';
+
+jest.mock('./ProdigiService', () => ({ getQuotes: jest.fn() }));
 
 function quote(
   method: string,
@@ -26,5 +30,16 @@ describe('buildShippingOptions', () => {
         (o) => o.shipping_rate_data?.metadata?.['prodigi-shipping-method']
       )
     ).toEqual(['Standard', 'Express']);
+  });
+});
+
+describe('quotePrintShipping', () => {
+  it('refuses a print Prodigi has no product for, naming the variant', async () => {
+    await expect(
+      quotePrintShipping([
+        { variant: MerchInternalVariant.PRINT_FAP_5X7_EASEL, quantity: 1 },
+      ])
+    ).rejects.toThrow('Prodigi product for print-fap-5x7-easel');
+    expect(ProdigiService.getQuotes).not.toHaveBeenCalled();
   });
 });

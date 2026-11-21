@@ -42,10 +42,18 @@ export const MERCH_CATALOG = {
     printfileExtension: 'jpg',
   },
   [MerchInternalVariant.PRINT_FAP_8X12_FRAMED]: {
-    label: '8×12 framed print',
+    label: '8×12 framed wall print',
     // Note this does not describe the prodigi one accurately, only use when whcc is active
     description:
       'An 8×12 inch lustre print in a ¾" wide smooth matte black MDF frame. No mat. Arrives with a wire hanger, ready to hang.',
+    kind: 'print',
+    provider: MerchProvider.WHCC,
+    printfileExtension: 'jpg',
+  },
+  [MerchInternalVariant.PRINT_FAP_5X7_EASEL]: {
+    label: '5×7 framed tabletop print',
+    description:
+      'A 5×7 inch lustre print in a ¾" wide smooth matte black MDF frame. No mat. Has an easel back so it stands on a desk or table.',
     kind: 'print',
     provider: MerchProvider.WHCC,
     printfileExtension: 'jpg',

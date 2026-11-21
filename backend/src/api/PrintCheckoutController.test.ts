@@ -104,7 +104,7 @@ describe('PrintCheckoutController.createPrintSession', () => {
 });
 
 describe('PrintCheckoutController.getAvailableProducts', () => {
-  it('adds each print description, and the frame of the WHCC framed print only', async () => {
+  it('adds each print description, and the frame of the WHCC framed prints only', async () => {
     jest.mocked(ProductRegistry.getAvailableProducts).mockResolvedValue([
       {
         variant: MerchInternalVariant.PRINT_HPR_8X12,
@@ -116,6 +116,11 @@ describe('PrintCheckoutController.getAvailableProducts', () => {
         label: '8×12 framed print',
         priceAmount: 5900,
       },
+      {
+        variant: MerchInternalVariant.PRINT_FAP_5X7_EASEL,
+        label: '5×7 tabletop framed print',
+        priceAmount: 3900,
+      },
     ]);
 
     const products = await new PrintCheckoutController().getAvailableProducts();
@@ -123,6 +128,7 @@ describe('PrintCheckoutController.getAvailableProducts', () => {
     expect(products.map((p) => p.description)).toEqual([
       `About ${MerchInternalVariant.PRINT_HPR_8X12}`,
       `About ${MerchInternalVariant.PRINT_FAP_8X12_FRAMED}`,
+      `About ${MerchInternalVariant.PRINT_FAP_5X7_EASEL}`,
     ]);
     expect(products.map((p) => p.frame)).toEqual([
       undefined,
@@ -130,6 +136,11 @@ describe('PrintCheckoutController.getAvailableProducts', () => {
         moulding: 'gallery_fine_black',
         printShortSideInches: 8,
         printLongSideInches: 12,
+      },
+      {
+        moulding: 'gallery_fine_black',
+        printShortSideInches: 5,
+        printLongSideInches: 7,
       },
     ]);
   });

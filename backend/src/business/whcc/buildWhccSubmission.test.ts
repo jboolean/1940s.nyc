@@ -1,5 +1,9 @@
 import type MerchOrder from '../../entities/MerchOrder';
-import { buildWhccSubmission } from './buildWhccSubmission';
+import MerchInternalVariant from '../../enum/MerchInternalVariant';
+import {
+  buildWhccConfiguredProduct,
+  buildWhccSubmission,
+} from './buildWhccSubmission';
 
 const order = {
   id: 12,
@@ -34,5 +38,23 @@ it('builds a dropship submission from the order address and shipping method', ()
       },
     },
     reference: 'dev-merch-order-12',
+  });
+});
+
+it('builds the tabletop framed print as a 5x7 framed print with an easel back', () => {
+  expect(
+    buildWhccConfiguredProduct(
+      MerchInternalVariant.PRINT_FAP_5X7_EASEL,
+      'https://printfile'
+    )
+  ).toMatchObject({
+    productId: 'framed-print',
+    selections: {
+      size: '5x7',
+      moulding: 'gallery_fine_black',
+      backing: 'easel_back',
+      quantity: 1,
+    },
+    images: [{ url: 'https://printfile' }],
   });
 });

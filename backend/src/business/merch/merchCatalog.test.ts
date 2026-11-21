@@ -40,7 +40,7 @@ describe('merch catalog', () => {
     }
   });
 
-  it('agrees with the Prodigi catalog on which variants are prints', () => {
+  it('agrees with the print catalog on which variants are prints', () => {
     const productVariants = PRINT_PRODUCTS.map((p) => p.variant).sort();
     expect([...PRINT_VARIANTS].sort()).toEqual(productVariants);
     expect(isPrintVariant(MerchInternalVariant.TOTE_BAG_SMALL)).toBe(false);

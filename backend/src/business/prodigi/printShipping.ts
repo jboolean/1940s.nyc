@@ -67,9 +67,12 @@ export async function quotePrintShipping(
 ): Promise<Stripe.Checkout.SessionCreateParams.ShippingOption[]> {
   const products = items.map((item) => ({
     product: required(
-      getPrintProduct(item.variant),
-      `print product for ${item.variant}`
-    )[MerchProvider.PRODIGI],
+      required(
+        getPrintProduct(item.variant),
+        `print product for ${item.variant}`
+      )[MerchProvider.PRODIGI],
+      `Prodigi product for ${item.variant}`
+    ),
     copies: item.quantity,
   }));
   const options = buildShippingOptions(

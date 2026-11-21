@@ -52,9 +52,12 @@ export function buildProdigiOrder(
     },
     items: order.items.map((item) => {
       const product = required(
-        getPrintProduct(item.internalVariant),
-        `print product for ${item.internalVariant}`
-      )[MerchProvider.PRODIGI];
+        required(
+          getPrintProduct(item.internalVariant),
+          `print product for ${item.internalVariant}`
+        )[MerchProvider.PRODIGI],
+        `Prodigi product for ${item.internalVariant}`
+      );
       return {
         merchantReference: `item-${item.id}`,
         sku: product.sku,

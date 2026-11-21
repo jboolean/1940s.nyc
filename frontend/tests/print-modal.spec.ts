@@ -19,6 +19,17 @@ const PRODUCTS = [
       printLongSideInches: 12,
     },
   },
+  {
+    variant: 'print-fap-5x7-easel',
+    label: '5×7 tabletop framed print',
+    priceAmount: 3900,
+    description: 'Stands on a desk or table.',
+    frame: {
+      moulding: 'gallery_fine_black',
+      printShortSideInches: 5,
+      printLongSideInches: 7,
+    },
+  },
 ];
 
 const CHECKOUT_URL = 'https://checkout.stripe.com/c/pay/cs_test_print';
@@ -148,6 +159,34 @@ test('print modal — the framed print shows its description and the photo in a 
   const img = (await thumbnail.boundingBox())!;
   const framed = (await preview.boundingBox())!;
   const inch = Math.min(img.width, img.height) / 8;
+  expect(framed.width - img.width).toBeCloseTo(2 * (9 / 16) * inch, 0);
+  expect(framed.height - img.height).toBeCloseTo(2 * (9 / 16) * inch, 0);
+  const topSide = (await page
+    .locator('[data-testid="framed-photo-side-top"]')
+    .boundingBox())!;
+  expect(topSide.height).toBeCloseTo((3 / 4) * inch, 0);
+});
+
+test('print modal — the tabletop print draws the same moulding to the scale of a 5×7 print', async ({
+  page,
+}) => {
+  await openPrintModal(page, PHOTO_1940);
+
+  const select = page.locator('[data-testid="print-product-select"]');
+  const preview = page.locator('[data-testid="framed-photo-preview"]');
+  await select.selectOption('print-fap-5x7-easel');
+  await expect(
+    page.locator('[data-testid="print-product-description"]')
+  ).toHaveText('Stands on a desk or table.');
+  await expect(preview).toBeVisible();
+
+  // The frame is the same width in inches as on the 8×12, so it takes up more of a 5-inch print.
+  const thumbnail = page.locator('[data-testid="print-thumbnail"]');
+  await expect(thumbnail).toBeVisible();
+  const img = (await thumbnail.boundingBox())!;
+  const framed = (await preview.boundingBox())!;
+  const inch = Math.min(img.width, img.height) / 5;
+  expect(Math.max(img.width, img.height) / inch).toBeCloseTo(7, 1);
   expect(framed.width - img.width).toBeCloseTo(2 * (9 / 16) * inch, 0);
   expect(framed.height - img.height).toBeCloseTo(2 * (9 / 16) * inch, 0);
   const topSide = (await page

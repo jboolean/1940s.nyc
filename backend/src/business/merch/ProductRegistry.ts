@@ -22,6 +22,9 @@ const MERCH_PRODUCT_IDS: Record<MerchInternalVariant, string | undefined> = {
   [MerchInternalVariant.PRINT_FAP_8X12_FRAMED]: isProduction()
     ? LIVE_PRODUCT_NOT_CREATED_YET
     : 'print-fap-8x12-framed',
+  [MerchInternalVariant.PRINT_FAP_5X7_EASEL]: isProduction()
+    ? LIVE_PRODUCT_NOT_CREATED_YET
+    : 'print-fap-5x7-easel',
 };
 
 export function hasMerchProduct(variant: MerchInternalVariant): boolean {
