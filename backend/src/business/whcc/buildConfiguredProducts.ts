@@ -5,7 +5,7 @@ const POLL_START_MS = 1_000;
 const POLL_MAX_MS = 3_000;
 
 // Builds the products and waits until each is ready. Throws at the deadline (epoch milliseconds).
-// Results keep the input order.
+// Results follow the order WHCC returns them in, which can differ from the input order.
 export async function buildConfiguredProducts(
   products: WhccClient.ConfiguredProductRequest[],
   deadline: number
@@ -43,5 +43,25 @@ export async function buildConfiguredProducts(
       items.find(
         (i) => i.configuredProductId === id
       ) as WhccClient.ConfiguredProduct
+  );
+}
+
+// Like buildConfiguredProducts, but results always match the input order. WHCC returns the products
+// of one create call in any order and echoes nothing that ties them to the request, so each product
+// gets its own create call.
+export function buildConfiguredProductsInOrder(
+  products: WhccClient.ConfiguredProductRequest[],
+  deadline: number
+): Promise<WhccClient.ConfiguredProduct[]> {
+  return Promise.all(
+    products.map(async (product) => {
+      const built = await buildConfiguredProducts([product], deadline);
+      if (built.length !== 1) {
+        throw new Error(
+          `WHCC returned ${built.length} products for one request`
+        );
+      }
+      return built[0];
+    })
   );
 }

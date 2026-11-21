@@ -4,7 +4,7 @@ import type { ShippingQuoteItem } from '../merch/providers/FulfillmentProvider';
 import { getOriginalPublicUrl } from '../utils/printfileUtils';
 import required from '../utils/required';
 import toCents from '../utils/toCents';
-import { buildConfiguredProducts } from './buildConfiguredProducts';
+import { buildConfiguredProductsInOrder } from './buildConfiguredProducts';
 import { buildWhccConfiguredProduct } from './buildWhccSubmission';
 import * as WhccClient from './whccApi';
 
@@ -74,7 +74,7 @@ export async function quoteWhccShipping(
     };
   });
   const deadline = Date.now() + WHCC_QUOTE_BUDGET_MS;
-  const built = await buildConfiguredProducts(
+  const built = await buildConfiguredProductsInOrder(
     lines.map((l) => l.request),
     deadline
   );
