@@ -5,10 +5,8 @@ import { API_BASE } from 'utils/apiConstants';
 
 import Button, { ButtonStyledLink } from 'shared/components/Button';
 import recordEvent from 'shared/utils/recordEvent';
-import { usePrintOrdersEnabled } from '../../../shared/stores/FeatureFlagsStore';
 import { useCorrectionsStore } from '../../Corrections';
 import { openPrintModal } from '../../PrintModal';
-import { ORDER_PRINT_EXTERNAL_LINK_MESSAGE } from '../../PrintModal/archivesLink';
 import { useStoryDraftStore } from '../../SubmitStoryWizard';
 import ColorizeButton from './ColorizeButton';
 
@@ -18,8 +16,6 @@ export default function ImageButtons(): React.JSX.Element {
   const initializeCorrections = useCorrectionsStore(
     (state) => state.initialize
   );
-
-  const printOrdersEnabled = usePrintOrdersEnabled();
 
   const orderPrintEvent = {
     category: 'Image Viewer',
@@ -34,26 +30,13 @@ export default function ImageButtons(): React.JSX.Element {
 
   return (
     <div>
-      {printOrdersEnabled ? (
-        <Button
-          {...orderPrintProps}
-          onClick={() => {
-            recordEvent(orderPrintEvent);
-            if (photoIdentifier) openPrintModal(photoIdentifier);
-          }}
-        />
-      ) : (
-        <ButtonStyledLink
-          {...orderPrintProps}
-          href={`${API_BASE}/photos/${photoIdentifier}/buy-prints`}
-          target="_blank"
-          onClick={() => {
-            recordEvent(orderPrintEvent);
-            alert(ORDER_PRINT_EXTERNAL_LINK_MESSAGE);
-            return true;
-          }}
-        />
-      )}
+      <Button
+        {...orderPrintProps}
+        onClick={() => {
+          recordEvent(orderPrintEvent);
+          if (photoIdentifier) openPrintModal(photoIdentifier);
+        }}
+      />
       <ColorizeButton photoIdentifier={photoIdentifier} />
       <Button
         buttonTheme="viewer"

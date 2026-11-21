@@ -53,8 +53,4 @@ export const useFeatureFlag = (feature: FeatureFlag): boolean => {
   return useFeatureFlagsStore((state) => state[feature]);
 };
 
-export const usePrintOrdersEnabled = (): boolean => {
-  return useFeatureFlagsStore((state) => state[FeatureFlag.PRINT_ORDERS]);
-};
-
 export default useFeatureFlagsStore;
