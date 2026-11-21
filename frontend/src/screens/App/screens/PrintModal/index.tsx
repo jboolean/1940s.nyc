@@ -102,8 +102,7 @@ export default function PrintModal(): React.JSX.Element {
                     onQuantityChange={setQuantity}
                   />
                   <div>
-                    Looking for another size or product? Let me know how I can
-                    help at{' '}
+                    Want a custom size or style? Let me know how I can help at{' '}
                     <a href="mailto:julian@1940s.nyc">julian@1940s.nyc</a>
                   </div>
                   <OrderSummary
