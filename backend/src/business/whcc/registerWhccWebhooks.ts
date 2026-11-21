@@ -6,8 +6,10 @@ import {
   listEventSubscriptions,
 } from './whccApi';
 
-// Only staging registers.
-const API_BASE = 'https://api.staging.1940s.nyc';
+const API_BASES: Record<string, string> = {
+  production: 'https://api.1940s.nyc',
+  staging: 'https://api.staging.1940s.nyc',
+};
 
 const EVENT_TYPES = [
   'order.accepted',
@@ -16,23 +18,29 @@ const EVENT_TYPES = [
   'order.cancelled',
 ] as const;
 
-// Subscriptions belong to the account. Reuse one that already matches.
+// Subscriptions belong to the account. Reuse the one for this stage's endpoint.
 export default async function registerWhccWebhooks(): Promise<void> {
-  if (process.env.STAGE !== 'staging') {
-    console.log('Not registering WHCC webhooks outside the staging stage');
+  const apiBase = API_BASES[process.env.STAGE ?? ''];
+  if (!apiBase) {
+    console.log(
+      'Not registering WHCC webhooks outside the production and staging stages'
+    );
     return;
   }
 
-  const callbackUri = `${API_BASE}/whcc-webhooks`;
+  const callbackUri = `${apiBase}/whcc-webhooks`;
   const { items } = await listEventSubscriptions();
-  const existing = items.find(
-    (s) =>
-      s.destination.callbackUri === callbackUri &&
-      s.destination.version === 2 &&
-      (s.eventTypes.includes('*') ||
-        EVENT_TYPES.every((type) => s.eventTypes.includes(type)))
-  );
+  const existing = items.find((s) => s.destination.callbackUri === callbackUri);
   if (existing) {
+    const matches =
+      existing.destination.version === 2 &&
+      (existing.eventTypes.includes('*') ||
+        EVENT_TYPES.every((type) => existing.eventTypes.includes(type)));
+    if (!matches) {
+      throw new Error(
+        `WHCC subscription ${existing.id} already uses ${callbackUri} but has a different version or event types; fix it in WHCC`
+      );
+    }
     if (existing.status !== 'active') {
       await enableEventSubscription(existing.id);
     }
