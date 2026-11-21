@@ -123,8 +123,12 @@ describe('PrintCheckoutController.getAvailableProducts', () => {
       },
     ]);
 
-    const products = await new PrintCheckoutController().getAvailableProducts();
+    const controller = new PrintCheckoutController();
+    const products = await controller.getAvailableProducts();
 
+    expect(controller.getHeaders()).toEqual({
+      'Cache-Control': 'public, max-age=300',
+    });
     expect(products.map((p) => p.description)).toEqual([
       `About ${MerchInternalVariant.PRINT_8X12}`,
       `About ${MerchInternalVariant.FRAMED_PRINT_8X12_WALL}`,
