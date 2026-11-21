@@ -250,6 +250,34 @@ test('print modal — checkout goes to Stripe', async ({ page }) => {
   await expectStripeRedirect(page);
 });
 
+test('print modal — a refused checkout shows the server message, other failures the generic one', async ({
+  page,
+}) => {
+  await openPrintModal(page, PHOTO_1940);
+  let status = 400;
+  await page.route('**/print-checkout/session', (route) =>
+    route.fulfill({
+      status,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        error:
+          status === 400 ? 'This order cannot be printed right now.' : 'Boom',
+      }),
+    })
+  );
+
+  await page.locator('[data-testid="print-checkout-button"]').click();
+  await expect(page.locator('[data-testid="print-error"]')).toHaveText(
+    'This order cannot be printed right now.'
+  );
+
+  status = 500;
+  await page.locator('[data-testid="print-checkout-button"]').click();
+  await expect(page.locator('[data-testid="print-error"]')).toHaveText(
+    'Something went wrong. Please try again.'
+  );
+});
+
 test('print modal — closing while the session is created does not go to Stripe', async ({
   page,
 }) => {

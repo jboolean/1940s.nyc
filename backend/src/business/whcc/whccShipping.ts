@@ -1,3 +1,4 @@
+import { BadRequest } from 'http-errors';
 import type Stripe from 'stripe';
 import MerchInternalVariant from '../../enum/MerchInternalVariant';
 import type { ShippingQuoteItem } from '../merch/providers/FulfillmentProvider';
@@ -10,9 +11,17 @@ import * as WhccClient from './whccApi';
 
 export const WHCC_SHIPPING_METHOD_METADATA_KEY = 'whcc-shipping-priority';
 
-// No address exists yet when shipping is quoted, and WHCC needs one. State and country alone give
-// the same methods and prices as a full New York address. A ZIP would add Alaska and Hawaii methods.
-const WHCC_QUOTE_ADDRESS = { state: 'NY', country: 'US' };
+// No address exists yet, and WHCC reports an order as not valid to submit without a name, street,
+// city and ZIP. This stand-in gets the same shipping methods and prices as the state and country alone.
+// A ZIP in Alaska or Hawaii would add methods for those states.
+const WHCC_QUOTE_ADDRESS = {
+  name: 'Shipping Quote',
+  addr1: '1 Centre St',
+  city: 'New York',
+  state: 'NY',
+  zip: '10007',
+  country: 'US',
+};
 
 // Stripe allows five shipping options per session.
 const MAX_SHIPPING_OPTIONS = 5;
@@ -65,6 +74,8 @@ export async function quoteWhccShipping(
   }
   const lines = [...byVariant].map(([variant, line]) => {
     return {
+      variant,
+      photoIdentifier: line.photoIdentifier,
       // Originals are not served through the Cloudflare bypass origin.
       request: buildWhccConfiguredProduct(
         variant,
@@ -78,18 +89,31 @@ export async function quoteWhccShipping(
     lines.map((l) => l.request),
     deadline
   );
-  const options = buildWhccShippingOptions(
-    await WhccClient.calculate(
-      {
-        items: built.map((b, i) => ({
-          configuredProductId: b.configuredProductId,
-          quantity: lines[i].quantity,
-        })),
-        shipping: { type: 'dropship', address: WHCC_QUOTE_ADDRESS },
-      },
-      deadline
-    )
+  const calculation = await WhccClient.calculate(
+    {
+      items: built.map((b, i) => ({
+        configuredProductId: b.configuredProductId,
+        quantity: lines[i].quantity,
+      })),
+      shipping: { type: 'dropship', address: WHCC_QUOTE_ADDRESS },
+    },
+    deadline
   );
+  if (!calculation.validation.isValidForSubmit) {
+    console.error('WHCC says this checkout cannot be submitted', {
+      validation: calculation.validation,
+      lines: lines.map((l, i) => ({
+        variant: l.variant,
+        quantity: l.quantity,
+        photoIdentifier: l.photoIdentifier,
+        configuredProductId: built[i].configuredProductId,
+      })),
+    });
+    throw new BadRequest(
+      'This order cannot be printed right now. Please try again later or choose different prints.'
+    );
+  }
+  const options = buildWhccShippingOptions(calculation);
   if (!options.length) {
     throw new Error('WHCC returned no shipping options');
   }

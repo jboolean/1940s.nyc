@@ -11,6 +11,7 @@ import usePrintCartStore from '../../PrintCart/stores/PrintCartStore';
 import {
   createPrintCheckoutSession,
   getAvailablePrintProducts,
+  getCheckoutErrorMessage,
   PrintProductApiResponse,
 } from '../utils/PrintCheckoutApi';
 
@@ -228,7 +229,7 @@ const usePrintCheckoutStore = create(
         // one, where it would show an error and re-enable the button mid-retry.
         if (request !== latestRequest || !get().isOpen) return;
         set((draft) => {
-          draft.errorMessage = 'Something went wrong. Please try again.';
+          draft.errorMessage = getCheckoutErrorMessage(error);
           draft.isCheckingOut = false;
         });
       }

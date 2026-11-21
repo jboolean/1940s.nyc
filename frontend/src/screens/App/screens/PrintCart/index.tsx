@@ -11,6 +11,7 @@ import { forgeImgSrc } from '../ViewerPane/components/ImageStack';
 import {
   createPrintCheckoutSession,
   getAvailablePrintProducts,
+  getCheckoutErrorMessage,
   PrintProductApiResponse,
 } from '../PrintModal/utils/PrintCheckoutApi';
 import stylesheet from './PrintCart.less';
@@ -178,7 +179,7 @@ export default function PrintCartModal(): React.JSX.Element {
     } catch (error) {
       console.error('Print cart checkout failed', error);
       setCheckingOut(false);
-      setErrorMessage('Something went wrong. Please try again.');
+      setErrorMessage(getCheckoutErrorMessage(error));
     }
   };
 

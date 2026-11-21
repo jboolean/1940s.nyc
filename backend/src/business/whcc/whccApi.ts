@@ -102,7 +102,10 @@ export interface Submission {
 }
 
 export interface Calculation {
-  validation: { isValidForSubmit: boolean };
+  validation: {
+    isValidForSubmit: boolean;
+    invalidParams?: { name: string; reason: string }[];
+  };
   options?: {
     shipping?: {
       priority: string;

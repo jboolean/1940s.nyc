@@ -3,6 +3,7 @@ import Collection from '../../enum/Collection';
 import MerchInternalVariant from '../../enum/MerchInternalVariant';
 import stripe from '../../third-party/stripe';
 import * as ProdigiService from '../prodigi/ProdigiService';
+import * as WhccApi from '../whcc/whccApi';
 import { getMerchProductId } from './ProductRegistry';
 import {
   createMerchCheckoutSession,
@@ -27,13 +28,22 @@ jest.mock('./providers/ProdigiFulfillmentProvider', () => ({
 }));
 jest.mock('./providers/WhccFulfillmentProvider', () => ({
   __esModule: true,
-  default: {},
+  default: {
+    quoteShippingOptions: jest.requireActual<
+      typeof import('../whcc/whccShipping')
+    >('../whcc/whccShipping').quoteWhccShipping,
+  },
 }));
+jest.mock('../whcc/whccApi');
 jest.mock('./merchCatalog', () => ({
   ...jest.requireActual<typeof import('./merchCatalog')>('./merchCatalog'),
-  // Force prints to Prodigi so these tests cover that path.
+  // Force prints to Prodigi so these tests cover that path, except the framed easel print.
   getMerchProvider: (variant: string) =>
-    variant === 'tote-bag-small' ? 'printful' : 'prodigi',
+    variant === 'tote-bag-small'
+      ? 'printful'
+      : variant === 'framed-print-5x7-easel'
+        ? 'whcc'
+        : 'prodigi',
 }));
 jest.mock('../prodigi/ProdigiService', () => ({ getQuotes: jest.fn() }));
 jest.mock('../../third-party/stripe', () => ({
@@ -200,6 +210,52 @@ describe('createMerchCheckoutSession', () => {
         ],
       })
     );
+  });
+
+  describe('with WHCC as the printer', () => {
+    const whccPrint = {
+      variant: MerchInternalVariant.FRAMED_PRINT_5X7_EASEL,
+      quantity: 1,
+      print: { photoIdentifier: 'p1', colorize: false },
+    };
+
+    function mockWhccCalculation(isValidForSubmit: boolean): void {
+      jest.mocked(WhccApi.createConfiguredProducts).mockResolvedValue({
+        items: [{ configuredProductId: 'CF_1', status: 'ready' }],
+      });
+      jest.mocked(WhccApi.calculate).mockResolvedValue({
+        validation: { isValidForSubmit },
+        options: {
+          shipping: [
+            {
+              priority: 'dropship_lowest_cost',
+              label: 'Economy',
+              price: { value: '9.95', code: 'USD' },
+            },
+          ],
+        },
+      });
+    }
+
+    it('creates the session when WHCC says the basket can be submitted', async () => {
+      mockWhccCalculation(true);
+
+      await createMerchCheckoutSession({ ...urls, items: [whccPrint] });
+
+      expect(sessionParams().shipping_options).toHaveLength(1);
+    });
+
+    it('refuses with a 400 before any Stripe session when WHCC says it cannot be submitted', async () => {
+      const consoleError = jest.spyOn(console, 'error').mockImplementation();
+      mockWhccCalculation(false);
+
+      await expect(
+        createMerchCheckoutSession({ ...urls, items: [whccPrint] })
+      ).rejects.toMatchObject({ status: 400 });
+
+      expect(stripe.checkout.sessions.create).not.toHaveBeenCalled();
+      consoleError.mockRestore();
+    });
   });
 
   it('rejects an empty checkout and one with too many items', async () => {

@@ -1,4 +1,5 @@
 import type * as express from 'express';
+import { BadRequest } from 'http-errors';
 import MerchInternalVariant from '../enum/MerchInternalVariant';
 import * as MerchCheckoutService from '../business/merch/MerchCheckoutService';
 import * as ProductRegistry from '../business/merch/ProductRegistry';
@@ -61,6 +62,29 @@ describe('PrintCheckoutController.createPrintSession', () => {
         },
       ],
     });
+  });
+
+  it('passes a refusal from the checkout through with its status and message', async () => {
+    jest
+      .mocked(MerchCheckoutService.createMerchCheckoutSession)
+      .mockRejectedValueOnce(new BadRequest('Cannot be printed'));
+
+    await expect(
+      new PrintCheckoutController().createPrintSession(
+        {
+          ...urls,
+          items: [
+            {
+              photoIdentifier: 'p1',
+              variant: MerchInternalVariant.PRINT_8X12,
+              quantity: 1,
+              colorize: false,
+            },
+          ],
+        },
+        req
+      )
+    ).rejects.toMatchObject({ status: 400, message: 'Cannot be printed' });
   });
 
   it('checks out several prints of different photos in one session', async () => {
