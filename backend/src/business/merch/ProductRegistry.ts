@@ -5,25 +5,21 @@ import required from '../utils/required';
 import { getCatalogDefaultPrice } from './checkoutSession';
 import { getMerchLabel } from './merchCatalog';
 
-// The live print products are created by hand in Stripe before prints launch. Until their ids
-// are filled in here, a live checkout for a print is refused.
-const LIVE_PRODUCT_NOT_CREATED_YET = undefined;
-
 const MERCH_PRODUCT_IDS: Record<MerchInternalVariant, string | undefined> = {
   [MerchInternalVariant.TOTE_BAG_SMALL]: isProduction()
     ? 'prod_RmpsQvWdhK6uZf'
     : 'prod_RjkZ81n7LrxUnl',
   [MerchInternalVariant.PRINT_4X6]: isProduction()
-    ? LIVE_PRODUCT_NOT_CREATED_YET
+    ? 'prod_VfcsrXpkJnMwhv'
     : 'prod_VfbmKx4y2G7RZ6',
   [MerchInternalVariant.PRINT_8X12]: isProduction()
-    ? LIVE_PRODUCT_NOT_CREATED_YET
+    ? 'prod_Vfcu23HuC06cNI'
     : 'prod_Vfbm7xcuGExM5a',
   [MerchInternalVariant.FRAMED_PRINT_8X12_WALL]: isProduction()
-    ? LIVE_PRODUCT_NOT_CREATED_YET
+    ? 'prod_VfcsY7jC9HCuWc'
     : 'prod_Vfbmgj1EFyu4Fp',
   [MerchInternalVariant.FRAMED_PRINT_5X7_EASEL]: isProduction()
-    ? LIVE_PRODUCT_NOT_CREATED_YET
+    ? 'prod_Vfcu7QBHdlxYcZ'
     : 'prod_VfbmFYcvZM6TrL',
 };
 
