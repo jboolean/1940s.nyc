@@ -26,6 +26,9 @@ export const PRINT_VARIANTS = [
 
 export type PrintVariant = typeof PRINT_VARIANTS[number];
 
+export const DEFAULT_PRINT_VARIANT: PrintVariant =
+  MerchInternalVariant.PRINT_8X12;
+
 export function isPrintVariant(
   variant: MerchInternalVariant
 ): variant is PrintVariant {

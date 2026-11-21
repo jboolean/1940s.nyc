@@ -210,13 +210,23 @@ test('print modal — a 1980s photo sizes the modal to its content', async ({
   expect(modalBox?.height).toBeLessThan(400);
 });
 
+test('print modal — the 8×12 print is selected when the modal opens', async ({
+  page,
+}) => {
+  await openPrintModal(page, PHOTO_1940);
+
+  await expect(
+    page.locator('[data-testid="print-product-select"]')
+  ).toHaveValue('print-8x12');
+});
+
 test('print modal — the product, quantity and colorize options set the order', async ({
   page,
 }) => {
   await openPrintModal(page, PHOTO_1940);
 
   const total = page.locator('[data-testid="print-total"]');
-  await expect(total).toHaveText('$9');
+  await expect(total).toHaveText('$19');
 
   await page
     .locator('[data-testid="print-product-select"]')
