@@ -1,4 +1,12 @@
-import { Body, Get, Post, Request, Route, Security } from '@tsoa/runtime';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Request,
+  Route,
+  Security,
+} from '@tsoa/runtime';
 import * as express from 'express';
 import { HttpError, InternalServerError } from 'http-errors';
 import { getUserFromRequestOrCreateAndSetCookie } from './auth/userAuthUtils';
@@ -35,7 +43,7 @@ interface PrintProductApiResponse {
 }
 
 @Route('print-checkout')
-export class PrintCheckoutController {
+export class PrintCheckoutController extends Controller {
   @Security('user-token')
   @Post('/session')
   public async createPrintSession(
@@ -71,6 +79,11 @@ export class PrintCheckoutController {
   @Get('/available-products')
   public async getAvailableProducts(): Promise<PrintProductApiResponse[]> {
     const products = await ProductRegistry.getAvailableProducts(PRINT_VARIANTS);
+
+    // The catalog is public and only changes when a price does, so let browsers and
+    // shared caches hold onto it for a few minutes.
+    this.setHeader('Cache-Control', 'public, max-age=300');
+
     return products.map((product) => ({
       ...product,
       description: getMerchDescription(product.variant),

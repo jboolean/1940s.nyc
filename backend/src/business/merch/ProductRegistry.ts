@@ -42,6 +42,44 @@ export interface AvailableProduct {
   priceAmount: number;
 }
 
+const PRICE_CACHE_TTL_MS = 5 * 60 * 1000;
+
+// Prices change rarely and the available-products endpoints are public and hot, so keep each
+// product's price for a few minutes instead of asking Stripe for it on every request.
+const priceCache = new Map<
+  string,
+  { priceAmount: number; expiresAt: number }
+>();
+
+async function getCachedPriceAmount(
+  variant: MerchInternalVariant
+): Promise<number> {
+  const productId = getMerchProductId(variant);
+  const cached = priceCache.get(productId);
+  if (cached && cached.expiresAt > Date.now()) {
+    return cached.priceAmount;
+  }
+
+  try {
+    const price = await getCatalogDefaultPrice(productId);
+    const priceAmount = required(
+      price.unit_amount,
+      `unit_amount of ${variant}`
+    );
+    priceCache.set(productId, {
+      priceAmount,
+      expiresAt: Date.now() + PRICE_CACHE_TTL_MS,
+    });
+    return priceAmount;
+  } catch (err) {
+    // A stale price is better than failing the whole catalog while Stripe is unavailable.
+    if (cached) {
+      return cached.priceAmount;
+    }
+    throw err;
+  }
+}
+
 // Only the variants that have a Stripe product in this mode, so a product that cannot be bought
 // here is never offered.
 export const getAvailableProducts = async (
@@ -51,9 +89,6 @@ export const getAvailableProducts = async (
     variants.filter(hasMerchProduct).map(async (variant) => ({
       variant,
       label: getMerchLabel(variant),
-      priceAmount: required(
-        (await getCatalogDefaultPrice(getMerchProductId(variant))).unit_amount,
-        `unit_amount of ${variant}`
-      ),
+      priceAmount: await getCachedPriceAmount(variant),
     }))
   );
