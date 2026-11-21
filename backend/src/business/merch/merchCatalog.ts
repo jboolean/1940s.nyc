@@ -27,21 +27,21 @@ export const MERCH_CATALOG = {
     provider: MerchProvider.PRINTFUL,
     printfileExtension: 'png',
   },
-  [MerchInternalVariant.PRINT_HPR_4X6]: {
+  [MerchInternalVariant.PRINT_4X6]: {
     label: '4×6 print',
     description: lustrePhotoPrintDescription(4, 6),
     kind: 'print',
     provider: MerchProvider.WHCC,
     printfileExtension: 'jpg',
   },
-  [MerchInternalVariant.PRINT_HPR_8X12]: {
+  [MerchInternalVariant.PRINT_8X12]: {
     label: '8×12 print',
     description: lustrePhotoPrintDescription(8, 12),
     kind: 'print',
     provider: MerchProvider.WHCC,
     printfileExtension: 'jpg',
   },
-  [MerchInternalVariant.PRINT_FAP_8X12_FRAMED]: {
+  [MerchInternalVariant.FRAMED_PRINT_8X12_WALL]: {
     label: '8×12 framed wall print',
     // Note this does not describe the prodigi one accurately, only use when whcc is active
     description:
@@ -50,7 +50,7 @@ export const MERCH_CATALOG = {
     provider: MerchProvider.WHCC,
     printfileExtension: 'jpg',
   },
-  [MerchInternalVariant.PRINT_FAP_5X7_EASEL]: {
+  [MerchInternalVariant.FRAMED_PRINT_5X7_EASEL]: {
     label: '5×7 framed tabletop print',
     description:
       'A 5×7 inch lustre print in a ¾" wide smooth matte black MDF frame. No mat. Has an easel back so it stands on a desk or table.',

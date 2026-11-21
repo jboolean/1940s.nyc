@@ -30,7 +30,7 @@ const prodigiSizing: Sizing = 'fitPrintArea';
 
 export const PRINT_PRODUCTS: PrintProduct[] = [
   {
-    variant: MerchInternalVariant.PRINT_HPR_4X6,
+    variant: MerchInternalVariant.PRINT_4X6,
     [MerchProvider.PRODIGI]: {
       sku: 'GLOBAL-PHO-4X6',
       attributes: {},
@@ -39,7 +39,7 @@ export const PRINT_PRODUCTS: PrintProduct[] = [
     [MerchProvider.WHCC]: whccPhotoPrint('4x6'),
   },
   {
-    variant: MerchInternalVariant.PRINT_HPR_8X12,
+    variant: MerchInternalVariant.PRINT_8X12,
     [MerchProvider.PRODIGI]: {
       sku: 'GLOBAL-PHO-8X12',
       attributes: {},
@@ -48,7 +48,7 @@ export const PRINT_PRODUCTS: PrintProduct[] = [
     [MerchProvider.WHCC]: whccPhotoPrint('8x12'),
   },
   {
-    variant: MerchInternalVariant.PRINT_FAP_8X12_FRAMED,
+    variant: MerchInternalVariant.FRAMED_PRINT_8X12_WALL,
     [MerchProvider.PRODIGI]: {
       sku: 'GLOBAL-BOX-8X12',
       attributes: { color: 'black' },
@@ -71,7 +71,7 @@ export const PRINT_PRODUCTS: PrintProduct[] = [
     },
   },
   {
-    variant: MerchInternalVariant.PRINT_FAP_5X7_EASEL,
+    variant: MerchInternalVariant.FRAMED_PRINT_5X7_EASEL,
     [MerchProvider.WHCC]: {
       productRef: 'framed-print',
       selections: {

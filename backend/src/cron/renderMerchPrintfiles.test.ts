@@ -63,10 +63,10 @@ function printItem(id: number, colorize: boolean, attempts?: number): object {
   return {
     id,
     order: { id: 77 },
-    internalVariant: MerchInternalVariant.PRINT_HPR_8X12,
+    internalVariant: MerchInternalVariant.PRINT_8X12,
     printfileAttempts: attempts,
     customizationOptions: {
-      variant: MerchInternalVariant.PRINT_HPR_8X12,
+      variant: MerchInternalVariant.PRINT_8X12,
       photoIdentifier: `p${id}`,
       colorize,
     },
@@ -236,7 +236,7 @@ describe('renderMerchPrintfiles', () => {
     const mismatched = {
       ...toteItem(4),
       customizationOptions: {
-        variant: MerchInternalVariant.PRINT_HPR_8X12,
+        variant: MerchInternalVariant.PRINT_8X12,
         photoIdentifier: 'p4',
         colorize: false,
       },

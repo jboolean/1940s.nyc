@@ -139,10 +139,10 @@ function render(
         throw new Error('Tote bag item does not carry tote bag options');
       }
       return renderTote(item, options);
-    case MerchInternalVariant.PRINT_HPR_4X6:
-    case MerchInternalVariant.PRINT_HPR_8X12:
-    case MerchInternalVariant.PRINT_FAP_8X12_FRAMED:
-    case MerchInternalVariant.PRINT_FAP_5X7_EASEL:
+    case MerchInternalVariant.PRINT_4X6:
+    case MerchInternalVariant.PRINT_8X12:
+    case MerchInternalVariant.FRAMED_PRINT_8X12_WALL:
+    case MerchInternalVariant.FRAMED_PRINT_5X7_EASEL:
       if (!isPrintOptions(options)) {
         throw new Error('Print item does not carry print options');
       }

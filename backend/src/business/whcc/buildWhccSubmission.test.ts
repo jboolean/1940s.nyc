@@ -44,7 +44,7 @@ it('builds a dropship submission from the order address and shipping method', ()
 it('builds the tabletop framed print as a 5x7 framed print with an easel back', () => {
   expect(
     buildWhccConfiguredProduct(
-      MerchInternalVariant.PRINT_FAP_5X7_EASEL,
+      MerchInternalVariant.FRAMED_PRINT_5X7_EASEL,
       'https://printfile'
     )
   ).toMatchObject({

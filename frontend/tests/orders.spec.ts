@@ -18,16 +18,16 @@ const ORDERS = [
       },
       {
         id: 12,
-        internalVariant: 'print-hpr-8x12',
+        internalVariant: 'print-8x12',
         label: '8×12 print',
         state: 'purchased',
       },
       {
         id: 13,
-        internalVariant: 'print-hpr-4x6',
+        internalVariant: 'print-4x6',
         label: '4×6 print',
         customizationOptions: {
-          variant: 'print-hpr-4x6',
+          variant: 'print-4x6',
           photoIdentifier: 'nynyma_rec0040_1_00581_0063',
           colorize: true,
         },

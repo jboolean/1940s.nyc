@@ -9,7 +9,7 @@ const NOW = Date.UTC(2026, 0, 10);
 
 const item = {
   photoIdentifier: 'photo-1',
-  variant: 'print-hpr-8x12',
+  variant: 'print-8x12',
   colorize: false,
   quantity: 2,
 } as never as import('../src/screens/App/screens/PrintCart/stores/PrintCartStore').CartItem;
@@ -151,6 +151,21 @@ test('drops a cart older than 7 days', async () => {
     })
   );
   expect(store.getState().items).toEqual([]);
+});
+
+test('drops saved lines whose variant is not a print', async () => {
+  const { store } = await loadStore(
+    fakeLocalStorage({
+      'print-cart': JSON.stringify({
+        state: {
+          items: [{ ...item, variant: 'print-unknown' }, item],
+          savedAt: NOW,
+        },
+        version: 0,
+      }),
+    })
+  );
+  expect(store.getState().items).toEqual([item]);
 });
 
 test('ignores corrupt stored data', async () => {

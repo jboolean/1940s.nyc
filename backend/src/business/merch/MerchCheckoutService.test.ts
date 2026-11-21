@@ -3,6 +3,7 @@ import Collection from '../../enum/Collection';
 import MerchInternalVariant from '../../enum/MerchInternalVariant';
 import stripe from '../../third-party/stripe';
 import * as ProdigiService from '../prodigi/ProdigiService';
+import { getMerchProductId } from './ProductRegistry';
 import {
   createMerchCheckoutSession,
   MAX_CHECKOUT_ITEMS,
@@ -45,7 +46,7 @@ jest.mock('../../third-party/stripe', () => ({
 
 const urls = { successUrl: 'http://s', cancelUrl: 'http://c' };
 const print = {
-  variant: MerchInternalVariant.PRINT_HPR_8X12,
+  variant: MerchInternalVariant.PRINT_8X12,
   quantity: 2,
   print: { photoIdentifier: 'p1', colorize: true },
 };
@@ -121,9 +122,12 @@ describe('createMerchCheckoutSession', () => {
         },
       },
     ]);
-    expect(stripe.products.retrieve).toHaveBeenCalledWith('print-hpr-8x12', {
-      expand: ['default_price'],
-    });
+    expect(stripe.products.retrieve).toHaveBeenCalledWith(
+      getMerchProductId(MerchInternalVariant.PRINT_8X12),
+      {
+        expand: ['default_price'],
+      }
+    );
     expect(
       params.shipping_options?.[0].shipping_rate_data?.fixed_amount?.amount
     ).toBe(1185);
@@ -153,7 +157,7 @@ describe('createMerchCheckoutSession', () => {
     await expect(
       createMerchCheckoutSession({
         ...urls,
-        items: [{ variant: MerchInternalVariant.PRINT_HPR_8X12, quantity: 1 }],
+        items: [{ variant: MerchInternalVariant.PRINT_8X12, quantity: 1 }],
       })
     ).rejects.toMatchObject({ status: 400 });
     expect(stripe.checkout.sessions.create).not.toHaveBeenCalled();
@@ -171,7 +175,7 @@ describe('createMerchCheckoutSession', () => {
       items: [
         print,
         {
-          variant: MerchInternalVariant.PRINT_HPR_4X6,
+          variant: MerchInternalVariant.PRINT_4X6,
           quantity: 1,
           print: { photoIdentifier: 'p2', colorize: false },
         },

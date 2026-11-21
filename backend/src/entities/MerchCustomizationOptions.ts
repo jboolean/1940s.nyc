@@ -15,10 +15,10 @@ export interface ToteBagCustomizationOptions {
 // derivation uses, and route generation aborts on it. merchCatalog.test holds this list to the
 // catalog's, so the prints are still stated in one place.
 export type PrintVariant =
-  | MerchInternalVariant.PRINT_HPR_4X6
-  | MerchInternalVariant.PRINT_HPR_8X12
-  | MerchInternalVariant.PRINT_FAP_8X12_FRAMED
-  | MerchInternalVariant.PRINT_FAP_5X7_EASEL;
+  | MerchInternalVariant.PRINT_4X6
+  | MerchInternalVariant.PRINT_8X12
+  | MerchInternalVariant.FRAMED_PRINT_8X12_WALL
+  | MerchInternalVariant.FRAMED_PRINT_5X7_EASEL;
 
 export interface PrintCustomizationOptions {
   variant: PrintVariant;
