@@ -1,0 +1,38 @@
+.container {
+  position: relative;
+  // The frame is drawn in the padding around the photo's own size.
+  box-sizing: content-box;
+  // Fills the hairline that anti-aliasing can leave between the photo and the frame.
+  background-color: rgb(16, 16, 16);
+}
+
+// Hidden until the photo has loaded and the frame can be sized, so the frame does not appear late.
+.unmeasured {
+  visibility: hidden;
+}
+
+.photo {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.side {
+  position: absolute;
+  background-color: rgb(16, 16, 16);
+  background-repeat: repeat-x;
+}
+
+// The light line and shadow along the 45° joint where two sides meet.
+.miterSeam {
+  position: absolute;
+  top: 0;
+  background: linear-gradient(
+    -45deg,
+    rgba(0, 0, 0, 0) 0px,
+    rgba(0, 0, 0, 0.25) calc(50% + 0.8px),
+    rgba(222, 222, 222, 0.45) calc(50% + 0.8px),
+    rgba(222, 222, 222, 0) calc(50% + 1.8px)
+  );
+}

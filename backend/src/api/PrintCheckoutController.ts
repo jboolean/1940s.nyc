@@ -4,7 +4,11 @@ import { HttpError, InternalServerError } from 'http-errors';
 import { getUserFromRequestOrCreateAndSetCookie } from './auth/userAuthUtils';
 
 import * as MerchCheckoutService from '../business/merch/MerchCheckoutService';
-import { PRINT_VARIANTS } from '../business/merch/merchCatalog';
+import {
+  getMerchDescription,
+  PRINT_VARIANTS,
+} from '../business/merch/merchCatalog';
+import { getWhccFrame, type PrintFrame } from '../business/merch/printCatalog';
 import * as ProductRegistry from '../business/merch/ProductRegistry';
 import * as UserService from '../business/users/UserService';
 import MerchInternalVariant from '../enum/MerchInternalVariant';
@@ -26,6 +30,8 @@ interface PrintProductApiResponse {
   variant: MerchInternalVariant;
   label: string;
   priceAmount: number;
+  description?: string;
+  frame?: PrintFrame;
 }
 
 @Route('print-checkout')
@@ -64,6 +70,11 @@ export class PrintCheckoutController {
 
   @Get('/available-products')
   public async getAvailableProducts(): Promise<PrintProductApiResponse[]> {
-    return ProductRegistry.getAvailableProducts(PRINT_VARIANTS);
+    const products = await ProductRegistry.getAvailableProducts(PRINT_VARIANTS);
+    return products.map((product) => ({
+      ...product,
+      description: getMerchDescription(product.variant),
+      frame: getWhccFrame(product.variant),
+    }));
   }
 }

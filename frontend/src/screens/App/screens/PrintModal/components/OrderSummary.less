@@ -1,0 +1,31 @@
+@import '../../../../../shared/styles/viewport.less';
+
+.orderSummary {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.buttonRow {
+  display: flex;
+  flex-wrap: nowrap;
+}
+
+.finePrint {
+  font-size: 12px;
+}
+
+@media screen and (max-width: @modal-width-max) {
+  .buttonRow button {
+    padding: 1rem;
+    margin-right: 0.75rem;
+  }
+}
+
+@media screen and (max-width: 360px) {
+  .buttonRow button {
+    padding: 1rem 0.5rem;
+    margin-right: 0.5rem;
+  }
+}
