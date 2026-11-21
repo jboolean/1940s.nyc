@@ -1,5 +1,8 @@
 import useLoginStore from 'shared/stores/LoginStore';
-import { MerchInternalVariant } from 'shared/utils/merch/Order';
+import {
+  DEFAULT_PRINT_VARIANT,
+  MerchInternalVariant,
+} from 'shared/utils/merch/Order';
 import { getPhoto, Photo } from 'shared/utils/photosApi';
 import recordEvent from 'shared/utils/recordEvent';
 import { create } from 'zustand';
@@ -102,7 +105,11 @@ const usePrintCheckoutStore = create(
           set((draft) => {
             draft.photo = photo;
             draft.products = products;
-            draft.variant = products[0]?.variant ?? null;
+            draft.variant =
+              products.find((p) => p.variant === DEFAULT_PRINT_VARIANT)
+                ?.variant ??
+              products[0]?.variant ??
+              null;
             draft.errorMessage = errorMessage;
             draft.isLoading = false;
           });
