@@ -103,7 +103,13 @@ export default function PrintModal(): React.JSX.Element {
                   />
                   <div>
                     Want a custom size or style? Let me know how I can help at{' '}
-                    <a href="mailto:julian@1940s.nyc">julian@1940s.nyc</a>
+                    <a
+                      href="mailto:julian@1940s.nyc"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      julian@1940s.nyc
+                    </a>
                   </div>
                   <OrderSummary
                     totalCents={total}
