@@ -11,7 +11,6 @@ import {
   WHCC_SHIPPING_METHOD_METADATA_KEY,
 } from '../../whcc/whccShipping';
 import { syncSubmission } from '../../whcc/WhccCallbackService';
-import isProduction from '../../utils/isProduction';
 import required from '../../utils/required';
 import FulfillmentProvider, {
   CreatedProviderOrder,
@@ -41,11 +40,6 @@ const WhccFulfillmentProvider: FulfillmentProvider = {
   ): Promise<CreatedProviderOrder> {
     if (order.providerOrderId) {
       return {};
-    }
-    if (isProduction() && process.env.WHCC_LIVE_ORDERS_ENABLED !== 'true') {
-      throw new Error(
-        'Refusing to create a WHCC submission on the live API: WHCC_LIVE_ORDERS_ENABLED is not true'
-      );
     }
 
     // A retry has a different body, so the idempotency key does not match. Look up the earlier
