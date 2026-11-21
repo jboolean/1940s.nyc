@@ -53,9 +53,8 @@ provider:
     PRODIGI_SK: ${ssm:/${self:service}-${sls:stage}-prodigi-sk}
     # See src/business/prodigi/ProdigiService.ts
     PRODIGI_LIVE_ORDERS_ENABLED: ${self:custom.prodigiLiveOrdersEnabled.${sls:stage}}
-    # The '' fallbacks let deploys pass before production WHCC is set up; remove them at go-live.
-    WHCC_SK: ${ssm:/${self:service}-${sls:stage}-whcc-sk, ''}
-    WHCC_SIGNING_SECRET: ${ssm:/${self:service}-${sls:stage}-whcc-signing-secret, ''}
+    WHCC_SK: ${ssm:/${self:service}-${sls:stage}-whcc-sk}
+    WHCC_SIGNING_SECRET: ${ssm:/${self:service}-${sls:stage}-whcc-signing-secret}
 plugins:
   - serverless-plugin-conditional-functions
   - serverless-webpack
