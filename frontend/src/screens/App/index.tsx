@@ -46,7 +46,7 @@ import PrintModal, { showPrintOrderPlaced } from './screens/PrintModal';
 import SubmitStoryWizard from './screens/SubmitStoryWizard';
 import TipJar, { useTipJarStore } from './screens/TipJar';
 
-const IS_SHUTDOWN = false;
+const IS_SHUTDOWN = true;
 
 const searchParams = new URLSearchParams(window.location.search);
 
@@ -57,7 +57,7 @@ const openMerchOnLoad = searchParams.has('openMerch');
 const printSuccessOnLoad = searchParams.has('printSuccess');
 const printSuccessFromCart = searchParams.get('printSuccess') === 'cart';
 const noWelcome = searchParams.has('noWelcome');
-const noTipJar = searchParams.has('noTipJar');
+const noTipJar = searchParams.has('noTipJar') || IS_SHUTDOWN;
 const openCreditPurchaseOnLoad = searchParams.has('openCreditPurchase');
 
 if (noWelcome) searchParams.delete('noWelcome');
