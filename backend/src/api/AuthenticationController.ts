@@ -138,12 +138,17 @@ export class AuthenticationController extends Controller {
       userId,
     });
 
+    const frontendRootUrl: URL = new URL('/', process.env.FRONTEND_BASE_URL);
     const redirectUrl: URL = new URL(
       returnToPath || '/',
       process.env.FRONTEND_BASE_URL
     );
 
-    res.redirect(redirectUrl.toString());
+    res.redirect(
+      redirectUrl.host === frontendRootUrl.host
+        ? redirectUrl.toString()
+        : frontendRootUrl.toString()
+    );
   }
 
   @Post('/logout')
