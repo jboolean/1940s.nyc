@@ -1,15 +1,32 @@
 import express from 'express';
 import type { AddressInfo } from 'node:net';
-import * as PrintfulCallbackService from '../business/merch/PrintfulCallbackService';
+import { AppDataSource } from '../createConnection';
+import * as MerchOrderService from '../business/merch/MerchOrderService';
+import { getOrder, getShipments } from '../business/utils/printfulApi';
+import MerchProvider from '../enum/MerchProvider';
 import router from './PrintfulWebhooksResource';
 
-jest.mock('../business/merch/PrintfulCallbackService', () => ({
-  handleOrderWebhook: jest.fn(),
+jest.mock('../createConnection', () => {
+  const findOneBy = jest.fn();
+  return { AppDataSource: { getRepository: () => ({ findOneBy }) } };
+});
+jest.mock('../business/utils/printfulApi', () => ({
+  getOrder: jest.fn(),
+  getShipments: jest.fn(),
+}));
+jest.mock('../business/merch/MerchOrderService', () => ({
+  onPrinterStatusChanged: jest.fn(),
+  onShipmentSent: jest.fn(),
 }));
 
-const handleOrderWebhook = jest.mocked(
-  PrintfulCallbackService.handleOrderWebhook
+const findOneBy = jest.mocked(
+  AppDataSource.getRepository('MerchOrder').findOneBy
 );
+const mockGetOrder = getOrder as jest.Mock;
+const mockGetShipments = getShipments as jest.Mock;
+const onShipmentSent = jest.mocked(MerchOrderService.onShipmentSent);
+
+const FETCHED_URL = 'https://tracking.example.com/real';
 
 const server = express()
   .use(express.json())
@@ -17,50 +34,56 @@ const server = express()
   .listen(0);
 const url = `http://127.0.0.1:${(server.address() as AddressInfo).port}/printful-webhooks`;
 
-const shipmentSent = {
-  type: 'shipment_sent',
-  created: 1,
-  retries: 0,
-  store: 1,
-  data: {
-    shipment: { id: 7, tracking_url: 'https://attacker.example.com' },
-    order: { id: 42, status: 'fulfilled' },
-  },
-};
-
-async function post(body: object): Promise<number> {
+async function postShipmentSent(): Promise<number> {
   const res = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
+    body: JSON.stringify({
+      type: 'shipment_sent',
+      data: {
+        shipment: { id: 7, tracking_url: 'https://attacker.example.com' },
+        order: { id: 42, status: 'fulfilled' },
+      },
+    }),
   });
   return res.status;
 }
 
-beforeEach(() => jest.clearAllMocks());
+beforeEach(() => {
+  jest.clearAllMocks();
+  findOneBy.mockResolvedValue({ id: 1 });
+  mockGetOrder.mockResolvedValue({
+    data: { data: { id: 42, status: 'fulfilled' } },
+    status: 200,
+  });
+  mockGetShipments.mockResolvedValue({
+    data: {
+      data: [{ shipped_at: '2026-01-02T00:00:00Z', tracking_url: FETCHED_URL }],
+    },
+    status: 200,
+  });
+});
+
 afterAll(() => server.close());
 
-it('passes only the order id on, ignoring the rest of the body', async () => {
-  handleOrderWebhook.mockResolvedValue(true);
-  await expect(post(shipmentSent)).resolves.toBe(200);
-  expect(handleOrderWebhook).toHaveBeenCalledWith(42, true);
-
-  await expect(post({ ...shipmentSent, type: 'order_updated' })).resolves.toBe(
-    200
+it('emails the tracking link fetched from Printful, not the one in the body', async () => {
+  await expect(postShipmentSent()).resolves.toBe(200);
+  expect(onShipmentSent).toHaveBeenCalledWith(
+    MerchProvider.PRINTFUL,
+    '42',
+    FETCHED_URL
   );
-  expect(handleOrderWebhook).toHaveBeenLastCalledWith(42, false);
 });
 
-it('answers 200 without doing anything for a body with no order id', async () => {
-  await expect(post({ type: 'shipment_sent', data: {} })).resolves.toBe(200);
-  await expect(post({ type: 'package_returned' })).resolves.toBe(200);
-  expect(handleOrderWebhook).not.toHaveBeenCalled();
+it('does nothing for an order we do not have', async () => {
+  findOneBy.mockResolvedValue(null);
+  await expect(postShipmentSent()).resolves.toBe(200);
+  expect(mockGetOrder).not.toHaveBeenCalled();
+  expect(onShipmentSent).not.toHaveBeenCalled();
 });
 
-it('answers 503 when handling fails, so Printful retries it', async () => {
-  handleOrderWebhook.mockResolvedValue(false);
-  await expect(post(shipmentSent)).resolves.toBe(503);
-
-  handleOrderWebhook.mockRejectedValue(new Error('boom'));
-  await expect(post(shipmentSent)).resolves.toBe(503);
+it('answers 503 when Printful cannot be reached, so Printful retries', async () => {
+  mockGetOrder.mockResolvedValue({ error: {}, status: 500 });
+  await expect(postShipmentSent()).resolves.toBe(503);
+  expect(onShipmentSent).not.toHaveBeenCalled();
 });
