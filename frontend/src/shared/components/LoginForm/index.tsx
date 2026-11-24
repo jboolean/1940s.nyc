@@ -2,6 +2,7 @@ import React from 'react';
 
 import Button from 'shared/components/Button';
 import Labeled from 'shared/components/Labeled';
+import RecaptchaDisclosure from 'shared/components/RecaptchaDisclosure';
 import TextInput from 'shared/components/TextInput';
 
 import useLoginStore from 'shared/stores/LoginStore';
@@ -62,6 +63,7 @@ export default function LoginForm({
           Continue
         </Button>
       </div>
+      <RecaptchaDisclosure />
       {isFollowMagicLinkMessageVisible && (
         <p className={stylesheet.resultMessage}>
           You already have an account. Please click the link emailed to{' '}

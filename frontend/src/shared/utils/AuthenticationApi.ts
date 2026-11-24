@@ -1,4 +1,5 @@
 import api from 'utils/api';
+import { executeRecaptcha } from './grecaptcha';
 
 export enum LoginOutcome {
   AlreadyAuthenticated = 'already_authenticated',
@@ -15,6 +16,7 @@ export async function processLoginRequest(
   newEmailBehavior?: 'update' | 'reject' | 'create',
   requireVerifiedEmail = false
 ): Promise<LoginOutcome> {
+  const recaptchaToken = await executeRecaptcha('request_login');
   const resp = await api.post<{ outcome: LoginOutcome }>(
     '/authentication/request-login',
     {
@@ -22,7 +24,8 @@ export async function processLoginRequest(
       returnToPath,
       requireVerifiedEmail,
       newEmailBehavior,
-    }
+    },
+    { headers: { 'X-Recaptcha-Token': recaptchaToken } }
   );
   return resp.data.outcome;
 }

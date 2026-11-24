@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Header,
   Post,
   Query,
   Request,
@@ -11,6 +12,7 @@ import {
 import * as express from 'express';
 import { BadRequest } from 'http-errors';
 import * as UserService from '../business/users/UserService';
+import { verifyRecaptchaToken } from '../business/utils/grecaptcha';
 import required from '../business/utils/required';
 import LoginOutcome from '../enum/LoginOutcome';
 import { clearAuthCookie, setAuthCookie } from './auth/authCookieUtils';
@@ -48,7 +50,12 @@ const getApiBase = (req: express.Request): string =>
 export class AuthenticationController extends Controller {
   @Security('user-token')
   @Get('/me')
-  public async getMe(@Request() req: express.Request): Promise<UserResponse> {
+  public async getMe(
+    @Request() req: express.Request & { user?: { id: number } }
+  ): Promise<UserResponse> {
+    if (!req.user) {
+      return { email: null };
+    }
     const userId = await getUserFromRequestOrCreateAndSetCookie(req);
     const user = await UserService.getUser(userId);
     return { email: user.email };
@@ -58,8 +65,10 @@ export class AuthenticationController extends Controller {
   @Post('/request-login')
   public async requestLogin(
     @Body() loginRequest: LoginRequest,
+    @Header('X-Recaptcha-Token') recaptchaToken: string,
     @Request() req: express.Request
   ): Promise<LoginResponse> {
+    await verifyRecaptchaToken(recaptchaToken, req.ip);
     const userId = await getUserFromRequestOrCreateAndSetCookie(req);
     const {
       requestedEmail,

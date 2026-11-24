@@ -1,6 +1,16 @@
-import { Body, Controller, Post, Route, Security } from '@tsoa/runtime';
+import {
+  Body,
+  Controller,
+  Header,
+  Post,
+  Request,
+  Route,
+  Security,
+} from '@tsoa/runtime';
+import * as express from 'express';
 import { BadRequest } from 'http-errors';
 import EmailCampaignService from '../business/email/EmailCampaignService';
+import { verifyRecaptchaToken } from '../business/utils/grecaptcha';
 import { Email } from './CommonApiTypes';
 
 type MailingListRequest = {
@@ -18,8 +28,11 @@ type EmailCampaignRequest = {
 export class EmailCampaignController extends Controller {
   @Post('/mailing-list')
   public async addEmailToMailingList(
-    @Body() mailingListRequest: MailingListRequest
+    @Body() mailingListRequest: MailingListRequest,
+    @Header('X-Recaptcha-Token') recaptchaToken: string,
+    @Request() req: express.Request
   ): Promise<void> {
+    await verifyRecaptchaToken(recaptchaToken, req.ip);
     await EmailCampaignService.addToMailingList(
       mailingListRequest.address,
       mailingListRequest.source ?? null

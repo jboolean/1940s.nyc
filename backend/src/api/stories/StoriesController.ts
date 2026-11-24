@@ -13,7 +13,6 @@ import {
   Security,
 } from '@tsoa/runtime';
 import Express from 'express';
-import isNumber from 'lodash/isNumber';
 import map from 'lodash/map';
 
 import { UserData as NetlifyUserData } from 'gotrue-js';
@@ -28,7 +27,7 @@ import {
   getStoryFromToken,
   verifyStoryToken,
 } from '../../business/stories/StoryTokenService';
-import { validateRecaptchaToken } from '../../business/utils/grecaptcha';
+import { verifyRecaptchaToken } from '../../business/utils/grecaptcha';
 import mapPaginated from '../../business/utils/mapPaginated';
 import normalizeEmail from '../../business/utils/normalizeEmail';
 import required from '../../business/utils/required';
@@ -114,15 +113,10 @@ export class StoriesController extends Controller {
       story.lngLat = await getLngLatForIdentifier(story.photoId);
     }
 
-    const ip = request.ip;
-    const recaptchaResult = await validateRecaptchaToken(recaptchaToken, ip);
-
-    if (!recaptchaResult.success || !isNumber(recaptchaResult.score)) {
-      console.error('Recaptcha error', recaptchaResult['error-codes']);
-      throw new Forbidden('Recaptcha failed');
-    }
-
-    story.recaptchaScore = recaptchaResult.score;
+    story.recaptchaScore = await verifyRecaptchaToken(
+      recaptchaToken,
+      request.ip
+    );
 
     story = await StoryRepository().save(story);
 

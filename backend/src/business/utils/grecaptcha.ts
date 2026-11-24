@@ -1,4 +1,6 @@
 import axios from 'axios';
+import { Forbidden } from 'http-errors';
+import isNumber from 'lodash/isNumber';
 
 const RECAPTCHA_SECRET_KEY = process.env.RECAPTCHA_SK;
 
@@ -26,4 +28,19 @@ export const validateRecaptchaToken = async (
     { headers: { 'content-type': 'application/x-www-form-urlencoded' } }
   );
   return resp.data;
+};
+
+// Returns the score, or throws Forbidden if the token is not valid
+export const verifyRecaptchaToken = async (
+  token: string,
+  ip?: string
+): Promise<number> => {
+  const recaptchaResult = await validateRecaptchaToken(token, ip);
+
+  if (!recaptchaResult.success || !isNumber(recaptchaResult.score)) {
+    console.error('Recaptcha error', recaptchaResult['error-codes']);
+    throw new Forbidden('Recaptcha failed');
+  }
+
+  return recaptchaResult.score;
 };
