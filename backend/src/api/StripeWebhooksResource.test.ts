@@ -47,6 +47,7 @@ jest.mock('../business/merch/merchCatalog', () => ({
 }));
 jest.mock('../business/users/UserService', () => ({
   attachStripeCustomerAndDetermineUserId: jest.fn().mockResolvedValue(9),
+  getUserByStripeCustomerId: jest.fn().mockResolvedValue(null),
 }));
 jest.mock('../third-party/stripe', () => ({
   __esModule: true,
@@ -55,10 +56,7 @@ jest.mock('../third-party/stripe', () => ({
 
 type Handler = (req: Request, res: Response) => Promise<void>;
 
-async function deliver(session: object): Promise<number | undefined> {
-  jest
-    .mocked(stripe.checkout.sessions.retrieve)
-    .mockResolvedValue(session as never);
+async function post(body: object): Promise<number | undefined> {
   const layer = (
     router as unknown as {
       stack: Array<{ route?: { stack: Array<{ handle: Handler }> } }>;
@@ -69,22 +67,27 @@ async function deliver(session: object): Promise<number | undefined> {
     send: jest.fn(),
   }));
   await (layer?.route as { stack: Array<{ handle: Handler }> }).stack[0].handle(
-    {
-      body: {
-        type: 'checkout.session.completed',
-        data: {
-          object: {
-            id: 'cs_1',
-            payment_status: 'paid',
-            amount_subtotal: 3800,
-            payment_intent: 'pi_1',
-          },
-        },
-      },
-    } as Request,
+    { body } as Request,
     { status } as unknown as Response
   );
   return status.mock.calls[0]?.[0];
+}
+
+async function deliver(session: object): Promise<number | undefined> {
+  jest
+    .mocked(stripe.checkout.sessions.retrieve)
+    .mockResolvedValue(session as never);
+  return post({
+    type: 'checkout.session.completed',
+    data: {
+      object: {
+        id: 'cs_1',
+        payment_status: 'paid',
+        amount_subtotal: 3800,
+        payment_intent: 'pi_1',
+      },
+    },
+  });
 }
 
 function printLineItem(overrides: object = {}): object {
@@ -296,4 +299,13 @@ describe('checkout.session.completed for merch', () => {
       'pi_1'
     );
   });
+});
+
+it('acknowledges a subscription event for a customer with no user', async () => {
+  jest.spyOn(console, 'warn').mockImplementation(() => undefined);
+  const status = await post({
+    type: 'customer.subscription.updated',
+    data: { object: { id: 'sub_1', customer: 'cus_unknown' } },
+  });
+  expect(status).toBe(200);
 });
