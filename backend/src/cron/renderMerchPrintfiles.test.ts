@@ -36,6 +36,7 @@ jest.mock('../business/merch/renderToteBag', () => ({
 }));
 jest.mock('../business/utils/printfileUtils', () => ({
   copyOriginalToPrintJpeg: jest.fn(() => Promise.resolve()),
+  newPrintfileToken: jest.fn(() => 'new-token'),
   uploadPrintfile: jest.fn(),
 }));
 
@@ -172,9 +173,16 @@ describe('renderMerchPrintfiles', () => {
     await renderMerchPrintfiles();
 
     expect(renderToteBag).toHaveBeenCalledTimes(1);
-    expect(uploadPrintfile).toHaveBeenCalledWith(1, 'png', expect.any(Buffer));
-    expect(copyOriginalToPrintJpeg).toHaveBeenCalledWith(2, 'p2');
-    expect(uploadPrintfile).not.toHaveBeenCalledWith(2, expect.anything());
+    expect(uploadPrintfile).toHaveBeenCalledWith(
+      expect.objectContaining({ id: 1, printfileToken: 'new-token' }),
+      'png',
+      expect.any(Buffer)
+    );
+    expect(copyOriginalToPrintJpeg).toHaveBeenCalledWith(
+      expect.objectContaining({ id: 2, printfileToken: 'new-token' }),
+      'p2'
+    );
+    expect(uploadPrintfile).toHaveBeenCalledTimes(1);
     expect(update).toHaveBeenCalledWith(1, {
       state: MerchItemState.READY_FOR_FULFILLMENT,
     });
@@ -188,7 +196,40 @@ describe('renderMerchPrintfiles', () => {
     jest.mocked(colorizeForPrint).mockResolvedValue(Buffer.from('jpg'));
     await renderMerchPrintfiles();
 
-    expect(uploadPrintfile).toHaveBeenCalledWith(3, 'jpg', expect.any(Buffer));
+    expect(uploadPrintfile).toHaveBeenCalledWith(
+      expect.objectContaining({ id: 3 }),
+      'jpg',
+      expect.any(Buffer)
+    );
+  });
+
+  it('saves a new print file token before writing the file', async () => {
+    getMany.mockResolvedValue([toteItem(1)]);
+    await renderMerchPrintfiles();
+
+    expect(update).toHaveBeenNthCalledWith(1, 1, {
+      printfileAttempts: 1,
+      printfileToken: 'new-token',
+    });
+    expect(update.mock.invocationCallOrder[0]).toBeLessThan(
+      jest.mocked(uploadPrintfile).mock.invocationCallOrder[0]
+    );
+  });
+
+  it('keeps the token of an item that already has one', async () => {
+    getMany.mockResolvedValue([
+      { ...printItem(2, false, 1), printfileToken: 'old-token' },
+    ]);
+    await renderMerchPrintfiles();
+
+    expect(update).toHaveBeenNthCalledWith(1, 2, {
+      printfileAttempts: 2,
+      printfileToken: 'old-token',
+    });
+    expect(copyOriginalToPrintJpeg).toHaveBeenCalledWith(
+      expect.objectContaining({ printfileToken: 'old-token' }),
+      'p2'
+    );
   });
 
   it('counts the attempt before calling out, and a failure does not stop other items', async () => {

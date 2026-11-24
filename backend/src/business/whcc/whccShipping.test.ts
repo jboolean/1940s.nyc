@@ -3,6 +3,10 @@ import * as WhccApi from './whccApi';
 import { quoteWhccShipping } from './whccShipping';
 
 jest.mock('./whccApi');
+jest.mock('../utils/printfileUtils', () => ({
+  getOriginalSignedUrl: (photoIdentifier: string) =>
+    Promise.resolve(`https://signed/jpg/${photoIdentifier}.jpg`),
+}));
 
 const createConfiguredProducts = jest.mocked(WhccApi.createConfiguredProducts);
 const calculate = jest.mocked(WhccApi.calculate);
@@ -55,11 +59,11 @@ it('quotes each variant with its own total quantity', async () => {
 
   expect(calculate.mock.calls[0][0].items).toEqual([
     {
-      configuredProductId: 'CF_https://photos.1940s.nyc/jpg/a.jpg',
+      configuredProductId: 'CF_https://signed/jpg/a.jpg',
       quantity: 3,
     },
     {
-      configuredProductId: 'CF_https://photos.1940s.nyc/jpg/b.jpg',
+      configuredProductId: 'CF_https://signed/jpg/b.jpg',
       quantity: 5,
     },
   ]);

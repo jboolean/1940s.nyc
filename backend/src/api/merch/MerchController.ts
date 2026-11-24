@@ -16,10 +16,7 @@ import { AppDataSource } from '../../createConnection';
 import * as MerchOrderService from '../../business/merch/MerchOrderService';
 import { getPrintfileExtensionForVariant } from '../../business/merch/merchCatalog';
 import absurd from '../../business/utils/absurd';
-import {
-  getPrintfileUrl,
-  PrintfileExtension,
-} from '../../business/utils/printfileUtils';
+import { getPrintfileUrl } from '../../business/utils/printfileUtils';
 import MerchCustomizationOptions from '../../entities/MerchCustomizationOptions';
 import MerchOrder from '../../entities/MerchOrder';
 import MerchOrderItem from '../../entities/MerchOrderItem';
@@ -89,12 +86,7 @@ export class MerchController extends Controller {
   public async getPrintfileUrl(
     @Path('itemId') itemId: number
   ): Promise<{ url: string }> {
-    const printfileUrl = await getPrintfileUrl(
-      itemId,
-      await this.getPrintfileExtension(itemId)
-    );
-
-    return { url: printfileUrl };
+    return { url: await this.getSignedPrintfileUrl(itemId) };
   }
 
   @Security('netlify', ['moderator'])
@@ -103,22 +95,18 @@ export class MerchController extends Controller {
     @Path('itemId') itemId: number,
     @Request() req: express.Request
   ): Promise<void> {
-    const printfileUrl = await getPrintfileUrl(
-      itemId,
-      await this.getPrintfileExtension(itemId)
-    );
-
-    return req.res?.redirect(302, printfileUrl);
+    return req.res?.redirect(302, await this.getSignedPrintfileUrl(itemId));
   }
 
   // Print orders have a JPEG print file; everything else is a rendered PNG.
-  private async getPrintfileExtension(
-    itemId: number
-  ): Promise<PrintfileExtension> {
+  private async getSignedPrintfileUrl(itemId: number): Promise<string> {
     const item = await AppDataSource.getRepository(
       MerchOrderItem
     ).findOneByOrFail({ id: itemId });
-    return getPrintfileExtensionForVariant(item.internalVariant);
+    return await getPrintfileUrl(
+      item,
+      getPrintfileExtensionForVariant(item.internalVariant)
+    );
   }
 
   @Security('netlify', ['moderator'])

@@ -85,7 +85,7 @@ export async function addItemToOrder(item: MerchOrderItem): Promise<void> {
     path: {
       order_id: printfulOrderId,
     },
-    body: makePrintfulItem(item.id, item.internalVariant),
+    body: makePrintfulItem(item),
   });
 
   if (createdResp.error) {

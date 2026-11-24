@@ -1,5 +1,6 @@
+import type MerchOrderItem from '../../entities/MerchOrderItem';
 import MerchInternalVariant from '../../enum/MerchInternalVariant';
-import { getPrintfileDirectUrl } from '../utils/printfileUtils';
+import { getPrintfileDirectUrl, PrintfileItem } from '../utils/printfileUtils';
 import { CatalogItemWritable as PrintfulCatalogItemWritable } from '../utils/printfulApi';
 
 export const INTERNAL_VARIANT_TO_PRINTFUL_VARIANT: Record<
@@ -10,16 +11,16 @@ export const INTERNAL_VARIANT_TO_PRINTFUL_VARIANT: Record<
 };
 
 export function makePrintfulItem(
-  customMerchItemId: number,
-  internalVariant: MerchInternalVariant
+  item: PrintfileItem & Pick<MerchOrderItem, 'internalVariant'>
 ): PrintfulCatalogItemWritable {
+  const { internalVariant } = item;
   switch (internalVariant) {
     case MerchInternalVariant.TOTE_BAG_SMALL:
       return {
         source: 'catalog',
         catalog_variant_id:
           INTERNAL_VARIANT_TO_PRINTFUL_VARIANT[internalVariant],
-        external_id: customMerchItemId.toString(),
+        external_id: item.id.toString(),
         placements: [
           {
             placement: 'default',
@@ -28,7 +29,7 @@ export function makePrintfulItem(
             layers: [
               {
                 type: 'file',
-                url: getPrintfileDirectUrl(customMerchItemId, 'png'),
+                url: getPrintfileDirectUrl(item, 'png'),
               },
             ],
           },

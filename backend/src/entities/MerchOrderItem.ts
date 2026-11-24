@@ -48,4 +48,7 @@ export default class MerchOrderItem {
 
   @Column({ type: 'varchar', nullable: true })
   printfileError?: string | null;
+
+  @Column({ type: 'varchar', nullable: true })
+  printfileToken?: string | null;
 }

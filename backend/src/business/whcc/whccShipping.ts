@@ -1,7 +1,7 @@
 import type Stripe from 'stripe';
 import MerchInternalVariant from '../../enum/MerchInternalVariant';
 import type { ShippingQuoteItem } from '../merch/providers/FulfillmentProvider';
-import { getOriginalPublicUrl } from '../utils/printfileUtils';
+import { getOriginalSignedUrl } from '../utils/printfileUtils';
 import required from '../utils/required';
 import toCents from '../utils/toCents';
 import { buildConfiguredProductsInOrder } from './buildConfiguredProducts';
@@ -63,16 +63,15 @@ export async function quoteWhccShipping(
       });
     }
   }
-  const lines = [...byVariant].map(([variant, line]) => {
-    return {
-      // Originals are not served through the Cloudflare bypass origin.
+  const lines = await Promise.all(
+    [...byVariant].map(async ([variant, line]) => ({
       request: buildWhccConfiguredProduct(
         variant,
-        getOriginalPublicUrl(line.photoIdentifier)
+        await getOriginalSignedUrl(line.photoIdentifier)
       ),
       quantity: line.quantity,
-    };
-  });
+    }))
+  );
   const deadline = Date.now() + WHCC_QUOTE_BUDGET_MS;
   const built = await buildConfiguredProductsInOrder(
     lines.map((l) => l.request),

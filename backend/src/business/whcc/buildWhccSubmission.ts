@@ -39,7 +39,7 @@ export function buildWhccConfiguredProducts(
   return order.items.map((item) =>
     buildWhccConfiguredProduct(
       item.internalVariant,
-      getPrintfileDirectUrl(item.id, 'jpg')
+      getPrintfileDirectUrl(item, 'jpg')
     )
   );
 }

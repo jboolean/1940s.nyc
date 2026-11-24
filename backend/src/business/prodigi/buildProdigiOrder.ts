@@ -65,7 +65,7 @@ export function buildProdigiOrder(
         sizing: product.sizing,
         attributes: product.attributes,
         assets: [
-          { printArea: 'default', url: getPrintfileDirectUrl(item.id, 'jpg') },
+          { printArea: 'default', url: getPrintfileDirectUrl(item, 'jpg') },
         ],
       };
     }),

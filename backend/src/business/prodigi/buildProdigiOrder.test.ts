@@ -29,6 +29,36 @@ it('sends the Prodigi product for each print', () => {
   ]);
 });
 
+it('sends the print file at the key the renderer wrote', () => {
+  const withToken = {
+    ...order(MerchInternalVariant.PRINT_8X12),
+    items: [
+      {
+        id: 3,
+        internalVariant: MerchInternalVariant.PRINT_8X12,
+        printfileToken: 'abc',
+      },
+    ],
+  } as MerchOrder;
+  expect(buildProdigiOrder(withToken).items[0].assets).toEqual([
+    {
+      printArea: 'default',
+      url: 'https://photos.1940s.nyc/merch/printfiles-dev/3-abc.jpg',
+    },
+  ]);
+});
+
+it('sends an item rendered before tokens at its old key', () => {
+  expect(
+    buildProdigiOrder(order(MerchInternalVariant.PRINT_8X12)).items[0].assets
+  ).toEqual([
+    {
+      printArea: 'default',
+      url: 'https://photos.1940s.nyc/merch/printfiles-dev/3.jpg',
+    },
+  ]);
+});
+
 it('refuses a print Prodigi has no product for, naming the variant', () => {
   expect(() =>
     buildProdigiOrder(order(MerchInternalVariant.FRAMED_PRINT_5X7_EASEL))

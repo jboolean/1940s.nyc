@@ -9,6 +9,7 @@ import renderToteBag from '../business/merch/renderToteBag';
 import { getPrintProduct } from '../business/merch/printCatalog';
 import {
   copyOriginalToPrintJpeg,
+  newPrintfileToken,
   PrintfileExtension,
   uploadPrintfile,
 } from '../business/utils/printfileUtils';
@@ -118,7 +119,7 @@ async function renderPrint(
   await withTimeout(
     RENDER_TIMEOUT_MS,
     'Original copy',
-    copyOriginalToPrintJpeg(item.id, options.photoIdentifier)
+    copyOriginalToPrintJpeg(item, options.photoIdentifier)
   );
   return { extension };
 }
@@ -200,15 +201,17 @@ export default async function renderMerchPrintfiles(): Promise<void> {
       continue;
     }
 
+    item.printfileToken = item.printfileToken ?? newPrintfileToken();
     await repository.update(item.id, {
       printfileAttempts: attempts,
+      printfileToken: item.printfileToken,
     });
 
     console.log('[merch] Rendering printfile for item', item.id);
     try {
       const file = await render(item, options);
       if (file.buffer) {
-        await uploadPrintfile(item.id, file.extension, file.buffer);
+        await uploadPrintfile(item, file.extension, file.buffer);
       }
       await repository.update(item.id, {
         state: MerchItemState.READY_FOR_FULFILLMENT,
