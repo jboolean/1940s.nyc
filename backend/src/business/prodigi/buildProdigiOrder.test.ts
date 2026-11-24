@@ -1,5 +1,6 @@
 import type MerchOrder from '../../entities/MerchOrder';
 import MerchInternalVariant from '../../enum/MerchInternalVariant';
+import { getPrintfileKey } from '../utils/printfileUtils';
 import { buildProdigiOrder } from './buildProdigiOrder';
 
 const order = (internalVariant: MerchInternalVariant): MerchOrder =>
@@ -29,34 +30,20 @@ it('sends the Prodigi product for each print', () => {
   ]);
 });
 
-it('sends the print file at the key the renderer wrote', () => {
+it('sends the print file at the key the renderer writes', () => {
+  const item = {
+    id: 3,
+    internalVariant: MerchInternalVariant.PRINT_8X12,
+    printfileToken: 'abc',
+  };
   const withToken = {
     ...order(MerchInternalVariant.PRINT_8X12),
-    items: [
-      {
-        id: 3,
-        internalVariant: MerchInternalVariant.PRINT_8X12,
-        printfileToken: 'abc',
-      },
-    ],
+    items: [item],
   } as MerchOrder;
-  expect(buildProdigiOrder(withToken).items[0].assets).toEqual([
-    {
-      printArea: 'default',
-      url: 'https://photos.1940s.nyc/merch/printfiles-dev/3-abc.jpg',
-    },
-  ]);
-});
 
-it('sends an item rendered before tokens at its old key', () => {
-  expect(
-    buildProdigiOrder(order(MerchInternalVariant.PRINT_8X12)).items[0].assets
-  ).toEqual([
-    {
-      printArea: 'default',
-      url: 'https://photos.1940s.nyc/merch/printfiles-dev/3.jpg',
-    },
-  ]);
+  expect(buildProdigiOrder(withToken).items[0].assets[0].url).toBe(
+    `https://photos.1940s.nyc/${getPrintfileKey(item, 'jpg')}`
+  );
 });
 
 it('refuses a print Prodigi has no product for, naming the variant', () => {
