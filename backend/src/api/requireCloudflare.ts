@@ -5,7 +5,7 @@ import { RequestHandler } from 'express';
 // request without it reached the API some other way (for example the API
 // Gateway's own CloudFront domain) and its X-Forwarded-For can't be trusted.
 // /__origin-check reports whether the header arrived, without revealing its value.
-const ENFORCE = false;
+const ENFORCE = true;
 
 type OriginVerifyResult = 'match' | 'mismatch' | 'missing';
 
