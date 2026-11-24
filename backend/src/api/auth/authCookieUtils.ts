@@ -11,6 +11,7 @@ export function setAuthCookie(token: string, res: Express.Response): void {
     // do not expire
     expires: new Date(253402300000000),
     sameSite: 'strict',
+    secure: process.env.STAGE !== 'dev',
   });
 }
 

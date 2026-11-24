@@ -26,9 +26,11 @@ import PrintfulWebhooksResource from './api/PrintfulWebhooksResource';
 import ProdigiWebhooksResource from './api/ProdigiWebhooksResource';
 import WhccWebhooksResource from './api/WhccWebhooksResource';
 import StripeWebhooksResource from './api/StripeWebhooksResource';
+import corsOrigins from './corsOrigins';
 
 // Cloudflare -> CloudFront (edge-optimized API Gateway) -> API Gateway
 app.set('trust proxy', 3);
+app.disable('x-powered-by');
 
 Sentry.init({
   dsn: 'https://5c9a98d156614bac899b541f69d9b7f3@o4504630310600704.ingest.sentry.io/4504630315974657',
@@ -65,14 +67,14 @@ app.use('/whcc-webhooks', express.raw({ type: () => true }));
 app.use(express.json());
 app.use(cookieParser());
 
+app.use((req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  next();
+});
+
 app.use(
   cors({
-    origin: [
-      'http://dev.1940s.nyc:8080',
-      'http://localhost:8080',
-      'https://1940s.nyc',
-      /--1940s-nyc\.netlify\.app$/,
-    ],
+    origin: corsOrigins,
     credentials: true,
   })
 );
