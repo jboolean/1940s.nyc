@@ -13,6 +13,9 @@ provider:
   region: us-east-1
   tags:
     Project: fourtiesnyc
+  apiGateway:
+    # Only reachable through the custom domain, which sits behind Cloudflare
+    disableDefaultEndpoint: true
   iam:
     role:
       statements:
