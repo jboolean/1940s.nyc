@@ -29,6 +29,7 @@ module.exports = {
     new CopyPlugin({
       patterns: [
         { from: '_redirects' },
+        { from: '_headers' },
         { from: 'terms.html' },
         // Loaded at runtime by maplibre-gl via setWorkerUrl; the worker imports
         // maplibre-gl-shared.mjs relative to itself, so both must sit together
