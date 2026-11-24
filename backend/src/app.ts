@@ -25,6 +25,9 @@ import PostmarkWebhooksResource from './api/PostmarkWebhooksResource';
 import PrintfulWebhooksResource from './api/PrintfulWebhooksResource';
 import ProdigiWebhooksResource from './api/ProdigiWebhooksResource';
 import WhccWebhooksResource from './api/WhccWebhooksResource';
+import requireBrowserRequest, {
+  ALLOWED_ORIGINS,
+} from './api/requireBrowserRequest';
 import StripeWebhooksResource from './api/StripeWebhooksResource';
 
 // Cloudflare -> CloudFront (edge-optimized API Gateway) -> API Gateway
@@ -67,12 +70,7 @@ app.use(cookieParser());
 
 app.use(
   cors({
-    origin: [
-      'http://dev.1940s.nyc:8080',
-      'http://localhost:8080',
-      'https://1940s.nyc',
-      /--1940s-nyc\.netlify\.app$/,
-    ],
+    origin: ALLOWED_ORIGINS,
     credentials: true,
   })
 );
@@ -95,6 +93,8 @@ app.use((req, res, next) => {
   });
   next();
 });
+
+app.use(requireBrowserRequest);
 
 app.use(async (req, res, next) => {
   await createConnection();

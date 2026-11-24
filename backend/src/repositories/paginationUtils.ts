@@ -13,6 +13,8 @@ import PaginationInput from '../business/pagination/PaginationInput';
 import PaginationOptions from '../business/pagination/PaginationOptions';
 import required from '../business/utils/required';
 
+export const MAX_PAGE_SIZE = 500;
+
 export async function getPaginated<E extends ObjectLiteral>(
   qb: SelectQueryBuilder<E>,
   {
@@ -21,8 +23,9 @@ export async function getPaginated<E extends ObjectLiteral>(
     getSerializedToken,
     deserializeToken,
   }: PaginationOptions<E>,
-  { pageToken: nextToken, pageSize }: PaginationInput
+  { pageToken: nextToken, pageSize: requestedPageSize }: PaginationInput
 ): Promise<Paginated<E>> {
+  const pageSize = Math.min(requestedPageSize, MAX_PAGE_SIZE);
   let filterOp: FindOperator<unknown> = Not(IsNull());
   if (nextToken) {
     const tokenDeserialized = deserializeToken(nextToken);
