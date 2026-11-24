@@ -145,7 +145,7 @@ export class AuthenticationController extends Controller {
     );
 
     res.redirect(
-      redirectUrl.origin === frontendRootUrl.origin
+      redirectUrl.host === frontendRootUrl.host
         ? redirectUrl.toString()
         : frontendRootUrl.toString()
     );
