@@ -30,7 +30,7 @@ export default function ProductPicker({
   return (
     <div className={stylesheet.productPicker}>
       <label className={stylesheet.label}>
-        Print
+        Select size & format
         <Select
           value={variant ?? ''}
           onChange={(e) => onChange(e.target.value as MerchInternalVariant)}
