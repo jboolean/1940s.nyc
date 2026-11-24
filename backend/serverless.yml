@@ -62,7 +62,6 @@ plugins:
   - serverless-plugin-datadog
   - serverless-domain-manager
   - serverless-offline
-  - ./serverless-plugins/stage-throttling
 layers:
   tippecanoe:
     package:
@@ -154,9 +153,6 @@ custom:
   webpack:
     webpackConfig: "webpack.config.js"
   bucket: fourties-photos
-  stageThrottling:
-    rateLimit: 50
-    burstLimit: 100
   prodigiLiveOrdersEnabled:
     production: 'false'
     staging: 'false'
