@@ -38,6 +38,7 @@ provider:
     DB_PASSWORD: ${ssm:/${self:service}-${sls:stage}-db-password}
     DB_DATABASE: ${ssm:/${self:service}-${sls:stage}-db-database}
     STRIPE_SK: ${ssm:/${self:service}-${sls:stage}-stripe-sk}
+    STRIPE_WEBHOOK_SECRET: ${ssm:/${self:service}-${sls:stage}-stripe-webhook-secret}
     RECAPTCHA_SK: ${ssm:/${self:service}-${sls:stage}-recaptcha-sk}
     POSTMARK_TOKEN: ${ssm:/${self:service}-${sls:stage}-postmark-token}
     POSTMARK_SANDBOX_TOKEN: ${ssm:/${self:service}-${sls:stage}-postmark-sandbox-token}

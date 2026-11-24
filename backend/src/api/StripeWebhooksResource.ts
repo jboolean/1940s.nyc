@@ -14,6 +14,7 @@ import getFulfillmentProvider, {
 } from '../business/merch/providers/getFulfillmentProvider';
 import * as UserService from '../business/users/UserService';
 import isProduction from '../business/utils/isProduction';
+import required from '../business/utils/required';
 import MerchInternalVariant from '../enum/MerchInternalVariant';
 import MerchItemState from '../enum/MerchItemState';
 import MerchProvider from '../enum/MerchProvider';
@@ -97,232 +98,249 @@ router.use(
   ipfilter.IpFilter(STRIPE_IPS, { mode: 'allow', trustProxy: 3 })
 );
 
-router.post<'/', unknown, unknown, Stripe.Event, unknown>(
-  '/',
-  async (req, res) => {
-    const event = req.body;
-    switch (event.type) {
-      case 'payment_intent.succeeded': {
-        const paymentIntent = event.data.object;
-        const email = paymentIntent.receipt_email;
-        if (email) {
-          await EmailCampaignService.addToMailingList(email, 'stripe');
-        }
-        break;
-      }
-      case 'checkout.session.async_payment_succeeded':
-      case 'checkout.session.completed': {
-        const session = event.data.object;
-        if (session.payment_status !== 'paid') {
-          console.warn('Checkout session was not paid', session);
-          break;
-        }
-        // Retrieve the session to expand the line items
-        const expandedSession = await stripe.checkout.sessions.retrieve(
-          session.id,
-          {
-            expand: [
-              'line_items',
-              'line_items.data.price.product',
-              'shipping_cost.shipping_rate',
-            ],
-          }
-        );
-        const paymentIntentId =
-          typeof session.payment_intent === 'string'
-            ? session.payment_intent
-            : null;
-        const subtotalAmountCents = session.amount_subtotal;
-
-        const userId = await UserService.attachStripeCustomerAndDetermineUserId(
-          expandedSession.customer as string,
-          expandedSession.metadata?.userId
-            ? parseInt(expandedSession.metadata.userId, 10)
-            : undefined,
-          expandedSession.customer_details?.email ?? undefined
-        );
-
-        // See if they purchased credits
-        const byProductType = groupBy(
-          expandedSession.line_items?.data,
-          (lineItem) =>
-            (
-              (lineItem.price?.product as Stripe.Product)
-                .metadata as ProductMetadata
-            )['product-type']
-        );
-
-        // A product tagged with a type this webhook does not know, or a merch product that is not
-        // tagged merch, would otherwise be dropped without an error. Stop before creating anything:
-        // a non-2xx reply asks Stripe to retry, which is safe because nothing was created. An
-        // untagged product that is not merch keeps being handled as it always was.
-        const unhandled = (expandedSession.line_items?.data ?? []).filter(
-          (lineItem) => {
-            const type = productMetadata(lineItem)['product-type'];
-            return type
-              ? !HANDLED_PRODUCT_TYPES.includes(type)
-              : !!productMetadata(lineItem)['merch-internal-variant'];
-          }
-        );
-        if (unhandled.length) {
-          console.error(
-            '[merch-alert] checkout session has line items with a product-type this webhook does not handle; nothing was created',
-            {
-              sessionId: session.id,
-              lineItems: unhandled.map((lineItem) => ({
-                id: lineItem.id,
-                productType: productMetadata(lineItem)['product-type'],
-              })),
-            }
-          );
-          return res.status(500).send();
-        }
-
-        const creditsLineItems = byProductType['color-credit'] ?? [];
-
-        // fulfill credit purchases
-        for (const creditsLineItem of creditsLineItems) {
-          const quantity = creditsLineItem.quantity;
-          if (typeof userId !== 'number') {
-            throw new Error('userId is missing from purchase of credits');
-          }
-          if (typeof quantity !== 'number') {
-            throw new Error('quantity is missing from purchase of credits');
-          }
-          console.log('Fulfilling purchase of credits', {
-            customer: session.customer,
-            userId,
-            quantity,
-          });
-          await LedgerService.grantCredits(
-            userId,
-            quantity,
-            paymentIntentId,
-            creditsLineItem.amount_subtotal || 0
-          );
-        }
-
-        const newItems = (byProductType['merch'] ?? []).flatMap(
-          merchLineItemToOrderItems
-        );
-        let provider: MerchProvider | undefined;
-        try {
-          // Older sessions have no provider.
-          const stamped =
-            expandedSession.metadata?.[MERCH_PROVIDER_METADATA_KEY];
-          provider = !newItems.length
-            ? undefined
-            : (Object.values(MerchProvider).find((p) => p === stamped) ??
-              selectProviderForItems(newItems.map((item) => item.variant)));
-        } catch (e) {
-          // Our checkouts never mix printers, and the provider choice rejects a mix. Stop before
-          // creating anything: an order made from a mixed basket would take the session's
-          // idempotency key and leave the other items unfulfillable. A non-2xx reply asks Stripe
-          // to retry, which is safe because nothing was created.
-          console.error(
-            '[merch-alert] checkout session mixes printers; no order was created',
-            { sessionId: session.id, error: String(e) }
-          );
-          return res.status(500).send();
-        }
-        if (provider) {
-          const shippingDetails =
-            expandedSession.collected_information?.shipping_details;
-          const shippingAddress = {
-            name: shippingDetails?.name,
-            line1: shippingDetails?.address.line1 ?? undefined,
-            line2: shippingDetails?.address.line2 ?? undefined,
-            city: shippingDetails?.address.city ?? undefined,
-            stateCode: shippingDetails?.address.state ?? undefined,
-            postalCode: shippingDetails?.address.postal_code ?? undefined,
-            countryCode: shippingDetails?.address.country ?? undefined,
-          };
-
-          // Sessions made before shipping was quoted carry a fixed rate that names no method.
-          const shippingRate = expandedSession.shipping_cost?.shipping_rate as
-            Stripe.ShippingRate | undefined;
-          const {
-            shippingMethodMetadataKey: metadataKey,
-            defaultShippingMethod: fallback,
-          } = getFulfillmentProvider(provider);
-          let shippingMethod: string | undefined =
-            metadataKey && shippingRate?.metadata?.[metadataKey];
-          if (!shippingMethod && fallback) {
-            console.warn(
-              `Checkout has no ${provider} shipping method; defaulting to ${fallback}`,
-              { sessionId: session.id }
-            );
-            shippingMethod = fallback;
-          }
-
-          const order = await MerchOrderService.createMerchOrder(
-            userId,
-            session.id,
-            shippingAddress,
-            newItems,
-            provider,
-            shippingMethod
-          );
-
-          console.log('Created merch order', order);
-        }
-
-        // Print purchases are not tips, so they do not earn credits. They are found from the
-        // products on the session, so a print can never be credited because it was not turned
-        // into an order item.
-        const buysPrint = (expandedSession.line_items?.data ?? []).some(
-          (lineItem) => {
-            const variant = productMetadata(lineItem)['merch-internal-variant'];
-            return !!variant && isPrintVariant(variant);
-          }
-        );
-        if (!creditsLineItems.length && !buysPrint) {
-          // Grant some credits from their non-credit payment, see comment on LedgerService
-          if (
-            userId &&
-            subtotalAmountCents &&
-            typeof paymentIntentId === 'string'
-          ) {
-            await LedgerService.grantCreditsForTip(
-              userId,
-              subtotalAmountCents,
-              paymentIntentId
-            );
-          } else {
-            console.warn(
-              'Stripe webhook missing required data to update ledger',
-              event
-            );
-          }
-        }
-        break;
-      }
-      // Used to track active subscriptions
-      case 'customer.subscription.deleted':
-      case 'customer.subscription.updated': {
-        const subscription = event.data.object;
-        const user = await UserService.getUserByStripeCustomerId(
-          subscription.customer as string
-        );
-        if (!user) {
-          console.warn('No user found for stripe customer id', subscription);
-          return;
-        }
-        if (event.type === 'customer.subscription.deleted') {
-          console.log('Subscription deleted', subscription);
-          await UserService.updateSupportSubscription(user.id, null);
-        } else if (
-          subscription.status === 'active' &&
-          user.stripeSupportSubscriptionId !== subscription.id
-        ) {
-          console.log('New subscription is active', subscription);
-          await UserService.updateSupportSubscription(user.id, subscription.id);
-        }
-        break;
-      }
-    }
-    res.status(200).send();
+router.post<'/', unknown, unknown, Buffer, unknown>('/', async (req, res) => {
+  let secret: string;
+  try {
+    secret = required(
+      process.env.STRIPE_WEBHOOK_SECRET || undefined,
+      'STRIPE_WEBHOOK_SECRET'
+    );
+  } catch (e) {
+    // No secret yet. A 503 makes Stripe retry later.
+    console.error('[Stripe webhook] Cannot check the signature', e);
+    return res.status(503).send();
   }
-);
+  let event: Stripe.Event;
+  try {
+    event = stripe.webhooks.constructEvent(
+      req.body,
+      req.get('stripe-signature') ?? '',
+      secret
+    );
+  } catch {
+    console.error('[Stripe webhook] Rejecting a delivery with a bad signature');
+    return res.status(400).send();
+  }
+  switch (event.type) {
+    case 'payment_intent.succeeded': {
+      const paymentIntent = event.data.object;
+      const email = paymentIntent.receipt_email;
+      if (email) {
+        await EmailCampaignService.addToMailingList(email, 'stripe');
+      }
+      break;
+    }
+    case 'checkout.session.async_payment_succeeded':
+    case 'checkout.session.completed': {
+      const session = event.data.object;
+      if (session.payment_status !== 'paid') {
+        console.warn('Checkout session was not paid', session);
+        break;
+      }
+      // Retrieve the session to expand the line items
+      const expandedSession = await stripe.checkout.sessions.retrieve(
+        session.id,
+        {
+          expand: [
+            'line_items',
+            'line_items.data.price.product',
+            'shipping_cost.shipping_rate',
+          ],
+        }
+      );
+      const paymentIntentId =
+        typeof session.payment_intent === 'string'
+          ? session.payment_intent
+          : null;
+      const subtotalAmountCents = session.amount_subtotal;
+
+      const userId = await UserService.attachStripeCustomerAndDetermineUserId(
+        expandedSession.customer as string,
+        expandedSession.metadata?.userId
+          ? parseInt(expandedSession.metadata.userId, 10)
+          : undefined,
+        expandedSession.customer_details?.email ?? undefined
+      );
+
+      // See if they purchased credits
+      const byProductType = groupBy(
+        expandedSession.line_items?.data,
+        (lineItem) =>
+          (
+            (lineItem.price?.product as Stripe.Product)
+              .metadata as ProductMetadata
+          )['product-type']
+      );
+
+      // A product tagged with a type this webhook does not know, or a merch product that is not
+      // tagged merch, would otherwise be dropped without an error. Stop before creating anything:
+      // a non-2xx reply asks Stripe to retry, which is safe because nothing was created. An
+      // untagged product that is not merch keeps being handled as it always was.
+      const unhandled = (expandedSession.line_items?.data ?? []).filter(
+        (lineItem) => {
+          const type = productMetadata(lineItem)['product-type'];
+          return type
+            ? !HANDLED_PRODUCT_TYPES.includes(type)
+            : !!productMetadata(lineItem)['merch-internal-variant'];
+        }
+      );
+      if (unhandled.length) {
+        console.error(
+          '[merch-alert] checkout session has line items with a product-type this webhook does not handle; nothing was created',
+          {
+            sessionId: session.id,
+            lineItems: unhandled.map((lineItem) => ({
+              id: lineItem.id,
+              productType: productMetadata(lineItem)['product-type'],
+            })),
+          }
+        );
+        return res.status(500).send();
+      }
+
+      const creditsLineItems = byProductType['color-credit'] ?? [];
+
+      // fulfill credit purchases
+      for (const creditsLineItem of creditsLineItems) {
+        const quantity = creditsLineItem.quantity;
+        if (typeof userId !== 'number') {
+          throw new Error('userId is missing from purchase of credits');
+        }
+        if (typeof quantity !== 'number') {
+          throw new Error('quantity is missing from purchase of credits');
+        }
+        console.log('Fulfilling purchase of credits', {
+          customer: session.customer,
+          userId,
+          quantity,
+        });
+        await LedgerService.grantCredits(
+          userId,
+          quantity,
+          paymentIntentId,
+          creditsLineItem.amount_subtotal || 0
+        );
+      }
+
+      const newItems = (byProductType['merch'] ?? []).flatMap(
+        merchLineItemToOrderItems
+      );
+      let provider: MerchProvider | undefined;
+      try {
+        // Older sessions have no provider.
+        const stamped = expandedSession.metadata?.[MERCH_PROVIDER_METADATA_KEY];
+        provider = !newItems.length
+          ? undefined
+          : (Object.values(MerchProvider).find((p) => p === stamped) ??
+            selectProviderForItems(newItems.map((item) => item.variant)));
+      } catch (e) {
+        // Our checkouts never mix printers, and the provider choice rejects a mix. Stop before
+        // creating anything: an order made from a mixed basket would take the session's
+        // idempotency key and leave the other items unfulfillable. A non-2xx reply asks Stripe
+        // to retry, which is safe because nothing was created.
+        console.error(
+          '[merch-alert] checkout session mixes printers; no order was created',
+          { sessionId: session.id, error: String(e) }
+        );
+        return res.status(500).send();
+      }
+      if (provider) {
+        const shippingDetails =
+          expandedSession.collected_information?.shipping_details;
+        const shippingAddress = {
+          name: shippingDetails?.name,
+          line1: shippingDetails?.address.line1 ?? undefined,
+          line2: shippingDetails?.address.line2 ?? undefined,
+          city: shippingDetails?.address.city ?? undefined,
+          stateCode: shippingDetails?.address.state ?? undefined,
+          postalCode: shippingDetails?.address.postal_code ?? undefined,
+          countryCode: shippingDetails?.address.country ?? undefined,
+        };
+
+        // Sessions made before shipping was quoted carry a fixed rate that names no method.
+        const shippingRate = expandedSession.shipping_cost?.shipping_rate as
+          Stripe.ShippingRate | undefined;
+        const {
+          shippingMethodMetadataKey: metadataKey,
+          defaultShippingMethod: fallback,
+        } = getFulfillmentProvider(provider);
+        let shippingMethod: string | undefined =
+          metadataKey && shippingRate?.metadata?.[metadataKey];
+        if (!shippingMethod && fallback) {
+          console.warn(
+            `Checkout has no ${provider} shipping method; defaulting to ${fallback}`,
+            { sessionId: session.id }
+          );
+          shippingMethod = fallback;
+        }
+
+        const order = await MerchOrderService.createMerchOrder(
+          userId,
+          session.id,
+          shippingAddress,
+          newItems,
+          provider,
+          shippingMethod
+        );
+
+        console.log('Created merch order', order);
+      }
+
+      // Print purchases are not tips, so they do not earn credits. They are found from the
+      // products on the session, so a print can never be credited because it was not turned
+      // into an order item.
+      const buysPrint = (expandedSession.line_items?.data ?? []).some(
+        (lineItem) => {
+          const variant = productMetadata(lineItem)['merch-internal-variant'];
+          return !!variant && isPrintVariant(variant);
+        }
+      );
+      if (!creditsLineItems.length && !buysPrint) {
+        // Grant some credits from their non-credit payment, see comment on LedgerService
+        if (
+          userId &&
+          subtotalAmountCents &&
+          typeof paymentIntentId === 'string'
+        ) {
+          await LedgerService.grantCreditsForTip(
+            userId,
+            subtotalAmountCents,
+            paymentIntentId
+          );
+        } else {
+          console.warn(
+            'Stripe webhook missing required data to update ledger',
+            event
+          );
+        }
+      }
+      break;
+    }
+    // Used to track active subscriptions
+    case 'customer.subscription.deleted':
+    case 'customer.subscription.updated': {
+      const subscription = event.data.object;
+      const user = await UserService.getUserByStripeCustomerId(
+        subscription.customer as string
+      );
+      if (!user) {
+        console.warn('No user found for stripe customer id', subscription);
+        return;
+      }
+      if (event.type === 'customer.subscription.deleted') {
+        console.log('Subscription deleted', subscription);
+        await UserService.updateSupportSubscription(user.id, null);
+      } else if (
+        subscription.status === 'active' &&
+        user.stripeSupportSubscriptionId !== subscription.id
+      ) {
+        console.log('New subscription is active', subscription);
+        await UserService.updateSupportSubscription(user.id, subscription.id);
+      }
+      break;
+    }
+  }
+  res.status(200).send();
+});
 
 export default router;

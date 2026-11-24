@@ -60,7 +60,8 @@ app.use(
 // TracingHandler creates a trace for every incoming request
 app.use(Sentry.Handlers.tracingHandler());
 
-// The WHCC signature check needs the raw body.
+// The Stripe and WHCC signature checks need the raw body.
+app.use('/stripe-webhooks', express.raw({ type: () => true }));
 app.use('/whcc-webhooks', express.raw({ type: () => true }));
 app.use(express.json());
 app.use(cookieParser());
