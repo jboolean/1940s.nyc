@@ -77,6 +77,25 @@ app.use(
   })
 );
 
+// API Gateway's access log only sees Cloudflare's IP, so log the real client here
+app.use((req, res, next) => {
+  res.on('finish', () => {
+    console.log(
+      JSON.stringify({
+        type: 'request',
+        ip: req.ip,
+        cfConnectingIp: req.get('cf-connecting-ip'),
+        method: req.method,
+        path: req.originalUrl,
+        status: res.statusCode,
+        userAgent: req.get('user-agent'),
+        referer: req.get('referer'),
+      })
+    );
+  });
+  next();
+});
+
 app.use(async (req, res, next) => {
   await createConnection();
   next();
