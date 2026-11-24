@@ -5,7 +5,8 @@ import { API_BASE } from 'utils/apiConstants';
 
 import Button, { ButtonStyledLink } from 'shared/components/Button';
 import recordEvent from 'shared/utils/recordEvent';
-import { usePrintOrdersEnabled } from '../../../shared/stores/FeatureFlagsStore';
+import { useFeatureFlag } from '../../../shared/stores/FeatureFlagsStore';
+import FeatureFlag from '../../../shared/types/FeatureFlag';
 import { useCorrectionsStore } from '../../Corrections';
 import { openPrintModal } from '../../PrintModal';
 import { ORDER_PRINT_EXTERNAL_LINK_MESSAGE } from '../../PrintModal/archivesLink';
@@ -19,7 +20,7 @@ export default function ImageButtons(): React.JSX.Element {
     (state) => state.initialize
   );
 
-  const printOrdersEnabled = usePrintOrdersEnabled();
+  const printOrdersEnabled = useFeatureFlag(FeatureFlag.PRINT_ORDERS);
 
   const orderPrintEvent = {
     category: 'Image Viewer',

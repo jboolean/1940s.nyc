@@ -28,10 +28,7 @@ async function openMap(page: Page, count: number): Promise<void> {
   await page.addInitScript((items) => {
     localStorage.setItem(
       'featureFlags',
-      JSON.stringify({
-        state: { 'print-orders': true, 'enable-sales': true },
-        version: 0,
-      })
+      JSON.stringify({ state: { 'print-orders': true }, version: 0 })
     );
     localStorage.setItem(
       'print-cart',
