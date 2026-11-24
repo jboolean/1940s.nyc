@@ -2,6 +2,7 @@ import React from 'react';
 import Button from 'shared/components/Button';
 import TextInput from 'shared/components/TextInput';
 import Modal from 'shared/components/Modal';
+import RecaptchaDisclosure from 'shared/components/RecaptchaDisclosure';
 import stylesheet from './NewsletterModal.less';
 import useNewsletterModalStore from './stores/NewsletterModalStore';
 
@@ -59,6 +60,7 @@ export default function NewsletterModal(): React.JSX.Element {
                 </Button>
               </div>
             </form>
+            <RecaptchaDisclosure />
             {errorMessage && <p className={stylesheet.error}>{errorMessage}</p>}
           </>
         )}

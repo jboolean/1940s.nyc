@@ -1,6 +1,7 @@
 import React from 'react';
 import Button from 'shared/components/Button';
 import Labeled from 'shared/components/Labeled';
+import RecaptchaDisclosure from 'shared/components/RecaptchaDisclosure';
 import TextInput from 'shared/components/TextInput';
 
 import stylesheet from './StorytellerInfo.less';
@@ -89,26 +90,7 @@ export default function StorytellerInfo({
         </a>
       </p>
 
-      {/* This text is legally required by reCAPTCHA because the badge is hidden */}
-      <p className={stylesheet.finePrint}>
-        This site is protected by reCAPTCHA and the Google{' '}
-        <a
-          href="https://policies.google.com/privacy"
-          target="_blank"
-          rel="noreferrer"
-        >
-          Privacy Policy
-        </a>{' '}
-        and{' '}
-        <a
-          href="https://policies.google.com/terms"
-          target="_blank"
-          rel="noreferrer"
-        >
-          Terms of Service
-        </a>{' '}
-        apply.
-      </p>
+      <RecaptchaDisclosure />
 
       <div className={stylesheet.buttons}>
         <Button

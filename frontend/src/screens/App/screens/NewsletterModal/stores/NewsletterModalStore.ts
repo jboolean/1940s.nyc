@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
 import api from 'shared/utils/api';
+import { executeRecaptcha } from 'shared/utils/grecaptcha';
 
 interface State {
   isOpen: boolean;
@@ -67,10 +68,15 @@ const useNewsletterModalStore = create(
       });
 
       try {
-        await api.post('/email-campaigns/mailing-list', {
-          address: email,
-          source: 'signup-form',
-        });
+        const recaptchaToken = await executeRecaptcha('mailing_list_signup');
+        await api.post(
+          '/email-campaigns/mailing-list',
+          {
+            address: email,
+            source: 'signup-form',
+          },
+          { headers: { 'X-Recaptcha-Token': recaptchaToken } }
+        );
 
         set((draft) => {
           draft.isSuccess = true;
