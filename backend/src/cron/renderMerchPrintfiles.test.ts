@@ -24,7 +24,11 @@ qb.getMany = getMany;
 
 jest.mock('../createConnection', () => ({
   AppDataSource: {
-    getRepository: () => ({ createQueryBuilder: () => qb, update }),
+    getRepository: () => ({
+      createQueryBuilder: () => qb,
+      update,
+      findOneByOrFail: () => Promise.resolve({ printfileToken: 'token' }),
+    }),
   },
 }));
 jest.mock('../business/color/ColorService', () => ({

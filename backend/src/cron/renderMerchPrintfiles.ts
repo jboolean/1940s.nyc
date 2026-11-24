@@ -1,3 +1,4 @@
+import { IsNull } from 'typeorm';
 import { AppDataSource } from '../createConnection';
 import { colorizeForPrint } from '../business/color/ColorService';
 import {
@@ -201,11 +202,18 @@ export default async function renderMerchPrintfiles(): Promise<void> {
       continue;
     }
 
-    item.printfileToken = item.printfileToken ?? newPrintfileToken();
-    await repository.update(item.id, {
-      printfileAttempts: attempts,
-      printfileToken: item.printfileToken,
-    });
+    await repository.update(item.id, { printfileAttempts: attempts });
+
+    // Overlapping runs may pick up the same item; only the first token written is kept.
+    if (!item.printfileToken) {
+      await repository.update(
+        { id: item.id, printfileToken: IsNull() },
+        { printfileToken: newPrintfileToken() }
+      );
+      item.printfileToken = (
+        await repository.findOneByOrFail({ id: item.id })
+      ).printfileToken;
+    }
 
     console.log('[merch] Rendering printfile for item', item.id);
     try {
