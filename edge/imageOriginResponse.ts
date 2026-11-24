@@ -8,7 +8,8 @@ export const handler: CloudFrontResponseHandler = async (event) => {
   // Get the requested URI
   const requestedUri = request.uri;
 
-  if (response.status === "404") {
+  // S3 returns 403 rather than 404 for missing keys when the caller lacks s3:ListBucket
+  if (response.status === "404" || response.status === "403") {
     const match = requestedUri.match(/^\/(\d+)\-(\w+)\/(.*)$/);
 
     // If they requested a specific width that does not exist, redirect to full width
