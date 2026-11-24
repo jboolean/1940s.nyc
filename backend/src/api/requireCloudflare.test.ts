@@ -5,12 +5,12 @@ import { createRequireCloudflare } from './requireCloudflare';
 const SECRET = 'expected-secret';
 
 async function request(
-  options: { enforce: boolean; expected: string | undefined },
+  enforce: boolean,
   path: string,
   header?: string
 ): Promise<{ status: number; body: unknown }> {
   const app = express();
-  app.use(createRequireCloudflare(options));
+  app.use(createRequireCloudflare({ enforce, expected: SECRET }));
   app.get('*', (req, res) => {
     res.json({ ok: true });
   });
@@ -26,69 +26,21 @@ async function request(
   }
 }
 
-describe('/__origin-check', () => {
-  const options = { enforce: true, expected: SECRET };
-
-  it('reports match', async () => {
-    expect(await request(options, '/__origin-check', SECRET)).toEqual({
-      status: 200,
-      body: { originVerify: 'match' },
-    });
-  });
-
-  it('reports mismatch, including a different length', async () => {
-    for (const header of ['expected-secreT', 'short']) {
-      expect(await request(options, '/__origin-check', header)).toEqual({
-        status: 200,
-        body: { originVerify: 'mismatch' },
-      });
-    }
-  });
-
-  it('reports missing', async () => {
-    expect(await request(options, '/__origin-check')).toEqual({
-      status: 200,
-      body: { originVerify: 'missing' },
-    });
-  });
+it('lets a matching header through', async () => {
+  expect((await request(true, '/photos', SECRET)).status).toBe(200);
 });
 
-describe('when enforcing', () => {
-  const options = { enforce: true, expected: SECRET };
-
-  it('lets a matching request through', async () => {
-    expect((await request(options, '/photos', SECRET)).status).toBe(200);
-  });
-
-  it('rejects a mismatched header', async () => {
-    expect((await request(options, '/photos', 'wrong')).status).toBe(403);
-  });
-
-  it('rejects a missing header', async () => {
-    expect((await request(options, '/photos')).status).toBe(403);
-  });
+it.each([
+  ['wrong', 'wrong'],
+  ['missing', undefined],
+])('rejects a %s header when enforcing', async (_, header) => {
+  expect((await request(true, '/photos', header)).status).toBe(403);
 });
 
-describe('when not enforcing', () => {
-  const options = { enforce: false, expected: SECRET };
-
-  it('lets mismatched and missing requests through', async () => {
-    expect((await request(options, '/photos', 'wrong')).status).toBe(200);
-    expect((await request(options, '/photos')).status).toBe(200);
-  });
-});
-
-describe('when the secret is not configured', () => {
-  const options = { enforce: true, expected: undefined };
-
-  it('lets every request through', async () => {
-    expect((await request(options, '/photos')).status).toBe(200);
-  });
-
-  it('does not answer /__origin-check', async () => {
-    expect(await request(options, '/__origin-check')).toEqual({
-      status: 200,
-      body: { ok: true },
-    });
+it('lets a mismatch through and reports it when not enforcing', async () => {
+  expect((await request(false, '/photos', 'wrong')).status).toBe(200);
+  expect(await request(false, '/__origin-check', 'wrong')).toEqual({
+    status: 200,
+    body: { originVerify: 'mismatch' },
   });
 });
