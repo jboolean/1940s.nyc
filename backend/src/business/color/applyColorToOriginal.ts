@@ -1,22 +1,9 @@
 import sharp from 'sharp';
 
-// CIE Lab D65 white point and XYZ-to-linear-sRGB matrix, matching libvips.
-const WHITE_X = 0.95047;
-const WHITE_Z = 1.088827;
-const EPSILON = 6 / 29;
-
-function labToXyzComponent(t: number): number {
-  return t > EPSILON ? t * t * t : 3 * EPSILON * EPSILON * (t - 4 / 29);
-}
-
-function linearToSrgb8(c: number): number {
-  const v = c <= 0.0031308 ? 12.92 * c : 1.055 * Math.pow(c, 1 / 2.4) - 0.055;
-  return Math.round(Math.min(1, Math.max(0, v)) * 255);
-}
-
-function asFloats(buffer: Buffer): Float32Array {
-  return new Float32Array(buffer.buffer, buffer.byteOffset, buffer.length / 4);
-}
+const LIGHTNESS = 0;
+const GREEN_RED = 1;
+const BLUE_YELLOW = 2;
+const JPEG_QUALITY = 95;
 
 /**
  * Lays the colour of `colorized` over `original`: lightness comes from the original, hue and chroma
@@ -30,52 +17,39 @@ export default async function applyColorToOriginal(
   const { autoOrient: originalSize } = await sharp(original).metadata();
   const { autoOrient: colorizedSize } = await sharp(colorized).metadata();
   const scale = Math.max(1, colorizedSize.width / originalSize.width);
+  const width = Math.round(originalSize.width * scale);
+  const height = Math.round(originalSize.height * scale);
 
-  const { data: lightnessData, info } = await sharp(original)
-    .rotate()
-    .resize(
-      Math.round(originalSize.width * scale),
-      Math.round(originalSize.height * scale),
-      { fit: 'fill' }
-    )
-    .toColourspace('lab')
-    .raw({ depth: 'float' })
-    .toBuffer({ resolveWithObject: true });
-  const { width, height } = info;
-
-  const { data: colorData } = await sharp(colorized)
-    .rotate()
-    .removeAlpha()
-    .resize(width, height, { fit: 'fill' })
-    .toColourspace('lab')
-    .raw({ depth: 'float' })
-    .toBuffer({ resolveWithObject: true });
-
-  const lightness = asFloats(lightnessData);
-  const color = asFloats(colorData);
-  const lightnessChannels = info.channels;
-  const rgb = Buffer.alloc(width * height * 3);
-
-  for (let i = 0; i < width * height; i++) {
-    const l = lightness[i * lightnessChannels];
-    const a = color[i * 3 + 1];
-    const b = color[i * 3 + 2];
-
-    const fy = (l + 16) / 116;
-    const x = WHITE_X * labToXyzComponent(fy + a / 500);
-    const y = labToXyzComponent(fy);
-    const z = WHITE_Z * labToXyzComponent(fy - b / 200);
-
-    rgb[i * 3] = linearToSrgb8(3.2404542 * x - 1.5371385 * y - 0.4985314 * z);
-    rgb[i * 3 + 1] = linearToSrgb8(
-      -0.969266 * x + 1.8760108 * y + 0.041556 * z
+  const labChannel = async (
+    image: Buffer,
+    channel: typeof LIGHTNESS | typeof GREEN_RED | typeof BLUE_YELLOW
+  ): Promise<Float32Array> => {
+    const data = await sharp(image)
+      .rotate()
+      .resize(width, height, { fit: 'fill' })
+      .toColourspace('lab')
+      .extractChannel(channel)
+      .raw({ depth: 'float' })
+      .toBuffer();
+    return new Float32Array(
+      data.buffer,
+      data.byteOffset,
+      data.length / Float32Array.BYTES_PER_ELEMENT
     );
-    rgb[i * 3 + 2] = linearToSrgb8(
-      0.0556434 * x - 0.2040259 * y + 1.0572252 * z
-    );
-  }
+  };
 
-  return sharp(rgb, { raw: { width, height, channels: 3 } })
-    .jpeg({ quality: 95 })
+  const [lightness, greenRed, blueYellow] = await Promise.all([
+    labChannel(original, LIGHTNESS),
+    labChannel(colorized, GREEN_RED),
+    labChannel(colorized, BLUE_YELLOW),
+  ]);
+
+  // Joined channels take on the output colourspace, so the bands are read as Lab. sharp's
+  // types only allow Buffers here, but like its constructor it takes float arrays as raw input.
+  const raw = { raw: { width, height, channels: 1 } } as const;
+  return sharp(lightness, raw)
+    .joinChannel([greenRed, blueYellow] as unknown as Buffer[], raw)
+    .toColourspace('lab')
+    .jpeg({ quality: JPEG_QUALITY })
     .toBuffer();
 }
