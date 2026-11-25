@@ -9,11 +9,10 @@ import {
   Security,
 } from '@tsoa/runtime';
 import * as express from 'express';
-import path from 'path';
 import { BadRequest } from 'http-errors';
 import Stripe from 'stripe';
 import * as ColorService from '../business/color/ColorService';
-import * as ColorizedUploadService from '../business/color/ColorizedUploadService';
+import * as ColorizedPhotoService from '../business/color/ColorizedPhotoService';
 import * as UserService from '../business/users/UserService';
 import isProduction from '../business/utils/isProduction';
 import required from '../business/utils/required';
@@ -32,11 +31,6 @@ const COLOR_CREDIT_PRODUCT_ID = isProduction()
 
 const MIN_QUANTITY = 10;
 const MAX_QUANTITY = 2000;
-
-type ColorizeUploadRequest = {
-  key: string;
-  filename: string;
-};
 
 @Route('colorization')
 export class ColorizationController extends Controller {
@@ -58,22 +52,13 @@ export class ColorizationController extends Controller {
   }
 
   @Security('netlify', ['moderator'])
-  @Post('/uploads')
-  public createUploadUrl(): Promise<{ key: string; url: string }> {
-    return ColorizedUploadService.createUploadUrl();
-  }
-
-  @Security('netlify', ['moderator'])
   @Post('/admin/colorize')
-  public async colorizeUpload(
-    @Body() body: ColorizeUploadRequest
+  public async colorizePhoto(
+    @Body() body: { identifier: string }
   ): Promise<{ url: string }> {
-    const baseName = path.parse(body.filename).name || 'photo';
-    const url = await ColorizedUploadService.colorizeUploadedImage(
-      body.key,
-      `${baseName}-colorized.jpg`
-    );
-    return { url };
+    return {
+      url: await ColorizedPhotoService.colorizeForDownload(body.identifier),
+    };
   }
 
   @Get('/billing/price')

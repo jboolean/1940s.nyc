@@ -1,7 +1,7 @@
 import axios, { HttpStatusCode } from 'axios';
 import React from 'react';
 import Button from 'shared/components/Button';
-import { colorizeUploadedImage } from 'shared/utils/ColorApi';
+import { colorizePhoto } from 'shared/utils/ColorApi';
 import stylesheet from './Colorize.less';
 
 const STATUSES_WITH_MESSAGES: number[] = [
@@ -10,18 +10,18 @@ const STATUSES_WITH_MESSAGES: number[] = [
 ];
 
 export default function Colorize(): React.JSX.Element {
-  const [file, setFile] = React.useState<File | null>(null);
+  const [identifier, setIdentifier] = React.useState('');
   const [isLoading, setIsLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
 
   const handleColorize = async (): Promise<void> => {
-    if (!file) {
+    if (!identifier) {
       return;
     }
     setIsLoading(true);
     setError(null);
     try {
-      window.location.href = await colorizeUploadedImage(file);
+      window.location.href = await colorizePhoto(identifier);
     } catch (err) {
       console.error('Colorization failed', err);
       const serverMessage =
@@ -40,15 +40,16 @@ export default function Colorize(): React.JSX.Element {
     <div className={stylesheet.container}>
       <h1>Colorize a Photo</h1>
       <input
-        type="file"
-        accept="image/jpeg,image/png,image/tiff,image/webp"
-        onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+        type="text"
+        placeholder="Photo identifier"
+        value={identifier}
+        onChange={(e) => setIdentifier(e.target.value.trim())}
         disabled={isLoading}
       />
       <Button
         buttonStyle="primary"
         onClick={() => void handleColorize()}
-        disabled={!file || isLoading}
+        disabled={!identifier || isLoading}
       >
         {isLoading ? 'Colorizing…' : 'Colorize'}
       </Button>

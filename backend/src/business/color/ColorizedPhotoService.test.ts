@@ -1,11 +1,13 @@
-import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import { NoSuchKey, PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import sharp from 'sharp';
-import { colorizeUploadedImage } from './ColorizedUploadService';
+import { colorizeForDownload } from './ColorizedPhotoService';
 import { colorizeImageWithAutoPromptBase64 } from '../utils/paletteApi';
 
 jest.mock('@aws-sdk/client-s3', () => {
   const send = jest.fn();
+  class NoSuchKey extends Error {}
   return {
+    NoSuchKey,
     S3Client: jest.fn(() => ({ send })),
     GetObjectCommand: jest.fn((input: unknown) => input),
     PutObjectCommand: jest.fn((input: unknown) => input),
@@ -21,7 +23,7 @@ jest.mock('../utils/paletteApi', () => ({
   colorizeImageWithAutoPromptBase64: jest.fn(),
 }));
 
-const UPLOAD_KEY = 'colorized-uploads-dev/0b5e3c1e-8a4f-4c2b-9d7e-2f6a1b3c4d5e';
+const IDENTIFIER = 'abc123';
 const send = new S3Client().send as jest.Mock;
 
 const jpeg = (background: string): Promise<Buffer> =>
@@ -29,13 +31,15 @@ const jpeg = (background: string): Promise<Buffer> =>
     .jpeg()
     .toBuffer();
 
-it('rejects a key outside the upload folder', async () => {
-  await expect(
-    colorizeUploadedImage('jpg/x.jpg', 'x.jpg')
-  ).rejects.toMatchObject({ statusCode: 400 });
+it('rejects an identifier with no original photo', async () => {
+  send.mockRejectedValue(new NoSuchKey({ message: '', $metadata: {} }));
+
+  await expect(colorizeForDownload('missing')).rejects.toMatchObject({
+    statusCode: 404,
+  });
 });
 
-it('writes the blended JPEG and returns its presigned URL', async () => {
+it('writes the blended full-resolution JPEG and returns its presigned URL', async () => {
   (colorizeImageWithAutoPromptBase64 as jest.Mock).mockResolvedValue({
     image: (await jpeg('red')).toString('base64'),
   });
@@ -43,20 +47,15 @@ it('writes the blended JPEG and returns its presigned URL', async () => {
     Body: { transformToByteArray: () => jpeg('gray') },
   });
 
-  const url = await colorizeUploadedImage(UPLOAD_KEY, 'photo.jpg');
+  const url = await colorizeForDownload(IDENTIFIER);
 
-  expect(url).toBe(`https://signed/${UPLOAD_KEY}-colorized.jpg`);
+  expect(url).toBe(`https://signed/colorized-full-resolution-dev/abc123.jpg`);
   const put = (
     (PutObjectCommand as unknown as jest.Mock).mock.calls as [
       { Key: string; ContentType: string; Body: Buffer },
     ][]
-  )
-    .map(([input]) => input)
-    .find((input) => input.Key === `${UPLOAD_KEY}-colorized.jpg`);
-  if (!put) {
-    throw new Error('The colorized image was not written to S3');
-  }
-  expect(put.ContentType).toBe('image/jpeg');
+  )[0][0];
+  expect(put.Key).toBe('colorized-full-resolution-dev/abc123.jpg');
   await expect(sharp(put.Body).metadata()).resolves.toMatchObject({
     format: 'jpeg',
     width: 20,

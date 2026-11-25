@@ -1,6 +1,7 @@
 import {
   GetObjectCommand,
   HeadObjectCommand,
+  NoSuchKey,
   PutObjectCommand,
   S3Client,
 } from '@aws-sdk/client-s3';
@@ -21,13 +22,24 @@ const PROMPT =
 
 type PaletteResolution = 'watermarked-sd' | 'sd' | '4k';
 
+export function getOriginalKey(identifier: string): string {
+  return `jpg/${identifier}.jpg`;
+}
+
 async function getSourceImage(sourceKey: string): Promise<Buffer> {
-  const s3Response = await s3.send(
-    new GetObjectCommand({
-      Bucket: BUCKET,
-      Key: sourceKey,
-    })
-  );
+  const s3Response = await s3
+    .send(
+      new GetObjectCommand({
+        Bucket: BUCKET,
+        Key: sourceKey,
+      })
+    )
+    .catch((error: unknown) => {
+      if (error instanceof NoSuchKey) {
+        throw new NotFound('Original image not found');
+      }
+      throw error;
+    });
 
   if (!s3Response.Body) {
     throw new NotFound('Original image not found');
@@ -107,7 +119,7 @@ export async function colorizeAtFullResolution(image: Buffer): Promise<Buffer> {
  */
 export async function colorizeForPrint(identifier: string): Promise<Buffer> {
   return colorizeAtFullResolution(
-    await getSourceImage(`jpg/${identifier}.jpg`)
+    await getSourceImage(getOriginalKey(identifier))
   );
 }
 
@@ -121,7 +133,7 @@ export async function getColorizedImage(
   identifier: string,
   userId: number
 ): Promise<string> {
-  const sourceKey = `jpg/${identifier}.jpg`;
+  const sourceKey = getOriginalKey(identifier);
   const destinationDirectory = isProduction() ? 'colorized' : 'colorized-dev';
   const destinationKey = `${destinationDirectory}/${identifier}.jpg`;
 
