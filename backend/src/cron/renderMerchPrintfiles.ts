@@ -1,5 +1,5 @@
 import { AppDataSource } from '../createConnection';
-import { colorizeForPrint } from '../business/color/ColorService';
+import { colorizePhotoAtFullResolution } from '../business/color/ColorService';
 import {
   getMerchLabel,
   getPrintfileExtensionForVariant,
@@ -110,7 +110,7 @@ async function renderPrint(
       buffer: await withTimeout(
         RENDER_TIMEOUT_MS,
         'Colorization',
-        colorizeForPrint(options.photoIdentifier)
+        colorizePhotoAtFullResolution(options.photoIdentifier)
       ),
     };
   }

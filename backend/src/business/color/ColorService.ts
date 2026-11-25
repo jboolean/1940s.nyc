@@ -97,10 +97,11 @@ export async function colorizeAtFullResolution(image: Buffer): Promise<Buffer> {
 }
 
 /**
- * Colorizes the full-resolution photo for printing.
- * Not metered against the user's credits: the customer paid for the print.
+ * Colorizes the full-resolution photo. Not metered against the user's credits.
  */
-export async function colorizeForPrint(identifier: string): Promise<Buffer> {
+export async function colorizePhotoAtFullResolution(
+  identifier: string
+): Promise<Buffer> {
   return colorizeAtFullResolution(
     await getSourceImage(`jpg/${identifier}.jpg`)
   );
@@ -109,7 +110,6 @@ export async function colorizeForPrint(identifier: string): Promise<Buffer> {
 /**
  * Colorizes the full-resolution photo, stores it, and returns a short-lived
  * signed URL that downloads it as an attachment.
- * Not metered: only moderators reach this.
  */
 export async function getFullResolutionDownloadUrl(
   identifier: string
@@ -121,7 +121,7 @@ export async function getFullResolutionDownloadUrl(
     new PutObjectCommand({
       Bucket: 'fourties-photos',
       Key: key,
-      Body: await colorizeForPrint(identifier),
+      Body: await colorizePhotoAtFullResolution(identifier),
       ContentType: 'image/jpeg',
     })
   );
