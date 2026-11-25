@@ -1,3 +1,4 @@
+import axios from 'axios';
 import api from 'utils/api';
 
 export async function redirectToCheckout(
@@ -35,4 +36,16 @@ export function getPriceAmount(): Promise<number> {
   return api
     .get<{ unitAmount: number }>('/colorization/billing/price')
     .then((resp) => resp.data.unitAmount);
+}
+
+export async function colorizeUploadedImage(image: File): Promise<string> {
+  const {
+    data: { key, url: uploadUrl },
+  } = await api.post<{ key: string; url: string }>('/colorization/uploads');
+  await axios.put(uploadUrl, image);
+  const resp = await api.post<{ url: string }>('/colorization/admin/colorize', {
+    key,
+    filename: image.name,
+  });
+  return resp.data.url;
 }

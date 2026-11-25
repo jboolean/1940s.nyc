@@ -12,6 +12,7 @@ import isProduction from '../utils/isProduction';
 import { colorizeImageWithAutoPromptBase64 } from '../utils/paletteApi';
 
 const s3 = new S3Client();
+export const BUCKET = 'fourties-photos';
 
 // A lot of engineering went into this prompt
 // One word can make a huge difference
@@ -23,7 +24,7 @@ type PaletteResolution = 'watermarked-sd' | 'sd' | '4k';
 async function getSourceImage(sourceKey: string): Promise<Buffer> {
   const s3Response = await s3.send(
     new GetObjectCommand({
-      Bucket: 'fourties-photos',
+      Bucket: BUCKET,
       Key: sourceKey,
     })
   );
@@ -52,23 +53,28 @@ async function colorizeImage(
   return Buffer.from(colorizedImageBase64, 'base64');
 }
 
+export async function colorizeS3Object(
+  sourceKey: string,
+  destinationKey: string,
+  colorize: (image: Buffer) => Promise<Buffer>
+): Promise<void> {
+  await s3.send(
+    new PutObjectCommand({
+      Bucket: BUCKET,
+      Key: destinationKey,
+      Body: await colorize(await getSourceImage(sourceKey)),
+      ContentType: 'image/jpeg',
+    })
+  );
+}
+
 async function createColorVersion(
   sourceKey: string,
   destinationKey: string,
   useTestingResolution: boolean
 ): Promise<void> {
-  const colorizedImage = await colorizeImage(
-    await getSourceImage(sourceKey),
-    useTestingResolution ? 'watermarked-sd' : 'sd'
-  );
-
-  await s3.send(
-    new PutObjectCommand({
-      Bucket: 'fourties-photos',
-      Key: destinationKey,
-      Body: colorizedImage,
-      ContentType: 'image/jpeg',
-    })
+  await colorizeS3Object(sourceKey, destinationKey, (image) =>
+    colorizeImage(image, useTestingResolution ? 'watermarked-sd' : 'sd')
   );
 }
 
@@ -123,7 +129,7 @@ export async function getColorizedImage(
   const headObjectResponse = await s3
     .send(
       new HeadObjectCommand({
-        Bucket: 'fourties-photos',
+        Bucket: BUCKET,
         Key: destinationKey,
       })
     )

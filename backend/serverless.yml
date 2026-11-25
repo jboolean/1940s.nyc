@@ -77,6 +77,25 @@ functions:
       - http:
           path: /{proxy+}
           method: ANY
+      # Routes the rest of /colorization explicitly, since adminColorize adds static resources
+      # under it.
+      - http:
+          path: /colorization/{proxy+}
+          method: ANY
+  # Colorizing at full resolution needs more memory and time than the app function has.
+  adminColorize:
+    handler: appHandler.handler
+    # API Gateway cuts off an integration at 29 seconds.
+    timeout: 29
+    memorySize: 2048
+    events:
+      - http:
+          path: /colorization/admin/colorize
+          method: POST
+      # The CORS preflight is answered by the Express app.
+      - http:
+          path: /colorization/admin/colorize
+          method: OPTIONS
   convertImage:
     enabled: '"${sls:stage}" == "production"'
     handler: convertImage.handler

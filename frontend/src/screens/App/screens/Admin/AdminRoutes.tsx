@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { Route, Routes } from 'react-router';
+import Colorize from './screens/Colorize';
 import LoginPage from './screens/LoginPage';
 import ReviewMerch from './screens/ReviewMerch';
 import ReviewStories from './screens/ReviewStories';
@@ -23,6 +24,14 @@ export default function AdminRoutes(): React.JSX.Element {
         element={
           <PrivateRoute>
             <ReviewMerch />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="colorize"
+        element={
+          <PrivateRoute>
+            <Colorize />
           </PrivateRoute>
         }
       />
