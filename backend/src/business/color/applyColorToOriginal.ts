@@ -20,14 +20,24 @@ function asFloats(buffer: Buffer): Float32Array {
 
 /**
  * Lays the colour of `colorized` over `original`: lightness comes from the original, hue and chroma
- * from the colorized image, at the original's full resolution.
+ * from the colorized image. The result keeps the original's aspect ratio at whichever of the two is
+ * wider.
  */
 export default async function applyColorToOriginal(
   original: Buffer,
   colorized: Buffer
 ): Promise<Buffer> {
+  const { autoOrient: originalSize } = await sharp(original).metadata();
+  const { autoOrient: colorizedSize } = await sharp(colorized).metadata();
+  const scale = Math.max(1, colorizedSize.width / originalSize.width);
+
   const { data: lightnessData, info } = await sharp(original)
     .rotate()
+    .resize(
+      Math.round(originalSize.width * scale),
+      Math.round(originalSize.height * scale),
+      { fit: 'fill' }
+    )
     .toColourspace('lab')
     .raw({ depth: 'float' })
     .toBuffer({ resolveWithObject: true });
