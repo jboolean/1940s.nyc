@@ -25,7 +25,7 @@ import getFulfillmentProvider, {
 } from './providers/getFulfillmentProvider';
 
 const API_BASE = isProduction()
-  ? 'http://api.1940s.nyc'
+  ? 'https://api.1940s.nyc'
   : 'http://dev.1940s.nyc:3000';
 
 function createOrderEmailTemplateData(order: MerchOrder): OrderTemplateData {
