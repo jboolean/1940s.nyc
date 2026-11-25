@@ -1,46 +1,20 @@
-import axios, { HttpStatusCode } from 'axios';
 import React from 'react';
 import Button from 'shared/components/Button';
-import { colorizePhoto } from 'shared/utils/ColorApi';
+import TextInput from 'shared/components/TextInput';
 import stylesheet from './Colorize.less';
-
-const STATUSES_WITH_MESSAGES: number[] = [
-  HttpStatusCode.BadRequest,
-  HttpStatusCode.NotFound,
-];
+import useColorizeStore from './stores/ColorizeStore';
 
 export default function Colorize(): React.JSX.Element {
-  const [identifier, setIdentifier] = React.useState('');
-  const [isLoading, setIsLoading] = React.useState(false);
-  const [error, setError] = React.useState<string | null>(null);
-
-  const handleColorize = async (): Promise<void> => {
-    if (!identifier) {
-      return;
-    }
-    setIsLoading(true);
-    setError(null);
-    try {
-      window.location.assign(await colorizePhoto(identifier));
-    } catch (err) {
-      console.error('Colorization failed', err);
-      const serverMessage =
-        axios.isAxiosError<{ error?: string }>(err) &&
-        err.response &&
-        STATUSES_WITH_MESSAGES.includes(err.response.status)
-          ? err.response.data?.error
-          : undefined;
-      setError(serverMessage ?? 'Colorization failed. Try again.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const identifier = useColorizeStore((state) => state.identifier);
+  const isLoading = useColorizeStore((state) => state.isLoading);
+  const error = useColorizeStore((state) => state.error);
+  const setIdentifier = useColorizeStore((state) => state.setIdentifier);
+  const colorize = useColorizeStore((state) => state.colorize);
 
   return (
     <div className={stylesheet.container}>
       <h1>Colorize a Photo</h1>
-      <input
-        type="text"
+      <TextInput
         placeholder="Photo identifier"
         value={identifier}
         onChange={(e) => setIdentifier(e.target.value.trim())}
@@ -48,7 +22,7 @@ export default function Colorize(): React.JSX.Element {
       />
       <Button
         buttonStyle="primary"
-        onClick={() => void handleColorize()}
+        onClick={() => void colorize()}
         disabled={!identifier || isLoading}
       >
         {isLoading ? 'Colorizing…' : 'Colorize'}
