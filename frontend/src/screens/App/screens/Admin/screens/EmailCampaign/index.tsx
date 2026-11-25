@@ -7,8 +7,13 @@ import stylesheet from './EmailCampaign.less';
 import useEmailCampaignStore from './stores/EmailCampaignStore';
 
 const DATE_FORMATTER = new Intl.DateTimeFormat('en-US', {
-  dateStyle: 'full',
-  timeStyle: 'short',
+  weekday: 'long',
+  month: 'long',
+  day: 'numeric',
+  year: 'numeric',
+  hour: 'numeric',
+  minute: '2-digit',
+  timeZoneName: 'long',
 });
 
 export default function EmailCampaign(): React.JSX.Element {
