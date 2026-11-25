@@ -6,6 +6,11 @@ import TextInput from 'shared/components/TextInput';
 import stylesheet from './EmailCampaign.less';
 import useEmailCampaignStore from './stores/EmailCampaignStore';
 
+const DATE_FORMATTER = new Intl.DateTimeFormat('en-US', {
+  dateStyle: 'full',
+  timeStyle: 'short',
+});
+
 export default function EmailCampaign(): React.JSX.Element {
   const template = useEmailCampaignStore((state) => state.template);
   const livemode = useEmailCampaignStore((state) => state.livemode);
@@ -60,7 +65,8 @@ export default function EmailCampaign(): React.JSX.Element {
       >
         <div className={stylesheet.confirmation}>
           <div>
-            Send template “{template}” on {new Date(sendOn).toLocaleString()}
+            Send template “{template}” on{' '}
+            {DATE_FORMATTER.format(new Date(sendOn))}
             {livemode ? ' to the whole mailing list' : ' in test mode'}?
           </div>
           {livemode && (
