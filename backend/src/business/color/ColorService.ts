@@ -19,6 +19,9 @@ const s3 = new S3Client();
 const PROMPT =
   'Outdoor photo of city street with stone buildings and sign, trees, apartment neighborhood. brooklyn newyorkcity. A dramatic contrast in natural color. ';
 
+const FULL_RESOLUTION_PREFIX = 'tmp/colorized-full';
+const FULL_RESOLUTION_DEV_PREFIX = 'tmp/colorized-full-dev';
+
 type PaletteResolution = 'watermarked-sd' | 'sd' | '4k';
 
 async function getSourceImage(sourceKey: string): Promise<Buffer> {
@@ -114,8 +117,10 @@ export async function colorizePhotoAtFullResolution(
 export async function getFullResolutionDownloadUrl(
   identifier: string
 ): Promise<string> {
-  const directory = isProduction() ? 'colorized' : 'colorized-dev';
-  const key = `${directory}/full/${identifier}.jpg`;
+  const prefix = isProduction()
+    ? FULL_RESOLUTION_PREFIX
+    : FULL_RESOLUTION_DEV_PREFIX;
+  const key = `${prefix}/${identifier}.jpg`;
 
   await s3.send(
     new PutObjectCommand({
