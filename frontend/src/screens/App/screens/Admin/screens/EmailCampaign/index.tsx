@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Button from 'shared/components/Button';
 import Checkbox from 'shared/components/Checkbox';
+import Modal from 'shared/components/Modal';
 import TextInput from 'shared/components/TextInput';
 import stylesheet from './EmailCampaign.less';
 import useEmailCampaignStore from './stores/EmailCampaignStore';
@@ -31,13 +32,11 @@ export default function EmailCampaign(): React.JSX.Element {
         placeholder="Template name"
         value={template}
         onChange={(e) => setTemplate(e.target.value.trim())}
-        disabled={isConfirming}
       />
       <label className={stylesheet.checkboxLabel}>
         <Checkbox
           checked={livemode}
           onChange={(e) => setLivemode(e.target.checked)}
-          disabled={isConfirming}
         />
         Live mode
       </label>
@@ -45,10 +44,20 @@ export default function EmailCampaign(): React.JSX.Element {
         type="date"
         value={sendOn}
         onChange={(e) => setSendOn(e.target.value)}
-        disabled={isConfirming}
       />
-      {isConfirming ? (
-        <>
+      <Button
+        buttonStyle="primary"
+        onClick={() => setIsConfirming(true)}
+        disabled={!template || !sendOn}
+      >
+        Send
+      </Button>
+      <Modal
+        isOpen={isConfirming}
+        onRequestClose={closeConfirmation}
+        size="small"
+      >
+        <div className={stylesheet.confirmation}>
           <div>
             Send template “{template}” on {sendOn}
             {livemode ? ' to the whole mailing list' : ' in test mode'}?
@@ -79,16 +88,8 @@ export default function EmailCampaign(): React.JSX.Element {
               Cancel
             </Button>
           </div>
-        </>
-      ) : (
-        <Button
-          buttonStyle="primary"
-          onClick={() => setIsConfirming(true)}
-          disabled={!template || !sendOn}
-        >
-          Send
-        </Button>
-      )}
+        </div>
+      </Modal>
       {isSent && <div>Campaign scheduled.</div>}
       {error && <div className={stylesheet.error}>{error}</div>}
     </div>
