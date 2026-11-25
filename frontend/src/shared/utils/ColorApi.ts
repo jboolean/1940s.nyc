@@ -36,3 +36,10 @@ export function getPriceAmount(): Promise<number> {
     .get<{ unitAmount: number }>('/colorization/billing/price')
     .then((resp) => resp.data.unitAmount);
 }
+
+export async function colorizePhoto(identifier: string): Promise<string> {
+  const resp = await api.post<{ url: string }>('/colorization/admin/colorize', {
+    identifier,
+  });
+  return resp.data.url;
+}

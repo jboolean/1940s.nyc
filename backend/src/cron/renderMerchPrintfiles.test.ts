@@ -1,7 +1,7 @@
 import MerchInternalVariant from '../enum/MerchInternalVariant';
 import MerchItemState from '../enum/MerchItemState';
 import MerchOrderState from '../enum/MerchOrderState';
-import { colorizeForPrint } from '../business/color/ColorService';
+import { colorizePhotoAtFullResolution } from '../business/color/ColorService';
 import renderToteBag from '../business/merch/renderToteBag';
 import renderMerchPrintfiles, {
   MAX_PRINTFILE_ATTEMPTS,
@@ -28,7 +28,9 @@ jest.mock('../createConnection', () => ({
   },
 }));
 jest.mock('../business/color/ColorService', () => ({
-  colorizeForPrint: jest.fn(() => Promise.resolve(Buffer.from('jpg'))),
+  colorizePhotoAtFullResolution: jest.fn(() =>
+    Promise.resolve(Buffer.from('jpg'))
+  ),
 }));
 jest.mock('../business/merch/renderToteBag', () => ({
   __esModule: true,
@@ -112,14 +114,16 @@ describe('renderMerchPrintfiles', () => {
       printItem(2, true),
       toteItem(3),
     ]);
-    jest.mocked(colorizeForPrint).mockResolvedValue(Buffer.from('jpg'));
+    jest
+      .mocked(colorizePhotoAtFullResolution)
+      .mockResolvedValue(Buffer.from('jpg'));
 
     await renderMerchPrintfiles();
 
     expect(update).toHaveBeenCalledWith(1, {
       state: MerchItemState.PRINTFILE_FAILED,
     });
-    expect(colorizeForPrint).toHaveBeenCalledTimes(1);
+    expect(colorizePhotoAtFullResolution).toHaveBeenCalledTimes(1);
     expect(update).toHaveBeenCalledWith(2, {
       state: MerchItemState.READY_FOR_FULFILLMENT,
     });
@@ -185,7 +189,9 @@ describe('renderMerchPrintfiles', () => {
 
   it('colorizes a colorized print and uploads the jpeg', async () => {
     getMany.mockResolvedValue([printItem(3, true)]);
-    jest.mocked(colorizeForPrint).mockResolvedValue(Buffer.from('jpg'));
+    jest
+      .mocked(colorizePhotoAtFullResolution)
+      .mockResolvedValue(Buffer.from('jpg'));
     await renderMerchPrintfiles();
 
     expect(uploadPrintfile).toHaveBeenCalledWith(3, 'jpg', expect.any(Buffer));
@@ -193,7 +199,9 @@ describe('renderMerchPrintfiles', () => {
 
   it('counts the attempt before calling out, and a failure does not stop other items', async () => {
     getMany.mockResolvedValue([printItem(1, true), printItem(2, false)]);
-    jest.mocked(colorizeForPrint).mockRejectedValue(new Error('palette down'));
+    jest
+      .mocked(colorizePhotoAtFullResolution)
+      .mockRejectedValue(new Error('palette down'));
     await renderMerchPrintfiles();
 
     const firstUpdate = update.mock.calls[0] as [number, object];
@@ -210,7 +218,7 @@ describe('renderMerchPrintfiles', () => {
   it('moves an item to printfile_failed once its attempts are used up', async () => {
     getMany.mockResolvedValue([printItem(1, true, MAX_PRINTFILE_ATTEMPTS)]);
     await renderMerchPrintfiles();
-    expect(colorizeForPrint).not.toHaveBeenCalled();
+    expect(colorizePhotoAtFullResolution).not.toHaveBeenCalled();
     expect(update).toHaveBeenCalledWith(1, {
       state: MerchItemState.PRINTFILE_FAILED,
     });

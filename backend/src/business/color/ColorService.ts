@@ -4,6 +4,7 @@ import {
   PutObjectCommand,
   S3Client,
 } from '@aws-sdk/client-s3';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { NotFound } from 'http-errors';
 import sharp from 'sharp';
 import applyColorToOriginal, { JPEG_QUALITY } from './applyColorToOriginal';
@@ -17,6 +18,9 @@ const s3 = new S3Client();
 // One word can make a huge difference
 const PROMPT =
   'Outdoor photo of city street with stone buildings and sign, trees, apartment neighborhood. brooklyn newyorkcity. A dramatic contrast in natural color. ';
+
+const FULL_RESOLUTION_PREFIX = 'tmp/colorized-full';
+const FULL_RESOLUTION_DEV_PREFIX = 'tmp/colorized-full-dev';
 
 type PaletteResolution = 'watermarked-sd' | 'sd' | '4k';
 
@@ -96,13 +100,43 @@ export async function colorizeAtFullResolution(image: Buffer): Promise<Buffer> {
 }
 
 /**
- * Colorizes the full-resolution photo for printing.
- * Not metered against the user's credits: the customer paid for the print.
+ * Colorizes the full-resolution photo. Not metered against the user's credits.
  */
-export async function colorizeForPrint(identifier: string): Promise<Buffer> {
+export async function colorizePhotoAtFullResolution(
+  identifier: string
+): Promise<Buffer> {
   return colorizeAtFullResolution(
     await getSourceImage(`jpg/${identifier}.jpg`)
   );
+}
+
+/**
+ * Colorizes the full-resolution photo, stores it, and returns a short-lived
+ * signed URL that downloads it as an attachment.
+ */
+export async function getFullResolutionDownloadUrl(
+  identifier: string
+): Promise<string> {
+  const prefix = isProduction()
+    ? FULL_RESOLUTION_PREFIX
+    : FULL_RESOLUTION_DEV_PREFIX;
+  const key = `${prefix}/${identifier}.jpg`;
+
+  await s3.send(
+    new PutObjectCommand({
+      Bucket: 'fourties-photos',
+      Key: key,
+      Body: await colorizePhotoAtFullResolution(identifier),
+      ContentType: 'image/jpeg',
+    })
+  );
+
+  const command = new GetObjectCommand({
+    Bucket: 'fourties-photos',
+    Key: key,
+    ResponseContentDisposition: 'attachment',
+  });
+  return await getSignedUrl(s3, command, { expiresIn: 60 });
 }
 
 /**
