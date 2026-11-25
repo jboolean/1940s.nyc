@@ -5,7 +5,8 @@ import {
   S3Client,
 } from '@aws-sdk/client-s3';
 import { NotFound } from 'http-errors';
-import applyColorToOriginal from './applyColorToOriginal';
+import sharp from 'sharp';
+import applyColorToOriginal, { JPEG_QUALITY } from './applyColorToOriginal';
 import * as LedgerService from '../ledger/LedgerService';
 import isProduction from '../utils/isProduction';
 import { colorizeImageWithAutoPromptBase64 } from '../utils/paletteApi';
@@ -71,13 +72,28 @@ async function createColorVersion(
   );
 }
 
+const EXIF_UPRIGHT_ORIENTATION = 1;
+
+// Palette is sent an upright JPEG, since the blend orients the original by its EXIF orientation.
+async function toUprightJpeg(image: Buffer): Promise<Buffer> {
+  const { format, orientation = EXIF_UPRIGHT_ORIENTATION } =
+    await sharp(image).metadata();
+  if (format === 'jpeg' && orientation === EXIF_UPRIGHT_ORIENTATION) {
+    return image;
+  }
+  return sharp(image).autoOrient().jpeg({ quality: JPEG_QUALITY }).toBuffer();
+}
+
 /**
  * Colorizes an image at the highest quality Palette offers. Palette returns a downscaled result, so
  * its colour is laid over the original to keep the original's detail. The result is never smaller
  * than either the original or Palette's output.
  */
 export async function colorizeAtFullResolution(image: Buffer): Promise<Buffer> {
-  return applyColorToOriginal(image, await colorizeImage(image, '4k'));
+  return applyColorToOriginal(
+    image,
+    await colorizeImage(await toUprightJpeg(image), '4k')
+  );
 }
 
 /**

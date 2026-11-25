@@ -3,7 +3,7 @@ import sharp from 'sharp';
 const LIGHTNESS = 0;
 const GREEN_RED = 1;
 const BLUE_YELLOW = 2;
-const JPEG_QUALITY = 95;
+export const JPEG_QUALITY = 95;
 
 /**
  * Lays the colour of `colorized` over `original`: lightness comes from the original, hue and chroma
@@ -25,7 +25,7 @@ export default async function applyColorToOriginal(
     channel: typeof LIGHTNESS | typeof GREEN_RED | typeof BLUE_YELLOW
   ): Promise<Float32Array> => {
     const data = await sharp(image)
-      .rotate()
+      .autoOrient()
       .resize(width, height, { fit: 'fill' })
       .toColourspace('lab')
       .extractChannel(channel)
