@@ -73,7 +73,8 @@ async function createColorVersion(
 
 /**
  * Colorizes an image at the highest quality Palette offers. Palette returns a downscaled result, so
- * its colour is laid over the original to keep the original's resolution and detail.
+ * its colour is laid over the original to keep the original's detail. The result is never smaller
+ * than either the original or Palette's output.
  */
 export async function colorizeAtFullResolution(image: Buffer): Promise<Buffer> {
   return applyColorToOriginal(image, await colorizeImage(image, '4k'));
