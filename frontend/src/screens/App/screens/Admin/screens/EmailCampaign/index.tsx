@@ -41,7 +41,7 @@ export default function EmailCampaign(): React.JSX.Element {
         Live mode
       </label>
       <TextInput
-        type="date"
+        type="datetime-local"
         value={sendOn}
         onChange={(e) => setSendOn(e.target.value)}
       />
@@ -59,7 +59,7 @@ export default function EmailCampaign(): React.JSX.Element {
       >
         <div className={stylesheet.confirmation}>
           <div>
-            Send template “{template}” on {sendOn}
+            Send template “{template}” on {new Date(sendOn).toLocaleString()}
             {livemode ? ' to the whole mailing list' : ' in test mode'}?
           </div>
           {livemode && (

@@ -55,8 +55,7 @@ const useEmailCampaignStore = create(
         await api.post('/email-campaigns/send-campaign', {
           template,
           livemode,
-          // Date-only strings parse as UTC midnight; send local midnight instead.
-          sendOn: new Date(`${sendOn}T00:00`),
+          sendOn: new Date(sendOn),
         });
         set((state) => {
           state.isSent = true;
