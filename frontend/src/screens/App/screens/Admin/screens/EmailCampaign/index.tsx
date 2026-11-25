@@ -12,16 +12,18 @@ const DATE_FORMATTER = new Intl.DateTimeFormat('en-US', {
 });
 
 export default function EmailCampaign(): React.JSX.Element {
-  const template = useEmailCampaignStore((state) => state.template);
-  const livemode = useEmailCampaignStore((state) => state.livemode);
-  const sendOn = useEmailCampaignStore((state) => state.sendOn);
-  const isLoading = useEmailCampaignStore((state) => state.isLoading);
-  const isSent = useEmailCampaignStore((state) => state.isSent);
-  const error = useEmailCampaignStore((state) => state.error);
-  const setTemplate = useEmailCampaignStore((state) => state.setTemplate);
-  const setLivemode = useEmailCampaignStore((state) => state.setLivemode);
-  const setSendOn = useEmailCampaignStore((state) => state.setSendOn);
-  const send = useEmailCampaignStore((state) => state.send);
+  const {
+    template,
+    livemode,
+    sendOn,
+    isLoading,
+    isSent,
+    error,
+    setTemplate,
+    setLivemode,
+    setSendOn,
+    send,
+  } = useEmailCampaignStore();
   const [isConfirming, setIsConfirming] = useState(false);
   const [isLiveConfirmed, setIsLiveConfirmed] = useState(false);
 
