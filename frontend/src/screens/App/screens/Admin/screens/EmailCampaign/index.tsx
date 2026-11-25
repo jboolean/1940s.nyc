@@ -30,6 +30,7 @@ export default function EmailCampaign(): React.JSX.Element {
       <h1>Send an Email Campaign</h1>
       <TextInput
         placeholder="Template name"
+        size={40}
         value={template}
         onChange={(e) => setTemplate(e.target.value.trim())}
       />
