@@ -1,4 +1,4 @@
-import { ServerClient, TemplatedMessage } from 'postmark';
+import { Errors, ServerClient, TemplatedMessage } from 'postmark';
 import { MessageSendingResponse } from 'postmark/dist/client/models';
 import isProduction from '../../utils/isProduction';
 import required from '../../utils/required';
@@ -16,6 +16,8 @@ const DEV_ALLOWED_DOMAINS = [
   '@bounce-testing.postmarkapp.com',
   'blackhole.postmarkapp.com',
 ];
+
+const TEMPLATE_NOT_FOUND_ERROR_CODE = 1101;
 
 const streamIds: Record<EmailStreamType, string> = {
   [EmailStreamType.TRANSACTIONAL]: 'outbound',
@@ -83,6 +85,24 @@ class PostmarkEmailService implements EmailService {
     const resp = await client.sendEmailBatchWithTemplates(apiParams);
 
     return resp.map((r) => PostmarkEmailService.mapPostmarkResponse(r));
+  }
+
+  async templateExists(
+    templateAlias: string,
+    livemode = true
+  ): Promise<boolean> {
+    try {
+      await this.getClient(livemode).getTemplate(templateAlias);
+      return true;
+    } catch (err) {
+      if (
+        err instanceof Errors.PostmarkError &&
+        err.code === TEMPLATE_NOT_FOUND_ERROR_CODE
+      ) {
+        return false;
+      }
+      throw err;
+    }
   }
 
   private static createApiMessage(

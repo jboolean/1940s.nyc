@@ -1,3 +1,4 @@
+import { BadRequest } from 'http-errors';
 import { toLower } from 'lodash';
 import { LessThan } from 'typeorm';
 import { AppDataSource } from '../../createConnection';
@@ -19,6 +20,9 @@ class EmailCampaignService {
   ): Promise<void> {
     if (sendOn < new Date()) {
       throw new Error('Cannot schedule email campaign in the past');
+    }
+    if (!(await EmailService.templateExists(template, livemode))) {
+      throw new BadRequest(`Email template "${template}" does not exist`);
     }
 
     await AppDataSource.query(
