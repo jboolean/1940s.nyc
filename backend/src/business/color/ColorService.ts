@@ -5,6 +5,7 @@ import {
   S3Client,
 } from '@aws-sdk/client-s3';
 import { NotFound } from 'http-errors';
+import applyColorToOriginal from './applyColorToOriginal';
 import * as LedgerService from '../ledger/LedgerService';
 import isProduction from '../utils/isProduction';
 import { colorizeImageWithAutoPromptBase64 } from '../utils/paletteApi';
@@ -18,10 +19,7 @@ const PROMPT =
 
 type PaletteResolution = 'watermarked-sd' | 'sd' | '4k';
 
-async function colorizeSourceImage(
-  sourceKey: string,
-  resolution: PaletteResolution
-): Promise<Buffer> {
+async function getSourceImage(sourceKey: string): Promise<Buffer> {
   const s3Response = await s3.send(
     new GetObjectCommand({
       Bucket: 'fourties-photos',
@@ -33,12 +31,16 @@ async function colorizeSourceImage(
     throw new NotFound('Original image not found');
   }
 
-  // Create buffer from image
-  const buffer = Buffer.from(await s3Response.Body?.transformToByteArray());
+  return Buffer.from(await s3Response.Body.transformToByteArray());
+}
 
+async function colorizeImage(
+  image: Buffer,
+  resolution: PaletteResolution
+): Promise<Buffer> {
   const { image: colorizedImageBase64 } =
     await colorizeImageWithAutoPromptBase64({
-      image: buffer,
+      image,
       resolution: resolution,
       prompt: PROMPT,
       raw_captions: true,
@@ -54,8 +56,8 @@ async function createColorVersion(
   destinationKey: string,
   useTestingResolution: boolean
 ): Promise<void> {
-  const colorizedImage = await colorizeSourceImage(
-    sourceKey,
+  const colorizedImage = await colorizeImage(
+    await getSourceImage(sourceKey),
     useTestingResolution ? 'watermarked-sd' : 'sd'
   );
 
@@ -70,11 +72,21 @@ async function createColorVersion(
 }
 
 /**
- * Colorizes the full-resolution photo at the highest quality Palette offers, for printing.
+ * Colorizes an image at the highest quality Palette offers. Palette returns a downscaled result, so
+ * its colour is laid over the original to keep the original's resolution and detail.
+ */
+export async function colorizeAtFullResolution(image: Buffer): Promise<Buffer> {
+  return applyColorToOriginal(image, await colorizeImage(image, '4k'));
+}
+
+/**
+ * Colorizes the full-resolution photo for printing.
  * Not metered against the user's credits: the customer paid for the print.
  */
-export function colorizeForPrint(identifier: string): Promise<Buffer> {
-  return colorizeSourceImage(`jpg/${identifier}.jpg`, '4k');
+export async function colorizeForPrint(identifier: string): Promise<Buffer> {
+  return colorizeAtFullResolution(
+    await getSourceImage(`jpg/${identifier}.jpg`)
+  );
 }
 
 /**
