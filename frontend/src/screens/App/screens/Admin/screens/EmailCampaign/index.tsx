@@ -58,45 +58,43 @@ export default function EmailCampaign(): React.JSX.Element {
       >
         Send
       </Button>
-      <Modal
-        isOpen={isConfirming}
-        onRequestClose={closeConfirmation}
-        size="small"
-      >
-        <div className={stylesheet.confirmation}>
-          <div>
-            Send template “{template}” on{' '}
-            {DATE_FORMATTER.format(new Date(sendOn))}
-            {livemode ? ' to the whole mailing list' : ' in test mode'}?
-          </div>
-          {livemode && (
-            <label className={stylesheet.checkboxLabel}>
-              <Checkbox
-                checked={isLiveConfirmed}
-                onChange={(e) => setIsLiveConfirmed(e.target.checked)}
+      {isConfirming && (
+        <Modal isOpen onRequestClose={closeConfirmation} size="small">
+          <div className={stylesheet.confirmation}>
+            <div>
+              Send template “{template}” on{' '}
+              {DATE_FORMATTER.format(new Date(sendOn))}
+              {livemode ? ' to the whole mailing list' : ' in test mode'}?
+            </div>
+            {livemode && (
+              <label className={stylesheet.checkboxLabel}>
+                <Checkbox
+                  checked={isLiveConfirmed}
+                  onChange={(e) => setIsLiveConfirmed(e.target.checked)}
+                  disabled={isLoading}
+                />
+                I understand this emails real subscribers
+              </label>
+            )}
+            <div className={stylesheet.buttons}>
+              <Button
+                buttonStyle="primary"
+                onClick={() => void send().then(closeConfirmation)}
+                disabled={(livemode && !isLiveConfirmed) || isLoading}
+              >
+                {isLoading ? 'Sending…' : 'Confirm send'}
+              </Button>
+              <Button
+                buttonStyle="secondary"
+                onClick={closeConfirmation}
                 disabled={isLoading}
-              />
-              I understand this emails real subscribers
-            </label>
-          )}
-          <div className={stylesheet.buttons}>
-            <Button
-              buttonStyle="primary"
-              onClick={() => void send().then(closeConfirmation)}
-              disabled={(livemode && !isLiveConfirmed) || isLoading}
-            >
-              {isLoading ? 'Sending…' : 'Confirm send'}
-            </Button>
-            <Button
-              buttonStyle="secondary"
-              onClick={closeConfirmation}
-              disabled={isLoading}
-            >
-              Cancel
-            </Button>
+              >
+                Cancel
+              </Button>
+            </div>
           </div>
-        </div>
-      </Modal>
+        </Modal>
+      )}
       {isSent && <div>Campaign scheduled.</div>}
       {error && <div className={stylesheet.error}>{error}</div>}
     </div>
