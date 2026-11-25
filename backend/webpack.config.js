@@ -66,6 +66,16 @@ module.exports = {
     minimize: isProduction,
     // Prevent webpack from optimizing away reflect-metadata
     sideEffects: false,
+    splitChunks: {
+      cacheGroups: {
+        vendor: {
+          test: /[\\/]node_modules[\\/]/,
+          name: 'vendor',
+          chunks: 'initial',
+          enforce: true,
+        },
+      },
+    },
   },
   devtool: isProduction ? false : 'eval-source-map',
   ignoreWarnings: [

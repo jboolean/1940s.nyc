@@ -152,6 +152,11 @@ functions:
 custom:
   webpack:
     webpackConfig: "webpack.config.js"
+    includeModules:
+      forceExclude:
+        - "@aws-sdk/client-s3"
+        - "@aws-sdk/s3-request-presigner"
+        - "@sparticuz/chromium"
   bucket: fourties-photos
   prodigiLiveOrdersEnabled:
     production: 'false'
