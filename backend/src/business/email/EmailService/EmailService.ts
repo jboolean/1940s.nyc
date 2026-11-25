@@ -27,4 +27,6 @@ export interface EmailService {
     options: TemplatedEmailData[],
     livemode?: boolean
   ): Promise<EmailResult[]>;
+
+  templateExists(templateAlias: string, livemode?: boolean): Promise<boolean>;
 }
