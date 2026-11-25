@@ -1,7 +1,6 @@
 import {
   GetObjectCommand,
   HeadObjectCommand,
-  NoSuchKey,
   PutObjectCommand,
   S3Client,
 } from '@aws-sdk/client-s3';
@@ -13,7 +12,6 @@ import isProduction from '../utils/isProduction';
 import { colorizeImageWithAutoPromptBase64 } from '../utils/paletteApi';
 
 const s3 = new S3Client();
-export const BUCKET = 'fourties-photos';
 
 // A lot of engineering went into this prompt
 // One word can make a huge difference
@@ -22,24 +20,13 @@ const PROMPT =
 
 type PaletteResolution = 'watermarked-sd' | 'sd' | '4k';
 
-export function getOriginalKey(identifier: string): string {
-  return `jpg/${identifier}.jpg`;
-}
-
 async function getSourceImage(sourceKey: string): Promise<Buffer> {
-  const s3Response = await s3
-    .send(
-      new GetObjectCommand({
-        Bucket: BUCKET,
-        Key: sourceKey,
-      })
-    )
-    .catch((error: unknown) => {
-      if (error instanceof NoSuchKey) {
-        throw new NotFound('Original image not found');
-      }
-      throw error;
-    });
+  const s3Response = await s3.send(
+    new GetObjectCommand({
+      Bucket: 'fourties-photos',
+      Key: sourceKey,
+    })
+  );
 
   if (!s3Response.Body) {
     throw new NotFound('Original image not found');
@@ -65,28 +52,23 @@ async function colorizeImage(
   return Buffer.from(colorizedImageBase64, 'base64');
 }
 
-export async function colorizeS3Object(
-  sourceKey: string,
-  destinationKey: string,
-  colorize: (image: Buffer) => Promise<Buffer>
-): Promise<void> {
-  await s3.send(
-    new PutObjectCommand({
-      Bucket: BUCKET,
-      Key: destinationKey,
-      Body: await colorize(await getSourceImage(sourceKey)),
-      ContentType: 'image/jpeg',
-    })
-  );
-}
-
 async function createColorVersion(
   sourceKey: string,
   destinationKey: string,
   useTestingResolution: boolean
 ): Promise<void> {
-  await colorizeS3Object(sourceKey, destinationKey, (image) =>
-    colorizeImage(image, useTestingResolution ? 'watermarked-sd' : 'sd')
+  const colorizedImage = await colorizeImage(
+    await getSourceImage(sourceKey),
+    useTestingResolution ? 'watermarked-sd' : 'sd'
+  );
+
+  await s3.send(
+    new PutObjectCommand({
+      Bucket: 'fourties-photos',
+      Key: destinationKey,
+      Body: colorizedImage,
+      ContentType: 'image/jpeg',
+    })
   );
 }
 
@@ -119,21 +101,21 @@ export async function colorizeAtFullResolution(image: Buffer): Promise<Buffer> {
  */
 export async function colorizeForPrint(identifier: string): Promise<Buffer> {
   return colorizeAtFullResolution(
-    await getSourceImage(getOriginalKey(identifier))
+    await getSourceImage(`jpg/${identifier}.jpg`)
   );
 }
 
 /**
  * Colorizes an image and returns the URL to the image
  * @param identifier
- * @param userId
+ * @param userId the user to meter against; omit to colorize without metering
  * @returns
  */
 export async function getColorizedImage(
   identifier: string,
-  userId: number
+  userId?: number
 ): Promise<string> {
-  const sourceKey = getOriginalKey(identifier);
+  const sourceKey = `jpg/${identifier}.jpg`;
   const destinationDirectory = isProduction() ? 'colorized' : 'colorized-dev';
   const destinationKey = `${destinationDirectory}/${identifier}.jpg`;
 
@@ -141,16 +123,20 @@ export async function getColorizedImage(
   const headObjectResponse = await s3
     .send(
       new HeadObjectCommand({
-        Bucket: BUCKET,
+        Bucket: 'fourties-photos',
         Key: destinationKey,
       })
     )
     .catch(() => null);
 
   if (!headObjectResponse) {
-    await LedgerService.withMeteredUsage(userId, identifier, async () => {
-      await createColorVersion(sourceKey, destinationKey, !isProduction());
-    });
+    const create = (): Promise<void> =>
+      createColorVersion(sourceKey, destinationKey, !isProduction());
+    if (userId === undefined) {
+      await create();
+    } else {
+      await LedgerService.withMeteredUsage(userId, identifier, create);
+    }
   }
 
   return `https://photos.1940s.nyc/${destinationKey}`;

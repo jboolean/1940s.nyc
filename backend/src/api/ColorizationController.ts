@@ -12,7 +12,6 @@ import * as express from 'express';
 import { BadRequest } from 'http-errors';
 import Stripe from 'stripe';
 import * as ColorService from '../business/color/ColorService';
-import * as ColorizedPhotoService from '../business/color/ColorizedPhotoService';
 import * as UserService from '../business/users/UserService';
 import isProduction from '../business/utils/isProduction';
 import required from '../business/utils/required';
@@ -57,7 +56,7 @@ export class ColorizationController extends Controller {
     @Body() body: { identifier: string }
   ): Promise<{ url: string }> {
     return {
-      url: await ColorizedPhotoService.colorizeForDownload(body.identifier),
+      url: await ColorService.getColorizedImage(body.identifier),
     };
   }
 

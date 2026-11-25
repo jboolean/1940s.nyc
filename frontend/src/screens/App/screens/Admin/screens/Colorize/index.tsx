@@ -12,6 +12,7 @@ const STATUSES_WITH_MESSAGES: number[] = [
 export default function Colorize(): React.JSX.Element {
   const [identifier, setIdentifier] = React.useState('');
   const [isLoading, setIsLoading] = React.useState(false);
+  const [url, setUrl] = React.useState<string | null>(null);
   const [error, setError] = React.useState<string | null>(null);
 
   const handleColorize = async (): Promise<void> => {
@@ -20,8 +21,9 @@ export default function Colorize(): React.JSX.Element {
     }
     setIsLoading(true);
     setError(null);
+    setUrl(null);
     try {
-      window.location.href = await colorizePhoto(identifier);
+      setUrl(await colorizePhoto(identifier));
     } catch (err) {
       console.error('Colorization failed', err);
       const serverMessage =
@@ -53,6 +55,11 @@ export default function Colorize(): React.JSX.Element {
       >
         {isLoading ? 'Colorizing…' : 'Colorize'}
       </Button>
+      {url && (
+        <a href={url} target="_blank" rel="noreferrer">
+          <img src={url} alt="Colorized" />
+        </a>
+      )}
       {error && <div className={stylesheet.error}>{error}</div>}
     </div>
   );
