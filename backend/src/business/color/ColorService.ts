@@ -4,6 +4,7 @@ import {
   PutObjectCommand,
   S3Client,
 } from '@aws-sdk/client-s3';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { NotFound } from 'http-errors';
 import sharp from 'sharp';
 import applyColorToOriginal, { JPEG_QUALITY } from './applyColorToOriginal';
@@ -106,14 +107,42 @@ export async function colorizeForPrint(identifier: string): Promise<Buffer> {
 }
 
 /**
+ * Colorizes the full-resolution photo, stores it, and returns a short-lived
+ * signed URL that downloads it as an attachment.
+ * Not metered: only moderators reach this.
+ */
+export async function getFullResolutionDownloadUrl(
+  identifier: string
+): Promise<string> {
+  const directory = isProduction() ? 'colorized' : 'colorized-dev';
+  const key = `${directory}/full/${identifier}.jpg`;
+
+  await s3.send(
+    new PutObjectCommand({
+      Bucket: 'fourties-photos',
+      Key: key,
+      Body: await colorizeForPrint(identifier),
+      ContentType: 'image/jpeg',
+    })
+  );
+
+  const command = new GetObjectCommand({
+    Bucket: 'fourties-photos',
+    Key: key,
+    ResponseContentDisposition: 'attachment',
+  });
+  return await getSignedUrl(s3, command, { expiresIn: 60 });
+}
+
+/**
  * Colorizes an image and returns the URL to the image
  * @param identifier
- * @param userId the user to meter against; omit to colorize without metering
+ * @param userId
  * @returns
  */
 export async function getColorizedImage(
   identifier: string,
-  userId?: number
+  userId: number
 ): Promise<string> {
   const sourceKey = `jpg/${identifier}.jpg`;
   const destinationDirectory = isProduction() ? 'colorized' : 'colorized-dev';
@@ -130,13 +159,9 @@ export async function getColorizedImage(
     .catch(() => null);
 
   if (!headObjectResponse) {
-    const create = (): Promise<void> =>
-      createColorVersion(sourceKey, destinationKey, !isProduction());
-    if (userId === undefined) {
-      await create();
-    } else {
-      await LedgerService.withMeteredUsage(userId, identifier, create);
-    }
+    await LedgerService.withMeteredUsage(userId, identifier, async () => {
+      await createColorVersion(sourceKey, destinationKey, !isProduction());
+    });
   }
 
   return `https://photos.1940s.nyc/${destinationKey}`;

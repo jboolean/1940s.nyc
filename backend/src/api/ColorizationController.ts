@@ -9,9 +9,11 @@ import {
   Security,
 } from '@tsoa/runtime';
 import * as express from 'express';
-import { BadRequest } from 'http-errors';
+import { BadRequest, NotFound } from 'http-errors';
 import Stripe from 'stripe';
 import * as ColorService from '../business/color/ColorService';
+import { AppDataSource } from '../createConnection';
+import Photo from '../entities/Photo';
 import * as UserService from '../business/users/UserService';
 import isProduction from '../business/utils/isProduction';
 import required from '../business/utils/required';
@@ -55,8 +57,15 @@ export class ColorizationController extends Controller {
   public async colorizePhoto(
     @Body() body: { identifier: string }
   ): Promise<{ url: string }> {
+    const photoExists = await AppDataSource.getRepository(Photo).exists({
+      where: { identifier: body.identifier },
+    });
+    if (!photoExists) {
+      throw new NotFound();
+    }
+
     return {
-      url: await ColorService.getColorizedImage(body.identifier),
+      url: await ColorService.getFullResolutionDownloadUrl(body.identifier),
     };
   }
 
