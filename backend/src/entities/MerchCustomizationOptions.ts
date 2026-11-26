@@ -17,6 +17,7 @@ export interface ToteBagCustomizationOptions {
 export type PrintVariant =
   | MerchInternalVariant.PRINT_4X6
   | MerchInternalVariant.PRINT_8X12
+  | MerchInternalVariant.PRINT_10X15
   | MerchInternalVariant.FRAMED_PRINT_8X12_WALL
   | MerchInternalVariant.FRAMED_PRINT_5X7_EASEL;
 

@@ -141,6 +141,7 @@ function render(
       return renderTote(item, options);
     case MerchInternalVariant.PRINT_4X6:
     case MerchInternalVariant.PRINT_8X12:
+    case MerchInternalVariant.PRINT_10X15:
     case MerchInternalVariant.FRAMED_PRINT_8X12_WALL:
     case MerchInternalVariant.FRAMED_PRINT_5X7_EASEL:
       if (!isPrintOptions(options)) {

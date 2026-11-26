@@ -15,6 +15,9 @@ const MERCH_PRODUCT_IDS: Record<MerchInternalVariant, string | undefined> = {
   [MerchInternalVariant.PRINT_8X12]: isProduction()
     ? 'prod_Vfcu23HuC06cNI'
     : 'prod_Vfbm7xcuGExM5a',
+  [MerchInternalVariant.PRINT_10X15]: isProduction()
+    ? 'prod_VhFnRr3y7g5WZ1'
+    : 'prod_VhFjz3hUOfAHpD',
   [MerchInternalVariant.FRAMED_PRINT_8X12_WALL]: isProduction()
     ? 'prod_VfcsY7jC9HCuWc'
     : 'prod_Vfbmgj1EFyu4Fp',

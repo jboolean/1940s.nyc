@@ -41,6 +41,13 @@ export const MERCH_CATALOG = {
     provider: MerchProvider.WHCC,
     printfileExtension: 'jpg',
   },
+  [MerchInternalVariant.PRINT_10X15]: {
+    label: '10×15 print',
+    description: lustrePhotoPrintDescription(10, 15),
+    kind: 'print',
+    provider: MerchProvider.WHCC,
+    printfileExtension: 'jpg',
+  },
   [MerchInternalVariant.FRAMED_PRINT_8X12_WALL]: {
     label: '8×12 framed wall print',
     // Note this does not describe the prodigi one accurately, only use when whcc is active
