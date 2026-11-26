@@ -26,6 +26,22 @@ const whccPhotoPrint = (size: string): WhccProduct => ({
   },
 });
 
+const whccFramedPrint = (size: string, backing: string): WhccProduct => ({
+  productRef: 'framed-print',
+  selections: {
+    size,
+    moulding: 'gallery_fine_black',
+    surface: 'photo_print',
+    photo_print: 'lustre_photo_print',
+    lamination: 'no',
+    mat: 'no',
+    acrylic: 'no',
+    dynamic_layout: 'no',
+    mounting: 'standard',
+    backing,
+  },
+});
+
 const prodigiSizing: Sizing = 'fitPrintArea';
 
 export const PRINT_PRODUCTS: PrintProduct[] = [
@@ -58,57 +74,21 @@ export const PRINT_PRODUCTS: PrintProduct[] = [
       attributes: { color: 'black' },
       sizing: prodigiSizing,
     },
-    [MerchProvider.WHCC]: {
-      productRef: 'framed-print',
-      selections: {
-        size: '8x12',
-        moulding: 'gallery_fine_black',
-        surface: 'photo_print',
-        photo_print: 'lustre_photo_print',
-        lamination: 'no',
-        mat: 'no',
-        acrylic: 'no',
-        dynamic_layout: 'no',
-        mounting: 'standard',
-        backing: 'wire_wall_hanger_paper_backing',
-      },
-    },
+    [MerchProvider.WHCC]: whccFramedPrint(
+      '8x12',
+      'wire_wall_hanger_paper_backing'
+    ),
   },
   {
     variant: MerchInternalVariant.FRAMED_PRINT_12X18_WALL,
-    [MerchProvider.WHCC]: {
-      productRef: 'framed-print',
-      selections: {
-        size: '12x18',
-        moulding: 'gallery_fine_black',
-        surface: 'photo_print',
-        photo_print: 'lustre_photo_print',
-        lamination: 'no',
-        mat: 'no',
-        acrylic: 'no',
-        dynamic_layout: 'no',
-        mounting: 'standard',
-        backing: 'wire_wall_hanger_paper_backing',
-      },
-    },
+    [MerchProvider.WHCC]: whccFramedPrint(
+      '12x18',
+      'wire_wall_hanger_paper_backing'
+    ),
   },
   {
     variant: MerchInternalVariant.FRAMED_PRINT_5X7_EASEL,
-    [MerchProvider.WHCC]: {
-      productRef: 'framed-print',
-      selections: {
-        size: '5x7',
-        moulding: 'gallery_fine_black',
-        surface: 'photo_print',
-        photo_print: 'lustre_photo_print',
-        lamination: 'no',
-        mat: 'no',
-        acrylic: 'no',
-        dynamic_layout: 'no',
-        mounting: 'standard',
-        backing: 'easel_back',
-      },
-    },
+    [MerchProvider.WHCC]: whccFramedPrint('5x7', 'easel_back'),
   },
 ];
 
