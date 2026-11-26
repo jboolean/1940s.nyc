@@ -306,7 +306,7 @@ router.post<'/', unknown, unknown, Stripe.Event, unknown>(
         );
         if (!user) {
           console.warn('No user found for stripe customer id', subscription);
-          return;
+          return res.status(200).send();
         }
         if (event.type === 'customer.subscription.deleted') {
           console.log('Subscription deleted', subscription);
