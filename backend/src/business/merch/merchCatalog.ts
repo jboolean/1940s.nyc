@@ -17,6 +17,9 @@ interface MerchVariantInfo {
 const lustrePhotoPrintDescription = (width: number, height: number): string =>
   `${width == 8 ? 'An' : 'A'} ${width}x${height}" paper print, professionally printed on archival semi-gloss lustre paper using a silver halide chemical process.`;
 
+const framedWallPrintDescription = (width: number, height: number): string =>
+  `${width == 8 ? 'An' : 'A'} ${width}×${height} inch lustre print in a ¾" wide smooth matte black MDF frame. No mat. Arrives with a wire hanger, ready to hang.`;
+
 // The one list of what we sell: the name and description the customer sees, how it is made, who
 // prints it and what the render cron writes. Every variant has to appear here, so a new one cannot
 // be sold without all of that.
@@ -51,16 +54,14 @@ export const MERCH_CATALOG = {
   [MerchInternalVariant.FRAMED_PRINT_8X12_WALL]: {
     label: '8×12 framed wall print',
     // Note this does not describe the prodigi one accurately, only use when whcc is active
-    description:
-      'An 8×12 inch lustre print in a ¾" wide smooth matte black MDF frame. No mat. Arrives with a wire hanger, ready to hang.',
+    description: framedWallPrintDescription(8, 12),
     kind: 'print',
     provider: MerchProvider.WHCC,
     printfileExtension: 'jpg',
   },
   [MerchInternalVariant.FRAMED_PRINT_12X18_WALL]: {
     label: '12×18 framed wall print',
-    description:
-      'A 12×18 inch lustre print in a ¾" wide smooth matte black MDF frame. No mat. Arrives with a wire hanger, ready to hang.',
+    description: framedWallPrintDescription(12, 18),
     kind: 'print',
     provider: MerchProvider.WHCC,
     printfileExtension: 'jpg',
