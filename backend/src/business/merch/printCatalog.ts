@@ -48,6 +48,10 @@ export const PRINT_PRODUCTS: PrintProduct[] = [
     [MerchProvider.WHCC]: whccPhotoPrint('8x12'),
   },
   {
+    variant: MerchInternalVariant.PRINT_10X15,
+    [MerchProvider.WHCC]: whccPhotoPrint('10x15'),
+  },
+  {
     variant: MerchInternalVariant.FRAMED_PRINT_8X12_WALL,
     [MerchProvider.PRODIGI]: {
       sku: 'GLOBAL-BOX-8X12',
