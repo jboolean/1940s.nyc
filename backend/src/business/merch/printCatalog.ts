@@ -26,6 +26,9 @@ const whccPhotoPrint = (size: string): WhccProduct => ({
   },
 });
 
+const WHCC_WALL_HANGER_BACKING = 'wire_wall_hanger_paper_backing';
+const WHCC_EASEL_BACKING = 'easel_back';
+
 const whccFramedPrint = (size: string, backing: string): WhccProduct => ({
   productRef: 'framed-print',
   selections: {
@@ -74,21 +77,15 @@ export const PRINT_PRODUCTS: PrintProduct[] = [
       attributes: { color: 'black' },
       sizing: prodigiSizing,
     },
-    [MerchProvider.WHCC]: whccFramedPrint(
-      '8x12',
-      'wire_wall_hanger_paper_backing'
-    ),
+    [MerchProvider.WHCC]: whccFramedPrint('8x12', WHCC_WALL_HANGER_BACKING),
   },
   {
     variant: MerchInternalVariant.FRAMED_PRINT_12X18_WALL,
-    [MerchProvider.WHCC]: whccFramedPrint(
-      '12x18',
-      'wire_wall_hanger_paper_backing'
-    ),
+    [MerchProvider.WHCC]: whccFramedPrint('12x18', WHCC_WALL_HANGER_BACKING),
   },
   {
     variant: MerchInternalVariant.FRAMED_PRINT_5X7_EASEL,
-    [MerchProvider.WHCC]: whccFramedPrint('5x7', 'easel_back'),
+    [MerchProvider.WHCC]: whccFramedPrint('5x7', WHCC_EASEL_BACKING),
   },
 ];
 
