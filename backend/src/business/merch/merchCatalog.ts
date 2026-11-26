@@ -57,6 +57,14 @@ export const MERCH_CATALOG = {
     provider: MerchProvider.WHCC,
     printfileExtension: 'jpg',
   },
+  [MerchInternalVariant.FRAMED_PRINT_12X18_WALL]: {
+    label: '12×18 framed wall print',
+    description:
+      'A 12×18 inch lustre print in a ¾" wide smooth matte black MDF frame. No mat. Arrives with a wire hanger, ready to hang.',
+    kind: 'print',
+    provider: MerchProvider.WHCC,
+    printfileExtension: 'jpg',
+  },
   [MerchInternalVariant.FRAMED_PRINT_5X7_EASEL]: {
     label: '5×7 framed tabletop print',
     description:

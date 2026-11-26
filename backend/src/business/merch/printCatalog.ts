@@ -75,6 +75,24 @@ export const PRINT_PRODUCTS: PrintProduct[] = [
     },
   },
   {
+    variant: MerchInternalVariant.FRAMED_PRINT_12X18_WALL,
+    [MerchProvider.WHCC]: {
+      productRef: 'framed-print',
+      selections: {
+        size: '12x18',
+        moulding: 'gallery_fine_black',
+        surface: 'photo_print',
+        photo_print: 'lustre_photo_print',
+        lamination: 'no',
+        mat: 'no',
+        acrylic: 'no',
+        dynamic_layout: 'no',
+        mounting: 'standard',
+        backing: 'wire_wall_hanger_paper_backing',
+      },
+    },
+  },
+  {
     variant: MerchInternalVariant.FRAMED_PRINT_5X7_EASEL,
     [MerchProvider.WHCC]: {
       productRef: 'framed-print',

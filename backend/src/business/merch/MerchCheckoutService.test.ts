@@ -243,6 +243,7 @@ describe('createMerchCheckoutSession', () => {
       MerchInternalVariant.PRINT_8X12,
       MerchInternalVariant.PRINT_10X15,
       MerchInternalVariant.FRAMED_PRINT_8X12_WALL,
+      MerchInternalVariant.FRAMED_PRINT_12X18_WALL,
       MerchInternalVariant.FRAMED_PRINT_5X7_EASEL,
     ];
     const ids = prints.map((variant) => live.getMerchProductId(variant));
