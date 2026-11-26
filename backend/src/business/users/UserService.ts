@@ -18,6 +18,8 @@ const ISSUER = `${STAGE}.1940s.nyc`;
 // This is to differentiate between user tokens and story tokens
 const SUBJECT_PREFIX = 'user:';
 
+const MAGIC_LINK_EXPIRY = '7d';
+
 export function createUserToken(userId: number): string {
   return jwt.sign({}, JWT_SECRET, {
     algorithm: 'HS256',
@@ -31,7 +33,7 @@ function createUserTokenForMagicLink(userId: number): string {
     algorithm: 'HS256',
     issuer: ISSUER,
     subject: SUBJECT_PREFIX + userId.toString(),
-    expiresIn: '1h',
+    expiresIn: MAGIC_LINK_EXPIRY,
   });
 }
 
