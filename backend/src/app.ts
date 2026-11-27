@@ -26,6 +26,7 @@ import PrintfulWebhooksResource from './api/PrintfulWebhooksResource';
 import ProdigiWebhooksResource from './api/ProdigiWebhooksResource';
 import WhccWebhooksResource from './api/WhccWebhooksResource';
 import StripeWebhooksResource from './api/StripeWebhooksResource';
+import requireCloudflare from './api/requireCloudflare';
 
 // Cloudflare -> CloudFront (edge-optimized API Gateway) -> API Gateway
 app.set('trust proxy', 3);
@@ -96,6 +97,8 @@ app.use((req, res, next) => {
   });
   next();
 });
+
+app.use(requireCloudflare);
 
 app.use(async (req, res, next) => {
   await createConnection();
