@@ -1,4 +1,6 @@
-import type { Request, Response } from 'express';
+import express from 'express';
+import type { AddressInfo } from 'node:net';
+import EmailCampaignService from '../business/email/EmailCampaignService';
 import * as LedgerService from '../business/ledger/LedgerService';
 import * as MerchOrderService from '../business/merch/MerchOrderService';
 import MerchInternalVariant from '../enum/MerchInternalVariant';
@@ -11,7 +13,10 @@ jest.mock('express-ipfilter', () => ({
     IpFilter: () => (_q: unknown, _r: unknown, next: () => void) => next(),
   },
 }));
-jest.mock('../business/email/EmailCampaignService', () => ({}));
+jest.mock('../business/email/EmailCampaignService', () => ({
+  __esModule: true,
+  default: { addToMailingList: jest.fn() },
+}));
 jest.mock('../business/ledger/LedgerService', () => ({
   grantCredits: jest.fn(),
   grantCreditsForTip: jest.fn(),
@@ -50,42 +55,97 @@ jest.mock('../business/users/UserService', () => ({
 }));
 jest.mock('../third-party/stripe', () => ({
   __esModule: true,
-  default: { checkout: { sessions: { retrieve: jest.fn() } } },
+  default: new (jest.requireActual<typeof import('stripe')>('stripe').default)(
+    'sk_test_unused'
+  ),
 }));
 
-type Handler = (req: Request, res: Response) => Promise<void>;
+const app = express();
+app.use('/stripe-webhooks', express.raw({ type: () => true }));
+app.use('/stripe-webhooks', router);
+const server = app.listen(0);
+const url = `http://127.0.0.1:${(server.address() as AddressInfo).port}/stripe-webhooks`;
+afterAll(() => server.close());
 
-async function deliver(session: object): Promise<number | undefined> {
-  jest
-    .mocked(stripe.checkout.sessions.retrieve)
-    .mockResolvedValue(session as never);
-  const layer = (
-    router as unknown as {
-      stack: Array<{ route?: { stack: Array<{ handle: Handler }> } }>;
-    }
-  ).stack.find((l) => l.route);
-  const status = jest.fn((code: number) => ({
-    statusCode: code,
-    send: jest.fn(),
-  }));
-  await (layer?.route as { stack: Array<{ handle: Handler }> }).stack[0].handle(
-    {
-      body: {
-        type: 'checkout.session.completed',
-        data: {
-          object: {
-            id: 'cs_1',
-            payment_status: 'paid',
-            amount_subtotal: 3800,
-            payment_intent: 'pi_1',
-          },
-        },
-      },
-    } as Request,
-    { status } as unknown as Response
-  );
-  return status.mock.calls[0]?.[0];
+process.env.STRIPE_WEBHOOK_SECRET = 'whsec_test';
+
+async function post(
+  event: object,
+  signature: (payload: string) => string | undefined = (payload) =>
+    stripe.webhooks.generateTestHeaderString({
+      payload,
+      secret: process.env.STRIPE_WEBHOOK_SECRET as string,
+    })
+): Promise<number> {
+  const payload = JSON.stringify(event);
+  const sig = signature(payload);
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(sig === undefined ? {} : { 'Stripe-Signature': sig }),
+    },
+    body: payload,
+  });
+  return res.status;
 }
+
+async function deliver(session: object): Promise<number> {
+  jest
+    .spyOn(stripe.checkout.sessions, 'retrieve')
+    .mockResolvedValue(session as never);
+  return post({
+    type: 'checkout.session.completed',
+    data: {
+      object: {
+        id: 'cs_1',
+        payment_status: 'paid',
+        amount_subtotal: 3800,
+        payment_intent: 'pi_1',
+      },
+    },
+  });
+}
+
+describe('signature', () => {
+  const addToMailingList = jest.mocked(EmailCampaignService.addToMailingList);
+  const event = {
+    type: 'payment_intent.succeeded',
+    data: { object: { receipt_email: 'a@example.com' } },
+  };
+  beforeEach(() => {
+    jest.clearAllMocks();
+    jest.spyOn(console, 'error').mockImplementation(() => undefined);
+  });
+
+  it('acts on a correctly signed event', async () => {
+    expect(await post(event)).toBe(200);
+    expect(addToMailingList).toHaveBeenCalledWith('a@example.com', 'stripe');
+  });
+
+  it.each([
+    ['missing', () => undefined],
+    [
+      'made with another secret',
+      (payload: string) =>
+        stripe.webhooks.generateTestHeaderString({
+          payload,
+          secret: 'whsec_other',
+        }),
+    ],
+    [
+      'made for a different body',
+      (payload: string) =>
+        stripe.webhooks.generateTestHeaderString({
+          payload: payload.replace('a@example.com', 'b@example.com'),
+          secret: process.env.STRIPE_WEBHOOK_SECRET as string,
+        }),
+    ],
+  ])('rejects a %s signature without acting', async (_name, signature) => {
+    expect(await post(event, signature)).toBe(400);
+    expect(addToMailingList).not.toHaveBeenCalled();
+  });
+});
 
 function printLineItem(overrides: object = {}): object {
   return {
