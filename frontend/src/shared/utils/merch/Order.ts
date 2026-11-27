@@ -6,6 +6,7 @@ export enum MerchInternalVariant {
   PRINT_8X12 = 'print-8x12',
   PRINT_10X15 = 'print-10x15',
   FRAMED_PRINT_8X12_WALL = 'framed-print-8x12-wall',
+  FRAMED_PRINT_12X18_WALL = 'framed-print-12x18-wall',
   FRAMED_PRINT_5X7_EASEL = 'framed-print-5x7-easel',
 }
 
@@ -23,6 +24,7 @@ export const PRINT_VARIANTS = [
   MerchInternalVariant.PRINT_8X12,
   MerchInternalVariant.PRINT_10X15,
   MerchInternalVariant.FRAMED_PRINT_8X12_WALL,
+  MerchInternalVariant.FRAMED_PRINT_12X18_WALL,
   MerchInternalVariant.FRAMED_PRINT_5X7_EASEL,
 ] as const;
 

@@ -14,8 +14,20 @@ interface MerchVariantInfo {
   printfileExtension: PrintfileExtension;
 }
 
+const article = (width: number): string => (width === 8 ? 'An' : 'A');
+
 const lustrePhotoPrintDescription = (width: number, height: number): string =>
-  `${width == 8 ? 'An' : 'A'} ${width}x${height}" paper print, professionally printed on archival semi-gloss lustre paper using a silver halide chemical process.`;
+  `${article(width)} ${width}x${height}" paper print, professionally printed on archival semi-gloss lustre paper using a silver halide chemical process.`;
+
+const WALL_HANGER_BACK = 'Arrives with a wire hanger, ready to hang.';
+const EASEL_BACK = 'Has an easel back so it stands on a desk or table.';
+
+const framedPrintDescription = (
+  width: number,
+  height: number,
+  back: string
+): string =>
+  `${article(width)} ${width}×${height} inch lustre print in a ¾" wide smooth matte black MDF frame. No mat. ${back}`;
 
 // The one list of what we sell: the name and description the customer sees, how it is made, who
 // prints it and what the render cron writes. Every variant has to appear here, so a new one cannot
@@ -51,16 +63,21 @@ export const MERCH_CATALOG = {
   [MerchInternalVariant.FRAMED_PRINT_8X12_WALL]: {
     label: '8×12 framed wall print',
     // Note this does not describe the prodigi one accurately, only use when whcc is active
-    description:
-      'An 8×12 inch lustre print in a ¾" wide smooth matte black MDF frame. No mat. Arrives with a wire hanger, ready to hang.',
+    description: framedPrintDescription(8, 12, WALL_HANGER_BACK),
+    kind: 'print',
+    provider: MerchProvider.WHCC,
+    printfileExtension: 'jpg',
+  },
+  [MerchInternalVariant.FRAMED_PRINT_12X18_WALL]: {
+    label: '12×18 framed wall print',
+    description: framedPrintDescription(12, 18, WALL_HANGER_BACK),
     kind: 'print',
     provider: MerchProvider.WHCC,
     printfileExtension: 'jpg',
   },
   [MerchInternalVariant.FRAMED_PRINT_5X7_EASEL]: {
     label: '5×7 framed tabletop print',
-    description:
-      'A 5×7 inch lustre print in a ¾" wide smooth matte black MDF frame. No mat. Has an easel back so it stands on a desk or table.',
+    description: framedPrintDescription(5, 7, EASEL_BACK),
     kind: 'print',
     provider: MerchProvider.WHCC,
     printfileExtension: 'jpg',
